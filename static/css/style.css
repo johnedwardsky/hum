@@ -880,27 +880,70 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     .placeholder-icon svg { width: 56px; height: 56px; }
     .placeholder-state h2 { font-size: 16px; }
 
-    /* Tabs: horizontal scroll */
+    /* Tabs: grid layout for mobile */
     .tabs-row {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 0;
+        flex-direction: column;
+        align-items: stretch;
+        overflow-x: visible;
+        padding-bottom: 12px;
+        gap: 12px;
+    }
+    .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
-        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        flex-shrink: 1;
     }
-    .tabs { gap: 0; flex-shrink: 0; }
-    .tab { padding: 0 12px 12px; font-size: 12.5px; white-space: nowrap; }
-    .btn-export { flex-shrink: 0; font-size: 12px; padding: 5px 10px; }
+    .tab {
+        padding: 10px 8px;
+        font-size: 12px;
+        white-space: normal;
+        text-align: center;
+        border-bottom: none;
+        border-radius: 8px;
+        background: #FFFFFF;
+        border: 1px solid var(--border);
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        height: 100%;
+    }
+    .tab.active {
+        background: rgba(197, 158, 63, 0.05);
+        border-color: var(--primary);
+    }
+    .export-wrapper {
+        width: 100%;
+    }
+    .btn-export {
+        width: 100%;
+        justify-content: center;
+        font-size: 13px;
+        padding: 10px;
+    }
 
-    /* Info strip: horizontal scroll */
+    /* Info strip: grid layout */
     .info-strip {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        border-radius: var(--radius-sm);
-        -webkit-overflow-scrolling: touch;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        overflow: visible;
+        padding: 0;
+        background: transparent;
+        border: none;
     }
-    .info-card { min-width: 160px; flex-shrink: 0; padding: 10px 14px; gap: 10px; }
-    .info-card-title { font-size: 11.5px; }
+    .info-card {
+        width: 100%;
+        padding: 10px 12px;
+        gap: 8px;
+        background: #FFFFFF;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 2px 6px rgba(46, 42, 32, 0.03);
+    }
+    .info-card-divider { display: none; }
+    .info-card-title { font-size: 11px; }
     .info-card-sub   { font-size: 10.5px; }
 
     .section-title { font-size: 14px; }
