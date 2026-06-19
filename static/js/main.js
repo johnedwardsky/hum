@@ -1236,4 +1236,839 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ============================================================
+    // COMPATIBILITY MODULE IMPLEMENTATION
+    // ============================================================
+
+    // Reusable city autocomplete helper
+    function initCityAutocomplete(inputId, latId, lonId, clearId, spinnerId, suggestionsId) {
+        const cityInput = document.getElementById(inputId);
+        const latHidden = document.getElementById(latId);
+        const lonHidden = document.getElementById(lonId);
+        const cityClear = document.getElementById(clearId);
+        const searchSpinner = document.getElementById(spinnerId);
+        const suggestions = document.getElementById(suggestionsId);
+
+        let debounce;
+        let activeIdx = -1;
+        let selectedCity = null;
+
+        cityClear.addEventListener('click', () => {
+            cityInput.value = '';
+            latHidden.value = '';
+            lonHidden.value = '';
+            selectedCity = null;
+            cityClear.classList.add('hidden');
+            closeSuggestions();
+            cityInput.focus();
+        });
+
+        cityInput.addEventListener('input', () => {
+            const q = cityInput.value.trim();
+            cityClear.classList.toggle('hidden', !q);
+            clearTimeout(debounce);
+            if (q.length < 2) { closeSuggestions(); return; }
+            
+            const cacheKey = q.toLowerCase();
+            if (geoCache.has(cacheKey)) {
+                renderSuggestions(geoCache.get(cacheKey));
+                return;
+            }
+            
+            debounce = setTimeout(() => fetchCities(q), 80);
+        });
+
+        cityInput.addEventListener('keydown', (e) => {
+            const items = suggestions.querySelectorAll('li');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); setActive(items, activeIdx + 1); }
+            if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(items, activeIdx - 1); }
+            if (e.key === 'Enter')     { e.preventDefault(); if (activeIdx > -1) pickSuggestion(items[activeIdx]); }
+            if (e.key === 'Escape')    { closeSuggestions(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!cityInput.contains(e.target) && !suggestions.contains(e.target)) closeSuggestions();
+        });
+
+        async function fetchCities(q) {
+            const cacheKey = q.toLowerCase();
+            if (geoCache.has(cacheKey)) {
+                renderSuggestions(geoCache.get(cacheKey));
+                return;
+            }
+            searchSpinner.classList.remove('hidden');
+            try {
+                const res  = await fetch(`/api/geocode?query=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    geoCache.set(cacheKey, data);
+                }
+                renderSuggestions(data);
+            } catch { closeSuggestions(); }
+            finally  { searchSpinner.classList.add('hidden'); }
+        }
+
+        function renderSuggestions(items) {
+            suggestions.innerHTML = '';
+            activeIdx = -1;
+            if (!items || !items.length) { closeSuggestions(); return; }
+
+            items.forEach(item => {
+                const li = document.createElement('li');
+                const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                icon.setAttribute('width', '14'); icon.setAttribute('height', '14');
+                icon.setAttribute('viewBox', '0 0 16 16'); icon.setAttribute('fill', 'none');
+                icon.classList.add('sug-icon');
+                icon.innerHTML = `<path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="#D4AF37" stroke-width="1.3"/><circle cx="8" cy="6" r="1.8" stroke="#D4AF37" stroke-width="1.3"/>`;
+
+                const body = document.createElement('div');
+                body.className = 'sug-body';
+                const parts = item.display_name.split(',');
+                const primary = parts.slice(0, 2).join(',').trim();
+                const sub = parts.slice(2).join(',').trim();
+
+                const nameEl = document.createElement('span');
+                nameEl.className = 'sug-name';
+                nameEl.textContent = primary;
+
+                const subEl = document.createElement('span');
+                subEl.className = 'sug-sub';
+                subEl.textContent = sub;
+
+                body.appendChild(nameEl);
+                if (sub) body.appendChild(subEl);
+                li.appendChild(icon);
+                li.appendChild(body);
+
+                li.dataset.lat  = item.lat;
+                li.dataset.lon  = item.lon;
+                li.dataset.name = primary;
+
+                li.addEventListener('click', () => pickSuggestion(li));
+                suggestions.appendChild(li);
+            });
+            suggestions.classList.add('open');
+        }
+
+        // Arrow navigation
+        function setActive(items, idx) {
+            items.forEach(i => i.classList.remove('active'));
+            activeIdx = Math.max(0, Math.min(idx, items.length - 1));
+            items[activeIdx].classList.add('active');
+        }
+
+        function pickSuggestion(li) {
+            selectedCity = { display: li.dataset.name, lat: parseFloat(li.dataset.lat), lon: parseFloat(li.dataset.lon) };
+            cityInput.value = li.dataset.name;
+            latHidden.value = li.dataset.lat;
+            lonHidden.value = li.dataset.lon;
+            cityClear.classList.remove('hidden');
+            closeSuggestions();
+        }
+
+        function closeSuggestions() {
+            suggestions.classList.remove('open');
+            suggestions.innerHTML = '';
+            activeIdx = -1;
+        }
+    }
+
+    // DOM References for Compatibility
+    const navModeNatal = document.getElementById('nav-mode-natal');
+    const navModeCompat = document.getElementById('nav-mode-compat');
+    const sidebar = document.querySelector('.sidebar');
+    const mainPanel = document.querySelector('.main-panel');
+    const compatLayout = document.getElementById('compat-layout');
+
+    const typeZodiacBtn = document.getElementById('type-zodiac-btn');
+    const typeSynastryBtn = document.getElementById('type-synastry-btn');
+    const zodiacInputCard = document.getElementById('zodiac-input-card');
+    const synastryInputCard = document.getElementById('synastry-input-card');
+
+    const compatInputView = document.getElementById('compat-input-view');
+    const compatResultView = document.getElementById('compat-result-view');
+    const btnCompatBack = document.getElementById('btn-compat-back');
+    const btnCompatExport = document.getElementById('btn-compat-export');
+
+    let currentCompatType = 'zodiac';
+
+    // Initialize Autocompletes
+    initCityAutocomplete('p1_city', 'p1_lat', 'p1_lon', 'p1-city-clear', 'p1-search-spinner', 'p1_suggestions');
+    initCityAutocomplete('p2_city', 'p2_lat', 'p2_lon', 'p2-city-clear', 'p2-search-spinner', 'p2_suggestions');
+
+    // GMT toggles for partners
+    let p1IsGmt = false;
+    const p1IsGmtHidden = document.getElementById('p1_is_gmt');
+    const p1RadioLocalDot = document.getElementById('p1-radio-local-dot');
+    const p1RadioGmtDot = document.getElementById('p1-radio-gmt-dot');
+    
+    document.getElementById('p1-radio-local').addEventListener('click', () => setP1Gmt(false));
+    document.getElementById('p1-radio-gmt').addEventListener('click', () => setP1Gmt(true));
+    
+    function setP1Gmt(val) {
+        p1IsGmt = val;
+        p1IsGmtHidden.value = val ? '1' : '0';
+        p1RadioLocalDot.classList.toggle('active', !val);
+        p1RadioGmtDot.classList.toggle('active', val);
+    }
+
+    let p2IsGmt = false;
+    const p2IsGmtHidden = document.getElementById('p2_is_gmt');
+    const p2RadioLocalDot = document.getElementById('p2-radio-local-dot');
+    const p2RadioGmtDot = document.getElementById('p2-radio-gmt-dot');
+    
+    document.getElementById('p2-radio-local').addEventListener('click', () => setP2Gmt(false));
+    document.getElementById('p2-radio-gmt').addEventListener('click', () => setP2Gmt(true));
+    
+    function setP2Gmt(val) {
+        p2IsGmt = val;
+        p2IsGmtHidden.value = val ? '1' : '0';
+        p2RadioLocalDot.classList.toggle('active', !val);
+        p2RadioGmtDot.classList.toggle('active', val);
+    }
+
+    // Set default dates for partners
+    document.getElementById('p1_birth_date').value = new Date().toLocaleDateString('en-CA');
+    document.getElementById('p2_birth_date').value = new Date().toLocaleDateString('en-CA');
+
+    // Mode navigation
+    navModeNatal.addEventListener('click', () => {
+        navModeNatal.classList.add('active');
+        navModeCompat.classList.remove('active');
+        sidebar.classList.remove('hidden');
+        mainPanel.classList.remove('hidden');
+        compatLayout.classList.add('hidden');
+        if (lastChart) {
+            resultsPanel.classList.remove('hidden');
+            placeholderState.classList.add('hidden');
+        } else {
+            placeholderState.classList.remove('hidden');
+            resultsPanel.classList.add('hidden');
+        }
+    });
+
+    navModeCompat.addEventListener('click', () => {
+        navModeCompat.classList.add('active');
+        navModeNatal.classList.remove('active');
+        sidebar.classList.add('hidden');
+        mainPanel.classList.add('hidden');
+        compatLayout.classList.remove('hidden');
+        if (isMobile()) {
+            sidebarCollapsible.classList.add('collapsed');
+            sidebarToggle.classList.add('collapsed');
+        }
+    });
+
+    // Compatibility sub-type switching
+    typeZodiacBtn.addEventListener('click', () => {
+        currentCompatType = 'zodiac';
+        typeZodiacBtn.classList.add('active');
+        typeSynastryBtn.classList.remove('active');
+        zodiacInputCard.classList.remove('hidden');
+        synastryInputCard.classList.add('hidden');
+    });
+
+    typeSynastryBtn.addEventListener('click', () => {
+        currentCompatType = 'synastry';
+        typeSynastryBtn.classList.add('active');
+        typeZodiacBtn.classList.remove('active');
+        synastryInputCard.classList.remove('hidden');
+        zodiacInputCard.classList.add('hidden');
+    });
+
+    // Back to inputs button
+    btnCompatBack.addEventListener('click', () => {
+        compatInputView.classList.remove('hidden');
+        compatResultView.classList.add('hidden');
+    });
+
+    // Zodiac calculate button click
+    const btnCalcZodiac = document.getElementById('btn-calculate-zodiac');
+    const zodiacP1Select = document.getElementById('zodiac-p1');
+    const zodiacP2Select = document.getElementById('zodiac-p2');
+
+    btnCalcZodiac.addEventListener('click', async () => {
+        const sign1 = zodiacP1Select.value;
+        const sign2 = zodiacP2Select.value;
+        
+        try {
+            const res = await fetch(`/api/zodiac_compatibility?sign1=${encodeURIComponent(sign1)}&sign2=${encodeURIComponent(sign2)}`);
+            const data = await res.json();
+            if (data.error) {
+                showToast(data.error);
+                return;
+            }
+            renderCompatResults(data, 'zodiac', sign1, sign2);
+        } catch (err) {
+            showToast("Ошибка при расчете совместимости");
+        }
+    });
+
+    // Synastry submit form
+    const synastryForm = document.getElementById('synastry-form');
+    const btnSubmitSynastry = document.getElementById('btn-submit-synastry');
+    const btnSpinnerSynastry = document.getElementById('btn-spinner-synastry');
+
+    synastryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const p1_birth_date = document.getElementById('p1_birth_date').value;
+        const p1_birth_time = document.getElementById('p1_birth_time').value;
+        const p1_lat = document.getElementById('p1_lat').value;
+        const p1_lon = document.getElementById('p1_lon').value;
+        const p1_city = document.getElementById('p1_city').value;
+        
+        const p2_birth_date = document.getElementById('p2_birth_date').value;
+        const p2_birth_time = document.getElementById('p2_birth_time').value;
+        const p2_lat = document.getElementById('p2_lat').value;
+        const p2_lon = document.getElementById('p2_lon').value;
+        const p2_city = document.getElementById('p2_city').value;
+        
+        if (!p1_birth_date || !p1_birth_time || !p1_lat || !p1_lon) {
+            showToast("Укажите полные данные Партнёра 1 (включая город)");
+            return;
+        }
+        if (!p2_birth_date || !p2_birth_time || !p2_lat || !p2_lon) {
+            showToast("Укажите полные данные Партнёра 2 (включая город)");
+            return;
+        }
+        
+        btnSubmitSynastry.disabled = true;
+        btnSpinnerSynastry.classList.remove('hidden');
+        
+        const payload = {
+            p1: {
+                birth_date: p1_birth_date,
+                birth_time: p1_birth_time,
+                lat: p1_lat,
+                lon: p1_lon,
+                is_gmt: p1IsGmt
+            },
+            p2: {
+                birth_date: p2_birth_date,
+                birth_time: p2_birth_time,
+                lat: p2_lat,
+                lon: p2_lon,
+                is_gmt: p2IsGmt
+            }
+        };
+        
+        try {
+            const res = await fetch('/api/synastry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.error) {
+                showToast(data.error);
+                return;
+            }
+            
+            // Inject cities display names into data for print report
+            data.p1_city_name = p1_city;
+            data.p2_city_name = p2_city;
+            
+            renderCompatResults(data, 'synastry');
+        } catch (err) {
+            showToast("Ошибка при расчете синастрии");
+        } finally {
+            btnSubmitSynastry.disabled = false;
+            btnSpinnerSynastry.classList.add('hidden');
+        }
+    });
+
+    // Helper functions for elements matching
+    function getElementClass(sign) {
+        const fire = ["Овен", "Лев", "Стрелец"];
+        const earth = ["Телец", "Дева", "Козерог"];
+        const air = ["Близнецы", "Весы", "Водолей"];
+        const water = ["Рак", "Скорпион", "Рыбы"];
+        
+        if (fire.includes(sign)) return "el-fire";
+        if (earth.includes(sign)) return "el-earth";
+        if (air.includes(sign)) return "el-air";
+        if (water.includes(sign)) return "el-water";
+        return "el-earth";
+    }
+
+    function getElementRu(sign) {
+        const fire = ["Овен", "Лев", "Стрелец"];
+        const earth = ["Телец", "Дева", "Козерог"];
+        const air = ["Близнецы", "Весы", "Водолей"];
+        const water = ["Рак", "Скорпион", "Рыбы"];
+        
+        if (fire.includes(sign)) return "Огонь";
+        if (earth.includes(sign)) return "Земля";
+        if (air.includes(sign)) return "Воздух";
+        if (water.includes(sign)) return "Вода";
+        return "Земля";
+    }
+
+    // Animation utilities
+    function animateScore(scoreElementId, circleBarId, targetScore) {
+        const scoreEl = document.getElementById(scoreElementId);
+        const circleBar = document.getElementById(circleBarId);
+        
+        const r = 56;
+        const circ = 2 * Math.PI * r;
+        const offsetVal = circ - (circ * targetScore / 100);
+        
+        if (circleBar) {
+            circleBar.style.strokeDasharray = circ;
+            circleBar.style.strokeDashoffset = circ;
+            circleBar.getBoundingClientRect(); // Reflow
+            circleBar.style.strokeDashoffset = offsetVal;
+        }
+        
+        let cur = 0;
+        const step = () => {
+            if (cur < targetScore) {
+                cur += Math.ceil((targetScore - cur) / 10) || 1;
+                scoreEl.textContent = cur + '%';
+                requestAnimationFrame(step);
+            } else {
+                scoreEl.textContent = targetScore + '%';
+            }
+        };
+        requestAnimationFrame(step);
+    }
+
+    function animateProgressBar(barId, scoreValId, targetScore) {
+        const bar = document.getElementById(barId);
+        const valEl = document.getElementById(scoreValId);
+        
+        bar.style.width = '0%';
+        bar.getBoundingClientRect(); // Reflow
+        bar.style.width = targetScore + '%';
+        
+        let cur = 0;
+        const step = () => {
+            if (cur < targetScore) {
+                cur += Math.ceil((targetScore - cur) / 10) || 1;
+                valEl.textContent = cur + '%';
+                requestAnimationFrame(step);
+            } else {
+                valEl.textContent = targetScore + '%';
+            }
+        };
+        requestAnimationFrame(step);
+    }
+
+    // Render results view
+    function renderCompatResults(data, type, sign1, sign2) {
+        // Show result view, hide inputs
+        compatInputView.classList.add('hidden');
+        compatResultView.classList.remove('hidden');
+
+        // Populate scores with animation
+        const overall = data.scores ? data.scores.overall : data.overall;
+        const love = data.scores ? data.scores.love : data.love;
+        const friendship = data.scores ? data.scores.friendship : data.friendship;
+        const work = data.scores ? data.scores.work : data.work;
+
+        animateScore('score-overall', 'score-circle-bar', overall);
+        animateProgressBar('bar-love', 'score-love', love);
+        animateProgressBar('bar-friendship', 'score-friendship', friendship);
+        animateProgressBar('bar-work', 'score-work', work);
+
+        // Populate text descriptions
+        document.getElementById('text-elements').textContent = data.elements_text || '—';
+        document.getElementById('text-description').textContent = data.description || '—';
+        document.getElementById('text-advice').textContent = data.advice || '—';
+
+        // Update print view texts
+        document.getElementById('print-compat-score-val').textContent = overall + '%';
+        document.getElementById('print-compat-love').textContent = love + '%';
+        document.getElementById('print-compat-friendship').textContent = friendship + '%';
+        document.getElementById('print-compat-work').textContent = work + '%';
+        document.getElementById('print-text-elements').textContent = data.elements_text || '—';
+        document.getElementById('print-text-description').textContent = data.description || '—';
+        document.getElementById('print-text-advice').textContent = data.advice || '—';
+
+        const printTimestamp = new Date().toLocaleString('ru-RU', {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        document.getElementById('print-compat-date-timestamp').textContent = 'Отчёт сформирован: ' + printTimestamp;
+
+        const visualTitle = document.getElementById('compat-visual-title');
+        const sCanvas = document.getElementById('synastry-canvas');
+
+        // Setup element badges
+        let s1 = '', s2 = '';
+        if (type === 'zodiac') {
+            s1 = sign1;
+            s2 = sign2;
+            
+            // Hide synastry elements
+            document.getElementById('synastry-legend').classList.add('hidden');
+            document.getElementById('synastry-aspects-card').classList.add('hidden');
+            document.getElementById('print-synastry-aspects-section').classList.add('hidden');
+
+            visualTitle.textContent = 'Союз стихий';
+            drawZodiacUnionGraphic(sign1, sign2, sCanvas, 320);
+
+            // Print info
+            document.getElementById('print-couple-details').innerHTML = `
+                <div style="font-weight:600;margin-bottom:6px;color:#AA7C11;">Быстрый экспресс-анализ</div>
+                <strong>Партнёр 1:</strong> Знак Зодиака ${sign1} (${getElementRu(sign1)})<br>
+                <strong>Партнёр 2:</strong> Знак Зодиака ${sign2} (${getElementRu(sign2)})
+            `;
+        } else {
+            s1 = data.p1.planets.find(p => p.name === "Солнце").formatted.sign;
+            s2 = data.p2.planets.find(p => p.name === "Солнце").formatted.sign;
+            
+            // Show synastry elements
+            document.getElementById('synastry-legend').classList.remove('hidden');
+            document.getElementById('synastry-aspects-card').classList.remove('hidden');
+            document.getElementById('print-synastry-aspects-section').classList.remove('hidden');
+
+            visualTitle.textContent = 'Звёздная карта союза';
+            drawSynastryChart(data, sCanvas, 340);
+
+            // Print info
+            const p1Meta = data.p1.metadata;
+            const p2Meta = data.p2.metadata;
+            document.getElementById('print-couple-details').innerHTML = `
+                <div style="font-weight:600;margin-bottom:6px;color:#AA7C11;">Точный синастрический расчёт</div>
+                <strong>Партнёр 1:</strong> родился ${p1Meta.birth_date_local} в ${p1Meta.birth_time_local} (${p1Meta.utc_offset}), г. ${data.p1_city_name || 'Не указан'}<br>
+                Солнце в знаке: ${s1} | Асцендент: ${data.p1.angles.ascendant.sign}<br><br>
+                <strong>Партнёр 2:</strong> родился ${p2Meta.birth_date_local} в ${p2Meta.birth_time_local} (${p2Meta.utc_offset}), г. ${data.p2_city_name || 'Не указан'}<br>
+                Солнце в знаке: ${s2} | Асцендент: ${data.p2.angles.ascendant.sign}
+            `;
+
+            // Populate aspect list
+            const aspectListEl = document.getElementById('synastry-aspects-list');
+            const printAspectListEl = document.getElementById('print-synastry-aspects-list');
+            aspectListEl.innerHTML = '';
+            printAspectListEl.innerHTML = '';
+
+            // Sort aspects by orb (most exact first)
+            const sortedAspects = [...data.aspects].sort((a, b) => a.orb - b.orb);
+
+            if (sortedAspects.length === 0) {
+                aspectListEl.innerHTML = '<div class="compat-card-subtitle" style="margin: 20px 0;">Мажорных межкарточных аспектов не обнаружено.</div>';
+                printAspectListEl.innerHTML = '<p style="font-size:9.5pt;color:#777;">Мажорных межкарточных аспектов не обнаружено.</p>';
+            } else {
+                sortedAspects.forEach(asp => {
+                    const typeLabel = asp.type === 'harmonic' ? 'Гармоничный' : 'Напряженный';
+                    const badgeClass = asp.type;
+                    
+                    // Web item
+                    const item = document.createElement('div');
+                    item.className = 'synastry-aspect-item';
+                    item.innerHTML = `
+                        <div class="synastry-aspect-header">
+                            <span class="synastry-aspect-symbols">${asp.p1_symbol} ${asp.aspect_symbol} ${asp.p2_symbol}</span>
+                            <span class="synastry-aspect-title">${asp.p1_planet} ${asp.aspect_name} ${asp.p2_planet}</span>
+                            <span class="synastry-aspect-badge ${badgeClass}">${typeLabel} (орб ${asp.orb}°)</span>
+                        </div>
+                        <p class="synastry-aspect-text">${asp.interpretation}</p>
+                    `;
+                    aspectListEl.appendChild(item);
+
+                    // Print item
+                    const printItem = document.createElement('div');
+                    printItem.className = 'print-synastry-aspect-card';
+                    printItem.innerHTML = `
+                        <div class="print-synastry-aspect-header">
+                            <span>${asp.p1_symbol} ${asp.aspect_symbol} ${asp.p2_symbol} &nbsp; ${asp.p1_planet} ${asp.aspect_name} ${asp.p2_planet}</span>
+                            <span style="color:${asp.type === 'harmonic' ? '#5E52B0' : '#CC593F'}">${typeLabel} (орб ${asp.orb}°)</span>
+                        </div>
+                        <p style="font-size:8pt;margin:4px 0 0 0;color:#4E493F;line-height:1.4;">${asp.interpretation}</p>
+                    `;
+                    printAspectListEl.appendChild(printItem);
+                });
+            }
+        }
+
+        // Set element badges text and classes
+        const badge1 = document.getElementById('badge-p1');
+        const badge2 = document.getElementById('badge-p2');
+        const el1 = getElementRu(s1);
+        const el2 = getElementRu(s2);
+        badge1.textContent = el1;
+        badge2.textContent = el2;
+        badge1.className = 'element-badge ' + getElementClass(s1);
+        badge2.className = 'element-badge ' + getElementClass(s2);
+    }
+
+    // Canvas drawing for Zodiac Union Union Graphic
+    function drawZodiacUnionGraphic(sign1, sign2, canvasEl, displayW) {
+        if (!canvasEl) return;
+        const scale = 2;
+        canvasEl.width = displayW * scale;
+        canvasEl.height = displayW * scale;
+        canvasEl.style.width = displayW + 'px';
+        canvasEl.style.height = displayW + 'px';
+        
+        const ctx = canvasEl.getContext('2d');
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        
+        const size = displayW;
+        const cx = size / 2;
+        const cy = size / 2;
+        
+        ctx.clearRect(0, 0, size, size);
+        
+        const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, size/2);
+        grad.addColorStop(0, '#FAF8F5');
+        grad.addColorStop(1, '#FFFFFF');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, size, size);
+        
+        ctx.beginPath();
+        ctx.arc(cx, cy, size/2 - 20, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(cx, cy, size/2 - 25, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        const getSym = (s) => ZODIAC_META.find(z => z.name === s)?.sym || '♈';
+        const getCol = (s) => {
+            const idx = ZODIAC_META.findIndex(z => z.name === s);
+            return ZODIAC_COLORS[idx >= 0 ? idx : 0];
+        };
+        
+        const sym1 = getSym(sign1);
+        const sym2 = getSym(sign2);
+        const col1 = getCol(sign1);
+        const col2 = getCol(sign2);
+        
+        ctx.font = '54px serif';
+        ctx.fillStyle = col1;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(sym1, cx - 60, cy);
+        
+        ctx.font = '54px serif';
+        ctx.fillStyle = col2;
+        ctx.fillText(sym2, cx + 60, cy);
+        
+        ctx.font = '28px sans-serif';
+        ctx.fillStyle = '#C59E3F';
+        ctx.fillText('❤️', cx, cy - 5);
+        
+        ctx.font = '500 13px Inter, sans-serif';
+        ctx.fillStyle = '#2E2A20';
+        ctx.fillText(`${sign1} + ${sign2}`, cx, cy + 60);
+    }
+
+    // Canvas drawing for exact Synastry Chart
+    function drawSynastryChart(data, canvasEl, displayW) {
+        if (!canvasEl) return;
+        const scale = 2;
+        canvasEl.width = displayW * scale;
+        canvasEl.height = displayW * scale;
+        canvasEl.style.width = displayW + 'px';
+        canvasEl.style.height = displayW + 'px';
+        
+        const ctx = canvasEl.getContext('2d');
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        
+        const size = displayW;
+        const cx = size / 2;
+        const cy = size / 2;
+        const R = size / 2 - 6;
+        const r1 = R * 0.82;
+        const r2 = R * 0.72;
+        const r3 = R * 0.60;
+        const r4 = R * 0.20;
+        
+        ctx.clearRect(0, 0, size, size);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw Zodiac ring
+        for (let i = 0; i < 12; i++) {
+            const startAngle = degToRad(i * 30 - 90);
+            const endAngle   = degToRad((i + 1) * 30 - 90);
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, R, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.04);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+            ctx.lineWidth   = 1;
+            ctx.stroke();
+
+            const midAngle = degToRad(i * 30 + 15 - 90);
+            const gx = cx + (R * 0.91) * Math.cos(midAngle);
+            const gy = cy + (R * 0.91) * Math.sin(midAngle);
+            ctx.font      = `bold 12px serif`;
+            ctx.fillStyle = ZODIAC_COLORS[i];
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(ZODIAC_META[i].sym, gx, gy);
+        }
+        
+        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
+        
+        // Align to Partner 1 Ascendant
+        const asc = data.p1.houses[0].longitude;
+        
+        // Partner 1 House lines
+        for (let i = 0; i < 12; i++) {
+            const hLon = data.p1.houses[i].longitude;
+            const angle = degToRad(lonToAngle(hLon, asc));
+            const x1 = cx + r2 * Math.cos(angle);
+            const y1 = cy + r2 * Math.sin(angle);
+            const x2 = cx + r3 * Math.cos(angle);
+            const y2 = cy + r3 * Math.sin(angle);
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            const hNext = data.p1.houses[(i + 1) % 12].longitude;
+            const midLon = (hLon + angularMid(hLon, hNext)) / 2;
+            const midAng = degToRad(lonToAngle(midLon, asc));
+            const hx = cx + (r2 + r3) / 2 * Math.cos(midAng);
+            const hy = cy + (r2 + r3) / 2 * Math.sin(midAng);
+            ctx.font      = '8px Inter, sans-serif';
+            ctx.fillStyle = '#C59E3F';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(toRoman(i + 1), hx, hy);
+        }
+        
+        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle='#FFFFFF'; ctx.fill(); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        
+        // Aspect lines between planets of P1 and P2
+        const ASPECTS_STYLES = {
+            'Соединение': 'rgba(197, 158, 63, 0.6)',
+            'Оппозиция': 'rgba(165, 120, 69, 0.6)',
+            'Тригон': 'rgba(94, 82, 176, 0.6)',
+            'Квадрат': 'rgba(204, 89, 63, 0.6)',
+            'Секстиль': 'rgba(119, 113, 102, 0.5)',
+        };
+        
+        const lineR = r3 - 28;
+        
+        data.aspects.forEach(asp => {
+            const a1 = degToRad(lonToAngle(asp.p1_longitude, asc));
+            const a2 = degToRad(lonToAngle(asp.p2_longitude, asc));
+            const x1 = cx + lineR * Math.cos(a1);
+            const y1 = cy + lineR * Math.sin(a1);
+            const x2 = cx + lineR * Math.cos(a2);
+            const y2 = cy + lineR * Math.sin(a2);
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = ASPECTS_STYLES[asp.aspect_name] || 'rgba(119, 113, 102, 0.4)';
+            ctx.lineWidth = 1.2;
+            if (asp.aspect_name === 'Квадрат') { ctx.setLineDash([4, 3]); }
+            else { ctx.setLineDash([]); }
+            ctx.stroke();
+            ctx.setLineDash([]);
+        });
+        
+        // Draw P1 Planets (Gold)
+        const rP1 = r2 - 12;
+        const placedP1 = [];
+        data.p1.planets.forEach(p => {
+            const meta = PLANET_META[p.name] || { sym: p.symbol };
+            let angle = lonToAngle(p.longitude, asc);
+            
+            for (let attempt = 0; attempt < 8; attempt++) {
+                if (!placedP1.some(a => Math.abs(angleDiff(a, angle)) < 11)) break;
+                angle += 12;
+            }
+            placedP1.push(angle);
+            
+            const rad = degToRad(angle);
+            const px = cx + rP1 * Math.cos(rad);
+            const py = cy + rP1 * Math.sin(rad);
+            
+            const dotR = degToRad(lonToAngle(p.longitude, asc));
+            const dx = cx + r2 * Math.cos(dotR);
+            const dy = cy + r2 * Math.sin(dotR);
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#C59E3F';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(dx, dy);
+            ctx.lineTo(px, py);
+            ctx.strokeStyle = 'rgba(197, 158, 63, 0.2)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            
+            ctx.font = '12px serif';
+            ctx.fillStyle = '#C59E3F';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(meta.sym, px, py);
+        });
+        
+        // Draw P2 Planets (Dark Slate)
+        const rP2 = r3 - 12;
+        const placedP2 = [];
+        data.p2.planets.forEach(p => {
+            const meta = PLANET_META[p.name] || { sym: p.symbol };
+            let angle = lonToAngle(p.longitude, asc);
+            
+            for (let attempt = 0; attempt < 8; attempt++) {
+                if (!placedP2.some(a => Math.abs(angleDiff(a, angle)) < 11)) break;
+                angle += 12;
+            }
+            placedP2.push(angle);
+            
+            const rad = degToRad(angle);
+            const px = cx + rP2 * Math.cos(rad);
+            const py = cy + rP2 * Math.sin(rad);
+            
+            const dotR = degToRad(lonToAngle(p.longitude, asc));
+            const dx = cx + r3 * Math.cos(dotR);
+            const dy = cy + r3 * Math.sin(dotR);
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#777166';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(dx, dy);
+            ctx.lineTo(px, py);
+            ctx.strokeStyle = 'rgba(119, 113, 102, 0.2)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            
+            ctx.font = '12px serif';
+            ctx.fillStyle = '#777166';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(meta.sym, px, py);
+        });
+    }
+
+    // Export PDF for Compatibility
+    btnCompatExport.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showToast("Подготовка печатной версии отчёта...");
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    });
+
 });

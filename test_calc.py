@@ -32,6 +32,40 @@ def run_test():
     print("\nHouses:")
     for h in res["houses"]:
         print(f"  {h['name']:<10}: {h['formatted']['formatted']}")
+        
+    print("\n=== Humantica Compatibility & Synastry Test ===")
+    import compatibility_data
+    
+    # 1. Test Zodiac Sign Compatibility
+    comp = compatibility_data.get_zodiac_compatibility("Овен", "Лев")
+    print("\nZodiac Compatibility (Овен + Лев):")
+    print(f"  Love score:       {comp['love']}% (Expected: 95%)")
+    print(f"  Friendship score: {comp['friendship']}% (Expected: 90%)")
+    print(f"  Business score:   {comp['work']}% (Expected: 85%)")
+    print(f"  Overall score:    {comp['overall']}%")
+    print(f"  Description:      {comp['description'][:60]}...")
+    
+    assert comp['love'] == 95, "Failed zodiac love score check!"
+    assert comp['overall'] > 80, "Failed zodiac overall score check!"
+    
+    # 2. Test Synastry Aspects & Scoring
+    # Mock some aspects
+    mock_aspects = [
+        {"p1_planet": "Венера", "p2_planet": "Марс", "aspect_name": "Соединение", "type": "harmonic"},
+        {"p1_planet": "Солнце", "p2_planet": "Луна", "aspect_name": "Тригон", "type": "harmonic"},
+        {"p1_planet": "Венера", "p2_planet": "Сатурн", "aspect_name": "Квадрат", "type": "tense"}
+    ]
+    scores = compatibility_data.calculate_synastry_scores(mock_aspects, "Овен", "Лев")
+    print("\nSynastry Scoring (Овен + Лев with mock aspects):")
+    print(f"  Love score:       {scores['love']}%")
+    print(f"  Friendship score: {scores['friendship']}%")
+    print(f"  Business score:   {scores['work']}%")
+    print(f"  Overall score:    {scores['overall']}%")
+    
+    # Base for Aries+Leo love is 95, Venus-Mars conjunction adds +12, Sun-Moon trine adds +15, Venus-Saturn square subtracts -10. Total: 95+12+15-10 = 112, clamped to 99.
+    assert scores['love'] == 99, f"Love score should be clamped to 99, got {scores['love']}"
+    print("\nAll tests passed successfully!")
 
 if __name__ == "__main__":
     run_test()
+
