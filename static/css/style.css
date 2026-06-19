@@ -980,181 +980,400 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     flex-shrink: 0;
 }
 
+/* Print report view (hidden on screen) */
+.print-report {
+    display: none;
+}
+
 /* ============================================================
-   Print & PDF Stylesheet
+   Print & PDF Stylesheet (A4 Single Page Layout)
    ============================================================ */
 @media print {
-    /* Hide background decor and non-printable layout elements */
-    header, 
-    .sidebar, 
-    .bottom-bar, 
-    .tabs-row, 
-    .footer-bar,
-    .btn-calculate,
-    button,
-    #btn-export,
-    .export-wrapper,
-    .logo-placeholder-container,
-    .placeholder-state {
+    /* Hide everything on screen */
+    body > *:not(#print-report) {
         display: none !important;
     }
 
-    /* Reset page layouts to default stream */
-    body, html {
-        background: #FFFFFF !important;
-        color: #2E2A20 !important;
-        font-size: 11pt !important;
+    /* Print container setup */
+    #print-report {
+        display: block !important;
         width: 100% !important;
-        height: auto !important;
+        max-width: 100% !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 10mm 15mm !important; /* Standard margins */
+        background: #FAF8F5 !important;
+        color: #2E2A20 !important;
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 10pt !important;
+        line-height: 1.4 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-sizing: border-box !important;
     }
 
-    .container {
+    /* Header styling */
+    .print-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding-bottom: 8px !important;
+    }
+
+    .print-header-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .print-logo {
+        fill: #C59E3F !important;
+        color: #C59E3F !important;
+    }
+
+    .print-brand-title {
+        font-family: 'Outfit', 'Inter', sans-serif !important;
+        font-size: 18pt !important;
+        font-weight: 700 !important;
+        color: #5E52B0 !important; /* Mockup brand accent */
+        letter-spacing: -0.5px !important;
+    }
+
+    .print-brand-divider {
+        color: #E5E1D8 !important;
+        font-size: 16pt !important;
+        font-weight: 300 !important;
+    }
+
+    .print-brand-subtitle {
+        font-size: 8.5pt !important;
+        color: #777166 !important;
+        font-weight: 400 !important;
+    }
+
+    .print-header-right {
+        font-size: 8pt !important;
+        color: #9E978A !important;
+        text-align: right !important;
+    }
+
+    .print-divider {
+        height: 1.5px !important;
+        background: #5E52B0 !important; /* Mockup brand accent line */
+        margin: 4px 0 16px 0 !important;
+        opacity: 0.8 !important;
+    }
+
+    /* Section title styling */
+    .print-section-title {
+        font-size: 12pt !important;
+        font-weight: 700 !important;
+        color: #5E52B0 !important;
+        letter-spacing: 0.5px !important;
+        margin-bottom: 12px !important;
+    }
+
+    /* Meta row & cards */
+    .print-meta-row {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .print-meta-card {
+        background: #FFFFFF !important;
+        border: 1px solid rgba(94, 82, 176, 0.12) !important;
+        border-radius: 8px !important;
+        padding: 10px 12px !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    .print-meta-icon {
+        color: #5E52B0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-top: 2px !important;
+    }
+
+    .print-meta-content {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+    }
+
+    .print-meta-label {
+        font-size: 7.5pt !important;
+        font-weight: 600 !important;
+        color: #9E978A !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3px !important;
+    }
+
+    .print-meta-val {
+        font-size: 9.5pt !important;
+        font-weight: 700 !important;
+        color: #2E2A20 !important;
+    }
+
+    .print-meta-sub {
+        font-size: 7.5pt !important;
+        color: #777166 !important;
+    }
+
+    /* Two column grid */
+    .print-main-grid {
+        display: grid !important;
+        grid-template-columns: 1.15fr 0.85fr !important;
+        gap: 24px !important;
+        margin-bottom: 16px !important;
+        align-items: start !important;
+    }
+
+    .print-column-title {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        color: #5E52B0 !important;
+        letter-spacing: 0.3px !important;
+        margin-bottom: 10px !important;
+        text-transform: uppercase !important;
+    }
+
+    /* Planets table styling */
+    .print-planets-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        background: #FFFFFF !important;
+        border: 1px solid rgba(94, 82, 176, 0.12) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
+    .print-planets-table th {
+        background: rgba(94, 82, 176, 0.05) !important;
+        color: #5E52B0 !important;
+        font-size: 7.5pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3px !important;
+        padding: 8px 10px !important;
+        text-align: left !important;
+        border-bottom: 1px solid rgba(94, 82, 176, 0.12) !important;
+    }
+
+    .print-planets-table td {
+        padding: 7px 10px !important;
+        font-size: 8.5pt !important;
+        border-bottom: 1px solid rgba(94, 82, 176, 0.06) !important;
+        color: #4E493F !important;
+    }
+
+    .print-planets-table tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    .print-planets-table td strong {
+        color: #2E2A20 !important;
+    }
+
+    .print-planets-table .lon-cell {
+        font-family: monospace !important;
+        font-size: 8pt !important;
+    }
+
+    /* Planet glyph and cell */
+    .print-planet-cell {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    .print-planet-glyph {
+        width: 20px !important;
+        height: 20px !important;
+        border-radius: 50% !important;
+        border: 1px solid rgba(197, 158, 63, 0.2) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 9pt !important;
+        font-family: serif !important;
+        background: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .print-sign-cell {
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+    }
+
+    .print-sign-glyph {
+        font-size: 11pt !important;
+        font-family: serif !important;
+    }
+
+    .print-retro-badge {
+        color: #E06D53 !important;
+        font-weight: 700 !important;
+        font-size: 8pt !important;
+    }
+
+    .print-retro-legend {
+        font-size: 7.5pt !important;
+        color: #9E978A !important;
+        margin-top: 6px !important;
+    }
+
+    .print-retro-legend span {
+        color: #E06D53 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Right column chart canvas */
+    .print-canvas-wrapper {
+        background: #FFFFFF !important;
+        border: 1px solid rgba(94, 82, 176, 0.12) !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-bottom: 12px !important;
+    }
+
+    .print-canvas-wrapper canvas {
         display: block !important;
         max-width: 100% !important;
-        width: 100% !important;
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
     }
 
-    main {
-        padding: 0 !important;
-        margin: 0 !important;
-        display: block !important;
-    }
-
-    .results-panel {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        padding: 0 !important;
-        gap: 0 !important;
-    }
-
-    /* Premium Report Header */
-    .results-panel::before {
-        content: "HUMANTICA — Персональный Астрологический Отчёт";
-        display: block;
-        font-family: 'Outfit', 'Inter', sans-serif;
-        font-size: 18pt;
-        font-weight: 700;
-        color: #C59E3F;
-        text-align: center;
-        margin-bottom: 24px;
-        border-bottom: 2px solid #C59E3F;
-        padding-bottom: 12px;
-    }
-
-    /* Force all tabs content to show for a complete printed report */
-    .tab-content {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        margin-bottom: 30px !important;
-        page-break-inside: avoid;
-    }
-
-    /* Center and size the natal chart canvas */
-    .chart-section {
-        border: none !important;
-        background: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 auto 30px !important;
-        page-break-inside: avoid;
-        text-align: center;
-    }
-
-    .chart-container {
+    /* Aspect legend */
+    .print-aspect-legend {
         display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px 14px !important;
+        padding: 8px 12px !important;
+        background: rgba(94, 82, 176, 0.03) !important;
+        border: 1px solid rgba(94, 82, 176, 0.08) !important;
+        border-radius: 6px !important;
         justify-content: center !important;
     }
 
-    .chart-container canvas {
-        max-width: 440px !important;
-        width: 440px !important;
-        height: 440px !important;
-        margin: 0 auto !important;
+    .print-aspect-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-size: 7.5pt !important;
+        color: #777166 !important;
     }
 
-    /* Tables layout side-by-side or stacked cleanly */
-    .tables-grid {
+    .aspect-line {
+        display: inline-block !important;
+        width: 16px !important;
+        height: 2px !important;
+        border-radius: 1px !important;
+    }
+
+    .aspect-conj { background: rgba(197, 158, 63, 0.8) !important; }
+    .aspect-trine { background: rgba(94, 82, 176, 0.8) !important; }
+    .aspect-square { background: rgba(204, 89, 63, 0.8) !important; border-top: 2px dashed rgba(204, 89, 63, 0.8) !important; height: 0 !important; }
+    .aspect-opp { background: rgba(165, 120, 69, 0.8) !important; }
+
+    /* House row styling */
+    .print-houses-row {
         display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: 24px !important;
-        page-break-inside: avoid;
-        margin-top: 20px;
+        grid-template-columns: repeat(12, 1fr) !important;
+        gap: 6px !important;
+        margin-bottom: 20px !important;
     }
 
-    .table-card {
-        border: 1px solid #E5E1D8 !important;
-        background: #FFF !important;
-        box-shadow: none !important;
-        page-break-inside: avoid;
+    .print-house-card {
+        background: #FFFFFF !important;
+        border: 1px solid rgba(94, 82, 176, 0.12) !important;
+        border-radius: 6px !important;
+        padding: 6px 4px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 2px !important;
     }
 
-    .table-card-header {
-        border-bottom: 1px solid #E5E1D8 !important;
-        padding: 10px 14px !important;
+    .print-house-name {
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        color: #9E978A !important;
     }
 
-    .table-card-header h3 {
-        color: #C59E3F !important;
-        font-size: 13pt !important;
+    .print-house-deg {
+        font-size: 7pt !important;
+        font-weight: 500 !important;
+        color: #4E493F !important;
+        white-space: nowrap !important;
     }
 
-    /* Info strip layout */
-    .info-strip {
-        background: #FDFCFB !important;
-        border: 1px solid #E5E1D8 !important;
-        margin-bottom: 24px !important;
-        box-shadow: none !important;
+    .print-house-sign-glyph {
+        font-size: 10pt !important;
+        font-family: serif !important;
+        margin-top: 1px !important;
+    }
+
+    /* Bottom row & notes */
+    .print-bottom-row {
+        display: flex !important;
+        gap: 16px !important;
+        align-items: stretch !important;
+        margin-bottom: 20px !important;
+    }
+
+    .print-bottom-card {
+        background: #FFFFFF !important;
+        border: 1px solid rgba(94, 82, 176, 0.12) !important;
+        border-radius: 8px !important;
+        padding: 12px 16px !important;
+    }
+
+    .print-extra-info-list {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    .print-extra-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        font-size: 8pt !important;
+        color: #4E493F !important;
+    }
+
+    .print-extra-item svg {
+        color: #5E52B0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .print-note-text {
+        font-size: 8pt !important;
+        color: #777166 !important;
+        line-height: 1.4 !important;
+        margin: 0 !important;
+        padding-right: 32px !important; /* Space for decor star */
+    }
+
+    .print-star-decor {
+        position: absolute !important;
+        right: 12px !important;
+        bottom: 12px !important;
+        pointer-events: none !important;
+    }
+
+    /* Footer */
+    .print-footer {
+        border-top: 1px solid #E5E1D8 !important;
+        padding-top: 8px !important;
         display: flex !important;
         justify-content: space-between !important;
-    }
-
-    .info-card {
-        padding: 12px 16px !important;
-        border: none !important;
-    }
-
-    .info-card-divider {
-        background: #E5E1D8 !important;
-        width: 1px !important;
-    }
-
-    .info-card-title {
-        color: #2E2A20 !important;
-        font-size: 11pt !important;
-    }
-
-    .info-card-sub {
-        font-size: 9pt !important;
-    }
-
-    /* Info detail cards */
-    .info-detail-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr !important;
-        gap: 15px !important;
-        page-break-inside: avoid;
-    }
-
-    .info-detail-card {
-        border: 1px solid #E5E1D8 !important;
-        background: #FFF !important;
-        box-shadow: none !important;
-        padding: 12px !important;
-    }
-
-    .info-detail-label {
-        font-size: 8.5pt !important;
-    }
-
-    .info-detail-value {
-        font-size: 10pt !important;
-        color: #2E2A20 !important;
+        font-size: 7.5pt !important;
+        color: #9E978A !important;
     }
 }

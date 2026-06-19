@@ -49,10 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => {
         initSidebarToggle();
-        if (lastChart) drawChart(lastChart);
+        if (lastChart) drawChart(lastChart, canvas);
     });
     window.addEventListener('orientationchange', () => {
-        setTimeout(() => { if (lastChart) drawChart(lastChart); }, 300);
+        setTimeout(() => { if (lastChart) drawChart(lastChart, canvas); }, 300);
     });
 
     initSidebarToggle();
@@ -456,8 +456,100 @@ document.addEventListener('DOMContentLoaded', () => {
         // Info detail tab
         renderInfoTab(data, cityName, jd);
 
-        // Draw chart
-        drawChart(data);
+        // ============================================================
+        // Populate Print Report Template
+        // ============================================================
+        const printDateEl = document.getElementById('print-date-timestamp');
+        if (printDateEl) {
+            const now = new Date();
+            const formatOptions = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const formattedCurrentDate = now.toLocaleDateString('ru-RU', formatOptions);
+            printDateEl.textContent = `Отчёт сформирован: ${formattedCurrentDate} (${meta.utc_offset})`;
+        }
+
+        // Print Meta Cards
+        document.getElementById('pm-city').textContent = cityName;
+        if (meta.latitude && meta.longitude) {
+            const latVal = parseFloat(meta.latitude).toFixed(4);
+            const lonVal = parseFloat(meta.longitude).toFixed(4);
+            document.getElementById('pm-coords').textContent = `${Math.abs(latVal)}°${latVal >= 0 ? 'N' : 'S'}, ${Math.abs(lonVal)}°${lonVal >= 0 ? 'E' : 'W'}`;
+        } else {
+            document.getElementById('pm-coords').textContent = '—';
+        }
+        
+        // Print local time format (DD.MM.YYYY HH:MM:SS)
+        const dateParts = meta.birth_date_local.split('-'); // YYYY-MM-DD
+        const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : meta.birth_date_local;
+        document.getElementById('pm-time').textContent = `${formattedDate} ${meta.birth_time_local} (${meta.utc_offset})`;
+        document.getElementById('pm-gmt').textContent = `GMT/UTC: ${meta.datetime_gmt.split(' ')[1]}`;
+        
+        document.getElementById('pm-timezone').textContent = meta.timezone;
+        document.getElementById('pm-offset').textContent = `Историческое смещение: ${meta.utc_offset}`;
+        document.getElementById('pm-jd').textContent = jd.toFixed(5);
+
+        // Populate print planets table
+        const printPlanetsTbody = document.getElementById('print-planets-tbody');
+        if (printPlanetsTbody) {
+            printPlanetsTbody.innerHTML = '';
+            data.planets.forEach(p => {
+                const pMeta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
+                const sm = signMeta(p.formatted.sign);
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>
+                        <div class="print-planet-cell">
+                            <div class="print-planet-glyph ${pMeta.cls}">${pMeta.sym}</div>
+                            <strong>${p.name}</strong>
+                        </div>
+                    </td>
+                    <td class="lon-cell">${lonToStr(p.longitude)}</td>
+                    <td>
+                        <div class="print-sign-cell">
+                            <span class="print-sign-glyph">${sm.sym}</span>
+                            <span>${sm.name}</span>
+                        </div>
+                    </td>
+                    <td>${fmtPos(p.formatted)}</td>
+                    <td style="text-align: center;">${p.is_retrograde ? '<span class="print-retro-badge">R</span>' : '<span style="color: #9E978A;">—</span>'}</td>
+                `;
+                printPlanetsTbody.appendChild(tr);
+            });
+        }
+
+        // Populate print houses grid
+        const printHousesRow = document.getElementById('print-houses-row');
+        if (printHousesRow) {
+            printHousesRow.innerHTML = '';
+            data.houses.forEach(h => {
+                const sm = signMeta(h.formatted.sign);
+                const card = document.createElement('div');
+                card.className = 'print-house-card';
+                
+                // Format name nicely (e.g. I (ASC), X (MC))
+                let dispName = toRoman(parseInt(h.name) || h.name);
+                if (h.name == '1') dispName = 'I (ASC)';
+                if (h.name == '7') dispName = 'VII (DSC)';
+                if (h.name == '10') dispName = 'MC (X)';
+                if (h.name == '4') dispName = 'IC (IV)';
+
+                const zodiacIndex = ZODIAC_META.findIndex(z => z.name === sm.name);
+                const zColor = ZODIAC_COLORS[zodiacIndex >= 0 ? zodiacIndex : 0] || '#5E52B0';
+
+                card.innerHTML = `
+                    <span class="print-house-name">${dispName}</span>
+                    <span class="print-house-deg">${fmtPos(h.formatted)}</span>
+                    <span class="print-house-sign-glyph" style="color: ${zColor}">${sm.sym}</span>
+                `;
+                printHousesRow.appendChild(card);
+            });
+        }
+
+        // Draw screen chart
+        drawChart(data, canvas);
+
+        // Draw print chart
+        drawChart(data, document.getElementById('print-chart-canvas'));
 
         // Show results, reset tabs
         placeholderState.classList.add('hidden');
@@ -641,11 +733,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'Южный Узел':   '#3F6E10',
     };
 
-    function drawChart(data) {
+    function drawChart(data, canvasEl) {
+        if (!canvasEl) return;
+        const canvas = canvasEl;
+        const ctx    = canvas.getContext('2d');
+
         // Make canvas fill its container on mobile
         const container = canvas.parentElement;
-        const displayW  = Math.min(container.clientWidth || 380, 380);
-        const scale     = window.devicePixelRatio || 1;
+        const isScreenCanvas = (canvas.id === 'chart-canvas');
+        const displayW  = isScreenCanvas ? Math.min(container.clientWidth || 380, 380) : 440;
+        const scale     = isScreenCanvas ? (window.devicePixelRatio || 1) : 2;
 
         // Set actual pixel size for sharpness
         canvas.width  = displayW * scale;
