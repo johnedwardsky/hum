@@ -942,6 +942,87 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 /* ============================================================
+   Astrological Interpretations Styles
+   ============================================================ */
+.interpretation-header {
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+.interpretation-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+.interpretation-header p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+.interpretation-group-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5E52B0; /* Branded dark purple accent */
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid rgba(94, 82, 176, 0.15);
+}
+.interpretation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+.interpretation-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.interpretation-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(197, 158, 63, 0.08);
+}
+.interpretation-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.interpretation-card-glyph {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-family: serif;
+    background: #FFFFFF;
+    color: var(--text-dark);
+}
+.interpretation-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.interpretation-card-text {
+    font-size: 13px;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* ============================================================
    Toast Notification Styling
    ============================================================ */
 .toast-notification {

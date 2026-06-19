@@ -456,6 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Info detail tab
         renderInfoTab(data, cityName, jd);
 
+        // Interpretations tab
+        renderInterpretations(data);
+
         // ============================================================
         // Populate Print Report Template
         // ============================================================
@@ -705,6 +708,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="info-detail-value">${item.value}</div>
                 ${item.sub ? `<div class="info-detail-sub">${item.sub}</div>` : ''}`;
             infoGrid.appendChild(div);
+        });
+    }
+
+    // ── Interpretations tab ───────────────────────────────────
+    function renderInterpretations(data) {
+        const planetsGrid = document.getElementById('interpretations-planets-grid');
+        const housesGrid  = document.getElementById('interpretations-houses-grid');
+        if (!planetsGrid || !housesGrid) return;
+
+        planetsGrid.innerHTML = '';
+        housesGrid.innerHTML  = '';
+
+        // Render Planets Interpretations
+        data.planets.forEach(p => {
+            const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
+            const sm   = signMeta(p.formatted.sign);
+            const card = document.createElement('div');
+            card.className = 'interpretation-card';
+            card.innerHTML = `
+                <div class="interpretation-card-header">
+                    <div class="interpretation-card-glyph ${meta.cls}">${meta.sym}</div>
+                    <span class="interpretation-card-title">${p.name} в знаке ${sm.name}</span>
+                </div>
+                <div class="interpretation-card-text">
+                    ${p.interpretation || 'Влияние планеты в данном положении.'}
+                </div>
+            `;
+            planetsGrid.appendChild(card);
+        });
+
+        // Render Houses Interpretations
+        data.houses.forEach(h => {
+            const sm = signMeta(h.formatted.sign);
+            const card = document.createElement('div');
+            card.className = 'interpretation-card';
+            
+            // Format name nicely (e.g. I (ASC), X (MC))
+            let dispName = toRoman(parseInt(h.name) || h.name);
+            if (h.name == '1') dispName = 'Асцендент (I дом)';
+            else if (h.name == '7') dispName = 'Десцендент (VII дом)';
+            else if (h.name == '10') dispName = 'Середина Неба (X дом)';
+            else if (h.name == '4') dispName = 'Надир (IV дом)';
+            else dispName = `Дом ${dispName}`;
+
+            const zodiacIndex = ZODIAC_META.findIndex(z => z.name === sm.name);
+            const zColor = ZODIAC_COLORS[zodiacIndex >= 0 ? zodiacIndex : 0] || '#5E52B0';
+
+            card.innerHTML = `
+                <div class="interpretation-card-header">
+                    <div class="interpretation-card-glyph" style="color: ${zColor}; font-weight: bold;">${sm.sym}</div>
+                    <span class="interpretation-card-title">${dispName} в знаке ${sm.name}</span>
+                </div>
+                <div class="interpretation-card-text">
+                    ${h.interpretation || 'Влияние куспида в данном положении.'}
+                </div>
+            `;
+            housesGrid.appendChild(card);
         });
     }
 

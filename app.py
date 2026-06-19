@@ -143,6 +143,23 @@ def calculate():
             gmt_year, gmt_month, gmt_day, gmt_hour_dec, calc_lat, calc_lon
         )
         
+        # Attach interpretations from interpretations database
+        try:
+            import interpretations
+            for p in chart_data["planets"]:
+                planet_name = p["name"]
+                sign_name = p["formatted"]["sign"]
+                p_texts = interpretations.PLANETS_TEXTS.get(planet_name, {})
+                p["interpretation"] = p_texts.get(sign_name, f"Индивидуальное влияние {planet_name} в знаке {sign_name}.")
+
+            for h in chart_data["houses"]:
+                house_num = str(h["number"])
+                sign_name = h["formatted"]["sign"]
+                h_texts = interpretations.HOUSES_TEXTS.get(house_num, {})
+                h["interpretation"] = h_texts.get(sign_name, f"Влияние {h['name']} в знаке {sign_name}.")
+        except Exception as err:
+            print(f"Error mapping interpretations: {err}")
+
         # Add metadata
         chart_data["metadata"] = {
             "birth_date_local": birth_date,

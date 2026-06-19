@@ -209,6 +209,13 @@
                             </svg>
                             Информация о расчёте
                         </button>
+                        <button class="tab" id="tab-interpretations" data-tab="interpretations">
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                                <rect x="2.5" y="2.5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+                                <path d="M5.5 5.5h4M5.5 8.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                            </svg>
+                            Расшифровка карты
+                        </button>
                     </div>
                     <div class="export-wrapper">
                         <button class="btn-export" id="btn-export" aria-haspopup="true" aria-expanded="false">
@@ -367,6 +374,28 @@
                 <!-- === TAB: INFO === -->
                 <div class="tab-content" id="content-info">
                     <div class="info-detail-grid" id="info-detail-grid"></div>
+                </div>
+
+                <!-- === TAB: INTERPRETATIONS === -->
+                <div class="tab-content" id="content-interpretations">
+                    <div class="interpretation-header">
+                        <h3>Астрологическая расшифровка</h3>
+                        <p>Индивидуальное толкование положений планет и куспидов домов на основе ваших расчетных данных.</p>
+                    </div>
+                    <div class="interpretation-sections">
+                        <div class="interpretation-group">
+                            <h4 class="interpretation-group-title">Положения планет</h4>
+                            <div class="interpretation-grid" id="interpretations-planets-grid">
+                                <!-- Generated via JS -->
+                            </div>
+                        </div>
+                        <div class="interpretation-group" style="margin-top: 24px;">
+                            <h4 class="interpretation-group-title">Куспиды домов (Сферы жизни)</h4>
+                            <div class="interpretation-grid" id="interpretations-houses-grid">
+                                <!-- Generated via JS -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div><!-- /results-panel -->
