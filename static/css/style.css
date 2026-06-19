@@ -1061,17 +1061,23 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     flex-shrink: 0;
 }
 
-/* Print report view (hidden on screen) */
-.print-report {
+/* Print report views (hidden on screen, shown only in @media print) */
+.print-report,
+.print-interpretations-section {
     display: none;
 }
 
 /* ============================================================
    Print & PDF Stylesheet (A4 Single Page Layout)
    ============================================================ */
+@page {
+    size: A4 portrait;
+    margin: 10mm 15mm;
+}
+
 @media print {
     /* Hide everything on screen */
-    body > *:not(#print-report) {
+    body > *:not(#print-report):not(#print-interpretations-section) {
         display: none !important;
     }
 
@@ -1081,7 +1087,20 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
         width: 100% !important;
         max-width: 100% !important;
         margin: 0 !important;
-        padding: 10mm 15mm !important; /* Standard margins */
+        padding: 0 !important;
+        background: #FAF8F5 !important;
+        color: #2E2A20 !important;
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 10pt !important;
+        line-height: 1.4 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-sizing: border-box !important;
+    }
+
+    #print-interpretations-section {
+        display: block !important;
+        width: 100% !important;
         background: #FAF8F5 !important;
         color: #2E2A20 !important;
         font-family: 'Inter', -apple-system, sans-serif !important;
@@ -1317,15 +1336,18 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
         background: #FFFFFF !important;
         border: 1px solid rgba(94, 82, 176, 0.12) !important;
         border-radius: 8px !important;
-        padding: 12px !important;
+        padding: 10px !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 10px !important;
+        overflow: hidden !important;
     }
 
     .print-canvas-wrapper canvas {
         display: block !important;
+        width: 220px !important;
+        height: 220px !important;
         max-width: 100% !important;
     }
 
@@ -1456,5 +1478,82 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
         justify-content: space-between !important;
         font-size: 7.5pt !important;
         color: #9E978A !important;
+    }
+
+    /* Page break before interpretations */
+    .print-interpretations-section {
+        page-break-before: always !important;
+        padding-top: 8mm !important;
+    }
+
+    /* Interpretations header on print page 2 */
+    .print-interp-page-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-bottom: 12px !important;
+        padding-bottom: 8px !important;
+        border-bottom: 1.5px solid #5E52B0 !important;
+    }
+
+    .print-interp-page-header .print-brand-title {
+        font-size: 14pt !important;
+    }
+
+    .print-interp-page-header .print-brand-subtitle {
+        font-size: 8pt !important;
+    }
+
+    .print-interp-section-title {
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        color: #5E52B0 !important;
+        letter-spacing: 0.4px !important;
+        text-transform: uppercase !important;
+        margin-bottom: 12px !important;
+        padding-bottom: 4px !important;
+        border-bottom: 1px solid rgba(94, 82, 176, 0.2) !important;
+    }
+
+    .print-interp-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .print-interp-card {
+        background: #FFFFFF !important;
+        border: 1px solid rgba(94, 82, 176, 0.12) !important;
+        border-radius: 6px !important;
+        padding: 8px 10px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .print-interp-card-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .print-interp-glyph {
+        font-family: serif !important;
+        font-size: 11pt !important;
+        line-height: 1 !important;
+    }
+
+    .print-interp-title {
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        color: #2E2A20 !important;
+    }
+
+    .print-interp-text {
+        font-size: 7.5pt !important;
+        color: #4E493F !important;
+        line-height: 1.45 !important;
+        margin: 0 !important;
     }
 }

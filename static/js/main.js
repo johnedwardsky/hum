@@ -300,7 +300,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('export-print').addEventListener('click', () => {
         exportDropdown.classList.remove('open');
         btnExport.setAttribute('aria-expanded', 'false');
+        if (!lastChart) return;
         window.print();
+    });
+
+    // Option: Download PDF (via print dialog with PDF save)
+    document.getElementById('export-pdf').addEventListener('click', () => {
+        exportDropdown.classList.remove('open');
+        btnExport.setAttribute('aria-expanded', 'false');
+        if (!lastChart) return;
+        // Use print with a toast guide
+        showToast('Выберите «Сохранить как PDF» в диалоге печати');
+        setTimeout(() => window.print(), 400);
     });
 
     // Option: Copy Report
@@ -551,8 +562,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw screen chart
         drawChart(data, canvas);
 
-        // Draw print chart
-        drawChart(data, document.getElementById('print-chart-canvas'));
+        // Draw print chart (sized to 220px to match CSS)
+        const printCanvas = document.getElementById('print-chart-canvas');
+        if (printCanvas) {
+            printCanvas.width  = 220 * 2;   // @2x for sharpness
+            printCanvas.height = 220 * 2;
+            printCanvas.style.width  = '220px';
+            printCanvas.style.height = '220px';
+            drawChartFixed(data, printCanvas, 220);
+        }
 
         // Show results, reset tabs
         placeholderState.classList.add('hidden');
@@ -572,6 +590,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+
+        // Populate print interpretations (page 2)
+        populatePrintInterpretations(data);
     }
 
     // ── Julian Day calculator (JS fallback for display) ───────
@@ -1026,4 +1047,193 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
     function toRoman(n) { return ROMAN[n - 1] || n; }
+
+    // ── Draw chart at a fixed size (for print canvas) ─────────
+    function drawChartFixed(data, canvasEl, displayW) {
+        if (!canvasEl) return;
+        const scale = 2; // @2x retina
+        canvasEl.width  = displayW * scale;
+        canvasEl.height = displayW * scale;
+        canvasEl.style.width  = displayW + 'px';
+        canvasEl.style.height = displayW + 'px';
+
+        const ctx = canvasEl.getContext('2d');
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+        const size = displayW;
+        const cx = size / 2;
+        const cy = size / 2;
+        const R  = size / 2 - 4;
+        const r1 = R * 0.82;
+        const r2 = R * 0.72;
+        const r3 = R * 0.60;
+        const r4 = R * 0.20;
+
+        ctx.clearRect(0, 0, size, size);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+
+        // Zodiac ring
+        for (let i = 0; i < 12; i++) {
+            const sA = degToRad(i * 30 - 90);
+            const eA = degToRad((i + 1) * 30 - 90);
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, sA, eA); ctx.closePath();
+            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.04); ctx.fill();
+            ctx.strokeStyle = 'rgba(197,158,63,0.15)'; ctx.lineWidth = 0.8; ctx.stroke();
+            const mA = degToRad(i * 30 + 15 - 90);
+            const gx = cx + (R * 0.91) * Math.cos(mA);
+            const gy = cy + (R * 0.91) * Math.sin(mA);
+            ctx.font = 'bold 10px serif'; ctx.fillStyle = ZODIAC_COLORS[i];
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(ZODIAC_META[i].sym, gx, gy);
+        }
+        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.35)'; ctx.lineWidth=1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
+
+        const asc = data.houses[0].longitude;
+
+        // House lines
+        for (let i = 0; i < 12; i++) {
+            const angle = degToRad(lonToAngle(data.houses[i].longitude, asc));
+            const x1 = cx + r2 * Math.cos(angle), y1 = cy + r2 * Math.sin(angle);
+            const x2 = cx + r3 * Math.cos(angle), y2 = cy + r3 * Math.sin(angle);
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+            ctx.strokeStyle = 'rgba(94,82,176,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + r2 * Math.cos(angle), cy + r2 * Math.sin(angle));
+            ctx.strokeStyle = 'rgba(197,158,63,0.08)'; ctx.lineWidth = 0.5; ctx.stroke();
+        }
+        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.2)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2);
+        ctx.fillStyle='rgba(250,248,245,0.95)'; ctx.fill();
+        ctx.strokeStyle='rgba(197,158,63,0.25)'; ctx.lineWidth=0.8; ctx.stroke();
+
+        // Aspects
+        const ASPECTS = [
+            { deg: 0,   orb: 8, color: 'rgba(197,158,63,0.5)',  dash: [] },
+            { deg: 120, orb: 6, color: 'rgba(94,82,176,0.45)',  dash: [] },
+            { deg: 90,  orb: 6, color: 'rgba(204,89,63,0.45)',  dash: [3,2] },
+            { deg: 180, orb: 6, color: 'rgba(165,120,69,0.45)', dash: [] },
+            { deg: 60,  orb: 5, color: 'rgba(94,82,176,0.25)',  dash: [2,3] },
+        ];
+        for (let i = 0; i < data.planets.length; i++) {
+            for (let j = i + 1; j < data.planets.length; j++) {
+                const diff = Math.abs(angleDiff(data.planets[i].longitude, data.planets[j].longitude));
+                for (const asp of ASPECTS) {
+                    if (Math.abs(diff - asp.deg) <= asp.orb || (asp.deg > 0 && Math.abs(360 - diff - asp.deg) <= asp.orb)) {
+                        const a1 = degToRad(lonToAngle(data.planets[i].longitude, asc));
+                        const a2 = degToRad(lonToAngle(data.planets[j].longitude, asc));
+                        ctx.beginPath();
+                        ctx.moveTo(cx + r3 * Math.cos(a1), cy + r3 * Math.sin(a1));
+                        ctx.lineTo(cx + r3 * Math.cos(a2), cy + r3 * Math.sin(a2));
+                        ctx.setLineDash(asp.dash); ctx.strokeStyle = asp.color; ctx.lineWidth = 0.6; ctx.stroke();
+                        ctx.setLineDash([]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Planets
+        const placed = [];
+        data.planets.forEach(p => {
+            const meta = PLANET_META[p.name] || { sym: p.symbol || '?', cls: 'glyph-node' };
+            let angle = degToRad(lonToAngle(p.longitude, asc));
+            const r_dot = (r3 + r2) / 2;
+            const dx = cx + r_dot * Math.cos(angle);
+            const dy = cy + r_dot * Math.sin(angle);
+            let pr = r3 * 0.7;
+            let px = cx + pr * Math.cos(angle);
+            let py = cy + pr * Math.sin(angle);
+            // Simple overlap avoidance
+            let tries = 0;
+            while (placed.some(q => Math.hypot(q.x - px, q.y - py) < 10) && tries < 8) {
+                angle += degToRad(5); px = cx + pr * Math.cos(angle); py = cy + pr * Math.sin(angle); tries++;
+            }
+            placed.push({ x: px, y: py });
+            ctx.beginPath(); ctx.moveTo(dx, dy); ctx.lineTo(px, py);
+            ctx.strokeStyle = 'rgba(197,158,63,0.2)'; ctx.lineWidth = 0.5; ctx.stroke();
+            ctx.font = '11px serif'; ctx.fillStyle = PLANET_COLORS[p.name] || '#2E2A20';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(meta.sym, px, py);
+            if (p.is_retrograde) {
+                ctx.font = 'bold 7px Inter,sans-serif'; ctx.fillStyle = '#E06D53';
+                ctx.fillText('R', px + 7, py - 5);
+            }
+        });
+
+        // Angle labels
+        [
+            { label: 'ASC', lon: asc },
+            { label: 'DSC', lon: asc + 180 },
+            { label: 'MC',  lon: data.houses[9].longitude },
+            { label: 'IC',  lon: data.houses[3].longitude },
+        ].forEach(({ label, lon }) => {
+            const a = degToRad(lonToAngle(lon % 360, asc));
+            const lx = cx + (R + 3) * Math.cos(a);
+            const ly = cy + (R + 3) * Math.sin(a);
+            ctx.font = 'bold 8px Inter,sans-serif'; ctx.fillStyle = '#C59E3F';
+            ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
+            ctx.textBaseline = ly < cy ? 'bottom' : 'top';
+            ctx.fillText(label, lx, ly);
+        });
+    }
+
+    // ── Populate print interpretations (PDF page 2) ───────────
+    function populatePrintInterpretations(data) {
+        const planetsGrid = document.getElementById('print-interp-planets-grid');
+        const housesGrid  = document.getElementById('print-interp-houses-grid');
+        const p2ts        = document.getElementById('print-date-timestamp-p2');
+
+        // Sync timestamp
+        const ts1 = document.getElementById('print-date-timestamp');
+        if (p2ts && ts1) p2ts.textContent = ts1.textContent;
+
+        if (planetsGrid) {
+            planetsGrid.innerHTML = '';
+            data.planets.forEach(p => {
+                const meta = PLANET_META[p.name] || { sym: p.symbol || '?', cls: 'glyph-node' };
+                const sm   = signMeta(p.formatted.sign);
+                const retroNote = p.is_retrograde ? ' <span style="color:#E06D53;font-weight:700;">(R)</span>' : '';
+                const card = document.createElement('div');
+                card.className = 'print-interp-card';
+                card.innerHTML = `
+                    <div class="print-interp-card-header">
+                        <span class="print-interp-glyph" style="color:${PLANET_COLORS[p.name]||'#5E52B0'}">${meta.sym}</span>
+                        <span class="print-interp-title">${p.name} в знаке ${sm.name}${retroNote}</span>
+                    </div>
+                    <p class="print-interp-text">${p.interpretation || 'Влияние планеты в данном положении.'}</p>
+                `;
+                planetsGrid.appendChild(card);
+            });
+        }
+
+        if (housesGrid) {
+            housesGrid.innerHTML = '';
+            data.houses.forEach(h => {
+                const sm = signMeta(h.formatted.sign);
+                let dispName = toRoman(parseInt(h.name) || h.name);
+                if (h.name == '1') dispName = 'Асцендент (I дом)';
+                else if (h.name == '7') dispName = 'Десцендент (VII дом)';
+                else if (h.name == '10') dispName = 'Середина Неба (X дом)';
+                else if (h.name == '4') dispName = 'Надир (IV дом)';
+                else dispName = `Дом ${dispName}`;
+
+                const zodiacIndex = ZODIAC_META.findIndex(z => z.name === sm.name);
+                const zColor = ZODIAC_COLORS[zodiacIndex >= 0 ? zodiacIndex : 0] || '#5E52B0';
+
+                const card = document.createElement('div');
+                card.className = 'print-interp-card';
+                card.innerHTML = `
+                    <div class="print-interp-card-header">
+                        <span class="print-interp-glyph" style="color:${zColor}">${sm.sym}</span>
+                        <span class="print-interp-title">${dispName} в знаке ${sm.name}</span>
+                    </div>
+                    <p class="print-interp-text">${h.interpretation || 'Влияние куспида в данном положении.'}</p>
+                `;
+                housesGrid.appendChild(card);
+            });
+        }
+    }
+
 });
