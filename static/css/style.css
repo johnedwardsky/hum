@@ -823,15 +823,26 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
     .topnav { 
         padding: 0 12px; 
+        gap: 8px;
     }
     .logo-text { 
-        display: none !important; 
+        display: block !important; 
+        font-size: 15px;
+    }
+    .logo {
+        gap: 8px;
     }
     .btn-ghost span { 
         display: none !important; 
     }
     .btn-ghost { 
-        padding: 6px 8px; 
+        padding: 0; 
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
     }
     .nav-segmented {
         padding: 2px;
@@ -839,13 +850,21 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
         gap: 2px;
     }
     .nav-segment-btn {
-        padding: 5px 8px;
-        font-size: 11.5px;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .nav-segment-btn span {
+        display: none !important;
     }
     .nav-segment-btn svg {
-        margin-right: 4px !important;
-        width: 12px;
-        height: 12px;
+        margin-right: 0 !important;
+        width: 14px;
+        height: 14px;
     }
 
     .app-layout {
