@@ -153,9 +153,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let curDate = new Date();
         if (inputEl.value) {
-            const parts = inputEl.value.split('-');
-            if (parts.length === 3) {
-                curDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            let parsedDate = null;
+            if (inputEl.value.includes('.')) {
+                // DD.MM.YYYY
+                const parts = inputEl.value.split('.');
+                if (parts.length === 3) {
+                    parsedDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+                }
+            } else if (inputEl.value.includes('-')) {
+                // YYYY-MM-DD
+                const parts = inputEl.value.split('-');
+                if (parts.length === 3) {
+                    parsedDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                }
+            }
+            if (parsedDate && !isNaN(parsedDate.getTime())) {
+                curDate = parsedDate;
             }
         }
 
@@ -191,7 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const year = getSelectedValue(pickerYear);
 
             if (day !== null && month !== null && year !== null) {
-                const formatted = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                // On mobile, store as DD.MM.YYYY format visually
+                const formatted = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
                 activeDatePickerInput.value = formatted;
                 activeDatePickerInput.dispatchEvent(new Event('change'));
                 activeDatePickerInput.dispatchEvent(new Event('input'));
@@ -203,6 +217,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupCustomDatePickerForInput(inputEl) {
         if (!inputEl) return;
         if (isMobile()) {
+            if (inputEl.type === 'date') {
+                let val = inputEl.value;
+                inputEl.type = 'text';
+                if (val && val.includes('-')) {
+                    const parts = val.split('-');
+                    if (parts.length === 3) {
+                        inputEl.value = `${parts[2]}.${parts[1]}.${parts[0]}`;
+                    }
+                }
+            }
             inputEl.setAttribute('readonly', 'true');
             if (!inputEl.dataset.pickerInitialized) {
                 inputEl.addEventListener('click', (e) => {
@@ -213,6 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 inputEl.dataset.pickerInitialized = 'true';
             }
         } else {
+            if (inputEl.type === 'text') {
+                let val = inputEl.value;
+                inputEl.type = 'date';
+                if (val && val.includes('.')) {
+                    const parts = val.split('.');
+                    if (parts.length === 3) {
+                        inputEl.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    }
+                }
+            }
             inputEl.removeAttribute('readonly');
         }
     }
@@ -220,6 +254,138 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize columns once
     initPickerColumns();
     setupDatePickerScrollListeners();
+
+    // ── Reusable Custom Time Picker for Mobile ──────────────────
+    const timePickerModal = document.getElementById('time-picker-modal');
+    const timePickerOverlay = document.getElementById('time-picker-overlay');
+    const timePickerCancel = document.getElementById('time-picker-cancel');
+    const timePickerConfirm = document.getElementById('time-picker-confirm');
+    const pickerHour = document.getElementById('picker-hour');
+    const pickerMinute = document.getElementById('picker-minute');
+    const pickerSecond = document.getElementById('picker-second');
+
+    let activeTimePickerInput = null;
+
+    function initTimePickerColumns() {
+        if (!pickerHour || !pickerMinute || !pickerSecond) return;
+
+        // Hour list (00 to 23)
+        let hourHtml = '<div class="custom-picker-spacer"></div>';
+        for (let h = 0; h < 24; h++) {
+            const displayVal = String(h).padStart(2, '0');
+            hourHtml += `<div class="custom-picker-item" data-val="${h}">${displayVal}</div>`;
+        }
+        hourHtml += '<div class="custom-picker-spacer"></div>';
+        pickerHour.innerHTML = hourHtml;
+
+        // Minute list (00 to 59)
+        let minuteHtml = '<div class="custom-picker-spacer"></div>';
+        for (let m = 0; m < 60; m++) {
+            const displayVal = String(m).padStart(2, '0');
+            minuteHtml += `<div class="custom-picker-item" data-val="${m}">${displayVal}</div>`;
+        }
+        minuteHtml += '<div class="custom-picker-spacer"></div>';
+        pickerMinute.innerHTML = minuteHtml;
+
+        // Second list (00 to 59)
+        let secondHtml = '<div class="custom-picker-spacer"></div>';
+        for (let s = 0; s < 60; s++) {
+            const displayVal = String(s).padStart(2, '0');
+            secondHtml += `<div class="custom-picker-item" data-val="${s}">${displayVal}</div>`;
+        }
+        secondHtml += '<div class="custom-picker-spacer"></div>';
+        pickerSecond.innerHTML = secondHtml;
+    }
+
+    function setupTimePickerScrollListeners() {
+        if (!pickerHour || !pickerMinute || !pickerSecond) return;
+        const onScroll = (e) => {
+            getSelectedValue(e.target);
+        };
+
+        pickerHour.addEventListener('scroll', onScroll);
+        pickerMinute.addEventListener('scroll', onScroll);
+        pickerSecond.addEventListener('scroll', onScroll);
+    }
+
+    function openCustomTimePicker(inputEl) {
+        activeTimePickerInput = inputEl;
+        
+        let curHour = 12;
+        let curMinute = 0;
+        let curSecond = 0;
+
+        if (inputEl.value) {
+            const parts = inputEl.value.split(':');
+            if (parts.length >= 2) {
+                curHour = parseInt(parts[0], 10);
+                curMinute = parseInt(parts[1], 10);
+                if (parts.length >= 3) {
+                    curSecond = parseInt(parts[2], 10);
+                }
+            }
+        }
+
+        timePickerModal.classList.remove('hidden');
+
+        setTimeout(() => {
+            scrollToValue(pickerHour, curHour);
+            scrollToValue(pickerMinute, curMinute);
+            scrollToValue(pickerSecond, curSecond);
+        }, 50);
+    }
+
+    function closeCustomTimePicker() {
+        timePickerModal.classList.add('hidden');
+        activeTimePickerInput = null;
+    }
+
+    if (timePickerCancel) timePickerCancel.addEventListener('click', closeCustomTimePicker);
+    if (timePickerOverlay) timePickerOverlay.addEventListener('click', closeCustomTimePicker);
+
+    if (timePickerConfirm) {
+        timePickerConfirm.addEventListener('click', () => {
+            if (!activeTimePickerInput) return;
+            const hour = getSelectedValue(pickerHour);
+            const minute = getSelectedValue(pickerMinute);
+            const second = getSelectedValue(pickerSecond);
+
+            if (hour !== null && minute !== null && second !== null) {
+                const formatted = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+                activeTimePickerInput.value = formatted;
+                activeTimePickerInput.dispatchEvent(new Event('change'));
+                activeTimePickerInput.dispatchEvent(new Event('input'));
+            }
+            closeCustomTimePicker();
+        });
+    }
+
+    function setupCustomTimePickerForInput(inputEl) {
+        if (!inputEl) return;
+        if (isMobile()) {
+            if (inputEl.type === 'time') {
+                inputEl.type = 'text';
+            }
+            inputEl.setAttribute('readonly', 'true');
+            if (!inputEl.dataset.timePickerInitialized) {
+                inputEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openCustomTimePicker(inputEl);
+                });
+                inputEl.dataset.timePickerInitialized = 'true';
+            }
+        } else {
+            if (inputEl.type === 'text') {
+                inputEl.type = 'time';
+            }
+            inputEl.removeAttribute('readonly');
+        }
+    }
+
+    // Initialize columns
+    initTimePickerColumns();
+    setupTimePickerScrollListeners();
 
     function initSidebarToggle() {
         if (isMobile()) {
@@ -242,6 +408,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCustomDatePickerForInput(birthDateEl);
         setupCustomDatePickerForInput(document.getElementById('p1_birth_date'));
         setupCustomDatePickerForInput(document.getElementById('p2_birth_date'));
+        setupCustomTimePickerForInput(birthTimeEl);
+        setupCustomTimePickerForInput(document.getElementById('p1_birth_time'));
+        setupCustomTimePickerForInput(document.getElementById('p2_birth_time'));
     });
     window.addEventListener('orientationchange', () => {
         setTimeout(() => { if (lastChart) drawChart(lastChart, canvas); }, 300);
@@ -249,8 +418,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initSidebarToggle();
     
-    // Bind date picker for primary birth date input
+    // Bind date and time pickers for primary inputs
     setupCustomDatePickerForInput(birthDateEl);
+    setupCustomTimePickerForInput(birthTimeEl);
 
     // Info strip
     const icCity   = document.getElementById('ic-city');
@@ -582,7 +752,13 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const birth_date = birthDateEl.value;
+        let birth_date = birthDateEl.value;
+        if (birth_date && birth_date.includes('.')) {
+            const parts = birth_date.split('.');
+            if (parts.length === 3) {
+                birth_date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+        }
         const birth_time = birthTimeEl.value;
 
         if (!birth_date || !birth_time) { alert('Укажите дату и время рождения'); return; }
@@ -1707,13 +1883,25 @@ document.addEventListener('DOMContentLoaded', () => {
     synastryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const p1_birth_date = document.getElementById('p1_birth_date').value;
+        let p1_birth_date = document.getElementById('p1_birth_date').value;
+        if (p1_birth_date && p1_birth_date.includes('.')) {
+            const parts = p1_birth_date.split('.');
+            if (parts.length === 3) {
+                p1_birth_date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+        }
         const p1_birth_time = document.getElementById('p1_birth_time').value;
         const p1_lat = document.getElementById('p1_lat').value;
         const p1_lon = document.getElementById('p1_lon').value;
         const p1_city = document.getElementById('p1_city').value;
         
-        const p2_birth_date = document.getElementById('p2_birth_date').value;
+        let p2_birth_date = document.getElementById('p2_birth_date').value;
+        if (p2_birth_date && p2_birth_date.includes('.')) {
+            const parts = p2_birth_date.split('.');
+            if (parts.length === 3) {
+                p2_birth_date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+        }
         const p2_birth_time = document.getElementById('p2_birth_time').value;
         const p2_lat = document.getElementById('p2_lat').value;
         const p2_lon = document.getElementById('p2_lon').value;

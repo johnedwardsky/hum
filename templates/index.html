@@ -1101,6 +1101,41 @@
         </div>
     </div>
 
+    <!-- Custom Time Picker Modal (Mobile Only) -->
+    <div class="custom-picker-modal hidden" id="time-picker-modal">
+        <div class="custom-picker-overlay" id="time-picker-overlay"></div>
+        <div class="custom-picker-content">
+            <div class="custom-picker-header">Установите время рождения</div>
+            <div class="custom-picker-labels">
+                <div class="custom-picker-column-label">Часы</div>
+                <div class="custom-picker-column-label">Минуты</div>
+                <div class="custom-picker-column-label">Секунды</div>
+            </div>
+            <div class="custom-picker-body">
+                <div class="custom-picker-column" id="picker-hour">
+                    <div class="custom-picker-spacer"></div>
+                    <!-- Hours 00 to 23 populated via JS -->
+                    <div class="custom-picker-spacer"></div>
+                </div>
+                <div class="custom-picker-column" id="picker-minute">
+                    <div class="custom-picker-spacer"></div>
+                    <!-- Minutes 00 to 59 populated via JS -->
+                    <div class="custom-picker-spacer"></div>
+                </div>
+                <div class="custom-picker-column" id="picker-second">
+                    <div class="custom-picker-spacer"></div>
+                    <!-- Seconds 00 to 59 populated via JS -->
+                    <div class="custom-picker-spacer"></div>
+                </div>
+                <div class="custom-picker-highlight"></div>
+            </div>
+            <div class="custom-picker-footer">
+                <button class="custom-picker-btn cancel" id="time-picker-cancel">Отмена</button>
+                <button class="custom-picker-btn confirm" id="time-picker-confirm">Установить</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/main.js"></script>
 </body>
 </html>
