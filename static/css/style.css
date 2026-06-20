@@ -879,8 +879,16 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     }
     .nav-segment-btn svg {
         margin-right: 0 !important;
-        width: 18px;
-        height: 18px;
+        width: 20px !important;
+        height: 20px !important;
+        flex-shrink: 0;
+    }
+    /* Ensure the heart icon on compat button is always visible */
+    #nav-mode-compat svg {
+        color: var(--primary);
+    }
+    #nav-mode-compat.active svg {
+        color: #FFFFFF;
     }
 
     .app-layout {
