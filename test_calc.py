@@ -64,6 +64,18 @@ def run_test():
     
     # Base for Aries+Leo love is 95, Venus-Mars conjunction adds +12, Sun-Moon trine adds +15, Venus-Saturn square subtracts -10. Total: 95+12+15-10 = 112, clamped to 99.
     assert scores['love'] == 99, f"Love score should be clamped to 99, got {scores['love']}"
+    
+    # 3. Test high latitude fallback (Dudinka: lat=69.4, lon=86.18)
+    print("\n--- Testing High Latitude Fallback (Dudinka, lat=69.4) ---")
+    try:
+        dudinka_res = calculator.calculate_chart(1980, 11, 6, 12.5, 69.4, 86.18)
+        print("  Dudinka calculation: SUCCESS")
+        print(f"  First house cusp: {dudinka_res['houses'][0]['formatted']['formatted']}")
+        assert len(dudinka_res["houses"]) == 12, "Should return exactly 12 houses!"
+    except Exception as e:
+        print(f"  Dudinka calculation failed: {e}")
+        raise e
+        
     print("\nAll tests passed successfully!")
 
 if __name__ == "__main__":

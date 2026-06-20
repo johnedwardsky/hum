@@ -122,11 +122,19 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon):
         "formatted": formatted_south
     })
     
-    # 3. Calculate Houses (Placidus system)
+    # 3. Calculate Houses (Placidus system with fallback for high latitudes where Placidus has no mathematical solution)
     # swe.houses returns (cusps, ascmc)
     # cusps is 0-indexed (0 to 11 for houses 1 to 12)
     # lat and lon should be in degrees
-    cusps, ascmc = swe.houses(jd_ut, lat, lon, b'P')
+    try:
+        cusps, ascmc = swe.houses(jd_ut, lat, lon, b'P')
+    except Exception:
+        try:
+            # Fallback to Porphyry system (quadrant system that doesn't fail at high latitudes)
+            cusps, ascmc = swe.houses(jd_ut, lat, lon, b'O')
+        except Exception:
+            # Final fallback to Equal system
+            cusps, ascmc = swe.houses(jd_ut, lat, lon, b'E')
     
     house_names = ["I (As)", "II", "III", "IV (Ic)", "V", "VI", "VII (Ds)", "VIII", "IX", "X (Mc)", "XI", "XII"]
     
