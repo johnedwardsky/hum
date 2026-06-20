@@ -32,6 +32,195 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function isMobile() { return window.innerWidth <= 768; }
 
+    // ── Reusable Custom Date Picker for Mobile ──────────────────
+    const datePickerModal = document.getElementById('date-picker-modal');
+    const datePickerOverlay = document.getElementById('date-picker-overlay');
+    const datePickerCancel = document.getElementById('date-picker-cancel');
+    const datePickerConfirm = document.getElementById('date-picker-confirm');
+    const pickerDay = document.getElementById('picker-day');
+    const pickerMonth = document.getElementById('picker-month');
+    const pickerYear = document.getElementById('picker-year');
+
+    const MONTHS_RU = [
+        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    ];
+
+    let activeDatePickerInput = null;
+
+    function getDaysInMonth(monthIndex, year) {
+        return new Date(year, monthIndex + 1, 0).getDate();
+    }
+
+    function initPickerColumns() {
+        if (!pickerMonth || !pickerYear) return;
+        // Month list
+        let monthHtml = '<div class="custom-picker-spacer"></div>';
+        MONTHS_RU.forEach((m, idx) => {
+            monthHtml += `<div class="custom-picker-item" data-val="${idx}">${m}</div>`;
+        });
+        monthHtml += '<div class="custom-picker-spacer"></div>';
+        pickerMonth.innerHTML = monthHtml;
+
+        // Year list (from current year down to 1900)
+        const currentYear = new Date().getFullYear();
+        let yearHtml = '<div class="custom-picker-spacer"></div>';
+        for (let y = currentYear; y >= 1900; y--) {
+            yearHtml += `<div class="custom-picker-item" data-val="${y}">${y}</div>`;
+        }
+        yearHtml += '<div class="custom-picker-spacer"></div>';
+        pickerYear.innerHTML = yearHtml;
+    }
+
+    function populateDaysColumn(daysCount) {
+        if (!pickerDay) return;
+        let dayHtml = '<div class="custom-picker-spacer"></div>';
+        for (let d = 1; d <= daysCount; d++) {
+            dayHtml += `<div class="custom-picker-item" data-val="${d}">${d}</div>`;
+        }
+        dayHtml += '<div class="custom-picker-spacer"></div>';
+        pickerDay.innerHTML = dayHtml;
+    }
+
+    function getSelectedValue(columnEl) {
+        if (!columnEl) return null;
+        const scrollTop = columnEl.scrollTop;
+        const index = Math.round(scrollTop / 36);
+        const items = columnEl.querySelectorAll('.custom-picker-item');
+        if (index >= 0 && index < items.length) {
+            items.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            return parseInt(items[index].dataset.val, 10);
+        }
+        return null;
+    }
+
+    function scrollToValue(columnEl, val) {
+        if (!columnEl) return;
+        const items = columnEl.querySelectorAll('.custom-picker-item');
+        let index = 0;
+        for (let i = 0; i < items.length; i++) {
+            if (parseInt(items[i].dataset.val, 10) === val) {
+                index = i;
+                break;
+            }
+        }
+        items.forEach((item, i) => {
+            item.classList.toggle('active', i === index);
+        });
+        columnEl.scrollTop = index * 36;
+    }
+
+    function setupDatePickerScrollListeners() {
+        if (!pickerDay || !pickerMonth || !pickerYear) return;
+        const onScroll = (e) => {
+            getSelectedValue(e.target);
+        };
+
+        pickerDay.addEventListener('scroll', onScroll);
+        pickerMonth.addEventListener('scroll', onScroll);
+        pickerYear.addEventListener('scroll', onScroll);
+
+        const onMonthOrYearScroll = () => {
+            const mVal = getSelectedValue(pickerMonth);
+            const yVal = getSelectedValue(pickerYear);
+            if (mVal !== null && yVal !== null) {
+                const daysCount = getDaysInMonth(mVal, yVal);
+                const currentDayVal = getSelectedValue(pickerDay) || 1;
+                
+                const currentDaysInColumn = pickerDay.querySelectorAll('.custom-picker-item').length;
+                if (currentDaysInColumn !== daysCount) {
+                    populateDaysColumn(daysCount);
+                    const targetDay = Math.min(currentDayVal, daysCount);
+                    scrollToValue(pickerDay, targetDay);
+                }
+            }
+        };
+
+        let scrollTimeout = null;
+        const handleMonthYearScrollStop = () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(onMonthOrYearScroll, 150);
+        };
+
+        pickerMonth.addEventListener('scroll', handleMonthYearScrollStop);
+        pickerYear.addEventListener('scroll', handleMonthYearScrollStop);
+    }
+
+    function openCustomDatePicker(inputEl) {
+        activeDatePickerInput = inputEl;
+        
+        let curDate = new Date();
+        if (inputEl.value) {
+            const parts = inputEl.value.split('-');
+            if (parts.length === 3) {
+                curDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            }
+        }
+
+        const currentDay = curDate.getDate();
+        const currentMonth = curDate.getMonth();
+        const currentYear = curDate.getFullYear();
+
+        const daysCount = getDaysInMonth(currentMonth, currentYear);
+        populateDaysColumn(daysCount);
+
+        datePickerModal.classList.remove('hidden');
+
+        setTimeout(() => {
+            scrollToValue(pickerYear, currentYear);
+            scrollToValue(pickerMonth, currentMonth);
+            scrollToValue(pickerDay, currentDay);
+        }, 50);
+    }
+
+    function closeCustomDatePicker() {
+        datePickerModal.classList.add('hidden');
+        activeDatePickerInput = null;
+    }
+
+    if (datePickerCancel) datePickerCancel.addEventListener('click', closeCustomDatePicker);
+    if (datePickerOverlay) datePickerOverlay.addEventListener('click', closeCustomDatePicker);
+
+    if (datePickerConfirm) {
+        datePickerConfirm.addEventListener('click', () => {
+            if (!activeDatePickerInput) return;
+            const day = getSelectedValue(pickerDay);
+            const month = getSelectedValue(pickerMonth);
+            const year = getSelectedValue(pickerYear);
+
+            if (day !== null && month !== null && year !== null) {
+                const formatted = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                activeDatePickerInput.value = formatted;
+                activeDatePickerInput.dispatchEvent(new Event('change'));
+                activeDatePickerInput.dispatchEvent(new Event('input'));
+            }
+            closeCustomDatePicker();
+        });
+    }
+
+    function setupCustomDatePickerForInput(inputEl) {
+        if (!inputEl) return;
+        if (isMobile()) {
+            inputEl.setAttribute('readonly', 'true');
+            if (!inputEl.dataset.pickerInitialized) {
+                inputEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openCustomDatePicker(inputEl);
+                });
+                inputEl.dataset.pickerInitialized = 'true';
+            }
+        } else {
+            inputEl.removeAttribute('readonly');
+        }
+    }
+
+    // Initialize columns once
+    initPickerColumns();
+    setupDatePickerScrollListeners();
+
     function initSidebarToggle() {
         if (isMobile()) {
             sidebarToggle.style.display = 'flex';
@@ -50,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         initSidebarToggle();
         if (lastChart) drawChart(lastChart, canvas);
+        setupCustomDatePickerForInput(birthDateEl);
+        setupCustomDatePickerForInput(document.getElementById('p1_birth_date'));
+        setupCustomDatePickerForInput(document.getElementById('p2_birth_date'));
     });
     window.addEventListener('orientationchange', () => {
         setTimeout(() => { if (lastChart) drawChart(lastChart, canvas); }, 300);
@@ -61,6 +253,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebarCollapsible.classList.add('collapsed');
         sidebarToggle.classList.add('collapsed');
     }
+    
+    // Bind date picker for primary birth date input
+    setupCustomDatePickerForInput(birthDateEl);
 
     // Info strip
     const icCity   = document.getElementById('ic-city');
@@ -1429,8 +1624,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Set default dates for partners
-    document.getElementById('p1_birth_date').value = new Date().toLocaleDateString('en-CA');
-    document.getElementById('p2_birth_date').value = new Date().toLocaleDateString('en-CA');
+    const p1BirthDateEl = document.getElementById('p1_birth_date');
+    const p2BirthDateEl = document.getElementById('p2_birth_date');
+    p1BirthDateEl.value = new Date().toLocaleDateString('en-CA');
+    p2BirthDateEl.value = new Date().toLocaleDateString('en-CA');
+    setupCustomDatePickerForInput(p1BirthDateEl);
+    setupCustomDatePickerForInput(p2BirthDateEl);
 
     // Mode navigation
     navModeNatal.addEventListener('click', () => {
