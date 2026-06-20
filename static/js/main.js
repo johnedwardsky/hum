@@ -248,11 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initSidebarToggle();
-    // Start collapsed on mobile
-    if (isMobile()) {
-        sidebarCollapsible.classList.add('collapsed');
-        sidebarToggle.classList.add('collapsed');
-    }
     
     // Bind date picker for primary birth date input
     setupCustomDatePickerForInput(birthDateEl);
