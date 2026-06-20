@@ -832,6 +832,12 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     .logo {
         gap: 8px;
     }
+    .logo-svg {
+        display: block !important;
+        width: 28px !important;
+        height: 28px !important;
+        flex-shrink: 0;
+    }
     .btn-ghost span { 
         display: none !important; 
     }
