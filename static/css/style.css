@@ -846,25 +846,35 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     }
     .nav-segmented {
         padding: 2px;
-        border-radius: 20px;
-        gap: 2px;
+        border-radius: 22px;
+        gap: 4px;
+        background: rgba(46, 42, 32, 0.05);
+        border: 1px solid rgba(197, 158, 63, 0.2);
     }
     .nav-segment-btn {
         padding: 0;
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 50%;
+        color: var(--primary) !important;
+        background: transparent !important;
+        transition: all 0.2s ease;
+    }
+    .nav-segment-btn.active {
+        background: linear-gradient(135deg, #C59E3F 0%, #B38F36 100%) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 2px 8px rgba(197, 158, 63, 0.3) !important;
     }
     .nav-segment-btn span {
         display: none !important;
     }
     .nav-segment-btn svg {
         margin-right: 0 !important;
-        width: 14px;
-        height: 14px;
+        width: 18px;
+        height: 18px;
     }
 
     .app-layout {
