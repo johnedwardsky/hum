@@ -1012,15 +1012,42 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${f.deg}° ${String(f.min).padStart(2,'0')}' ${String(f.sec).padStart(2,'0')}"`;
     }
     function lonToStr(lon) {
-        const sign = Math.floor(lon / 30);
-        const deg  = lon % 30;
-        const d    = Math.floor(deg);
-        const mf   = (deg - d) * 60;
-        const m    = Math.floor(mf);
-        const s    = Math.round((mf - m) * 60);
-        const z    = ZODIAC_META[sign % 12];
-        return `${Math.round(lon)}° ${String(m).padStart(2,'0')}' ${String(s).padStart(2,'0')}"`;
+        let normalized = lon;
+        if (normalized < 0 || normalized >= 360) {
+            normalized = (normalized % 360 + 360) % 360;
+        }
+        let d = Math.floor(normalized);
+        let mf = (normalized - d) * 60.0;
+        let m = Math.floor(mf);
+        let sf = (mf - m) * 60.0;
+        let s = Math.floor(sf);
+
+        if (s >= 60) {
+            s = 0;
+            m += 1;
+        }
+        if (m >= 60) {
+            m = 0;
+            d += 1;
+        }
+        if (d >= 360) {
+            d = 0;
+        }
+
+        const fmt1 = `${d}° ${String(m).padStart(2, '0')}' ${String(s).padStart(2, '0')}"`;
+
+        // Format 2: Decimal representation, truncated to 5 decimal places
+        const parts = normalized.toFixed(10).split('.');
+        let integerPart = parts[0];
+        if (integerPart === '360') {
+            integerPart = '0';
+        }
+        const fractionalPart = parts[1].substring(0, 5);
+        const fmt2 = `${integerPart},${fractionalPart}`;
+
+        return `${fmt1}<br><span class="lon-dec" style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;">${fmt2}</span>`;
     }
+
 
     // ── Planets table ─────────────────────────────────────────
     function renderPlanetsTable(planets) {
