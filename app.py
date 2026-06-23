@@ -128,8 +128,15 @@ def calculate_person_chart(data):
     calc_lat = lat if lat is not None else 0.0
     calc_lon = lon if lon is not None else 0.0
     
+    house_system = data.get('house_system', 'P')
+    try:
+        cusp_offset = float(data.get('cusp_offset', 0.0))
+    except (ValueError, TypeError):
+        cusp_offset = 0.0
+
     chart_data = calculator.calculate_chart(
-        gmt_year, gmt_month, gmt_day, gmt_hour_dec, calc_lat, calc_lon
+        gmt_year, gmt_month, gmt_day, gmt_hour_dec, calc_lat, calc_lon,
+        house_system=house_system, cusp_offset=cusp_offset
     )
     
     # Attach interpretations from interpretations database
@@ -165,7 +172,9 @@ def calculate_person_chart(data):
         "datetime_gmt": dt_gmt.strftime("%Y-%m-%d %H:%M:%S"),
         "latitude": lat,
         "longitude": lon,
-        "is_gmt": is_gmt
+        "is_gmt": is_gmt,
+        "house_system": house_system,
+        "cusp_offset": cusp_offset
     }
     
     return chart_data

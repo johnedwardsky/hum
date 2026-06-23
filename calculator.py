@@ -72,7 +72,7 @@ def format_longitude(lon):
         "formatted": f"{deg}° {minutes:02d}' {seconds:02d}\" {sign_info['symbol']} ({sign_info['ru']})"
     }
 
-def calculate_chart(year, month, day, hour_gmt, lat, lon):
+def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp_offset=0.0):
     """
     Calculates planetary positions and house cusps.
     hour_gmt should be a decimal hour in GMT (e.g. 14.5 for 14:30 GMT).
@@ -136,12 +136,10 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon):
         "formatted": format_longitude(mean_south_node_lon)
     })
     
-    # 3. Calculate Houses (Placidus system with fallback for high latitudes where Placidus has no mathematical solution)
-    # swe.houses returns (cusps, ascmc)
-    # cusps is 0-indexed (0 to 11 for houses 1 to 12)
-    # lat and lon should be in degrees
+    # 3. Calculate Houses (with fallback if the selected system fails)
+    hs_code = house_system.encode('utf-8') if isinstance(house_system, str) else house_system
     try:
-        cusps, ascmc = swe.houses(jd_ut, lat, lon, b'P')
+        cusps, ascmc = swe.houses(jd_ut, lat, lon, hs_code)
     except Exception:
         try:
             # Fallback to Porphyry system (quadrant system that doesn't fail at high latitudes)
@@ -150,10 +148,15 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon):
             # Final fallback to Equal system
             cusps, ascmc = swe.houses(jd_ut, lat, lon, b'E')
     
+    cusps_list = list(cusps)
+    if house_system == 'D' and cusp_offset != 0.0:
+        for i in range(12):
+            cusps_list[i] = (cusps_list[i] + cusp_offset) % 360.0
+
     house_names = ["I (As)", "II", "III", "IV (Ic)", "V", "VI", "VII (Ds)", "VIII", "IX", "X (Mc)", "XI", "XII"]
     
     for i in range(1, 13):
-        cusp_lon = cusps[i-1]
+        cusp_lon = cusps_list[i-1]
         formatted = format_longitude(cusp_lon)
         results["houses"].append({
             "number": i,

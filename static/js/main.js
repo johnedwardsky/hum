@@ -461,6 +461,16 @@ document.addEventListener('DOMContentLoaded', () => {
         radioGmtDot.classList.toggle('active',  val);
     }
 
+    // ── House system picker toggle ────────────────────────────
+    const houseSystemSelect = document.getElementById('house_system');
+    const cuspOffsetGroup   = document.getElementById('cusp-offset-group');
+    if (houseSystemSelect && cuspOffsetGroup) {
+        houseSystemSelect.addEventListener('change', () => {
+            const isEqualMC = houseSystemSelect.value === 'D';
+            cuspOffsetGroup.classList.toggle('hidden', !isEqualMC);
+        });
+    }
+
     // ── City clear button ─────────────────────────────────────
     cityClear.addEventListener('click', () => {
         cityInput.value = '';
@@ -781,6 +791,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     is_gmt: isGmt,
                     lat: isGmt ? null : parseFloat(latHidden.value),
                     lon: isGmt ? null : parseFloat(lonHidden.value),
+                    house_system: houseSystemSelect.value,
+                    cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
                 })
             });
             const data = await resp.json();
@@ -866,6 +878,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pm-timezone').textContent = meta.timezone;
         document.getElementById('pm-offset').textContent = `Историческое смещение: ${meta.utc_offset}`;
         document.getElementById('pm-jd').textContent = jd.toFixed(5);
+
+        const printHouseSystemLabel = document.getElementById('print-house-system-label');
+        if (printHouseSystemLabel) {
+            if (meta.house_system === 'D') {
+                const offset = meta.cusp_offset || 0;
+                printHouseSystemLabel.textContent = 'Равнодомная от МС' + (offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset}°)` : '');
+            } else {
+                printHouseSystemLabel.textContent = 'Placidus';
+            }
+        }
 
         // Populate print planets table
         const printPlanetsTbody = document.getElementById('print-planets-tbody');
@@ -1115,7 +1137,12 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Юлианский день (UT)',  value: jd.toFixed(5) },
             { label: 'Широта',               value: meta.latitude  ? `${parseFloat(meta.latitude).toFixed(6)}°` : '—' },
             { label: 'Долгота',              value: meta.longitude ? `${parseFloat(meta.longitude).toFixed(6)}°` : '—' },
-            { label: 'Система домов',        value: 'Плацидус' },
+            { 
+                label: 'Система домов',        
+                value: meta.house_system === 'D' 
+                    ? `Равнодомная от МС${meta.cusp_offset !== 0 ? ` (${meta.cusp_offset > 0 ? '+' : ''}${meta.cusp_offset}°)` : ''}`
+                    : 'Плацидус' 
+            },
             { label: 'Движок расчётов',      value: 'Swiss Ephemeris (pyswisseph)' },
         ];
         items.forEach(item => {
@@ -1960,14 +1987,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 birth_time: p1_birth_time,
                 lat: p1_lat,
                 lon: p1_lon,
-                is_gmt: p1IsGmt
+                is_gmt: p1IsGmt,
+                house_system: houseSystemSelect.value,
+                cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0
             },
             p2: {
                 birth_date: p2_birth_date,
                 birth_time: p2_birth_time,
                 lat: p2_lat,
                 lon: p2_lon,
-                is_gmt: p2IsGmt
+                is_gmt: p2IsGmt,
+                house_system: houseSystemSelect.value,
+                cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0
             }
         };
         

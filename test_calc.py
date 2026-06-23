@@ -76,6 +76,29 @@ def run_test():
         print(f"  Dudinka calculation failed: {e}")
         raise e
         
+    # 4. Test Equal MC and cusp offset
+    print("\n--- Testing Equal MC and Cusp Offset ---")
+    try:
+        # Equal MC ('D') without offset
+        res_eq = calculator.calculate_chart(2026, 6, 19, 14.12944, 55.7558, 37.6173, house_system='D')
+        eq_h1 = res_eq["houses"][0]["longitude"]
+        eq_h2 = res_eq["houses"][1]["longitude"]
+        diff = (eq_h2 - eq_h1) % 360.0
+        print(f"  Equal MC difference (H2 - H1): {diff:.6f} degrees (Expected: 30.0)")
+        assert abs(diff - 30.0) < 1e-5, f"Equal MC houses should be exactly 30 degrees apart, got {diff}"
+
+        # Equal MC with offset (+5 degrees)
+        res_eq_offset = calculator.calculate_chart(2026, 6, 19, 14.12944, 55.7558, 37.6173, house_system='D', cusp_offset=5.0)
+        eq_h1_offset = res_eq_offset["houses"][0]["longitude"]
+        shift_diff = (eq_h1_offset - eq_h1) % 360.0
+        print(f"  Equal MC offset shift: {shift_diff:.6f} degrees (Expected: 5.0)")
+        assert abs(shift_diff - 5.0) < 1e-5, f"Cusp shift should be exactly 5.0 degrees, got {shift_diff}"
+        
+        print("  Equal MC and Cusp Offset tests: SUCCESS")
+    except Exception as e:
+        print(f"  Equal MC and Cusp Offset tests failed: {e}")
+        raise e
+        
     print("\nAll tests passed successfully!")
 
 if __name__ == "__main__":
