@@ -138,7 +138,15 @@ def calculate_person_chart(data):
         for p in chart_data["planets"]:
             planet_name = p["name"]
             sign_name = p["formatted"]["sign"]
-            p_texts = interpretations.PLANETS_TEXTS.get(planet_name, {})
+            
+            # Map node names to their base interpretations key
+            mapping_name = planet_name
+            if "Северный Узел" in planet_name:
+                mapping_name = "Северный Узел"
+            elif "Южный Узел" in planet_name:
+                mapping_name = "Южный Узел"
+                
+            p_texts = interpretations.PLANETS_TEXTS.get(mapping_name, {})
             p["interpretation"] = p_texts.get(sign_name, f"Индивидуальное влияние {planet_name} в знаке {sign_name}.")
 
         for h in chart_data["houses"]:

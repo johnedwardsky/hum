@@ -983,6 +983,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'Плутон':       { sym: '♇', cls: 'glyph-pluto' },
         'Северный Узел':{ sym: '☊', cls: 'glyph-node' },
         'Южный Узел':   { sym: '☋', cls: 'glyph-node' },
+        'Истинный Северный Узел':{ sym: '☊', cls: 'glyph-node' },
+        'Истинный Южный Узел':   { sym: '☋', cls: 'glyph-node' },
+        'Средний Северный Узел':{ sym: '☊', cls: 'glyph-node' },
+        'Средний Южный Узел':   { sym: '☋', cls: 'glyph-node' },
     };
 
     const ZODIAC_META = [
@@ -1178,6 +1182,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'Плутон':       '#7C2D12',
         'Северный Узел':'#3F6E10',
         'Южный Узел':   '#3F6E10',
+        'Истинный Северный Узел':'#3F6E10',
+        'Истинный Южный Узел':   '#3F6E10',
+        'Средний Северный Узел':'#3F6E10',
+        'Средний Южный Узел':   '#3F6E10',
     };
 
     function drawChart(data, canvasEl) {

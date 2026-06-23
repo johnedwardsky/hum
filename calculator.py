@@ -33,7 +33,8 @@ PLANETS_MAP = {
     swe.URANUS: {"name": "Уран", "symbol": "♅"},
     swe.NEPTUNE: {"name": "Нептун", "symbol": "♆"},
     swe.PLUTO: {"name": "Плутон", "symbol": "♇"},
-    swe.MEAN_NODE: {"name": "Северный Узел", "symbol": "☊"},
+    swe.TRUE_NODE: {"name": "Истинный Северный Узел", "symbol": "☊"},
+    swe.MEAN_NODE: {"name": "Средний Северный Узел", "symbol": "☊"},
 }
 
 def format_longitude(lon):
@@ -48,7 +49,7 @@ def format_longitude(lon):
     minutes = int(minutes_float)
     
     seconds_float = (minutes_float - minutes) * 60.0
-    seconds = int(round(seconds_float))
+    seconds = int(seconds_float)  # Truncated consistently to match Sotis Online
     
     # Handle rounding up to 60 seconds
     if seconds >= 60:
@@ -107,19 +108,32 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon):
             "formatted": formatted
         })
         
-    # Add South Node (which is exactly opposite to Mean North Node)
-    north_node_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.MEAN_NODE][0]
-    north_node_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.MEAN_NODE][0]
-    south_node_lon = (north_node_lon + 180.0) % 360.0
-    formatted_south = format_longitude(south_node_lon)
+    # Add True South Node (which is exactly opposite to True North Node)
+    true_node_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.TRUE_NODE][0]
+    true_node_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.TRUE_NODE][0]
+    true_south_node_lon = (true_node_lon + 180.0) % 360.0
+    results["planets"].append({
+        "id": -2,
+        "name": "Истинный Южный Узел",
+        "symbol": "☋",
+        "longitude": true_south_node_lon,
+        "speed": true_node_speed,  # shares the node speed
+        "is_retrograde": true_node_speed < 0,
+        "formatted": format_longitude(true_south_node_lon)
+    })
+    
+    # Add Mean South Node (which is exactly opposite to Mean North Node)
+    mean_node_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.MEAN_NODE][0]
+    mean_node_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.MEAN_NODE][0]
+    mean_south_node_lon = (mean_node_lon + 180.0) % 360.0
     results["planets"].append({
         "id": -1,
-        "name": "Южный Узел",
+        "name": "Средний Южный Узел",
         "symbol": "☋",
-        "longitude": south_node_lon,
-        "speed": north_node_speed,  # shares the node speed
-        "is_retrograde": north_node_speed < 0,
-        "formatted": formatted_south
+        "longitude": mean_south_node_lon,
+        "speed": mean_node_speed,  # shares the node speed
+        "is_retrograde": mean_node_speed < 0,
+        "formatted": format_longitude(mean_south_node_lon)
     })
     
     # 3. Calculate Houses (Placidus system with fallback for high latitudes where Placidus has no mathematical solution)
