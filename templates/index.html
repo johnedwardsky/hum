@@ -183,6 +183,22 @@
                         </div>
                     </div>
 
+                    <!-- Polar equal house system options (shown only when Placidus is selected) -->
+                    <div id="placidus-polar-options">
+                        <div class="field-group">
+                            <label class="checkbox-row" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 10px;">
+                                <input type="checkbox" id="use_polar_equal" style="accent-color: var(--primary); cursor: pointer; transform: scale(1.15);">
+                                <span style="font-size: 13px; color: var(--text-dark);">Равнодомная для заполярных широт</span>
+                            </label>
+                        </div>
+                        <div class="field-group hidden" id="polar-boundary-group">
+                            <label class="field-label" for="polar_boundary">Граница заполярья (широта, °)</label>
+                            <div class="field-wrap">
+                                <input type="number" id="polar_boundary" class="field-input" value="62" min="0" max="90" step="1">
+                            </div>
+                        </div>
+                    </div>
+
 
                     <!-- Timezone note -->
                     <div class="tz-note">

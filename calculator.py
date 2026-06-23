@@ -72,7 +72,7 @@ def format_longitude(lon):
         "formatted": f"{deg}° {minutes:02d}' {seconds:02d}\" {sign_info['symbol']} ({sign_info['ru']})"
     }
 
-def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp_offset=0.0):
+def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp_offset=0.0, use_polar_equal=False, polar_boundary=62.0):
     """
     Calculates planetary positions and house cusps.
     hour_gmt should be a decimal hour in GMT (e.g. 14.5 for 14:30 GMT).
@@ -83,7 +83,8 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
     results = {
         "planets": [],
         "houses": [],
-        "angles": {}
+        "angles": {},
+        "calculated_house_system": house_system
     }
     
     # 2. Calculate Planets
@@ -137,7 +138,13 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
     })
     
     # 3. Calculate Houses (with fallback if the selected system fails)
-    hs_code = house_system.encode('utf-8') if isinstance(house_system, str) else house_system
+    effective_house_system = house_system
+    if house_system == 'P' and use_polar_equal and abs(lat) > polar_boundary:
+        effective_house_system = 'E'
+        
+    results["calculated_house_system"] = effective_house_system
+
+    hs_code = effective_house_system.encode('utf-8') if isinstance(effective_house_system, str) else effective_house_system
     try:
         cusps, ascmc = swe.houses(jd_ut, lat, lon, hs_code)
     except Exception:
@@ -149,7 +156,7 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
             cusps, ascmc = swe.houses(jd_ut, lat, lon, b'E')
     
     cusps_list = list(cusps)
-    if house_system == 'D' and cusp_offset != 0.0:
+    if effective_house_system == 'D' and cusp_offset != 0.0:
         for i in range(12):
             cusps_list[i] = (cusps_list[i] + cusp_offset) % 360.0
 

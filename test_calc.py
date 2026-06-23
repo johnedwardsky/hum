@@ -99,6 +99,35 @@ def run_test():
         print(f"  Equal MC and Cusp Offset tests failed: {e}")
         raise e
         
+    # 5. Test Polar Equal House System transition
+    print("\n--- Testing Polar Equal House System transition ---")
+    try:
+        # Latitude 69.4 (Dudinka) is greater than 62.0.
+        # Placidus with polar equal enabled -> Should switch to 'E'
+        res_polar = calculator.calculate_chart(2026, 6, 19, 14.12944, 69.4, 86.18, house_system='P', use_polar_equal=True, polar_boundary=62.0)
+        h1 = res_polar["houses"][0]["longitude"]
+        h2 = res_polar["houses"][1]["longitude"]
+        diff = (h2 - h1) % 360.0
+        print(f"  Polar equal enabled: system={res_polar['calculated_house_system']}, H2-H1 diff={diff:.6f} degrees (Expected: 'E' and 30.0)")
+        assert res_polar["calculated_house_system"] == 'E', f"Should switch to 'E' system, got {res_polar['calculated_house_system']}"
+        assert abs(diff - 30.0) < 1e-5, f"Polar equal houses should be exactly 30 degrees apart, got {diff}"
+
+        # Placidus with polar equal disabled -> Should remain 'P' (Placidus) if it succeeds, or fallback to 'O' (Porphyry) if it fails
+        res_no_polar = calculator.calculate_chart(2026, 6, 19, 14.12944, 69.4, 86.18, house_system='P', use_polar_equal=False, polar_boundary=62.0)
+        print(f"  Polar equal disabled: system={res_no_polar['calculated_house_system']} (Expected: 'P' or 'O')")
+        assert res_no_polar["calculated_house_system"] in ('P', 'O'), f"Should be 'P' or 'O' system, got {res_no_polar['calculated_house_system']}"
+
+        # Latitude 55.75 (Moscow) is less than 62.0.
+        # Placidus with polar equal enabled -> Should remain 'P' (Placidus)
+        res_moscow = calculator.calculate_chart(2026, 6, 19, 14.12944, 55.7558, 37.6173, house_system='P', use_polar_equal=True, polar_boundary=62.0)
+        print(f"  Moscow (lat=55.75) with polar equal enabled: system={res_moscow['calculated_house_system']} (Expected: 'P')")
+        assert res_moscow["calculated_house_system"] == 'P', f"Should remain 'P' system, got {res_moscow['calculated_house_system']}"
+        
+        print("  Polar Equal House System tests: SUCCESS")
+    except Exception as e:
+        print(f"  Polar Equal House System tests failed: {e}")
+        raise e
+        
     print("\nAll tests passed successfully!")
 
 if __name__ == "__main__":

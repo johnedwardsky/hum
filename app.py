@@ -134,9 +134,16 @@ def calculate_person_chart(data):
     except (ValueError, TypeError):
         cusp_offset = 0.0
 
+    use_polar_equal = bool(data.get('use_polar_equal', False))
+    try:
+        polar_boundary = float(data.get('polar_boundary', 62.0))
+    except (ValueError, TypeError):
+        polar_boundary = 62.0
+
     chart_data = calculator.calculate_chart(
         gmt_year, gmt_month, gmt_day, gmt_hour_dec, calc_lat, calc_lon,
-        house_system=house_system, cusp_offset=cusp_offset
+        house_system=house_system, cusp_offset=cusp_offset,
+        use_polar_equal=use_polar_equal, polar_boundary=polar_boundary
     )
     
     # Attach interpretations from interpretations database
@@ -174,7 +181,10 @@ def calculate_person_chart(data):
         "longitude": lon,
         "is_gmt": is_gmt,
         "house_system": house_system,
-        "cusp_offset": cusp_offset
+        "cusp_offset": cusp_offset,
+        "use_polar_equal": use_polar_equal,
+        "polar_boundary": polar_boundary,
+        "calculated_house_system": chart_data.get("calculated_house_system", house_system)
     }
     
     return chart_data

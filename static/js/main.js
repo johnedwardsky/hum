@@ -464,10 +464,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── House system picker toggle ────────────────────────────
     const houseSystemSelect = document.getElementById('house_system');
     const cuspOffsetGroup   = document.getElementById('cusp-offset-group');
-    if (houseSystemSelect && cuspOffsetGroup) {
+    const placidusPolarOptions = document.getElementById('placidus-polar-options');
+    const usePolarEqualCheckbox = document.getElementById('use_polar_equal');
+    const polarBoundaryGroup = document.getElementById('polar-boundary-group');
+
+    if (houseSystemSelect && cuspOffsetGroup && placidusPolarOptions) {
         houseSystemSelect.addEventListener('change', () => {
             const isEqualMC = houseSystemSelect.value === 'D';
             cuspOffsetGroup.classList.toggle('hidden', !isEqualMC);
+            placidusPolarOptions.classList.toggle('hidden', isEqualMC);
+        });
+    }
+
+    if (usePolarEqualCheckbox && polarBoundaryGroup) {
+        usePolarEqualCheckbox.addEventListener('change', () => {
+            polarBoundaryGroup.classList.toggle('hidden', !usePolarEqualCheckbox.checked);
         });
     }
 
@@ -793,6 +804,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     lon: isGmt ? null : parseFloat(lonHidden.value),
                     house_system: houseSystemSelect.value,
                     cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
+                    use_polar_equal: usePolarEqualCheckbox ? usePolarEqualCheckbox.checked : false,
+                    polar_boundary: parseFloat(document.getElementById('polar_boundary').value) || 62.0,
                 })
             });
             const data = await resp.json();
@@ -881,7 +894,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const printHouseSystemLabel = document.getElementById('print-house-system-label');
         if (printHouseSystemLabel) {
-            if (meta.house_system === 'D') {
+            if (meta.calculated_house_system === 'E') {
+                printHouseSystemLabel.textContent = meta.use_polar_equal 
+                    ? `Равнодомная (заполярная шир. > ${meta.polar_boundary || 62}°)`
+                    : 'Равнодомная';
+            } else if (meta.calculated_house_system === 'O') {
+                printHouseSystemLabel.textContent = 'Порфирий';
+            } else if (meta.house_system === 'D') {
                 const offset = meta.cusp_offset || 0;
                 printHouseSystemLabel.textContent = 'Равнодомная от МС' + (offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset}°)` : '');
             } else {
@@ -1139,9 +1158,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Долгота',              value: meta.longitude ? `${parseFloat(meta.longitude).toFixed(6)}°` : '—' },
             { 
                 label: 'Система домов',        
-                value: meta.house_system === 'D' 
-                    ? `Равнодомная от МС${meta.cusp_offset !== 0 ? ` (${meta.cusp_offset > 0 ? '+' : ''}${meta.cusp_offset}°)` : ''}`
-                    : 'Плацидус' 
+                value: meta.calculated_house_system === 'E'
+                    ? (meta.use_polar_equal 
+                        ? `Равнодомная (заполярная шир. > ${meta.polar_boundary || 62}°)`
+                        : 'Равнодомная (запасной вариант)')
+                    : (meta.calculated_house_system === 'O'
+                        ? 'Порфирий (запасной вариант)'
+                        : (meta.house_system === 'D' 
+                            ? `Равнодомная от МС${meta.cusp_offset !== 0 ? ` (${meta.cusp_offset > 0 ? '+' : ''}${meta.cusp_offset}°)` : ''}`
+                            : 'Плацидус'))
             },
             { label: 'Движок расчётов',      value: 'Swiss Ephemeris (pyswisseph)' },
         ];
@@ -1989,7 +2014,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 lon: p1_lon,
                 is_gmt: p1IsGmt,
                 house_system: houseSystemSelect.value,
-                cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0
+                cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
+                use_polar_equal: usePolarEqualCheckbox ? usePolarEqualCheckbox.checked : false,
+                polar_boundary: parseFloat(document.getElementById('polar_boundary').value) || 62.0
             },
             p2: {
                 birth_date: p2_birth_date,
@@ -1998,7 +2025,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 lon: p2_lon,
                 is_gmt: p2IsGmt,
                 house_system: houseSystemSelect.value,
-                cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0
+                cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
+                use_polar_equal: usePolarEqualCheckbox ? usePolarEqualCheckbox.checked : false,
+                polar_boundary: parseFloat(document.getElementById('polar_boundary').value) || 62.0
             }
         };
         
