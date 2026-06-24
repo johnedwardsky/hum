@@ -177,7 +177,33 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
         "formatted": format_longitude(earth_lon)
     })
     
-    # 3. Calculate Houses (with fallback if the selected system fails)
+    # 3. Sort planets in a predefined professional astrological order
+    planet_order = [
+        "Солнце",
+        "Луна",
+        "Меркурий",
+        "Венера",
+        "Земля",
+        "Марс",
+        "Юпитер",
+        "Сатурн",
+        "Уран",
+        "Нептун",
+        "Плутон",
+        "Истинный Северный Узел",
+        "Истинный Южный Узел",
+        "Средний Северный Узел",
+        "Средний Южный Узел",
+        "Хирон",
+        "Лилит (истинная)",
+        "Лилит (средняя)",
+        "Лилит (интерп.)",
+        "Приап (интерп.)"
+    ]
+    results["planets"].sort(key=lambda p: planet_order.index(p["name"]) if p["name"] in planet_order else 999)
+
+    
+    # 4. Calculate Houses (with fallback if the selected system fails)
     effective_house_system = house_system
     if house_system == 'P' and use_polar_equal and abs(lat) > polar_boundary:
         effective_house_system = 'D'
