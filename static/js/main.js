@@ -831,8 +831,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const cityName = selectedCity ? selectedCity.display : '—';
         icCity.textContent = cityName;
         if (meta.latitude && meta.longitude) {
-            const lat = parseFloat(meta.latitude).toFixed(4);
-            const lon = parseFloat(meta.longitude).toFixed(4);
+            const lat = truncTo(meta.latitude, 4);
+            const lon = truncTo(meta.longitude, 4);
             icCoords.textContent = `${lat}° N, ${lon}° E`;
         } else {
             icCoords.textContent = '—';
@@ -875,9 +875,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Print Meta Cards
         document.getElementById('pm-city').textContent = cityName;
         if (meta.latitude && meta.longitude) {
-            const latVal = parseFloat(meta.latitude).toFixed(4);
-            const lonVal = parseFloat(meta.longitude).toFixed(4);
-            document.getElementById('pm-coords').textContent = `${Math.abs(latVal)}°${latVal >= 0 ? 'N' : 'S'}, ${Math.abs(lonVal)}°${lonVal >= 0 ? 'E' : 'W'}`;
+            const latVal = truncTo(meta.latitude, 4);
+            const lonVal = truncTo(meta.longitude, 4);
+            const latNum = parseFloat(latVal);
+            const lonNum = parseFloat(lonVal);
+            document.getElementById('pm-coords').textContent = `${Math.abs(latNum)}°${latNum >= 0 ? 'N' : 'S'}, ${Math.abs(lonNum)}°${lonNum >= 0 ? 'E' : 'W'}`;
         } else {
             document.getElementById('pm-coords').textContent = '—';
         }
@@ -1049,6 +1051,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return ZODIAC_META.find(z => z.name === signName) || { sym: '?', name: signName };
     }
 
+    function truncTo(val, decimals) {
+        if (val === null || val === undefined || val === '') return '—';
+        const num = parseFloat(val);
+        if (isNaN(num)) return '—';
+        const parts = num.toFixed(12).split('.');
+        const integerPart = parts[0];
+        const fractionalPart = parts[1].substring(0, decimals);
+        return `${integerPart}.${fractionalPart}`;
+    }
+
     function fmtPos(f) {
         return `${f.deg}° ${String(f.min).padStart(2,'0')}' ${String(f.sec).padStart(2,'0')}"`;
     }
@@ -1077,13 +1089,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fmt1 = `${d}° ${String(m).padStart(2, '0')}' ${String(s).padStart(2, '0')}"`;
 
-        // Format 2: Decimal representation, truncated to 5 decimal places
-        const parts = normalized.toFixed(10).split('.');
+        // Format 2: Decimal representation, truncated to 6 decimal places
+        const parts = normalized.toFixed(12).split('.');
         let integerPart = parts[0];
         if (integerPart === '360') {
             integerPart = '0';
         }
-        const fractionalPart = parts[1].substring(0, 5);
+        const fractionalPart = parts[1].substring(0, 6);
         const fmt2 = `${integerPart},${fractionalPart}`;
 
         return `${fmt1}<br><span class="lon-dec" style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;">${fmt2}</span>`;
@@ -1154,8 +1166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Часовой пояс',         value: meta.timezone,   sub: meta.utc_offset },
             { label: 'GMT / UTC',            value: meta.datetime_gmt },
             { label: 'Юлианский день (UT)',  value: jd.toFixed(5) },
-            { label: 'Широта',               value: meta.latitude  ? `${parseFloat(meta.latitude).toFixed(6)}°` : '—' },
-            { label: 'Долгота',              value: meta.longitude ? `${parseFloat(meta.longitude).toFixed(6)}°` : '—' },
+            { label: 'Широта',               value: meta.latitude  ? `${truncTo(meta.latitude, 6)}°` : '—' },
+            { label: 'Долгота',              value: meta.longitude ? `${truncTo(meta.longitude, 6)}°` : '—' },
             { 
                 label: 'Система домов',        
                 value: meta.calculated_house_system === 'E'
