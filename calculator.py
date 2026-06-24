@@ -1,10 +1,31 @@
 import os
+import urllib.request
+import ssl
 import swisseph as swe
 
 # Set the path to Swiss Ephemeris files (if they exist)
 EPHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ephe')
 if not os.path.exists(EPHE_PATH):
     os.makedirs(EPHE_PATH)
+
+# Auto-download ephemeris files if they are missing
+REQUIRED_EPHE_FILES = {
+    "sepl_18.se1": "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/sepl_18.se1",
+    "semo_18.se1": "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/semo_18.se1",
+    "seas_18.se1": "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/seas_18.se1"
+}
+for filename, url in REQUIRED_EPHE_FILES.items():
+    filepath = os.path.join(EPHE_PATH, filename)
+    if not os.path.exists(filepath):
+        try:
+            # Bypass SSL verification to avoid issues on platforms like macOS/Render with missing certificates
+            ctx = ssl._create_unverified_context()
+            with urllib.request.urlopen(url, context=ctx) as response, open(filepath, 'wb') as out_file:
+                out_file.write(response.read())
+        except Exception as e:
+            # Fallback warning
+            pass
+
 swe.set_ephe_path(EPHE_PATH)
 
 ZODIAC_SIGNS = [
@@ -35,6 +56,11 @@ PLANETS_MAP = {
     swe.PLUTO: {"name": "Плутон", "symbol": "♇"},
     swe.TRUE_NODE: {"name": "Истинный Северный Узел", "symbol": "☊"},
     swe.MEAN_NODE: {"name": "Средний Северный Узел", "symbol": "☊"},
+    swe.CHIRON: {"name": "Хирон", "symbol": "⚷"},
+    swe.MEAN_APOG: {"name": "Лилит (средняя)", "symbol": "⚸"},
+    swe.OSCU_APOG: {"name": "Лилит (истинная)", "symbol": "⚸"},
+    swe.INTP_APOG: {"name": "Лилит (интерп.)", "symbol": "⚸"},
+    swe.INTP_PERG: {"name": "Приап (интерп.)", "symbol": "⯓"},
 }
 
 def format_longitude(lon):
@@ -135,6 +161,20 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
         "speed": mean_node_speed,  # shares the node speed
         "is_retrograde": mean_node_speed < 0,
         "formatted": format_longitude(mean_south_node_lon)
+    })
+
+    # Add Earth (opposition of the Sun)
+    sun_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.SUN][0]
+    sun_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.SUN][0]
+    earth_lon = (sun_lon - 180.0) % 360.0
+    results["planets"].append({
+        "id": -3,
+        "name": "Земля",
+        "symbol": "♁",
+        "longitude": earth_lon,
+        "speed": sun_speed,
+        "is_retrograde": False,
+        "formatted": format_longitude(earth_lon)
     })
     
     # 3. Calculate Houses (with fallback if the selected system fails)

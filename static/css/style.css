@@ -650,6 +650,12 @@ input  { font-family: inherit; }
 .glyph-neptune { color: #3C33C0; }
 .glyph-pluto   { color: #7C2D12; }
 .glyph-node    { color: #3F6E10; }
+.glyph-earth   { color: #2D82B7; }
+.glyph-chiron  { color: #8B5CF6; }
+.glyph-lilith-mean { color: #8C8C9C; }
+.glyph-lilith-true { color: #1C1917; }
+.glyph-lilith-intp { color: #4B5563; }
+.glyph-priapus { color: #A16207; }
 
 /* Sign cell */
 .sign-cell { display: flex; align-items: center; gap: 8px; }

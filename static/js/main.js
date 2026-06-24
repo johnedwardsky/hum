@@ -448,6 +448,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let isGmt        = false;
     let selectedCity = null;   // { display, lat, lon }
     let lastChart    = null;   // last calculation result
+    let lastCompatData = null; // last synastry compatibility calculation result
+    let activePlanets = null;  // Set of active planet names to display on chart
+    const DEFAULT_INACTIVE_PLANETS = [
+        'Средний Северный Узел',
+        'Средний Южный Узел',
+        'Хирон',
+        'Лилит (средняя)',
+        'Лилит (истинная)',
+        'Лилит (интерп.)',
+        'Приап (интерп.)'
+    ];
     const geoCache   = new Map(); // local geocoding cache
 
     // ── Radio time mode ───────────────────────────────────────
@@ -1034,6 +1045,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'Истинный Южный Узел':   { sym: '☋', cls: 'glyph-node' },
         'Средний Северный Узел':{ sym: '☊', cls: 'glyph-node' },
         'Средний Южный Узел':   { sym: '☋', cls: 'glyph-node' },
+        'Земля':                 { sym: '♁', cls: 'glyph-earth' },
+        'Хирон':                 { sym: '⚷', cls: 'glyph-chiron' },
+        'Лилит (средняя)':       { sym: '⚸', cls: 'glyph-lilith-mean' },
+        'Лилит (истинная)':      { sym: '⚸', cls: 'glyph-lilith-true' },
+        'Лилит (интерп.)':       { sym: '⚸', cls: 'glyph-lilith-intp' },
+        'Приап (интерп.)':       { sym: '⯓', cls: 'glyph-priapus' },
     };
 
     const ZODIAC_META = [
@@ -1108,6 +1125,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Planets table ─────────────────────────────────────────
     function renderPlanetsTable(planets) {
+        if (activePlanets === null) {
+            activePlanets = new Set();
+            planets.forEach(p => {
+                if (!DEFAULT_INACTIVE_PLANETS.includes(p.name)) {
+                    activePlanets.add(p.name);
+                }
+            });
+        }
+
         planetsTbody.innerHTML = '';
         planets.forEach(p => {
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
@@ -1117,7 +1143,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.is_retrograde) {
                 tr.classList.add('retro-row');
             }
+            const isChecked = activePlanets.has(p.name) ? 'checked' : '';
             tr.innerHTML = `
+                <td style="text-align: center; width: 40px; padding: 0 4px;">
+                    <input type="checkbox" class="planet-toggle-checkbox" data-name="${p.name}" ${isChecked} style="cursor:pointer; accent-color:var(--primary); transform:scale(1.15); vertical-align: middle;">
+                </td>
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
@@ -1136,6 +1166,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? '<span class="retro-badge">R</span>'
                     : '<span class="direct-dash">—</span>'}</td>`;
             planetsTbody.appendChild(tr);
+        });
+
+        // Attach change listeners to checkboxes
+        planetsTbody.querySelectorAll('.planet-toggle-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const name = e.target.getAttribute('data-name');
+                if (e.target.checked) {
+                    activePlanets.add(name);
+                } else {
+                    activePlanets.delete(name);
+                }
+                // Redraw canvases
+                const canvas = document.getElementById('chart-canvas');
+                if (lastChart) {
+                    drawChart(lastChart, canvas);
+                    const printCanvas = document.getElementById('print-chart-canvas');
+                    if (printCanvas) {
+                        drawChartFixed(lastChart, printCanvas, 220);
+                    }
+                }
+                const sCanvas = document.getElementById('synastry-canvas');
+                if (sCanvas && lastCompatData) {
+                    drawSynastryChart(lastCompatData, sCanvas, 340);
+                }
+            });
         });
     }
 
@@ -1283,6 +1338,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'Истинный Южный Узел':   '#3F6E10',
         'Средний Северный Узел':'#3F6E10',
         'Средний Южный Узел':   '#3F6E10',
+        'Земля':                 '#2D82B7',
+        'Хирон':                 '#8B5CF6',
+        'Лилит (средняя)':       '#8C8C9C',
+        'Лилит (истинная)':      '#1C1917',
+        'Лилит (интерп.)':       '#4B5563',
+        'Приап (интерп.)':       '#A16207',
     };
 
     function drawChart(data, canvasEl) {
@@ -1385,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle='#FFFFFF'; ctx.fill(); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
 
         // -- Aspects (between planets) --
-        const planets = data.planets;
+        const planets = data.planets.filter(p => !activePlanets || activePlanets.has(p.name));
         const ASPECTS = [
             { name:'conj', orb:10, color:'rgba(197, 158, 63, 0.6)',  deg:0 },    // gold
             { name:'oppo', orb:10, color:'rgba(165, 120, 69, 0.6)',  deg:180 },  // bronze
@@ -1580,6 +1641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.strokeStyle='rgba(197,158,63,0.25)'; ctx.lineWidth=0.8; ctx.stroke();
 
         // Aspects
+        const planets = data.planets.filter(p => !activePlanets || activePlanets.has(p.name));
         const ASPECTS = [
             { deg: 0,   orb: 8, color: 'rgba(197,158,63,0.5)',  dash: [] },
             { deg: 120, orb: 6, color: 'rgba(94,82,176,0.45)',  dash: [] },
@@ -1587,13 +1649,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { deg: 180, orb: 6, color: 'rgba(165,120,69,0.45)', dash: [] },
             { deg: 60,  orb: 5, color: 'rgba(94,82,176,0.25)',  dash: [2,3] },
         ];
-        for (let i = 0; i < data.planets.length; i++) {
-            for (let j = i + 1; j < data.planets.length; j++) {
-                const diff = Math.abs(angleDiff(data.planets[i].longitude, data.planets[j].longitude));
+        for (let i = 0; i < planets.length; i++) {
+            for (let j = i + 1; j < planets.length; j++) {
+                const diff = Math.abs(angleDiff(planets[i].longitude, planets[j].longitude));
                 for (const asp of ASPECTS) {
                     if (Math.abs(diff - asp.deg) <= asp.orb || (asp.deg > 0 && Math.abs(360 - diff - asp.deg) <= asp.orb)) {
-                        const a1 = degToRad(lonToAngle(data.planets[i].longitude, asc));
-                        const a2 = degToRad(lonToAngle(data.planets[j].longitude, asc));
+                        const a1 = degToRad(lonToAngle(planets[i].longitude, asc));
+                        const a2 = degToRad(lonToAngle(planets[j].longitude, asc));
                         ctx.beginPath();
                         ctx.moveTo(cx + r3 * Math.cos(a1), cy + r3 * Math.sin(a1));
                         ctx.lineTo(cx + r3 * Math.cos(a2), cy + r3 * Math.sin(a2));
@@ -1607,7 +1669,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Planets
         const placed = [];
-        data.planets.forEach(p => {
+        planets.forEach(p => {
             const meta = PLANET_META[p.name] || { sym: p.symbol || '?', cls: 'glyph-node' };
             let angle = degToRad(lonToAngle(p.longitude, asc));
             const r_dot = (r3 + r2) / 2;
@@ -2153,6 +2215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render results view
     function renderCompatResults(data, type, sign1, sign2) {
+        lastCompatData = (type === 'synastry') ? data : null;
         // Show result view, hide inputs
         compatInputView.classList.add('hidden');
         compatResultView.classList.remove('hidden');
@@ -2460,6 +2523,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const lineR = r3 - 28;
         
         data.aspects.forEach(asp => {
+            if (activePlanets && (!activePlanets.has(asp.p1_planet) || !activePlanets.has(asp.p2_planet))) {
+                return;
+            }
             const a1 = degToRad(lonToAngle(asp.p1_longitude, asc));
             const a2 = degToRad(lonToAngle(asp.p2_longitude, asc));
             const x1 = cx + lineR * Math.cos(a1);
@@ -2481,7 +2547,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw P1 Planets (Gold)
         const rP1 = r2 - 12;
         const placedP1 = [];
-        data.p1.planets.forEach(p => {
+        const p1Planets = data.p1.planets.filter(p => !activePlanets || activePlanets.has(p.name));
+        p1Planets.forEach(p => {
             const meta = PLANET_META[p.name] || { sym: p.symbol };
             let angle = lonToAngle(p.longitude, asc);
             
@@ -2520,7 +2587,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw P2 Planets (Dark Slate)
         const rP2 = r3 - 12;
         const placedP2 = [];
-        data.p2.planets.forEach(p => {
+        const p2Planets = data.p2.planets.filter(p => !activePlanets || activePlanets.has(p.name));
+        p2Planets.forEach(p => {
             const meta = PLANET_META[p.name] || { sym: p.symbol };
             let angle = lonToAngle(p.longitude, asc);
             
