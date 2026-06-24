@@ -898,13 +898,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (printHouseSystemLabel) {
             if (meta.calculated_house_system === 'E') {
                 printHouseSystemLabel.textContent = meta.use_polar_equal 
-                    ? `Равнодомная (заполярная шир. > ${meta.polar_boundary || 62}°)`
-                    : 'Равнодомная';
+                    ? `Равнодомная от AS (заполярная шир. > ${meta.polar_boundary || 62}°)`
+                    : 'Равнодомная от AS';
+            } else if (meta.calculated_house_system === 'D') {
+                if (meta.house_system === 'P') {
+                    printHouseSystemLabel.textContent = `Равнодомная от МС (заполярная шир. > ${meta.polar_boundary || 62}°)`;
+                } else {
+                    const offset = meta.cusp_offset || 0;
+                    printHouseSystemLabel.textContent = 'Равнодомная от МС' + (offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset}°)` : '');
+                }
             } else if (meta.calculated_house_system === 'O') {
                 printHouseSystemLabel.textContent = 'Порфирий';
-            } else if (meta.house_system === 'D') {
-                const offset = meta.cusp_offset || 0;
-                printHouseSystemLabel.textContent = 'Равнодомная от МС' + (offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset}°)` : '');
             } else {
                 printHouseSystemLabel.textContent = 'Placidus';
             }
@@ -1172,12 +1176,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 label: 'Система домов',        
                 value: meta.calculated_house_system === 'E'
                     ? (meta.use_polar_equal 
-                        ? `Равнодомная (заполярная шир. > ${meta.polar_boundary || 62}°)`
-                        : 'Равнодомная (запасной вариант)')
-                    : (meta.calculated_house_system === 'O'
-                        ? 'Порфирий (запасной вариант)'
-                        : (meta.house_system === 'D' 
-                            ? `Равнодомная от МС${meta.cusp_offset !== 0 ? ` (${meta.cusp_offset > 0 ? '+' : ''}${meta.cusp_offset}°)` : ''}`
+                        ? `Равнодомная от AS (заполярная шир. > ${meta.polar_boundary || 62}°)`
+                        : 'Равнодомная от AS (запасной вариант)')
+                    : (meta.calculated_house_system === 'D'
+                        ? (meta.house_system === 'P'
+                            ? `Равнодомная от МС (заполярная шир. > ${meta.polar_boundary || 62}°)`
+                            : `Равнодомная от МС${meta.cusp_offset !== 0 ? ` (${meta.cusp_offset > 0 ? '+' : ''}${meta.cusp_offset}°)` : ''}`)
+                        : (meta.calculated_house_system === 'O'
+                            ? 'Порфирий (запасной вариант)'
                             : 'Плацидус'))
             },
             { label: 'Движок расчётов',      value: 'Swiss Ephemeris (pyswisseph)' },

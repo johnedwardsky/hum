@@ -103,13 +103,13 @@ def run_test():
     print("\n--- Testing Polar Equal House System transition ---")
     try:
         # Latitude 69.4 (Dudinka) is greater than 62.0.
-        # Placidus with polar equal enabled -> Should switch to 'E'
+        # Placidus with polar equal enabled -> Should switch to 'D'
         res_polar = calculator.calculate_chart(2026, 6, 19, 14.12944, 69.4, 86.18, house_system='P', use_polar_equal=True, polar_boundary=62.0)
         h1 = res_polar["houses"][0]["longitude"]
         h2 = res_polar["houses"][1]["longitude"]
         diff = (h2 - h1) % 360.0
-        print(f"  Polar equal enabled: system={res_polar['calculated_house_system']}, H2-H1 diff={diff:.6f} degrees (Expected: 'E' and 30.0)")
-        assert res_polar["calculated_house_system"] == 'E', f"Should switch to 'E' system, got {res_polar['calculated_house_system']}"
+        print(f"  Polar equal enabled: system={res_polar['calculated_house_system']}, H2-H1 diff={diff:.6f} degrees (Expected: 'D' and 30.0)")
+        assert res_polar["calculated_house_system"] == 'D', f"Should switch to 'D' system, got {res_polar['calculated_house_system']}"
         assert abs(diff - 30.0) < 1e-5, f"Polar equal houses should be exactly 30 degrees apart, got {diff}"
 
         # Placidus with polar equal disabled -> Should remain 'P' (Placidus) if it succeeds, or fallback to 'O' (Porphyry) if it fails

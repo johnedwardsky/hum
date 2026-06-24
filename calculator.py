@@ -140,7 +140,7 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
     # 3. Calculate Houses (with fallback if the selected system fails)
     effective_house_system = house_system
     if house_system == 'P' and use_polar_equal and abs(lat) > polar_boundary:
-        effective_house_system = 'E'
+        effective_house_system = 'D'
         
     results["calculated_house_system"] = effective_house_system
 
@@ -152,8 +152,8 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
             # Fallback to Porphyry system (quadrant system that doesn't fail at high latitudes)
             cusps, ascmc = swe.houses(jd_ut, lat, lon, b'O')
         except Exception:
-            # Final fallback to Equal system
-            cusps, ascmc = swe.houses(jd_ut, lat, lon, b'E')
+            # Final fallback to Equal system (from MC)
+            cusps, ascmc = swe.houses(jd_ut, lat, lon, b'D')
     
     cusps_list = list(cusps)
     if effective_house_system == 'D' and cusp_offset != 0.0:
