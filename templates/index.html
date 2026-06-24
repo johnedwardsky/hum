@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=1.0.3">
+    <link rel="stylesheet" href="/static/css/style.css?v=1.0.4">
 </head>
 <body>
     <!-- ===== SVG SPRITE FOR GOLDEN LOGO ===== -->
@@ -275,6 +275,20 @@
                             </svg>
                             Программы
                         </button>
+                        <button class="tab" id="tab-bodygraph" data-tab="bodygraph">
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                                <path d="M7.5 1a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM2 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                            </svg>
+                            Бодиграф
+                        </button>
+                        <button class="tab" id="tab-mandala" data-tab="mandala">
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                                <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/>
+                                <circle cx="7.5" cy="7.5" r="3.5" stroke="currentColor" stroke-width="1.2"/>
+                                <path d="M7.5 1v3M7.5 11v3M1 7.5h3M11 7.5h3" stroke="currentColor" stroke-width="1.2"/>
+                            </svg>
+                            Мандала
+                        </button>
                         <button class="tab" id="tab-interpretations" data-tab="interpretations">
                             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                                 <rect x="2.5" y="2.5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
@@ -465,6 +479,72 @@
                                 </thead>
                                 <tbody id="hexagrams-tbody"></tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === TAB: BODYGRAPH === -->
+                <div class="tab-content" id="content-bodygraph">
+                    <div class="content-grid">
+                        <!-- Table of active gates -->
+                        <div class="table-section">
+                            <h3 class="section-title">Активированные ворота</h3>
+                            <p class="hexagram-subtitle">Ворота (гексаграммы), активированные положениями планет в вашей карте.</p>
+                            <div class="table-wrap">
+                                <table class="data-table" id="bodygraph-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Объект</th>
+                                            <th>Ворота</th>
+                                            <th>Линия</th>
+                                            <th>Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bodygraph-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Bodygraph graphic -->
+                        <div class="chart-section" style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="chart-header" style="align-self: flex-start; width: 100%;">
+                                <h3 class="section-title">Рейв-Бодиграф</h3>
+                            </div>
+                            <div class="chart-container" style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 15px; box-shadow: var(--shadow-md); backdrop-filter: blur(16px); width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="bodygraph-canvas" width="400" height="500" style="max-width:100%;height:auto;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === TAB: MANDALA === -->
+                <div class="tab-content" id="content-mandala">
+                    <div class="content-grid">
+                        <!-- Table of all 64 gates in Rave Mandala order -->
+                        <div class="table-section">
+                            <h3 class="section-title">Порядок ворот на колесе</h3>
+                            <p class="hexagram-subtitle">Все 64 ворот в традиционной последовательности Рейв-Мандалы по ходу знаков зодиака.</p>
+                            <div class="table-wrap" style="max-height: 520px; overflow-y: auto;">
+                                <table class="data-table" id="mandala-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">№</th>
+                                            <th>Ворота</th>
+                                            <th>Зодиак</th>
+                                            <th>Активатор</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mandala-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Mandala graphic -->
+                        <div class="chart-section" style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="chart-header" style="align-self: flex-start; width: 100%;">
+                                <h3 class="section-title">Рейв-Мандала</h3>
+                            </div>
+                            <div class="chart-container" style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 10px; box-shadow: var(--shadow-md); backdrop-filter: blur(16px); width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="mandala-canvas" width="500" height="500" style="max-width:100%;height:auto;"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1209,6 +1289,6 @@
         </div>
     </div>
 
-    <script src="/static/js/main.js?v=1.0.3"></script>
+    <script src="/static/js/main.js?v=1.0.4"></script>
 </body>
 </html>

@@ -870,6 +870,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hexagrams (Programs) table
         renderHexagramsTable(data.planets);
 
+        // Bodygraph Table
+        renderBodygraphTable(data);
+
+        // Mandala Table
+        renderMandalaTable(data);
+
         // Info detail tab
         renderInfoTab(data, cityName, jd);
 
@@ -989,6 +995,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draw screen chart
         drawChart(data, canvas);
+
+        // Draw Rave Bodygraph
+        drawBodygraph(data, document.getElementById('bodygraph-canvas'));
+
+        // Draw Rave Mandala
+        drawMandala(data, document.getElementById('mandala-canvas'));
 
         // Draw print chart (sized to 220px to match CSS)
         const printCanvas = document.getElementById('print-chart-canvas');
@@ -1189,6 +1201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (printCanvas) {
                         drawChartFixed(lastChart, printCanvas, 220);
                     }
+                    // Redraw Rave Bodygraph and Mandala
+                    drawBodygraph(lastChart, document.getElementById('bodygraph-canvas'));
+                    drawMandala(lastChart, document.getElementById('mandala-canvas'));
+                    renderBodygraphTable(lastChart);
+                    renderMandalaTable(lastChart);
                 }
                 const sCanvas = document.getElementById('synastry-canvas');
                 if (sCanvas && lastCompatData) {
@@ -2656,6 +2673,600 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.textBaseline = 'middle';
             ctx.fillText(meta.sym, px, py);
         });
+    }
+
+    // ============================================================
+    //  HUMAN DESIGN RAVE BODYGRAPH & MANDALA DRAWING
+    // ============================================================
+
+    // Coordinates for all 36 channels connecting the 9 centers (designed for 400x500 canvas)
+    const CHANNELS_DATA = [
+        // Head -> Ajna
+        { name: "64-47", gateA: 64, gateB: 47, centerA: "Head", centerB: "Ajna", p1: [187, 48], p2: [185, 80] },
+        { name: "61-24", gateA: 61, gateB: 24, centerA: "Head", centerB: "Ajna", p1: [200, 50], p2: [200, 80] },
+        { name: "63-4",  gateA: 63, gateB: 4,  centerA: "Head", centerB: "Ajna", p1: [213, 48], p2: [215, 80] },
+
+        // Ajna -> Throat
+        { name: "17-62", gateA: 17, gateB: 62, centerA: "Ajna", centerB: "Throat", p1: [190, 110], p2: [180, 152] },
+        { name: "11-56", gateA: 11, gateB: 56, centerA: "Ajna", centerB: "Throat", p1: [200, 120], p2: [200, 152] },
+        { name: "43-23", gateA: 43, gateB: 23, centerA: "Ajna", centerB: "Throat", p1: [210, 110], p2: [220, 152] },
+
+        // Throat -> G-Center
+        { name: "31-7",  gateA: 31, gateB: 7,  centerA: "Throat", centerB: "G-Center", p1: [180, 198], p2: [185, 230] },
+        { name: "8-1",   gateA: 8,  gateB: 1,  centerA: "Throat", centerB: "G-Center", p1: [200, 198], p2: [200, 222] },
+        { name: "33-13", gateA: 33, gateB: 13, centerA: "Throat", centerB: "G-Center", p1: [220, 198], p2: [215, 230] },
+        { name: "20-10", gateA: 20, gateB: 10, centerA: "Throat", centerB: "G-Center", p1: [167, 185], p2: [185, 280] },
+
+        // Throat -> Heart/Ego
+        { name: "45-21", gateA: 45, gateB: 21, centerA: "Throat", centerB: "Heart", p1: [233, 185], p2: [275, 253] },
+
+        // Throat -> Spleen
+        { name: "16-48", gateA: 16, gateB: 48, centerA: "Throat", centerB: "Spleen", p1: [167, 165], p2: [138, 320], ctrl: [130, 220] },
+        { name: "20-57", gateA: 20, gateB: 57, centerA: "Throat", centerB: "Spleen", p1: [167, 185], p2: [138, 345], ctrl: [145, 250] },
+
+        // Throat -> Solar Plexus
+        { name: "35-36", gateA: 35, gateB: 36, centerA: "Throat", centerB: "SolarPlexus", p1: [233, 175], p2: [262, 320], ctrl: [270, 230] },
+        { name: "12-22", gateA: 12, gateB: 22, centerA: "Throat", centerB: "SolarPlexus", p1: [233, 185], p2: [262, 345], ctrl: [280, 250] },
+
+        // G-Center -> Heart/Ego
+        { name: "25-51", gateA: 25, gateB: 51, centerA: "G-Center", centerB: "Heart", p1: [225, 255], p2: [254, 250] },
+
+        // G-Center -> Spleen
+        { name: "10-57", gateA: 10, gateB: 57, centerA: "G-Center", centerB: "Spleen", p1: [185, 280], p2: [138, 345] },
+
+        // G-Center -> Sacral
+        { name: "15-5",  gateA: 15, gateB: 5,  centerA: "G-Center", centerB: "Sacral", p1: [215, 280], p2: [180, 317] },
+        { name: "2-14",  gateA: 2,  gateB: 14, centerA: "G-Center", centerB: "Sacral", p1: [200, 288], p2: [200, 317] },
+        { name: "46-29", gateA: 46, gateB: 29, centerA: "G-Center", centerB: "Sacral", p1: [175, 255], p2: [220, 317] },
+        { name: "10-34", gateA: 10, gateB: 34, centerA: "G-Center", centerB: "Sacral", p1: [185, 280], p2: [172, 345], ctrl: [155, 305] },
+
+        // Heart/Ego -> Spleen
+        { name: "26-44", gateA: 26, gateB: 44, centerA: "Heart", centerB: "Spleen", p1: [258, 275], p2: [138, 370], ctrl: [205, 315] },
+
+        // Heart/Ego -> Solar Plexus
+        { name: "40-37", gateA: 40, gateB: 37, centerA: "Heart", centerB: "SolarPlexus", p1: [270, 275], p2: [262, 370], ctrl: [285, 305] },
+
+        // Spleen -> Sacral
+        { name: "50-27", gateA: 50, gateB: 27, centerA: "Spleen", centerB: "Sacral", p1: [125, 330], p2: [172, 330] },
+        { name: "57-34", gateA: 57, gateB: 34, centerA: "Spleen", centerB: "Sacral", p1: [138, 345], p2: [172, 345] },
+
+        // Spleen -> Root
+        { name: "54-32", gateA: 54, gateB: 32, centerA: "Root", centerB: "Spleen", p1: [172, 432], p2: [125, 360], ctrl: [135, 400] },
+        { name: "28-38", gateA: 28, gateB: 38, centerA: "Spleen", centerB: "Root", p1: [110, 335], p2: [172, 450], ctrl: [120, 400] },
+        { name: "18-58", gateA: 18, gateB: 58, centerA: "Spleen", centerB: "Root", p1: [110, 355], p2: [172, 468], ctrl: [110, 410] },
+
+        // Solar Plexus -> Sacral
+        { name: "6-59",  gateA: 6,  gateB: 59, centerA: "SolarPlexus", centerB: "Sacral", p1: [275, 330], p2: [228, 330] },
+
+        // Solar Plexus -> Root
+        { name: "49-19", gateA: 49, gateB: 19, centerA: "SolarPlexus", centerB: "Root", p1: [275, 360], p2: [228, 432], ctrl: [265, 400] },
+        { name: "55-39", gateA: 55, gateB: 39, centerA: "SolarPlexus", centerB: "Root", p1: [290, 335], p2: [228, 450], ctrl: [280, 400] },
+        { name: "30-41", gateA: 30, gateB: 41, centerA: "SolarPlexus", centerB: "Root", p1: [290, 355], p2: [228, 468], ctrl: [290, 410] },
+
+        // Sacral -> Root
+        { name: "42-53", gateA: 42, gateB: 53, centerA: "Sacral", centerB: "Root", p1: [185, 373], p2: [180, 422] },
+        { name: "3-60",  gateA: 3,  gateB: 60, centerA: "Sacral", centerB: "Root", p1: [200, 373], p2: [200, 422] },
+        { name: "9-52",  gateA: 9,  gateB: 52, centerA: "Sacral", centerB: "Root", p1: [220, 373], p2: [220, 422] },
+
+        // Throat -> Sacral
+        { name: "20-34", gateA: 20, gateB: 34, centerA: "Throat", centerB: "Sacral", p1: [167, 185], p2: [172, 345], ctrl: [150, 260] }
+    ];
+
+    function drawBodygraph(data, canvasEl) {
+        if (!canvasEl) return;
+        const canvas = canvasEl;
+        const ctx = canvas.getContext('2d');
+
+        const container = canvas.parentElement;
+        const displayW = Math.min(container.clientWidth || 400, 400);
+        const displayH = displayW * 1.25;
+
+        const scale = window.devicePixelRatio || 1;
+        canvas.width = displayW * scale;
+        canvas.height = displayH * scale;
+        canvas.style.width = displayW + 'px';
+        canvas.style.height = displayH + 'px';
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+        ctx.clearRect(0, 0, displayW, displayH);
+
+        const scX = displayW / 400;
+        const scY = displayH / 500;
+        const sc = Math.min(scX, scY);
+
+        // 1. Draw stylized human body contour
+        ctx.beginPath();
+        ctx.arc(200 * scX, 70 * scY, 40 * sc, 0, Math.PI * 2);
+        ctx.moveTo(185 * scX, 110 * scY);
+        ctx.lineTo(185 * scX, 140 * scY);
+        ctx.moveTo(215 * scX, 110 * scY);
+        ctx.lineTo(215 * scX, 140 * scY);
+        ctx.moveTo(185 * scX, 140 * scY);
+        ctx.quadraticCurveTo(120 * scX, 150 * scY, 90 * scX, 210 * scY);
+        ctx.quadraticCurveTo(120 * scX, 330 * scY, 90 * scX, 480 * scY);
+        ctx.lineTo(310 * scX, 480 * scY);
+        ctx.quadraticCurveTo(280 * scX, 330 * scY, 310 * scX, 210 * scY);
+        ctx.quadraticCurveTo(280 * scX, 150 * scY, 215 * scX, 140 * scY);
+        ctx.strokeStyle = 'rgba(197, 158, 63, 0.08)';
+        ctx.lineWidth = 2.5 * sc;
+        ctx.stroke();
+
+        // 2. Identify active gates
+        const activeGates = new Set();
+        data.planets.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+                activeGates.add(p.hexagram.gate);
+            }
+        });
+
+        // 3. Define Centers State
+        const centers = {
+            "Head": { defined: false, color: "#C59E3F" },
+            "Ajna": { defined: false, color: "#C59E3F" },
+            "Throat": { defined: false, color: "#C59E3F" },
+            "G-Center": { defined: false, color: "#C59E3F" },
+            "Heart": { defined: false, color: "#C59E3F" },
+            "Spleen": { defined: false, color: "#C59E3F" },
+            "SolarPlexus": { defined: false, color: "#C59E3F" },
+            "Sacral": { defined: false, color: "#C59E3F" },
+            "Root": { defined: false, color: "#C59E3F" }
+        };
+
+        // 4. Determine defined centers
+        CHANNELS_DATA.forEach(ch => {
+            const activeA = activeGates.has(ch.gateA);
+            const activeB = activeGates.has(ch.gateB);
+            if (activeA && activeB) {
+                centers[ch.centerA].defined = true;
+                centers[ch.centerB].defined = true;
+            }
+        });
+
+        const sP = (p) => [p[0] * scX, p[1] * scY];
+
+        // 5. Draw channels
+        CHANNELS_DATA.forEach(ch => {
+            const p1 = sP(ch.p1);
+            const p2 = sP(ch.p2);
+            const ctrl = ch.ctrl ? sP(ch.ctrl) : [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
+
+            const mid = getQuadraticBezierPoint(0.5, p1, ctrl, p2);
+            const ctrlA = [0.5 * p1[0] + 0.5 * ctrl[0], 0.5 * p1[1] + 0.5 * ctrl[1]];
+            const ctrlB = [0.5 * ctrl[0] + 0.5 * p2[0], 0.5 * ctrl[1] + 0.5 * p2[1]];
+
+            const activeA = activeGates.has(ch.gateA);
+            const activeB = activeGates.has(ch.gateB);
+
+            // Draw full background line
+            ctx.beginPath();
+            ctx.moveTo(p1[0], p1[1]);
+            ctx.quadraticCurveTo(ctrl[0], ctrl[1], p2[0], p2[1]);
+            ctx.strokeStyle = '#F3EFE9';
+            ctx.lineWidth = 6 * sc;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // Draw active halves
+            const activeColor = '#C59E3F';
+            if (activeA) {
+                drawBezierHalf(ctx, p1, ctrlA, mid, activeColor, 4.5 * sc);
+            }
+            if (activeB) {
+                drawBezierHalf(ctx, mid, ctrlB, p2, activeColor, 4.5 * sc);
+            }
+        });
+
+        // 6. Draw center shapes
+        const themeBg = '#FFFFFF';
+        const strokeColor = 'rgba(197, 158, 63, 0.4)';
+
+        // Head
+        let fill = centers["Head"].defined ? centers["Head"].color : themeBg;
+        let stroke = centers["Head"].defined ? '#C59E3F' : strokeColor;
+        drawTriangle(ctx, 200*scX, 15*scY, 175*scX, 55*scY, 225*scX, 55*scY, fill, stroke);
+
+        // Ajna
+        fill = centers["Ajna"].defined ? centers["Ajna"].color : themeBg;
+        stroke = centers["Ajna"].defined ? '#C59E3F' : strokeColor;
+        drawTriangle(ctx, 170*scX, 75*scY, 230*scX, 75*scY, 200*scX, 125*scY, fill, stroke);
+
+        // Throat
+        fill = centers["Throat"].defined ? centers["Throat"].color : themeBg;
+        stroke = centers["Throat"].defined ? '#C59E3F' : strokeColor;
+        drawRect(ctx, 165*scX, 150*scY, 70*scX, 50*scY, fill, stroke);
+
+        // G-Center
+        fill = centers["G-Center"].defined ? centers["G-Center"].color : themeBg;
+        stroke = centers["G-Center"].defined ? '#C59E3F' : strokeColor;
+        drawDiamond(ctx, 200*scX, 255*scY, 60*scX, 70*scY, fill, stroke);
+
+        // Heart
+        fill = centers["Heart"].defined ? centers["Heart"].color : themeBg;
+        stroke = centers["Heart"].defined ? '#C59E3F' : strokeColor;
+        drawTriangle(ctx, 250*scX, 245*scY, 285*scX, 255*scY, 260*scX, 285*scY, fill, stroke);
+
+        // Spleen
+        fill = centers["Spleen"].defined ? centers["Spleen"].color : themeBg;
+        stroke = centers["Spleen"].defined ? '#C59E3F' : strokeColor;
+        drawTriangle(ctx, 140*scX, 310*scY, 140*scX, 380*scY, 95*scX, 345*scY, fill, stroke);
+
+        // Solar Plexus
+        fill = centers["SolarPlexus"].defined ? centers["SolarPlexus"].color : themeBg;
+        stroke = centers["SolarPlexus"].defined ? '#C59E3F' : strokeColor;
+        drawTriangle(ctx, 260*scX, 310*scY, 260*scX, 380*scY, 305*scX, 345*scY, fill, stroke);
+
+        // Sacral
+        fill = centers["Sacral"].defined ? centers["Sacral"].color : themeBg;
+        stroke = centers["Sacral"].defined ? '#C59E3F' : strokeColor;
+        drawRect(ctx, 170*scX, 315*scY, 60*scX, 60*scY, fill, stroke);
+
+        // Root
+        fill = centers["Root"].defined ? centers["Root"].color : themeBg;
+        stroke = centers["Root"].defined ? '#C59E3F' : strokeColor;
+        drawRect(ctx, 170*scX, 420*scY, 60*scX, 60*scY, fill, stroke);
+
+        // 7. Draw gate labels
+        const gatePositions = {};
+        CHANNELS_DATA.forEach(ch => {
+            if (!gatePositions[ch.gateA]) {
+                gatePositions[ch.gateA] = { pos: sP(ch.p1), center: ch.centerA };
+            }
+            if (!gatePositions[ch.gateB]) {
+                gatePositions[ch.gateB] = { pos: sP(ch.p2), center: ch.centerB };
+            }
+        });
+
+        Object.keys(gatePositions).forEach(gStr => {
+            const gateNum = parseInt(gStr);
+            const { pos, center } = gatePositions[gateNum];
+            const isActive = activeGates.has(gateNum);
+            const isCenterDefined = centers[center].defined;
+
+            if (isActive) {
+                ctx.beginPath();
+                ctx.arc(pos[0], pos[1], 6.5 * sc, 0, Math.PI * 2);
+                ctx.fillStyle = '#C59E3F';
+                ctx.fill();
+                
+                ctx.font = `bold ${8 * sc}px Inter, sans-serif`;
+                ctx.fillStyle = '#FFFFFF';
+            } else {
+                ctx.font = `${7.5 * sc}px Inter, sans-serif`;
+                ctx.fillStyle = isCenterDefined ? 'rgba(255, 255, 255, 0.7)' : '#777166';
+            }
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(gateNum.toString(), pos[0], pos[1]);
+        });
+    }
+
+    function getQuadraticBezierPoint(t, p0, p1, p2) {
+        const x = (1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0];
+        const y = (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1];
+        return [x, y];
+    }
+
+    function drawBezierHalf(ctx, start, ctrl, end, strokeColor, width) {
+        ctx.beginPath();
+        ctx.moveTo(start[0], start[1]);
+        ctx.quadraticCurveTo(ctrl[0], ctrl[1], end[0], end[1]);
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.stroke();
+    }
+
+    function drawTriangle(ctx, x1, y1, x2, y2, x3, y3, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+    }
+
+    function drawRect(ctx, x, y, w, h, fill, stroke) {
+        ctx.beginPath();
+        ctx.rect(x, y, w, h);
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+    }
+
+    function drawDiamond(ctx, cx, cy, w, h, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - h/2);
+        ctx.lineTo(cx + w/2, cy);
+        ctx.lineTo(cx, cy + h/2);
+        ctx.lineTo(cx - w/2, cy);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+    }
+
+    function drawMandala(data, canvasEl) {
+        if (!canvasEl) return;
+        const canvas = canvasEl;
+        const ctx = canvas.getContext('2d');
+
+        const container = canvas.parentElement;
+        const displayW = Math.min(container.clientWidth || 500, 500);
+        const scale = window.devicePixelRatio || 1;
+
+        canvas.width = displayW * scale;
+        canvas.height = displayW * scale;
+        canvas.style.width = displayW + 'px';
+        canvas.style.height = displayW + 'px';
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+        const size = displayW;
+        const cx = size / 2;
+        const cy = size / 2;
+        const R = size / 2 - 10;
+        
+        const rZodiacOuter = R;
+        const rZodiacInner = R - 25;
+        const rGatesOuter = rZodiacInner;
+        const rGatesInner = rGatesOuter - 35;
+        const rPlanetsBorder = rGatesInner;
+        const rPlanetsLabels = rPlanetsBorder - 35;
+        const rInnermost = rPlanetsLabels - 20;
+
+        ctx.clearRect(0, 0, size, size);
+
+        // Background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 1. Draw Zodiac ring (12 signs)
+        for (let i = 0; i < 12; i++) {
+            const startAngle = degToRad(i * 30 - 90);
+            const endAngle = degToRad((i + 1) * 30 - 90);
+            
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.03);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
+            ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            const midAngle = startAngle + degToRad(15);
+            const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
+            const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
+            ctx.font = 'bold 11px serif';
+            ctx.fillStyle = ZODIAC_COLORS[i];
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(ZODIAC_META[i].sym, gx, gy);
+        }
+
+        ctx.beginPath(); ctx.arc(cx, cy, rZodiacOuter, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(197, 158, 63, 0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, rZodiacInner, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, rGatesInner, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(197, 158, 63, 0.2)'; ctx.lineWidth = 1; ctx.stroke();
+
+        // 2. Draw 64 gates
+        const GATE_ORDER = [
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
+        ];
+        const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+        const GATE_INTERVAL = 5.625;
+
+        const activeGates = new Set();
+        data.planets.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+                activeGates.add(p.hexagram.gate);
+            }
+        });
+
+        for (let i = 0; i < 64; i++) {
+            const gateNum = GATE_ORDER[i];
+            const isActive = activeGates.has(gateNum);
+
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
+            const startAngle = degToRad(startLon - 90);
+            const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
+
+            if (isActive) {
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(197, 158, 63, 0.12)';
+                ctx.fill();
+            }
+
+            const xOuter = cx + rGatesOuter * Math.cos(startAngle);
+            const yOuter = cy + rGatesOuter * Math.sin(startAngle);
+            const xInner = cx + rGatesInner * Math.cos(startAngle);
+            const yInner = cy + rGatesInner * Math.sin(startAngle);
+
+            ctx.beginPath();
+            ctx.moveTo(xOuter, yOuter);
+            ctx.lineTo(xInner, yInner);
+            ctx.strokeStyle = isActive ? 'rgba(197, 158, 63, 0.45)' : 'rgba(197, 158, 63, 0.12)';
+            ctx.lineWidth = isActive ? 1.2 : 0.8;
+            ctx.stroke();
+
+            const midLon = startLon + GATE_INTERVAL / 2;
+            const midAngle = degToRad(midLon - 90);
+            const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
+            const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
+
+            ctx.font = isActive ? 'bold 9px Inter, sans-serif' : '8px Inter, sans-serif';
+            ctx.fillStyle = isActive ? '#C59E3F' : '#777166';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(gateNum.toString(), lx, ly);
+        }
+
+        // 3. Plot planets
+        const planets = data.planets.filter(p => p.hexagram && (!activePlanets || activePlanets.has(p.name)));
+        const placed = [];
+
+        planets.forEach(p => {
+            const meta = PLANET_META[p.name] || { sym: p.symbol };
+            const pColor = PLANET_COLORS[p.name] || '#2E2A20';
+            const lon = p.longitude;
+            
+            let angle = lon;
+
+            for (let attempt = 0; attempt < 8; attempt++) {
+                if (!placed.some(a => Math.abs(angleDiff(a, angle)) < 11)) break;
+                angle += 12;
+            }
+            placed.push(angle);
+
+            const dotAngle = degToRad(lon - 90);
+            const labelAngle = degToRad(angle - 90);
+
+            const dx = cx + rPlanetsBorder * Math.cos(dotAngle);
+            const dy = cy + rPlanetsBorder * Math.sin(dotAngle);
+
+            ctx.beginPath();
+            ctx.arc(dx, dy, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#C59E3F';
+            ctx.fill();
+
+            const lx = cx + rPlanetsLabels * Math.cos(labelAngle);
+            const ly = cy + rPlanetsLabels * Math.sin(labelAngle);
+
+            ctx.beginPath();
+            ctx.moveTo(dx, dy);
+            ctx.lineTo(lx, ly);
+            ctx.strokeStyle = 'rgba(197, 158, 63, 0.2)';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+
+            ctx.font = '12px serif';
+            ctx.fillStyle = pColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(meta.sym, lx, ly);
+
+            const gx = cx + rInnermost * Math.cos(labelAngle);
+            const gy = cy + rInnermost * Math.sin(labelAngle);
+            ctx.font = 'bold 8px Inter, sans-serif';
+            ctx.fillStyle = '#9E978A';
+            ctx.fillText(`${p.hexagram.gate}.${p.hexagram.line}`, gx, gy);
+        });
+    }
+
+    function renderBodygraphTable(data) {
+        const tbody = document.getElementById('bodygraph-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        data.planets.forEach(p => {
+            if (!p.hexagram) return;
+            const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
+            const hx = p.hexagram;
+
+            const isActive = !activePlanets || activePlanets.has(p.name);
+
+            const tr = document.createElement('tr');
+            if (!isActive) tr.style.opacity = '0.5';
+
+            tr.innerHTML = `
+                <td>
+                    <div class="planet-cell">
+                        <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
+                        <span class="planet-name">${p.name}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="hex-gate-badge">Ворота ${hx.gate}</span>
+                </td>
+                <td><span class="hex-num">${hx.line}</span></td>
+                <td>
+                    ${isActive 
+                        ? '<span class="status-badge active" style="background: var(--primary-light); color: var(--primary); border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; font-size: 11px;">Активны</span>' 
+                        : '<span class="status-badge inactive" style="background: #F9FAFB; color: #9CA3AF; border: 1px solid rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 10px; font-size: 11px;">Отключены</span>'}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderMandalaTable(data) {
+        const tbody = document.getElementById('mandala-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const GATE_ORDER = [
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
+        ];
+        const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+        const GATE_INTERVAL = 5.625;
+
+        const gateActivators = {};
+        data.planets.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+                const gNum = p.hexagram.gate;
+                if (!gateActivators[gNum]) {
+                    gateActivators[gNum] = [];
+                }
+                const meta = PLANET_META[p.name] || { sym: p.symbol, cls: '' };
+                gateActivators[gNum].push(`<span class="planet-badge ${meta.cls}" style="display:inline-flex; align-items:center; gap:2px; font-size:10px; background:rgba(197,158,63,0.06); border:1px solid rgba(197,158,63,0.15); padding:1px 6px; border-radius:10px; margin-right:4px;">${meta.sym} ${p.name}</span>`);
+            }
+        });
+
+        for (let i = 0; i < 64; i++) {
+            const gateNum = GATE_ORDER[i];
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
+            
+            const signIdx = Math.floor(startLon / 30) % 12;
+            const sm = ZODIAC_META[signIdx];
+            const activatorHtml = gateActivators[gateNum] ? gateActivators[gateNum].join('') : '<span style="color:#9E978A;">—</span>';
+            const isActive = !!gateActivators[gateNum];
+
+            const tr = document.createElement('tr');
+            if (isActive) {
+                tr.style.background = 'rgba(197, 158, 63, 0.03)';
+            }
+
+            tr.innerHTML = `
+                <td style="font-size:11px; color:#9E978A;">${i + 1}</td>
+                <td><span class="hex-gate-badge" style="background:${isActive ? 'var(--primary)' : 'var(--primary-light)'}; color:${isActive ? '#FFF' : 'var(--primary)'};">Ворота ${gateNum}</span></td>
+                <td>
+                    <div class="sign-cell" style="font-size:12px;">
+                        <span class="sign-glyph" style="font-size:14px;">${sm.sym}</span>
+                        <span>${sm.name}</span>
+                    </div>
+                </td>
+                <td>${activatorHtml}</td>
+            `;
+            tbody.appendChild(tr);
+        }
     }
 
     // Export PDF for Compatibility
