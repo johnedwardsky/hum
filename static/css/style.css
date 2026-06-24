@@ -685,6 +685,41 @@ input  { font-family: inherit; }
 }
 .direct-dash { color: var(--text-muted); padding-left: 6px; }
 
+/* Hexagram (Programs) table */
+.hexagram-subtitle {
+    font-size: 13px;
+    color: var(--text-sub);
+    margin: -4px 0 14px 0;
+    line-height: 1.55;
+}
+.hex-gate-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, rgba(197,158,63,0.13), rgba(197,158,63,0.06));
+    border: 1px solid rgba(197,158,63,0.3);
+    color: #8A6A10;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+.hex-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: rgba(94,82,176,0.08);
+    border: 1px solid rgba(94,82,176,0.18);
+    color: #4A3FAA;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 50%;
+}
+
+
 /* Longitude cell */
 .lon-cell { font-size: 12.5px; color: var(--text-sub); font-variant-numeric: tabular-nums; }
 

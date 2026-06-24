@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=1.0.2">
+    <link rel="stylesheet" href="/static/css/style.css?v=1.0.3">
 </head>
 <body>
     <!-- ===== SVG SPRITE FOR GOLDEN LOGO ===== -->
@@ -263,6 +263,18 @@
                             </svg>
                             Информация о расчёте
                         </button>
+                        <button class="tab" id="tab-hexagrams" data-tab="hexagrams">
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                                <line x1="3" y1="2" x2="12" y2="2" stroke="currentColor" stroke-width="1.4"/>
+                                <line x1="3" y1="4.5" x2="7" y2="4.5" stroke="currentColor" stroke-width="1.4"/>
+                                <line x1="8" y1="4.5" x2="12" y2="4.5" stroke="currentColor" stroke-width="1.4"/>
+                                <line x1="3" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="1.4"/>
+                                <line x1="3" y1="9.5" x2="7" y2="9.5" stroke="currentColor" stroke-width="1.4"/>
+                                <line x1="8" y1="9.5" x2="12" y2="9.5" stroke="currentColor" stroke-width="1.4"/>
+                                <line x1="3" y1="12" x2="12" y2="12" stroke="currentColor" stroke-width="1.4"/>
+                            </svg>
+                            Программы
+                        </button>
                         <button class="tab" id="tab-interpretations" data-tab="interpretations">
                             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                                 <rect x="2.5" y="2.5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
@@ -428,6 +440,30 @@
                                     </tr>
                                 </thead>
                                 <tbody id="houses-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === TAB: HEXAGRAMS (Programs) === -->
+                <div class="tab-content" id="content-hexagrams">
+                    <div class="table-section">
+                        <h3 class="section-title">Программы (Гексаграммы)</h3>
+                        <p class="hexagram-subtitle">Расчёт программ по градусам эклиптики. Каждая планета попадает в одну из 64 программ (гексаграмм), которая далее делится на Линию, Цвет, Тон, Базу и Теос.</p>
+                        <div class="table-wrap">
+                            <table class="data-table" id="hexagrams-table">
+                                <thead>
+                                    <tr>
+                                        <th>Объект</th>
+                                        <th>Прогр.</th>
+                                        <th>Линия</th>
+                                        <th>Цвет</th>
+                                        <th>Тон</th>
+                                        <th>База</th>
+                                        <th>Теос</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hexagrams-tbody"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1173,6 +1209,6 @@
         </div>
     </div>
 
-    <script src="/static/js/main.js?v=1.0.2"></script>
+    <script src="/static/js/main.js?v=1.0.3"></script>
 </body>
 </html>

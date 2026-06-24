@@ -431,9 +431,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const icJd     = document.getElementById('ic-jd');
 
     // Tables
-    const planetsTbody = document.getElementById('planets-tbody');
-    const housesTbody  = document.getElementById('houses-tbody');
-    const infoGrid     = document.getElementById('info-detail-grid');
+    const planetsTbody   = document.getElementById('planets-tbody');
+    const housesTbody    = document.getElementById('houses-tbody');
+    const hexagramsTbody = document.getElementById('hexagrams-tbody');
+    const infoGrid       = document.getElementById('info-detail-grid');
 
     // Canvas
     const canvas = document.getElementById('chart-canvas');
@@ -866,6 +867,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Houses table
         renderHousesTable(data.houses);
 
+        // Hexagrams (Programs) table
+        renderHexagramsTable(data.planets);
+
         // Info detail tab
         renderInfoTab(data, cityName, jd);
 
@@ -1211,6 +1215,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td>${fmtPos(h.formatted)}</td>`;
             housesTbody.appendChild(tr);
+        });
+    }
+
+    // ── Hexagrams (Programs) table ────────────────────────────
+    function renderHexagramsTable(planets) {
+        if (!hexagramsTbody) return;
+        hexagramsTbody.innerHTML = '';
+        planets.forEach(p => {
+            if (!p.hexagram) return;
+            const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
+            const hx = p.hexagram;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div class="planet-cell">
+                        <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
+                        <span class="planet-name">${p.name}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="hex-gate-badge">Гекс. ${hx.gate}</span>
+                </td>
+                <td><span class="hex-num">${hx.line}</span></td>
+                <td><span class="hex-num">${hx.color}</span></td>
+                <td><span class="hex-num">${hx.tone}</span></td>
+                <td><span class="hex-num">${hx.base}</span></td>
+                <td><span class="hex-num">${hx.theos}</span></td>
+            `;
+            hexagramsTbody.appendChild(tr);
         });
     }
 

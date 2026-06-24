@@ -2,6 +2,7 @@ import os
 import urllib.request
 import ssl
 import swisseph as swe
+import hexagram
 
 # Set the path to Swiss Ephemeris files (if they exist)
 EPHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ephe')
@@ -201,6 +202,10 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
         "Приап (интерп.)"
     ]
     results["planets"].sort(key=lambda p: planet_order.index(p["name"]) if p["name"] in planet_order else 999)
+
+    # Add hexagram/gate data for each planet
+    for p in results["planets"]:
+        p["hexagram"] = hexagram.calculate_hexagram(p["longitude"])
 
     
     # 4. Calculate Houses (with fallback if the selected system fails)
