@@ -4086,11 +4086,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 head:    { name: 'Голова',                    subtitle: 'Центр вдохновения и сомнения',                            blockNum: 1 },
                 ajna:    { name: 'Аджна',                     subtitle: 'Центр ума и концептуализации',                            blockNum: 2 },
                 throat:  { name: 'Горло',                     subtitle: 'Центр коммуникации и манифестации',                       blockNum: 3 },
-                gcenter: { name: 'G-Центр',                   subtitle: 'Центр Бога · Магнитный монополь · Любовь и Направление',  blockNum: 4 },
+                gcenter: { name: 'G-Центр · Солнечное Сплетение', subtitle: 'Центр Бога · Магнитный монополь · Любовь и Направление',  blockNum: 4 },
                 heart:   { name: 'Сердце / Эго',              subtitle: 'Центр воли и материального мира',                         blockNum: 5 },
                 spleen:  { name: 'Селезёнка',                 subtitle: 'Центр интуиции, инстинкта и здоровья',                    blockNum: 6 },
                 sacral:  { name: 'Сакральный',                subtitle: 'Центр истинных творцов · Жизненная сила',                 blockNum: 7 },
-                solar:   { name: 'Эмоциональный центр',        subtitle: 'Солнечное Сплетение · Центр чувств и духовного дыхания',  blockNum: 8 },
+                solar:   { name: 'Эмоциональный центр',        subtitle: 'Центр чувств и духовного дыхания',                       blockNum: 8 },
                 root:    { name: 'Корень',                    subtitle: 'Центр давления и адреналина',                            blockNum: 9 },
             };
 
