@@ -3977,27 +3977,27 @@ document.addEventListener('DOMContentLoaded', () => {
             row.title              = `${p.displayName || p.name}: ворота ${gate}.${line}`;
 
             if (isDesign) {
-                // Left column: Gate.Line | Planet | Zodiac
+                // Left column: Planet | Gate.Line | Zodiac
                 row.innerHTML = `
-                    <div class="bg-gate-info">
-                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
-                    </div>
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym" style="color:${colorCss}">${sym}</span>
                         ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
+                    </div>
+                    <div class="bg-gate-info">
+                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
                     </div>
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
                 `;
             } else {
-                // Right column: Zodiac | Planet | Gate.Line
+                // Right column: Zodiac | Gate.Line | Planet
                 row.innerHTML = `
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
+                    <div class="bg-gate-info">
+                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
+                    </div>
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym" style="color:${colorCss}">${sym}</span>
                         ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
-                    </div>
-                    <div class="bg-gate-info">
-                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
                     </div>
                 `;
             }
