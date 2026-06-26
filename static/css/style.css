@@ -2913,6 +2913,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     color: #888;
     font-size: 15px;
     display: inline-block;
+    width: 24px;
+    flex-shrink: 0;
 }
 
 .bg-planet-row .bg-gate-info {
@@ -2920,26 +2922,31 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     flex-direction: row;
     align-items: center;
     gap: 3px;
-    flex: 1;
+    width: 42px;
+    flex-shrink: 0;
     min-width: 0;
 }
 
 /* Alignments inside design (left) column */
-.bg-col-design .bg-gate-info {
+.bg-col-design .bg-planet-row {
     justify-content: flex-start;
 }
+.bg-col-design .bg-gate-info {
+    justify-content: flex-end;
+}
 .bg-col-design .bg-zodiac-sym {
-    flex: 1;
-    text-align: right;
+    text-align: left;
 }
 
 /* Alignments inside personality (right) column */
-.bg-col-personality .bg-gate-info {
+.bg-col-personality .bg-planet-row {
     justify-content: flex-end;
 }
+.bg-col-personality .bg-gate-info {
+    justify-content: flex-start;
+}
 .bg-col-personality .bg-zodiac-sym {
-    flex: 1;
-    text-align: left;
+    text-align: right;
 }
 
 .bg-gate-num {
