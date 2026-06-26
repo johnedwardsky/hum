@@ -444,25 +444,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const chartLayoutContainer = document.querySelector('.natal-chart-layout');
     const chartLayoutToggleBtn = document.getElementById('chart-layout-toggle');
     if (chartLayoutContainer && chartLayoutToggleBtn) {
-        // Load initial state
-        const savedLayout = localStorage.getItem('humantica_natal_layout_mode') || 'maximized';
-        if (savedLayout === 'minimized') {
-            chartLayoutContainer.classList.remove('layout-maximized');
-            chartLayoutContainer.classList.add('layout-minimized');
-        } else {
-            chartLayoutContainer.classList.remove('layout-minimized');
-            chartLayoutContainer.classList.add('layout-maximized');
-        }
+        // Always start as maximized when opening the page
+        chartLayoutContainer.classList.remove('layout-minimized');
+        chartLayoutContainer.classList.add('layout-maximized');
 
         chartLayoutToggleBtn.addEventListener('click', () => {
             if (chartLayoutContainer.classList.contains('layout-maximized')) {
                 chartLayoutContainer.classList.remove('layout-maximized');
                 chartLayoutContainer.classList.add('layout-minimized');
-                localStorage.setItem('humantica_natal_layout_mode', 'minimized');
             } else {
                 chartLayoutContainer.classList.remove('layout-minimized');
                 chartLayoutContainer.classList.add('layout-maximized');
-                localStorage.setItem('humantica_natal_layout_mode', 'maximized');
             }
             // Redraw chart to fit the new size
             if (lastChart) {
