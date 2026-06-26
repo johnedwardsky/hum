@@ -1438,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Make canvas fill its container on mobile
         const container = canvas.parentElement;
         const isScreenCanvas = (canvas.id === 'chart-canvas');
-        const displayW  = isScreenCanvas ? Math.min(container.clientWidth || 380, 380) : 440;
+        const displayW  = isScreenCanvas ? Math.min(container.clientWidth || 500, 500) : 440;
         const scale     = isScreenCanvas ? (window.devicePixelRatio || 1) : 2;
 
         // Set actual pixel size for sharpness

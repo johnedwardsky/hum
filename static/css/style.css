@@ -583,6 +583,14 @@ input  { font-family: inherit; }
     .content-grid { grid-template-columns: 1fr; }
 }
 
+.natal-chart-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+}
+
 /* Table */
 .table-section { 
     background: var(--bg-card); 
