@@ -2912,10 +2912,12 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-planet-row .bg-zodiac-sym {
     color: #888;
     font-size: 15px;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
+    height: 24px;
     flex-shrink: 0;
-    text-align: center;
 }
 
 .bg-planet-row .bg-gate-info {
@@ -2931,12 +2933,12 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 /* Alignments inside design (left) column */
 .bg-col-design .bg-planet-row {
-    justify-content: flex-start;
+    justify-content: space-between;
 }
 
 /* Alignments inside personality (right) column */
 .bg-col-personality .bg-planet-row {
-    justify-content: flex-end;
+    justify-content: space-between;
 }
 
 .bg-gate-num {
