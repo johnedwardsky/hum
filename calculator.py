@@ -1,4 +1,5 @@
 import os
+import math
 import urllib.request
 import ssl
 import swisseph as swe
@@ -30,18 +31,18 @@ for filename, url in REQUIRED_EPHE_FILES.items():
 swe.set_ephe_path(EPHE_PATH)
 
 ZODIAC_SIGNS = [
-    {"name": "Овен", "symbol": "♈", "ru": "Овен"},
-    {"name": "Телец", "symbol": "♉", "ru": "Телец"},
-    {"name": "Близнецы", "symbol": "♊", "ru": "Близнецы"},
-    {"name": "Рак", "symbol": "♋", "ru": "Рак"},
-    {"name": "Лев", "symbol": "♌", "ru": "Лев"},
-    {"name": "Дева", "symbol": "♍", "ru": "Дева"},
-    {"name": "Весы", "symbol": "♎", "ru": "Весы"},
-    {"name": "Скорпион", "symbol": "♏", "ru": "Скорпион"},
-    {"name": "Стрелец", "symbol": "♐", "ru": "Стрелец"},
-    {"name": "Козерог", "symbol": "♑", "ru": "Козерог"},
-    {"name": "Водолей", "symbol": "♒", "ru": "Водолей"},
-    {"name": "Рыбы", "symbol": "♓", "ru": "Рыбы"},
+    {"name": "Овен", "symbol": "♈\uFE0E", "ru": "Овен"},
+    {"name": "Телец", "symbol": "♉\uFE0E", "ru": "Телец"},
+    {"name": "Близнецы", "symbol": "♊\uFE0E", "ru": "Близнецы"},
+    {"name": "Рак", "symbol": "♋\uFE0E", "ru": "Рак"},
+    {"name": "Лев", "symbol": "♌\uFE0E", "ru": "Лев"},
+    {"name": "Дева", "symbol": "♍\uFE0E", "ru": "Дева"},
+    {"name": "Весы", "symbol": "♎\uFE0E", "ru": "Весы"},
+    {"name": "Скорпион", "symbol": "♏\uFE0E", "ru": "Скорпион"},
+    {"name": "Стрелец", "symbol": "♐\uFE0E", "ru": "Стрелец"},
+    {"name": "Козерог", "symbol": "♑\uFE0E", "ru": "Козерог"},
+    {"name": "Водолей", "symbol": "♒\uFE0E", "ru": "Водолей"},
+    {"name": "Рыбы", "symbol": "♓\uFE0E", "ru": "Рыбы"},
 ]
 
 PLANETS_MAP = {
@@ -99,34 +100,36 @@ def format_longitude(lon):
         "formatted": f"{deg}° {minutes:02d}' {seconds:02d}\" {sign_info['symbol']} ({sign_info['ru']})"
     }
 
-def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp_offset=0.0, use_polar_equal=False, polar_boundary=62.0):
-    """
-    Calculates planetary positions and house cusps.
-    hour_gmt should be a decimal hour in GMT (e.g. 14.5 for 14:30 GMT).
-    """
-    # 1. Calculate Julian Day UT
-    jd_ut = swe.julday(year, month, day, hour_gmt)
+def calculate_design_jd(jd_birth, sun_lon):
+    target_lon = (sun_lon - 88.0) % 360.0
+    # Approximate Julian Day (88 degrees is ~89.28 days)
+    jd = jd_birth - 89.28
     
-    results = {
-        "planets": [],
-        "houses": [],
-        "angles": {},
-        "calculated_house_system": house_system
-    }
-    
-    # 2. Calculate Planets
+    for _ in range(15):
+        res, flags = swe.calc_ut(jd, swe.SUN)
+        lon = res[0]
+        speed = res[3]  # speed in degrees per day
+        
+        diff = (lon - target_lon)
+        # Normalize to [-180, 180]
+        diff = (diff + 180) % 360 - 180
+        
+        if abs(diff) < 1e-7:
+            break
+            
+        jd -= diff / speed
+    return jd
+
+def _calculate_planets_only(jd_ut):
+    planets = []
+    # Calculate Planets
     for planet_id, info in PLANETS_MAP.items():
-        # swe.calc_ut returns (longitude, latitude, distance, speed_lon, speed_lat, speed_dist)
         res, flags = swe.calc_ut(jd_ut, planet_id)
         longitude = res[0]
         speed_lon = res[3]
-        
-        # Check retrograde status
         is_retrograde = speed_lon < 0
-        
-        # Add to results
         formatted = format_longitude(longitude)
-        results["planets"].append({
+        planets.append({
             "id": planet_id,
             "name": info["name"],
             "symbol": info["symbol"],
@@ -136,39 +139,39 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
             "formatted": formatted
         })
         
-    # Add True South Node (which is exactly opposite to True North Node)
-    true_node_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.TRUE_NODE][0]
-    true_node_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.TRUE_NODE][0]
+    # True South Node (exactly opposite to True North Node)
+    true_node_lon = [p["longitude"] for p in planets if p["id"] == swe.TRUE_NODE][0]
+    true_node_speed = [p["speed"] for p in planets if p["id"] == swe.TRUE_NODE][0]
     true_south_node_lon = (true_node_lon + 180.0) % 360.0
-    results["planets"].append({
+    planets.append({
         "id": -2,
         "name": "Истинный Южный Узел",
         "symbol": "☋",
         "longitude": true_south_node_lon,
-        "speed": true_node_speed,  # shares the node speed
+        "speed": true_node_speed,
         "is_retrograde": true_node_speed < 0,
         "formatted": format_longitude(true_south_node_lon)
     })
     
-    # Add Mean South Node (which is exactly opposite to Mean North Node)
-    mean_node_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.MEAN_NODE][0]
-    mean_node_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.MEAN_NODE][0]
+    # Mean South Node (exactly opposite to Mean North Node)
+    mean_node_lon = [p["longitude"] for p in planets if p["id"] == swe.MEAN_NODE][0]
+    mean_node_speed = [p["speed"] for p in planets if p["id"] == swe.MEAN_NODE][0]
     mean_south_node_lon = (mean_node_lon + 180.0) % 360.0
-    results["planets"].append({
+    planets.append({
         "id": -1,
         "name": "Средний Южный Узел",
         "symbol": "☋",
         "longitude": mean_south_node_lon,
-        "speed": mean_node_speed,  # shares the node speed
+        "speed": mean_node_speed,
         "is_retrograde": mean_node_speed < 0,
         "formatted": format_longitude(mean_south_node_lon)
     })
 
-    # Add Earth (opposition of the Sun)
-    sun_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.SUN][0]
-    sun_speed = [p["speed"] for p in results["planets"] if p["id"] == swe.SUN][0]
+    # Earth (opposition of the Sun)
+    sun_lon = [p["longitude"] for p in planets if p["id"] == swe.SUN][0]
+    sun_speed = [p["speed"] for p in planets if p["id"] == swe.SUN][0]
     earth_lon = (sun_lon - 180.0) % 360.0
-    results["planets"].append({
+    planets.append({
         "id": -3,
         "name": "Земля",
         "symbol": "♁",
@@ -178,7 +181,7 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
         "formatted": format_longitude(earth_lon)
     })
     
-    # 3. Sort planets in a predefined professional astrological order
+    # Sort planets in a predefined professional astrological order
     planet_order = [
         "Солнце",
         "Луна",
@@ -201,11 +204,37 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
         "Лилит (интерп.)",
         "Приап (интерп.)"
     ]
-    results["planets"].sort(key=lambda p: planet_order.index(p["name"]) if p["name"] in planet_order else 999)
+    planets.sort(key=lambda p: planet_order.index(p["name"]) if p["name"] in planet_order else 999)
 
     # Add hexagram/gate data for each planet
-    for p in results["planets"]:
+    for p in planets:
         p["hexagram"] = hexagram.calculate_hexagram(p["longitude"])
+        
+    return planets
+
+def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp_offset=0.0, use_polar_equal=False, polar_boundary=62.0):
+    """
+    Calculates planetary positions and house cusps.
+    hour_gmt should be a decimal hour in GMT (e.g. 14.5 for 14:30 GMT).
+    """
+    # 1. Calculate Julian Day UT
+    jd_ut = swe.julday(year, month, day, hour_gmt)
+    
+    results = {
+        "planets": [],
+        "design_planets": [],
+        "houses": [],
+        "angles": {},
+        "calculated_house_system": house_system
+    }
+    
+    # 2. Calculate Planets (Personality)
+    results["planets"] = _calculate_planets_only(jd_ut)
+    
+    # Calculate Design planets (88 degrees ecliptic longitude offset in the past)
+    sun_lon = [p["longitude"] for p in results["planets"] if p["id"] == swe.SUN][0]
+    design_jd = calculate_design_jd(jd_ut, sun_lon)
+    results["design_planets"] = _calculate_planets_only(design_jd)
 
     
     # 4. Calculate Houses (with fallback if the selected system fails)

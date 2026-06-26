@@ -29,6 +29,11 @@ def run_test():
         retro = " [R]" if p["is_retrograde"] else ""
         print(f"  {p['symbol']} {p['name']:<15}{retro:<5}: {p['formatted']['formatted']}")
         
+    print("\nDesign Planets:")
+    for p in res["design_planets"]:
+        retro = " [R]" if p["is_retrograde"] else ""
+        print(f"  {p['symbol']} {p['name']:<15}{retro:<5}: {p['formatted']['formatted']}")
+        
     print("\nHouses:")
     for h in res["houses"]:
         print(f"  {h['name']:<10}: {h['formatted']['formatted']}")

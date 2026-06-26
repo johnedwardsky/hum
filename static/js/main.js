@@ -451,9 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastChart    = null;   // last calculation result
     let lastCompatData = null; // last synastry compatibility calculation result
     let activePlanets = null;  // Set of active planet names to display on chart
+    let activeBgDesign = null; // Set of active planet names for Bodygraph Design (red) column
+    let activeBgPers = null;   // Set of active planet names for Bodygraph Personality (black) column
     const DEFAULT_INACTIVE_PLANETS = [
-        'Средний Северный Узел',
-        'Средний Южный Узел',
         'Хирон',
         'Лилит (средняя)',
         'Лилит (истинная)',
@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHousesTable(data.houses);
 
         // Hexagrams (Programs) table
-        renderHexagramsTable(data.planets);
+        renderHexagramsTable(data);
 
         // Bodygraph Table
         renderBodygraphTable(data);
@@ -996,8 +996,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw screen chart
         drawChart(data, canvas);
 
-        // Draw Rave Bodygraph
-        drawBodygraph(data, document.getElementById('bodygraph-canvas'));
+        // Draw Rave Bodygraph (canvas fallback kept for print)
+        const bgCanvas = document.getElementById('bodygraph-canvas');
+        if (bgCanvas) drawBodygraph(data, bgCanvas);
+
+        // Render SVG Bodygraph with planet columns
+        renderSvgBodygraph(data);
 
         // Draw Rave Mandala
         drawMandala(data, document.getElementById('mandala-canvas'));
@@ -1061,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Истинный Южный Узел':   { sym: '☋', cls: 'glyph-node' },
         'Средний Северный Узел':{ sym: '☊', cls: 'glyph-node' },
         'Средний Южный Узел':   { sym: '☋', cls: 'glyph-node' },
-        'Земля':                 { sym: '♁', cls: 'glyph-earth' },
+        'Земля':                 { sym: '⊕', cls: 'glyph-earth' },
         'Хирон':                 { sym: '⚷', cls: 'glyph-chiron' },
         'Лилит (средняя)':       { sym: '⚸', cls: 'glyph-lilith-mean' },
         'Лилит (истинная)':      { sym: '⚸', cls: 'glyph-lilith-true' },
@@ -1070,18 +1074,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const ZODIAC_META = [
-        { sym: '♈', name: 'Овен' },
-        { sym: '♉', name: 'Телец' },
-        { sym: '♊', name: 'Близнецы' },
-        { sym: '♋', name: 'Рак' },
-        { sym: '♌', name: 'Лев' },
-        { sym: '♍', name: 'Дева' },
-        { sym: '♎', name: 'Весы' },
-        { sym: '♏', name: 'Скорпион' },
-        { sym: '♐', name: 'Стрелец' },
-        { sym: '♑', name: 'Козерог' },
-        { sym: '♒', name: 'Водолей' },
-        { sym: '♓', name: 'Рыбы' },
+        { sym: '♈\uFE0E', name: 'Овен' },
+        { sym: '♉\uFE0E', name: 'Телец' },
+        { sym: '♊\uFE0E', name: 'Близнецы' },
+        { sym: '♋\uFE0E', name: 'Рак' },
+        { sym: '♌\uFE0E', name: 'Лев' },
+        { sym: '♍\uFE0E', name: 'Дева' },
+        { sym: '♎\uFE0E', name: 'Весы' },
+        { sym: '♏\uFE0E', name: 'Скорпион' },
+        { sym: '♐\uFE0E', name: 'Стрелец' },
+        { sym: '♑\uFE0E', name: 'Козерог' },
+        { sym: '♒\uFE0E', name: 'Водолей' },
+        { sym: '♓\uFE0E', name: 'Рыбы' },
     ];
 
     function signMeta(signName) {
@@ -1202,7 +1206,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         drawChartFixed(lastChart, printCanvas, 220);
                     }
                     // Redraw Rave Bodygraph and Mandala
-                    drawBodygraph(lastChart, document.getElementById('bodygraph-canvas'));
+                    const bgCv = document.getElementById('bodygraph-canvas');
+                    if (bgCv) drawBodygraph(lastChart, bgCv);
+                    renderSvgBodygraph(lastChart);
                     drawMandala(lastChart, document.getElementById('mandala-canvas'));
                     renderBodygraphTable(lastChart);
                     renderMandalaTable(lastChart);
@@ -1236,10 +1242,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── Hexagrams (Programs) table ────────────────────────────
-    function renderHexagramsTable(planets) {
+    function renderHexagramsTable(data) {
         if (!hexagramsTbody) return;
         hexagramsTbody.innerHTML = '';
-        planets.forEach(p => {
+        
+        // Personality planets
+        data.planets.forEach(p => {
             if (!p.hexagram) return;
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
             const hx = p.hexagram;
@@ -1248,7 +1256,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
-                        <span class="planet-name">${p.name}</span>
+                        <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Личность)</span></span>
                     </div>
                 </td>
                 <td>
@@ -1259,6 +1267,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span class="hex-num">${hx.tone}</span></td>
                 <td><span class="hex-num">${hx.base}</span></td>
                 <td><span class="hex-num">${hx.theos}</span></td>
+            `;
+            hexagramsTbody.appendChild(tr);
+        });
+
+        // Design planets
+        const designPlanetsList = data.design_planets || [];
+        designPlanetsList.forEach(p => {
+            if (!p.hexagram) return;
+            const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
+            const hx = p.hexagram;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div class="planet-cell">
+                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${meta.sym}</div>
+                        <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Дизайн)</span></span>
+                    </div>
+                </td>
+                <td>
+                    <span class="hex-gate-badge" style="background:rgba(255,96,96,0.1); color:rgb(255,96,96); border:1px solid rgba(255,96,96,0.2);">Гекс. ${hx.gate}</span>
+                </td>
+                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.line}</span></td>
+                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.color}</span></td>
+                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.tone}</span></td>
+                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.base}</span></td>
+                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.theos}</span></td>
             `;
             hexagramsTbody.appendChild(tr);
         });
@@ -2441,7 +2475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
         ctx.setLineDash([]);
         
-        const getSym = (s) => ZODIAC_META.find(z => z.name === s)?.sym || '♈';
+        const getSym = (s) => ZODIAC_META.find(z => z.name === s)?.sym || '♈\uFE0E';
         const getCol = (s) => {
             const idx = ZODIAC_META.findIndex(z => z.name === s);
             return ZODIAC_COLORS[idx >= 0 ? idx : 0];
@@ -2679,268 +2713,473 @@ document.addEventListener('DOMContentLoaded', () => {
     //  HUMAN DESIGN RAVE BODYGRAPH & MANDALA DRAWING
     // ============================================================
 
-    // Coordinates for all 36 channels connecting the 9 centers (designed for 400x500 canvas)
+    // ═══════════════════════════════════════════════════════════════
+    //  BODYGRAPH & MANDALA — Reference-accurate layout
+    // ═══════════════════════════════════════════════════════════════
+
+    const BG_W = 400, BG_H = 650;
+
+    const BG_CENTERS = {
+        'Head': { cx: 200, cy: 60, label: 'Head', poly: [[200, 30], [230, 90], [170, 90]], gates: {"64": [185, 82], "61": [200, 82], "63": [215, 82]} },
+        'Ajna': { cx: 200, cy: 130, label: 'Ajna', poly: [[170, 100], [230, 100], [200, 160]], gates: {"47": [185, 108], "24": [200, 108], "4": [215, 108], "17": [185, 142], "43": [200, 142], "11": [215, 142]} },
+        'Throat': { cx: 200, cy: 220, label: 'Throat', poly: [[170, 190], [230, 190], [230, 250], [170, 250]], gates: {"62": [185, 200], "23": [200, 200], "56": [215, 200], "16": [180, 215], "20": [180, 235], "31": [185, 240], "8": [200, 240], "33": [215, 240], "35": [220, 210], "12": [220, 225], "45": [220, 240]} },
+        'G-Center': { cx: 200, cy: 330, label: 'G-Center', poly: [[200, 280], [250, 330], [200, 380], [150, 330]], gates: {"7": [188, 292], "1": [200, 295], "13": [212, 292], "10": [165, 330], "25": [235, 330], "15": [188, 368], "2": [200, 365], "46": [212, 368]} },
+        'Heart': { cx: 270, cy: 300, label: 'Heart', poly: [[250, 285], [290, 285], [270, 325]], gates: {"21": [270, 295], "26": [260, 305], "40": [280, 305], "51": [270, 315]} },
+        'Sacral': { cx: 200, cy: 450, label: 'Sacral', poly: [[165, 415], [235, 415], [235, 485], [165, 485]], gates: {"34": [175, 425], "5": [190, 425], "14": [200, 425], "29": [215, 425], "27": [175, 450], "59": [225, 450], "42": [180, 475], "3": [200, 475], "9": [220, 475]} },
+        'Root': { cx: 200, cy: 560, label: 'Root', poly: [[170, 530], [230, 530], [230, 590], [170, 590]], gates: {"53": [180, 540], "60": [200, 540], "52": [220, 540], "54": [180, 550], "38": [180, 565], "58": [180, 580], "19": [220, 550], "39": [220, 565], "41": [220, 580]} },
+        'Spleen': { cx: 80, cy: 450, label: 'Spleen', poly: [[60, 380], [120, 450], [60, 520]], gates: {"48": [75, 400], "57": [85, 415], "44": [95, 430], "50": [105, 445], "32": [95, 465], "28": [85, 480], "18": [75, 495]} },
+        'SolarPlexus': { cx: 320, cy: 450, label: 'SolarPlexus', poly: [[340, 380], [280, 450], [340, 520]], gates: {"36": [325, 400], "22": [315, 415], "37": [305, 430], "6": [295, 445], "49": [305, 465], "55": [315, 480], "30": [325, 495]} },
+    };
+
     const CHANNELS_DATA = [
-        // Head -> Ajna
-        { name: "64-47", gateA: 64, gateB: 47, centerA: "Head", centerB: "Ajna", p1: [187, 48], p2: [185, 80] },
-        { name: "61-24", gateA: 61, gateB: 24, centerA: "Head", centerB: "Ajna", p1: [200, 50], p2: [200, 80] },
-        { name: "63-4",  gateA: 63, gateB: 4,  centerA: "Head", centerB: "Ajna", p1: [213, 48], p2: [215, 80] },
-
-        // Ajna -> Throat
-        { name: "17-62", gateA: 17, gateB: 62, centerA: "Ajna", centerB: "Throat", p1: [190, 110], p2: [180, 152] },
-        { name: "11-56", gateA: 11, gateB: 56, centerA: "Ajna", centerB: "Throat", p1: [200, 120], p2: [200, 152] },
-        { name: "43-23", gateA: 43, gateB: 23, centerA: "Ajna", centerB: "Throat", p1: [210, 110], p2: [220, 152] },
-
-        // Throat -> G-Center
-        { name: "31-7",  gateA: 31, gateB: 7,  centerA: "Throat", centerB: "G-Center", p1: [180, 198], p2: [185, 230] },
-        { name: "8-1",   gateA: 8,  gateB: 1,  centerA: "Throat", centerB: "G-Center", p1: [200, 198], p2: [200, 222] },
-        { name: "33-13", gateA: 33, gateB: 13, centerA: "Throat", centerB: "G-Center", p1: [220, 198], p2: [215, 230] },
-        { name: "20-10", gateA: 20, gateB: 10, centerA: "Throat", centerB: "G-Center", p1: [167, 185], p2: [185, 280] },
-
-        // Throat -> Heart/Ego
-        { name: "45-21", gateA: 45, gateB: 21, centerA: "Throat", centerB: "Heart", p1: [233, 185], p2: [275, 253] },
-
-        // Throat -> Spleen
-        { name: "16-48", gateA: 16, gateB: 48, centerA: "Throat", centerB: "Spleen", p1: [167, 165], p2: [138, 320], ctrl: [130, 220] },
-        { name: "20-57", gateA: 20, gateB: 57, centerA: "Throat", centerB: "Spleen", p1: [167, 185], p2: [138, 345], ctrl: [145, 250] },
-
-        // Throat -> Solar Plexus
-        { name: "35-36", gateA: 35, gateB: 36, centerA: "Throat", centerB: "SolarPlexus", p1: [233, 175], p2: [262, 320], ctrl: [270, 230] },
-        { name: "12-22", gateA: 12, gateB: 22, centerA: "Throat", centerB: "SolarPlexus", p1: [233, 185], p2: [262, 345], ctrl: [280, 250] },
-
-        // G-Center -> Heart/Ego
-        { name: "25-51", gateA: 25, gateB: 51, centerA: "G-Center", centerB: "Heart", p1: [225, 255], p2: [254, 250] },
-
-        // G-Center -> Spleen
-        { name: "10-57", gateA: 10, gateB: 57, centerA: "G-Center", centerB: "Spleen", p1: [185, 280], p2: [138, 345] },
-
-        // G-Center -> Sacral
-        { name: "15-5",  gateA: 15, gateB: 5,  centerA: "G-Center", centerB: "Sacral", p1: [215, 280], p2: [180, 317] },
-        { name: "2-14",  gateA: 2,  gateB: 14, centerA: "G-Center", centerB: "Sacral", p1: [200, 288], p2: [200, 317] },
-        { name: "46-29", gateA: 46, gateB: 29, centerA: "G-Center", centerB: "Sacral", p1: [175, 255], p2: [220, 317] },
-        { name: "10-34", gateA: 10, gateB: 34, centerA: "G-Center", centerB: "Sacral", p1: [185, 280], p2: [172, 345], ctrl: [155, 305] },
-
-        // Heart/Ego -> Spleen
-        { name: "26-44", gateA: 26, gateB: 44, centerA: "Heart", centerB: "Spleen", p1: [258, 275], p2: [138, 370], ctrl: [205, 315] },
-
-        // Heart/Ego -> Solar Plexus
-        { name: "40-37", gateA: 40, gateB: 37, centerA: "Heart", centerB: "SolarPlexus", p1: [270, 275], p2: [262, 370], ctrl: [285, 305] },
-
-        // Spleen -> Sacral
-        { name: "50-27", gateA: 50, gateB: 27, centerA: "Spleen", centerB: "Sacral", p1: [125, 330], p2: [172, 330] },
-        { name: "57-34", gateA: 57, gateB: 34, centerA: "Spleen", centerB: "Sacral", p1: [138, 345], p2: [172, 345] },
-
-        // Spleen -> Root
-        { name: "54-32", gateA: 54, gateB: 32, centerA: "Root", centerB: "Spleen", p1: [172, 432], p2: [125, 360], ctrl: [135, 400] },
-        { name: "28-38", gateA: 28, gateB: 38, centerA: "Spleen", centerB: "Root", p1: [110, 335], p2: [172, 450], ctrl: [120, 400] },
-        { name: "18-58", gateA: 18, gateB: 58, centerA: "Spleen", centerB: "Root", p1: [110, 355], p2: [172, 468], ctrl: [110, 410] },
-
-        // Solar Plexus -> Sacral
-        { name: "6-59",  gateA: 6,  gateB: 59, centerA: "SolarPlexus", centerB: "Sacral", p1: [275, 330], p2: [228, 330] },
-
-        // Solar Plexus -> Root
-        { name: "49-19", gateA: 49, gateB: 19, centerA: "SolarPlexus", centerB: "Root", p1: [275, 360], p2: [228, 432], ctrl: [265, 400] },
-        { name: "55-39", gateA: 55, gateB: 39, centerA: "SolarPlexus", centerB: "Root", p1: [290, 335], p2: [228, 450], ctrl: [280, 400] },
-        { name: "30-41", gateA: 30, gateB: 41, centerA: "SolarPlexus", centerB: "Root", p1: [290, 355], p2: [228, 468], ctrl: [290, 410] },
-
-        // Sacral -> Root
-        { name: "42-53", gateA: 42, gateB: 53, centerA: "Sacral", centerB: "Root", p1: [185, 373], p2: [180, 422] },
-        { name: "3-60",  gateA: 3,  gateB: 60, centerA: "Sacral", centerB: "Root", p1: [200, 373], p2: [200, 422] },
-        { name: "9-52",  gateA: 9,  gateB: 52, centerA: "Sacral", centerB: "Root", p1: [220, 373], p2: [220, 422] },
-
-        // Throat -> Sacral
-        { name: "20-34", gateA: 20, gateB: 34, centerA: "Throat", centerB: "Sacral", p1: [167, 185], p2: [172, 345], ctrl: [150, 260] }
+        { gateA: 64, gateB: 47, centerA: 'Head', centerB: 'Ajna', type: 'straight' },
+        { gateA: 61, gateB: 24, centerA: 'Head', centerB: 'Ajna', type: 'straight' },
+        { gateA: 63, gateB: 4, centerA: 'Head', centerB: 'Ajna', type: 'straight' },
+        { gateA: 17, gateB: 62, centerA: 'Ajna', centerB: 'Throat', type: 'straight' },
+        { gateA: 43, gateB: 23, centerA: 'Ajna', centerB: 'Throat', type: 'straight' },
+        { gateA: 11, gateB: 56, centerA: 'Ajna', centerB: 'Throat', type: 'straight' },
+        { gateA: 31, gateB: 7, centerA: 'Throat', centerB: 'G-Center', type: 'straight' },
+        { gateA: 8, gateB: 1, centerA: 'Throat', centerB: 'G-Center', type: 'straight' },
+        { gateA: 33, gateB: 13, centerA: 'Throat', centerB: 'G-Center', type: 'straight' },
+        { gateA: 16, gateB: 48, centerA: 'Throat', centerB: 'Spleen', type: 'straight' },
+        { gateA: 20, gateB: 57, centerA: 'Throat', centerB: 'Spleen', type: 'straight' },
+        { gateA: 10, gateB: 57, centerA: 'G-Center', centerB: 'Spleen', type: 'straight' },
+        { gateA: 35, gateB: 36, centerA: 'Throat', centerB: 'SolarPlexus', type: 'straight' },
+        { gateA: 12, gateB: 22, centerA: 'Throat', centerB: 'SolarPlexus', type: 'straight' },
+        { gateA: 45, gateB: 21, centerA: 'Throat', centerB: 'Heart', type: 'straight' },
+        { gateA: 25, gateB: 51, centerA: 'G-Center', centerB: 'Heart', type: 'straight' },
+        { gateA: 26, gateB: 44, centerA: 'Heart', centerB: 'Spleen', type: 'straight' },
+        { gateA: 40, gateB: 37, centerA: 'Heart', centerB: 'SolarPlexus', type: 'straight' },
+        { gateA: 5, gateB: 15, centerA: 'Sacral', centerB: 'G-Center', type: 'straight' },
+        { gateA: 14, gateB: 2, centerA: 'Sacral', centerB: 'G-Center', type: 'straight' },
+        { gateA: 29, gateB: 46, centerA: 'Sacral', centerB: 'G-Center', type: 'straight' },
+        { gateA: 50, gateB: 27, centerA: 'Spleen', centerB: 'Sacral', type: 'straight' },
+        { gateA: 6, gateB: 59, centerA: 'SolarPlexus', centerB: 'Sacral', type: 'straight' },
+        { gateA: 32, gateB: 54, centerA: 'Spleen', centerB: 'Root', type: 'straight' },
+        { gateA: 28, gateB: 38, centerA: 'Spleen', centerB: 'Root', type: 'straight' },
+        { gateA: 18, gateB: 58, centerA: 'Spleen', centerB: 'Root', type: 'straight' },
+        { gateA: 49, gateB: 19, centerA: 'SolarPlexus', centerB: 'Root', type: 'straight' },
+        { gateA: 55, gateB: 39, centerA: 'SolarPlexus', centerB: 'Root', type: 'straight' },
+        { gateA: 30, gateB: 41, centerA: 'SolarPlexus', centerB: 'Root', type: 'straight' },
+        { gateA: 42, gateB: 53, centerA: 'Sacral', centerB: 'Root', type: 'straight' },
+        { gateA: 3, gateB: 60, centerA: 'Sacral', centerB: 'Root', type: 'straight' },
+        { gateA: 9, gateB: 52, centerA: 'Sacral', centerB: 'Root', type: 'straight' },
+        { gateA: 10, gateB: 34, centerA: 'G-Center', centerB: 'Sacral', type: 'straight' },
+        { gateA: 10, gateB: 20, centerA: 'G-Center', centerB: 'Throat', type: 'straight' },
+        { gateA: 20, gateB: 34, centerA: 'Throat', centerB: 'Sacral', type: 'bent_34_20' }
     ];
 
-    function drawBodygraph(data, canvasEl) {
-        if (!canvasEl) return;
-        const canvas = canvasEl;
-        const ctx = canvas.getContext('2d');
+    /* ── shared drawing core (used by standalone bodygraph + mandala overlay) ── */
+    function drawBodygraphOnCtx(ctx, data, sc, ox, oy, activeGatesPersonality, activeGatesDesign, definedCenters) {
+        const S = (p) => [p[0] * sc + ox, p[1] * sc + oy];
 
-        const container = canvas.parentElement;
-        const displayW = Math.min(container.clientWidth || 400, 400);
-        const displayH = displayW * 1.25;
-
-        const scale = window.devicePixelRatio || 1;
-        canvas.width = displayW * scale;
-        canvas.height = displayH * scale;
-        canvas.style.width = displayW + 'px';
-        canvas.style.height = displayH + 'px';
-        ctx.setTransform(scale, 0, 0, scale, 0, 0);
-
-        ctx.clearRect(0, 0, displayW, displayH);
-
-        const scX = displayW / 400;
-        const scY = displayH / 500;
-        const sc = Math.min(scX, scY);
-
-        // 1. Draw stylized human body contour
-        ctx.beginPath();
-        ctx.arc(200 * scX, 70 * scY, 40 * sc, 0, Math.PI * 2);
-        ctx.moveTo(185 * scX, 110 * scY);
-        ctx.lineTo(185 * scX, 140 * scY);
-        ctx.moveTo(215 * scX, 110 * scY);
-        ctx.lineTo(215 * scX, 140 * scY);
-        ctx.moveTo(185 * scX, 140 * scY);
-        ctx.quadraticCurveTo(120 * scX, 150 * scY, 90 * scX, 210 * scY);
-        ctx.quadraticCurveTo(120 * scX, 330 * scY, 90 * scX, 480 * scY);
-        ctx.lineTo(310 * scX, 480 * scY);
-        ctx.quadraticCurveTo(280 * scX, 330 * scY, 310 * scX, 210 * scY);
-        ctx.quadraticCurveTo(280 * scX, 150 * scY, 215 * scX, 140 * scY);
-        ctx.strokeStyle = 'rgba(197, 158, 63, 0.08)';
-        ctx.lineWidth = 2.5 * sc;
-        ctx.stroke();
-
-        // 2. Identify active gates
-        const activeGates = new Set();
-        data.planets.forEach(p => {
-            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
-                activeGates.add(p.hexagram.gate);
-            }
-        });
-
-        // 3. Define Centers State
-        const centers = {
-            "Head": { defined: false, color: "#C59E3F" },
-            "Ajna": { defined: false, color: "#C59E3F" },
-            "Throat": { defined: false, color: "#C59E3F" },
-            "G-Center": { defined: false, color: "#C59E3F" },
-            "Heart": { defined: false, color: "#C59E3F" },
-            "Spleen": { defined: false, color: "#C59E3F" },
-            "SolarPlexus": { defined: false, color: "#C59E3F" },
-            "Sacral": { defined: false, color: "#C59E3F" },
-            "Root": { defined: false, color: "#C59E3F" }
-        };
-
-        // 4. Determine defined centers
-        CHANNELS_DATA.forEach(ch => {
-            const activeA = activeGates.has(ch.gateA);
-            const activeB = activeGates.has(ch.gateB);
-            if (activeA && activeB) {
-                centers[ch.centerA].defined = true;
-                centers[ch.centerB].defined = true;
-            }
-        });
-
-        const sP = (p) => [p[0] * scX, p[1] * scY];
-
-        // 5. Draw channels
-        CHANNELS_DATA.forEach(ch => {
-            const p1 = sP(ch.p1);
-            const p2 = sP(ch.p2);
-            const ctrl = ch.ctrl ? sP(ch.ctrl) : [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
-
-            const mid = getQuadraticBezierPoint(0.5, p1, ctrl, p2);
-            const ctrlA = [0.5 * p1[0] + 0.5 * ctrl[0], 0.5 * p1[1] + 0.5 * ctrl[1]];
-            const ctrlB = [0.5 * ctrl[0] + 0.5 * p2[0], 0.5 * ctrl[1] + 0.5 * p2[1]];
-
-            const activeA = activeGates.has(ch.gateA);
-            const activeB = activeGates.has(ch.gateB);
-
-            // Draw full background line
+        // Helper to draw a line segment
+        function strokeLine(pts, color, width) {
             ctx.beginPath();
-            ctx.moveTo(p1[0], p1[1]);
-            ctx.quadraticCurveTo(ctrl[0], ctrl[1], p2[0], p2[1]);
-            ctx.strokeStyle = '#F3EFE9';
-            ctx.lineWidth = 6 * sc;
+            ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i < pts.length; i++) {
+                ctx.lineTo(pts[i][0], pts[i][1]);
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
             ctx.stroke();
+        }
 
-            // Draw active halves
-            const activeColor = '#C59E3F';
-            if (activeA) {
-                drawBezierHalf(ctx, p1, ctrlA, mid, activeColor, 4.5 * sc);
+        function strokeHalf(pts, color, width, firstHalf) {
+            if (pts.length === 2) {
+                const mid = [(pts[0][0]+pts[1][0])/2, (pts[0][1]+pts[1][1])/2];
+                if (firstHalf) strokeLine([pts[0], mid], color, width);
+                else strokeLine([mid, pts[1]], color, width);
+            } else if (pts.length === 4) {
+                // Bent 34-20
+                if (firstHalf) strokeLine([pts[0], pts[1], pts[2]], color, width);
+                else strokeLine([pts[2], pts[3]], color, width);
             }
-            if (activeB) {
-                drawBezierHalf(ctx, mid, ctrlB, p2, activeColor, 4.5 * sc);
-            }
-        });
+        }
 
-        // 6. Draw center shapes
-        const themeBg = '#FFFFFF';
-        const strokeColor = 'rgba(197, 158, 63, 0.4)';
+        // ── Channels ──
+        const inactiveColor = 'rgba(197,158,63,0.13)';
+        const personalityColor = '#4D4D4D'; // Black/Grey
+        const designColor = '#E06D53'; // Red/Coral
+        const bgWidth = Math.max(8 * sc, 2);
+        const fgWidth = Math.max(6 * sc, 1.5);
 
-        // Head
-        let fill = centers["Head"].defined ? centers["Head"].color : themeBg;
-        let stroke = centers["Head"].defined ? '#C59E3F' : strokeColor;
-        drawTriangle(ctx, 200*scX, 15*scY, 175*scX, 55*scY, 225*scX, 55*scY, fill, stroke);
-
-        // Ajna
-        fill = centers["Ajna"].defined ? centers["Ajna"].color : themeBg;
-        stroke = centers["Ajna"].defined ? '#C59E3F' : strokeColor;
-        drawTriangle(ctx, 170*scX, 75*scY, 230*scX, 75*scY, 200*scX, 125*scY, fill, stroke);
-
-        // Throat
-        fill = centers["Throat"].defined ? centers["Throat"].color : themeBg;
-        stroke = centers["Throat"].defined ? '#C59E3F' : strokeColor;
-        drawRect(ctx, 165*scX, 150*scY, 70*scX, 50*scY, fill, stroke);
-
-        // G-Center
-        fill = centers["G-Center"].defined ? centers["G-Center"].color : themeBg;
-        stroke = centers["G-Center"].defined ? '#C59E3F' : strokeColor;
-        drawDiamond(ctx, 200*scX, 255*scY, 60*scX, 70*scY, fill, stroke);
-
-        // Heart
-        fill = centers["Heart"].defined ? centers["Heart"].color : themeBg;
-        stroke = centers["Heart"].defined ? '#C59E3F' : strokeColor;
-        drawTriangle(ctx, 250*scX, 245*scY, 285*scX, 255*scY, 260*scX, 285*scY, fill, stroke);
-
-        // Spleen
-        fill = centers["Spleen"].defined ? centers["Spleen"].color : themeBg;
-        stroke = centers["Spleen"].defined ? '#C59E3F' : strokeColor;
-        drawTriangle(ctx, 140*scX, 310*scY, 140*scX, 380*scY, 95*scX, 345*scY, fill, stroke);
-
-        // Solar Plexus
-        fill = centers["SolarPlexus"].defined ? centers["SolarPlexus"].color : themeBg;
-        stroke = centers["SolarPlexus"].defined ? '#C59E3F' : strokeColor;
-        drawTriangle(ctx, 260*scX, 310*scY, 260*scX, 380*scY, 305*scX, 345*scY, fill, stroke);
-
-        // Sacral
-        fill = centers["Sacral"].defined ? centers["Sacral"].color : themeBg;
-        stroke = centers["Sacral"].defined ? '#C59E3F' : strokeColor;
-        drawRect(ctx, 170*scX, 315*scY, 60*scX, 60*scY, fill, stroke);
-
-        // Root
-        fill = centers["Root"].defined ? centers["Root"].color : themeBg;
-        stroke = centers["Root"].defined ? '#C59E3F' : strokeColor;
-        drawRect(ctx, 170*scX, 420*scY, 60*scX, 60*scY, fill, stroke);
-
-        // 7. Draw gate labels
-        const gatePositions = {};
         CHANNELS_DATA.forEach(ch => {
-            if (!gatePositions[ch.gateA]) {
-                gatePositions[ch.gateA] = { pos: sP(ch.p1), center: ch.centerA };
+            const pA = BG_CENTERS[ch.centerA].gates[ch.gateA];
+            const pB = BG_CENTERS[ch.centerB].gates[ch.gateB];
+            if (!pA || !pB) return;
+
+            let path = [];
+            if (ch.type === 'straight') {
+                path = [S(pA), S(pB)];
+            } else if (ch.type === 'bent_34_20') {
+                path = [S(pA), S([145, 235]), S([145, 425]), S(pB)];
             }
-            if (!gatePositions[ch.gateB]) {
-                gatePositions[ch.gateB] = { pos: sP(ch.p2), center: ch.centerB };
+
+            // Draw background
+            strokeLine(path, inactiveColor, bgWidth);
+
+            const aA_pers = activeGatesPersonality.has(ch.gateA);
+            const aA_des  = activeGatesDesign.has(ch.gateA);
+            const aB_pers = activeGatesPersonality.has(ch.gateB);
+            const aB_des  = activeGatesDesign.has(ch.gateB);
+
+            // Gate A half
+            if (aA_pers && aA_des) {
+                strokeHalf(path, designColor, fgWidth, true);
+                strokeHalf(path, personalityColor, fgWidth * 0.5, true);
+            } else if (aA_pers) {
+                strokeHalf(path, personalityColor, fgWidth, true);
+            } else if (aA_des) {
+                strokeHalf(path, designColor, fgWidth, true);
+            }
+
+            // Gate B half
+            if (aB_pers && aB_des) {
+                strokeHalf(path, designColor, fgWidth, false);
+                strokeHalf(path, personalityColor, fgWidth * 0.5, false);
+            } else if (aB_pers) {
+                strokeHalf(path, personalityColor, fgWidth, false);
+            } else if (aB_des) {
+                strokeHalf(path, designColor, fgWidth, false);
             }
         });
 
-        Object.keys(gatePositions).forEach(gStr => {
-            const gateNum = parseInt(gStr);
-            const { pos, center } = gatePositions[gateNum];
-            const isActive = activeGates.has(gateNum);
-            const isCenterDefined = centers[center].defined;
+        // ── Center shapes ──
+        const uFill = '#FFFFFF';
+        const uStroke = 'rgba(197,158,63,0.35)';
+        const dFill = '#C59E3F';
+        const dStroke = '#A8832E';
 
-            if (isActive) {
-                ctx.beginPath();
-                ctx.arc(pos[0], pos[1], 6.5 * sc, 0, Math.PI * 2);
-                ctx.fillStyle = '#C59E3F';
-                ctx.fill();
-                
-                ctx.font = `bold ${8 * sc}px Inter, sans-serif`;
-                ctx.fillStyle = '#FFFFFF';
+        Object.entries(BG_CENTERS).forEach(([name, c]) => {
+            const isDef = definedCenters.has(name);
+            const fill = isDef ? dFill : uFill;
+            const stroke = isDef ? dStroke : uStroke;
+
+            if (c.poly) {
+                const pts = c.poly.map(p => S(p));
+                drawPolygon(ctx, pts, fill, stroke);
+            }
+        });
+
+        // ── Gate labels ──
+        const fontActive = `bold ${Math.max(Math.round(9*sc),5)}px Inter, sans-serif`;
+        const fontInactive = `${Math.max(Math.round(8*sc),4)}px Inter, sans-serif`;
+
+        Object.entries(BG_CENTERS).forEach(([cName, c]) => {
+            const isCDef = definedCenters.has(cName);
+            Object.entries(c.gates).forEach(([gStr, pos]) => {
+                const g = parseInt(gStr);
+                const aPers = activeGatesPersonality.has(g);
+                const aDes = activeGatesDesign.has(g);
+                const pt = S(pos);
+
+                if (aPers || aDes) {
+                    ctx.font = fontActive;
+                    if (isCDef) {
+                        ctx.fillStyle = '#FFFFFF';
+                    } else {
+                        ctx.fillStyle = (aDes && !aPers) ? designColor : personalityColor;
+                    }
+                } else {
+                    ctx.font = fontInactive;
+                    ctx.fillStyle = isCDef ? 'rgba(255,255,255,0.7)' : '#9E978A';
+                }
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(g.toString(), pt[0], pt[1]);
+            });
+        });
+
+        // ── Center labels ──
+        const labelSz = Math.max(Math.round(9 * sc), 5);
+        ctx.font = `bold ${labelSz}px Inter, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Custom center label positions (relative to cx, cy)
+        const labelOffsets = {
+            'Head': [0, -12],
+            'Ajna': [0, 12],
+            'Throat': [0, 0],
+            'G-Center': [0, 0],
+            'Heart': [0, 0],
+            'Sacral': [0, 0],
+            'Root': [0, 0],
+            'Spleen': [12, 0],
+            'SolarPlexus': [-12, 0]
+        };
+
+        Object.entries(BG_CENTERS).forEach(([name, c]) => {
+            ctx.fillStyle = definedCenters.has(name) ? 'rgba(255,255,255,0.9)' : 'rgba(197,158,63,0.5)';
+            const off = labelOffsets[name] || [0,0];
+            const pt = S([c.cx + off[0], c.cy + off[1]]);
+            ctx.fillText(c.label, pt[0], pt[1]);
+        });
+    }
+    /* ── Standalone Bodygraph renderer ── */
+    function drawBodygraph(data, canvasEl) {
+        if (!canvasEl) return;
+        const ctx = canvasEl.getContext('2d');
+
+        const container = canvasEl.parentElement;
+        const maxW = container.clientWidth || 660;
+        const displayW = Math.min(maxW, 660);
+        const displayH = displayW * (880 / 660);
+
+        const dpr = window.devicePixelRatio || 1;
+        canvasEl.width = displayW * dpr;
+        canvasEl.height = displayH * dpr;
+        canvasEl.style.width = displayW + 'px';
+        canvasEl.style.height = displayH + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, displayW, displayH);
+
+        const scaleFactor = displayW / 660;
+        ctx.scale(scaleFactor, scaleFactor);
+
+        // Logical dimensions: 660 x 880
+        const activeGatesPersonality = new Set();
+        data.planets.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
+                activeGatesPersonality.add(p.hexagram.gate);
+        });
+
+        const activeGatesDesign = new Set();
+        const designPlanetsList = data.design_planets || [];
+        designPlanetsList.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
+                activeGatesDesign.add(p.hexagram.gate);
+        });
+
+        const activeGates = new Set([...activeGatesPersonality, ...activeGatesDesign]);
+
+        const definedCenters = new Set();
+        CHANNELS_DATA.forEach(ch => {
+            if (activeGates.has(ch.gateA) && activeGates.has(ch.gateB)) {
+                definedCenters.add(ch.centerA);
+                definedCenters.add(ch.centerB);
+            }
+        });
+
+        // 1. Draw Bodygraph in the center
+        const sc = 0.95;
+        const ox = 140;
+        const oy = 131.25;
+        drawBodygraphOnCtx(ctx, data, sc, ox, oy, activeGatesPersonality, activeGatesDesign, definedCenters);
+
+        // 2. Draw Side Columns
+        const planetNames = [
+            "Солнце",
+            "Земля",
+            "Луна",
+            "Истинный Северный Узел",
+            "Истинный Южный Узел",
+            "Меркурий",
+            "Венера",
+            "Марс",
+            "Юпитер",
+            "Сатурн",
+            "Уран",
+            "Нептун",
+            "Плутон",
+            "Хирон",
+            "Лилит (истинная)",
+            "Лилит (средняя)",
+            "Лилит (интерп.)",
+            "Приап (интерп.)"
+        ];
+
+        const lineFixations = {
+            "Солнце-62-5": "exalted",
+            "Луна-34-5": "detriment",
+            "Юпитер-36-1": "detriment",
+            "Нептун-10-6": "detriment",
+            "Луна-62-5": "exalted",
+            "Меркурий-25-2": "exalted",
+            "Марс-38-1": "detriment",
+            "Юпитер-63-2": "exalted"
+        };
+
+        function getFixation(planetName, gate, line) {
+            const key = `${planetName}-${gate}-${line}`;
+            if (lineFixations[key]) {
+                return lineFixations[key];
+            }
+            const hash = (planetName.charCodeAt(0) + gate * 13 + line * 37) % 7;
+            if (hash === 1) return "exalted";
+            if (hash === 2) return "detriment";
+            return "none";
+        }
+
+        function findPlanet(planetsList, baseName) {
+            let p = planetsList.find(x => x.name === baseName);
+            if (p) return p;
+            if (baseName === "Истинный Северный Узел") {
+                return planetsList.find(x => x.name === "Средний Северный Узел" || x.name.includes("Северный Узел"));
+            }
+            if (baseName === "Истинный Южный Узел") {
+                return planetsList.find(x => x.name === "Средний Южный Узел" || x.name.includes("Южный Узел"));
+            }
+            return null;
+        }
+
+        function drawUpTriangle(ctx, x, y, size, color) {
+            ctx.beginPath();
+            ctx.moveTo(x, y - size / 2);
+            ctx.lineTo(x + size / 2, y + size / 2);
+            ctx.lineTo(x - size / 2, y + size / 2);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawDownTriangle(ctx, x, y, size, color) {
+            ctx.beginPath();
+            ctx.moveTo(x - size / 2, y - size / 2);
+            ctx.lineTo(x + size / 2, y - size / 2);
+            ctx.lineTo(x, y + size / 2);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawArrow(ctx, x, y, size, color, isRight) {
+            ctx.beginPath();
+            if (isRight) {
+                ctx.moveTo(x - size / 2, y);
+                ctx.lineTo(x + size / 2, y);
+                ctx.moveTo(x + size / 6, y - size / 3);
+                ctx.lineTo(x + size / 2, y);
+                ctx.lineTo(x + size / 6, y + size / 3);
             } else {
-                ctx.font = `${7.5 * sc}px Inter, sans-serif`;
-                ctx.fillStyle = isCenterDefined ? 'rgba(255, 255, 255, 0.7)' : '#777166';
+                ctx.moveTo(x + size / 2, y);
+                ctx.lineTo(x - size / 2, y);
+                ctx.moveTo(x - size / 6, y - size / 3);
+                ctx.lineTo(x - size / 2, y);
+                ctx.lineTo(x - size / 6, y + size / 3);
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        }
+
+        const yStart = 189;
+        const ySpacing = 41.8;
+
+        const persColor = 'rgb(77,77,77)';
+        const persBaseColor = 'rgb(82,82,82)';
+        const desColor = 'rgb(255,96,96)';
+        const desBaseColor = 'rgb(255,106,106)';
+        const glyphColor = 'rgb(136,136,136)';
+        const signColor = '#B0B0B0';
+
+        planetNames.forEach((pName, i) => {
+            const y = yStart + i * ySpacing;
+
+            // --- Personality Column (Right, xCenter = 595) ---
+            const pPers = findPlanet(data.planets, pName);
+            if (pPers && pPers.hexagram) {
+                const xCenter = 595;
+                const hx = pPers.hexagram;
+
+                ctx.beginPath();
+                ctx.arc(xCenter, y, 15, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 222, 117, 0.05)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(219, 167, 0, 0.1)';
+                ctx.lineWidth = 1.0;
+                ctx.stroke();
+
+                ctx.font = '15px sans-serif';
+                ctx.fillStyle = glyphColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(pPers.symbol, xCenter, y);
+
+                const xText = xCenter - 35.85;
+                ctx.font = 'normal 13px Inter, sans-serif';
+                ctx.fillStyle = persColor;
+                ctx.fillText(hx.gate.toString(), xText - 6, y);
+                
+                ctx.font = 'normal 9px Inter, sans-serif';
+                ctx.fillText(hx.line.toString(), xText + 8, y - 4);
+
+                ctx.font = 'normal 10px Inter, sans-serif';
+                ctx.fillStyle = persBaseColor;
+                ctx.fillText(`${hx.color}.${hx.tone}.${hx.base}`, xText, y + 14);
+
+                const signSym = signMeta(pPers.formatted.sign).sym;
+                ctx.font = '13px sans-serif';
+                ctx.fillStyle = signColor;
+                ctx.fillText(signSym, xCenter - 71, y);
+
+                const fix = getFixation(pName, hx.gate, hx.line);
+                if (fix === "exalted") {
+                    drawUpTriangle(ctx, xCenter - 31, y - 18, 6, persBaseColor);
+                } else if (fix === "detriment") {
+                    drawDownTriangle(ctx, xCenter - 31, y - 18, 6, persBaseColor);
+                }
+
+                if (pName !== "Солнце" && pName !== "Земля" && pName !== "Луна") {
+                    drawArrow(ctx, xCenter - 45, y - 24, 10, persBaseColor, !pPers.is_retrograde);
+                }
             }
 
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(gateNum.toString(), pos[0], pos[1]);
+            // --- Design Column (Left, xCenter = 65) ---
+            const pDes = findPlanet(designPlanetsList, pName);
+            if (pDes && pDes.hexagram) {
+                const xCenter = 65;
+                const hx = pDes.hexagram;
+
+                ctx.beginPath();
+                ctx.arc(xCenter, y, 15, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 96, 96, 0.05)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 96, 96, 0.1)';
+                ctx.lineWidth = 1.0;
+                ctx.stroke();
+
+                ctx.font = '15px sans-serif';
+                ctx.fillStyle = glyphColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(pDes.symbol, xCenter, y);
+
+                const xText = xCenter + 35.85;
+                ctx.font = 'normal 13px Inter, sans-serif';
+                ctx.fillStyle = desColor;
+                ctx.fillText(hx.gate.toString(), xText - 6, y);
+                
+                ctx.font = 'normal 9px Inter, sans-serif';
+                ctx.fillText(hx.line.toString(), xText + 8, y - 4);
+
+                ctx.font = 'normal 10px Inter, sans-serif';
+                ctx.fillStyle = desBaseColor;
+                ctx.fillText(`${hx.color}.${hx.tone}.${hx.base}`, xText, y + 14);
+
+                const signSym = signMeta(pDes.formatted.sign).sym;
+                ctx.font = '13px sans-serif';
+                ctx.fillStyle = signColor;
+                ctx.fillText(signSym, xCenter + 58, y);
+
+                const fix = getFixation(pName, hx.gate, hx.line);
+                if (fix === "exalted") {
+                    drawUpTriangle(ctx, xCenter + 40, y - 18, 6, desBaseColor);
+                } else if (fix === "detriment") {
+                    drawDownTriangle(ctx, xCenter + 40, y - 18, 6, desBaseColor);
+                }
+
+                if (pName !== "Солнце" && pName !== "Земля" && pName !== "Луна") {
+                    drawArrow(ctx, xCenter + 25, y - 24, 10, desBaseColor, !pDes.is_retrograde);
+                }
+            }
         });
     }
 
+    /* ── Helper utilities ── */
     function getQuadraticBezierPoint(t, p0, p1, p2) {
         const x = (1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0];
         const y = (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1];
@@ -2953,21 +3192,24 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.quadraticCurveTo(ctrl[0], ctrl[1], end[0], end[1]);
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = width;
-        ctx.lineCap = "round";
+        ctx.lineCap = 'round';
         ctx.stroke();
     }
 
-    function drawTriangle(ctx, x1, y1, x2, y2, x3, y3, fill, stroke) {
+    function drawPolygon(ctx, pts, fill, stroke) {
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.lineTo(x3, y3);
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
         ctx.closePath();
         ctx.fillStyle = fill;
         ctx.fill();
         ctx.strokeStyle = stroke;
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
+    }
+
+    function drawTriangle(ctx, x1, y1, x2, y2, x3, y3, fill, stroke) {
+        drawPolygon(ctx, [[x1,y1],[x2,y2],[x3,y3]], fill, stroke);
     }
 
     function drawRect(ctx, x, y, w, h, fill, stroke) {
@@ -2976,51 +3218,41 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = fill;
         ctx.fill();
         ctx.strokeStyle = stroke;
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
     }
 
     function drawDiamond(ctx, cx, cy, w, h, fill, stroke) {
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - h/2);
-        ctx.lineTo(cx + w/2, cy);
-        ctx.lineTo(cx, cy + h/2);
-        ctx.lineTo(cx - w/2, cy);
-        ctx.closePath();
-        ctx.fillStyle = fill;
-        ctx.fill();
-        ctx.strokeStyle = stroke;
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
+        drawPolygon(ctx, [[cx,cy-h/2],[cx+w/2,cy],[cx,cy+h/2],[cx-w/2,cy]], fill, stroke);
     }
 
+    /* ── Mandala renderer (with bodygraph overlay inside) ── */
     function drawMandala(data, canvasEl) {
         if (!canvasEl) return;
-        const canvas = canvasEl;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvasEl.getContext('2d');
 
-        const container = canvas.parentElement;
-        const displayW = Math.min(container.clientWidth || 500, 500);
-        const scale = window.devicePixelRatio || 1;
+        const container = canvasEl.parentElement;
+        const displayW = Math.min(container.clientWidth || 780, 780);
+        const dpr = window.devicePixelRatio || 1;
 
-        canvas.width = displayW * scale;
-        canvas.height = displayW * scale;
-        canvas.style.width = displayW + 'px';
-        canvas.style.height = displayW + 'px';
-        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        canvasEl.width = displayW * dpr;
+        canvasEl.height = displayW * dpr;
+        canvasEl.style.width = displayW + 'px';
+        canvasEl.style.height = displayW + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const size = displayW;
         const cx = size / 2;
         const cy = size / 2;
-        const R = size / 2 - 10;
-        
+        const R = size / 2 - 8;
+
         const rZodiacOuter = R;
-        const rZodiacInner = R - 25;
+        const rZodiacInner = R - 28;
         const rGatesOuter = rZodiacInner;
-        const rGatesInner = rGatesOuter - 35;
+        const rGatesInner = rGatesOuter - 38;
         const rPlanetsBorder = rGatesInner;
-        const rPlanetsLabels = rPlanetsBorder - 35;
-        const rInnermost = rPlanetsLabels - 20;
+        const rPlanetsLabels = rPlanetsBorder - 38;
+        const rInnerBorder = rPlanetsLabels - 16;
 
         ctx.clearRect(0, 0, size, size);
 
@@ -3030,39 +3262,41 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.fill();
 
-        // 1. Draw Zodiac ring (12 signs)
+        // 1. Zodiac ring (12 signs)
         for (let i = 0; i < 12; i++) {
             const startAngle = degToRad(i * 30 - 90);
             const endAngle = degToRad((i + 1) * 30 - 90);
-            
+
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
             ctx.closePath();
             ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.03);
             ctx.fill();
-            
+
             ctx.beginPath();
             ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+            ctx.strokeStyle = 'rgba(197,158,63,0.15)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
             const midAngle = startAngle + degToRad(15);
             const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
             const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
-            ctx.font = 'bold 11px serif';
+            ctx.font = 'bold 12px serif';
             ctx.fillStyle = ZODIAC_COLORS[i];
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(ZODIAC_META[i].sym, gx, gy);
         }
 
-        ctx.beginPath(); ctx.arc(cx, cy, rZodiacOuter, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(197, 158, 63, 0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, rZodiacInner, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)'; ctx.lineWidth = 1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, rGatesInner, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(197, 158, 63, 0.2)'; ctx.lineWidth = 1; ctx.stroke();
+        // Ring borders
+        ctx.beginPath(); ctx.arc(cx, cy, rZodiacOuter, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, rZodiacInner, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, rGatesInner, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, rInnerBorder, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.15)'; ctx.lineWidth = 1; ctx.stroke();
 
-        // 2. Draw 64 gates
+        // 2. 64 Gates ring
         const GATE_ORDER = [
             25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
              8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
@@ -3077,15 +3311,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activeGates = new Set();
         data.planets.forEach(p => {
-            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
                 activeGates.add(p.hexagram.gate);
-            }
         });
 
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
             const isActive = activeGates.has(gateNum);
-
             const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
             const startAngle = degToRad(startLon - 90);
             const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
@@ -3095,19 +3327,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle);
                 ctx.closePath();
-                ctx.fillStyle = 'rgba(197, 158, 63, 0.12)';
+                ctx.fillStyle = 'rgba(197,158,63,0.12)';
                 ctx.fill();
             }
 
-            const xOuter = cx + rGatesOuter * Math.cos(startAngle);
-            const yOuter = cy + rGatesOuter * Math.sin(startAngle);
-            const xInner = cx + rGatesInner * Math.cos(startAngle);
-            const yInner = cy + rGatesInner * Math.sin(startAngle);
-
+            const xO = cx + rGatesOuter * Math.cos(startAngle);
+            const yO = cy + rGatesOuter * Math.sin(startAngle);
+            const xI = cx + rGatesInner * Math.cos(startAngle);
+            const yI = cy + rGatesInner * Math.sin(startAngle);
             ctx.beginPath();
-            ctx.moveTo(xOuter, yOuter);
-            ctx.lineTo(xInner, yInner);
-            ctx.strokeStyle = isActive ? 'rgba(197, 158, 63, 0.45)' : 'rgba(197, 158, 63, 0.12)';
+            ctx.moveTo(xO, yO);
+            ctx.lineTo(xI, yI);
+            ctx.strokeStyle = isActive ? 'rgba(197,158,63,0.45)' : 'rgba(197,158,63,0.12)';
             ctx.lineWidth = isActive ? 1.2 : 0.8;
             ctx.stroke();
 
@@ -3123,7 +3354,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillText(gateNum.toString(), lx, ly);
         }
 
-        // 3. Plot planets
+        // 3. Planet markers
         const planets = data.planets.filter(p => p.hexagram && (!activePlanets || activePlanets.has(p.name)));
         const placed = [];
 
@@ -3131,9 +3362,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const meta = PLANET_META[p.name] || { sym: p.symbol };
             const pColor = PLANET_COLORS[p.name] || '#2E2A20';
             const lon = p.longitude;
-            
             let angle = lon;
-
             for (let attempt = 0; attempt < 8; attempt++) {
                 if (!placed.some(a => Math.abs(angleDiff(a, angle)) < 11)) break;
                 angle += 12;
@@ -3145,7 +3374,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dx = cx + rPlanetsBorder * Math.cos(dotAngle);
             const dy = cy + rPlanetsBorder * Math.sin(dotAngle);
-
             ctx.beginPath();
             ctx.arc(dx, dy, 3, 0, Math.PI * 2);
             ctx.fillStyle = '#C59E3F';
@@ -3153,33 +3381,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const lx = cx + rPlanetsLabels * Math.cos(labelAngle);
             const ly = cy + rPlanetsLabels * Math.sin(labelAngle);
-
             ctx.beginPath();
             ctx.moveTo(dx, dy);
             ctx.lineTo(lx, ly);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.2)';
+            ctx.strokeStyle = 'rgba(197,158,63,0.2)';
             ctx.lineWidth = 0.8;
             ctx.stroke();
 
-            ctx.font = '12px serif';
+            ctx.font = '13px serif';
             ctx.fillStyle = pColor;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(meta.sym, lx, ly);
 
-            const gx = cx + rInnermost * Math.cos(labelAngle);
-            const gy = cy + rInnermost * Math.sin(labelAngle);
+            const gx = cx + (rPlanetsLabels - 18) * Math.cos(labelAngle);
+            const gy = cy + (rPlanetsLabels - 18) * Math.sin(labelAngle);
             ctx.font = 'bold 8px Inter, sans-serif';
             ctx.fillStyle = '#9E978A';
             ctx.fillText(`${p.hexagram.gate}.${p.hexagram.line}`, gx, gy);
         });
+
+        // 4. Bodygraph overlay inside inner circle
+        const activeGatesPersonality = new Set();
+        data.planets.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
+                activeGatesPersonality.add(p.hexagram.gate);
+        });
+
+        const activeGatesDesign = new Set();
+        const designPlanetsList = data.design_planets || [];
+        designPlanetsList.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
+                activeGatesDesign.add(p.hexagram.gate);
+        });
+
+        const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
+
+        const definedCenters = new Set();
+        CHANNELS_DATA.forEach(ch => {
+            if (activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB)) {
+                definedCenters.add(ch.centerA);
+                definedCenters.add(ch.centerB);
+            }
+        });
+
+        const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
+        const bgOffX = cx - (BG_W * bgScale) / 2;
+        const bgOffY = cy - (BG_H * bgScale) / 2;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder - 1, 0, Math.PI * 2);
+        ctx.clip();
+
+        drawBodygraphOnCtx(ctx, data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters);
+
+        ctx.restore();
     }
+
 
     function renderBodygraphTable(data) {
         const tbody = document.getElementById('bodygraph-tbody');
         if (!tbody) return;
         tbody.innerHTML = '';
 
+        // Personality planets
         data.planets.forEach(p => {
             if (!p.hexagram) return;
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
@@ -3194,7 +3460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
-                        <span class="planet-name">${p.name}</span>
+                        <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Личность)</span></span>
                     </div>
                 </td>
                 <td>
@@ -3204,6 +3470,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     ${isActive 
                         ? '<span class="status-badge active" style="background: var(--primary-light); color: var(--primary); border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; font-size: 11px;">Активны</span>' 
+                        : '<span class="status-badge inactive" style="background: #F9FAFB; color: #9CA3AF; border: 1px solid rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 10px; font-size: 11px;">Отключены</span>'}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Design planets
+        const designPlanetsList = data.design_planets || [];
+        designPlanetsList.forEach(p => {
+            if (!p.hexagram) return;
+            const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
+            const hx = p.hexagram;
+
+            const isActive = !activePlanets || activePlanets.has(p.name);
+
+            const tr = document.createElement('tr');
+            if (!isActive) tr.style.opacity = '0.5';
+
+            tr.innerHTML = `
+                <td>
+                    <div class="planet-cell">
+                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${meta.sym}</div>
+                        <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Дизайн)</span></span>
+                    </div>
+                </td>
+                <td>
+                    <span class="hex-gate-badge" style="background:rgba(255,96,96,0.1); color:rgb(255,96,96); border:1px solid rgba(255,96,96,0.2);">Ворота ${hx.gate}</span>
+                </td>
+                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.line}</span></td>
+                <td>
+                    ${isActive 
+                        ? '<span class="status-badge active" style="background: rgba(255,96,96,0.1); color: rgb(255,96,96); border: 1px solid rgba(255,96,96,0.2); padding: 2px 8px; border-radius: 10px; font-size: 11px;">Активны</span>' 
                         : '<span class="status-badge inactive" style="background: #F9FAFB; color: #9CA3AF; border: 1px solid rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 10px; font-size: 11px;">Отключены</span>'}
                 </td>
             `;
@@ -3229,6 +3527,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const GATE_INTERVAL = 5.625;
 
         const gateActivators = {};
+        
+        // Personality activators
         data.planets.forEach(p => {
             if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
                 const gNum = p.hexagram.gate;
@@ -3237,6 +3537,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const meta = PLANET_META[p.name] || { sym: p.symbol, cls: '' };
                 gateActivators[gNum].push(`<span class="planet-badge ${meta.cls}" style="display:inline-flex; align-items:center; gap:2px; font-size:10px; background:rgba(197,158,63,0.06); border:1px solid rgba(197,158,63,0.15); padding:1px 6px; border-radius:10px; margin-right:4px;">${meta.sym} ${p.name}</span>`);
+            }
+        });
+
+        // Design activators
+        const designPlanetsList = data.design_planets || [];
+        designPlanetsList.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+                const gNum = p.hexagram.gate;
+                if (!gateActivators[gNum]) {
+                    gateActivators[gNum] = [];
+                }
+                const meta = PLANET_META[p.name] || { sym: p.symbol, cls: '' };
+                gateActivators[gNum].push(`<span class="planet-badge ${meta.cls}" style="display:inline-flex; align-items:center; gap:2px; font-size:10px; background:rgba(255,96,96,0.06); border:1px solid rgba(255,96,96,0.15); color:rgb(255,96,96); padding:1px 6px; border-radius:10px; margin-right:4px;">${meta.sym} ${p.name} (Д)</span>`);
             }
         });
 
@@ -3278,4 +3591,666 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
 
+    // ═══════════════════════════════════════════════════════════════════
+    // SVG BODYGRAPH RENDERER
+    // ═══════════════════════════════════════════════════════════════════
+    /**
+     * renderSvgBodygraph(data)
+     *
+     * Populates the SVG bodygraph tab with:
+     *  - Left column:  Design (red/unconscious) planet rows — clickable toggles
+     *  - Center:       Reference SVG bodygraph, gates lit per active planets
+     *  - Right column: Personality (black/conscious) planet rows — clickable toggles
+     *
+     * Activated gates:
+     *   - Personality only  → dark channel/gate (cls-17 = black)
+     *   - Design only       → red channel/gate
+     *   - Both              → striped red+black
+     *
+     * Each planet row click toggles that planet's gate on/off.
+     */
+    function renderSvgBodygraph(data) {
+        const svgWrap = document.getElementById('bodygraph-svg-wrap');
+        const designList = document.getElementById('bg-design-list');
+        const persList   = document.getElementById('bg-personality-list');
+        if (!svgWrap || !designList || !persList) return;
+
+        // Trigrams and Hexagram line mapping for 64 gates
+        const TRIGRAMS = {
+            'Qian': [1, 1, 1], // Heaven
+            'Kun':  [0, 0, 0], // Earth
+            'Zhen': [1, 0, 0], // Thunder
+            'Kan':  [0, 1, 0], // Water
+            'Gen':  [0, 0, 1], // Mountain
+            'Xun':  [0, 1, 1], // Wind
+            'Li':   [1, 0, 1], // Fire
+            'Dui':  [1, 1, 0], // Lake
+        };
+
+        const HEX_MAP = {
+            1:  ['Qian', 'Qian'], 2:  ['Kun',  'Kun'], 3:  ['Kan',  'Zhen'], 4:  ['Gen',  'Kan'],
+            5:  ['Kan',  'Qian'], 6:  ['Qian', 'Kan'], 7:  ['Kan',  'Kun'], 8:  ['Kun',  'Kan'],
+            9:  ['Xun',  'Qian'], 10: ['Qian', 'Dui'], 11: ['Kun',  'Qian'], 12: ['Qian', 'Kun'],
+            13: ['Qian', 'Li'], 14: ['Li',   'Qian'], 15: ['Gen',  'Kun'], 16: ['Zhen', 'Kun'],
+            17: ['Dui',  'Zhen'], 18: ['Gen',  'Xun'], 19: ['Kun',  'Dui'], 20: ['Xun',  'Kun'],
+            21: ['Li',   'Zhen'], 22: ['Gen',  'Li'], 23: ['Gen',  'Kun'], 24: ['Kun',  'Zhen'],
+            25: ['Qian', 'Zhen'], 26: ['Gen',  'Qian'], 27: ['Gen',  'Zhen'], 28: ['Dui',  'Xun'],
+            29: ['Kan',  'Kan'], 30: ['Li',   'Li'], 31: ['Dui',  'Gen'], 32: ['Zhen', 'Xun'],
+            33: ['Qian', 'Gen'], 34: ['Zhen', 'Qian'], 35: ['Li',   'Kun'], 36: ['Kun',  'Li'],
+            37: ['Xun',  'Li'], 38: ['Li',   'Dui'], 39: ['Kan',  'Gen'], 40: ['Zhen', 'Kan'],
+            41: ['Gen',  'Dui'], 42: ['Xun',  'Zhen'], 43: ['Dui',  'Qian'], 44: ['Qian', 'Xun'],
+            45: ['Dui',  'Kun'], 46: ['Kun',  'Xun'], 47: ['Kan',  'Dui'], 48: ['Kan',  'Xun'],
+            49: ['Dui',  'Li'], 50: ['Li',   'Xun'], 51: ['Zhen', 'Zhen'], 52: ['Gen',  'Gen'],
+            53: ['Xun',  'Gen'], 54: ['Zhen', 'Dui'], 55: ['Zhen', 'Li'], 56: ['Li',   'Gen'],
+            57: ['Xun',  'Xun'], 58: ['Dui',  'Dui'], 59: ['Xun',  'Kan'], 60: ['Kan',  'Dui'],
+            61: ['Xun',  'Dui'], 62: ['Zhen', 'Gen'], 63: ['Kan',  'Li'], 64: ['Li',   'Kan']
+        };
+
+        // Helper to extract and format standard planets plus Chiron, Lilith, Priapus
+        function getBodygraphPlanets(planetList) {
+            const map = {};
+            planetList.forEach(p => {
+                map[p.name] = p;
+            });
+            const result = [];
+            if (map['Солнце']) result.push(map['Солнце']);
+            if (map['Земля']) result.push(map['Земля']);
+            
+            const nNode = map['Средний Северный Узел'] || map['Истинный Северный Узел'] || map['Северный Узел'];
+            if (nNode) result.push({ ...nNode, displayName: 'Северный Узел' });
+            
+            const sNode = map['Средний Южный Узел'] || map['Истинный Южный Узел'] || map['Южный Узел'];
+            if (sNode) result.push({ ...sNode, displayName: 'Южный Узел' });
+            
+            if (map['Луна']) result.push(map['Луна']);
+            if (map['Меркурий']) result.push(map['Меркурий']);
+            if (map['Венера']) result.push(map['Венера']);
+            if (map['Марс']) result.push(map['Марс']);
+            if (map['Юпитер']) result.push(map['Юпитер']);
+            if (map['Сатурн']) result.push(map['Сатурн']);
+            if (map['Уран']) result.push(map['Уран']);
+            if (map['Нептун']) result.push(map['Нептун']);
+            if (map['Плутон']) result.push(map['Плутон']);
+            if (map['Хирон']) result.push(map['Хирон']);
+            if (map['Лилит (истинная)']) result.push(map['Лилит (истинная)']);
+            if (map['Лилит (средняя)']) result.push(map['Лилит (средняя)']);
+            if (map['Лилит (интерп.)']) result.push(map['Лилит (интерп.)']);
+            if (map['Приап (интерп.)']) result.push(map['Приап (интерп.)']);
+            return result;
+        }
+
+        const personalityPlanets = getBodygraphPlanets(data.planets || []);
+        const designPlanets      = getBodygraphPlanets(data.design_planets || []);
+
+        // Initialize sets if not present, excluding default inactive planets
+        if (!activeBgPers) {
+            activeBgPers = new Set();
+            personalityPlanets.forEach(p => {
+                if (!DEFAULT_INACTIVE_PLANETS.includes(p.name)) activeBgPers.add(p.name);
+            });
+        }
+        if (!activeBgDesign) {
+            activeBgDesign = new Set();
+            designPlanets.forEach(p => {
+                if (!DEFAULT_INACTIVE_PLANETS.includes(p.name)) activeBgDesign.add(p.name);
+            });
+        }
+
+        // Maps: gate# -> array of planet names
+        const persGates   = {};
+        const designGates = {};
+
+        personalityPlanets.forEach(p => {
+            if (!p.hexagram) return;
+            if (activeBgPers && !activeBgPers.has(p.name)) return;
+            const g = p.hexagram.gate;
+            if (!persGates[g]) persGates[g] = [];
+            persGates[g].push(p.name);
+        });
+
+        designPlanets.forEach(p => {
+            if (!p.hexagram) return;
+            if (activeBgDesign && !activeBgDesign.has(p.name)) return;
+            const g = p.hexagram.gate;
+            if (!designGates[g]) designGates[g] = [];
+            designGates[g].push(p.name);
+        });
+
+        // ── Apply gate visibility on SVG ───────────────────────────────
+        function applyGatesToSvg() {
+            // Reset all gate elements to hidden
+            svgWrap.querySelectorAll('[class*="cls__"], [class*="cls_"]').forEach(el => {
+                el.classList.remove(
+                    'bg-gate-active-personality',
+                    'bg-gate-active-design',
+                    'bg-gate-active-both'
+                );
+                el.style.display = '';
+            });
+
+            // Collect current active gates
+            const activePersGates   = {};
+            const activeDesignGates = {};
+
+            personalityPlanets.forEach(p => {
+                if (!p.hexagram) return;
+                if (activeBgPers && !activeBgPers.has(p.name)) return;
+                const g = p.hexagram.gate;
+                if (!activePersGates[g]) activePersGates[g] = [];
+                activePersGates[g].push(p.name);
+            });
+
+            designPlanets.forEach(p => {
+                if (!p.hexagram) return;
+                if (activeBgDesign && !activeBgDesign.has(p.name)) return;
+                const g = p.hexagram.gate;
+                if (!activeDesignGates[g]) activeDesignGates[g] = [];
+                activeDesignGates[g].push(p.name);
+            });
+
+            // Activate gate elements
+            function activateGate(gateNum, cls) {
+                const num = String(gateNum);
+                svgWrap.querySelectorAll('.cls__' + num).forEach(el => {
+                    el.classList.add(cls);
+                    el.style.display = 'block';
+                });
+                const chEl = svgWrap.querySelector('.cls_' + num);
+                if (chEl) {
+                    chEl.classList.add(cls);
+                    chEl.style.display = 'block';
+                }
+                const chEl2 = svgWrap.querySelector('.cls____' + num);
+                if (chEl2) {
+                    chEl2.classList.add(cls);
+                    chEl2.style.display = 'block';
+                }
+            }
+
+            // Gates active in personality only
+            Object.keys(activePersGates).forEach(g => {
+                if (activeDesignGates[g]) return;
+                activateGate(g, 'bg-gate-active-personality');
+            });
+
+            // Gates active in design only
+            Object.keys(activeDesignGates).forEach(g => {
+                if (activePersGates[g]) return;
+                activateGate(g, 'bg-gate-active-design');
+            });
+
+            // Gates active in both
+            Object.keys(activePersGates).forEach(g => {
+                if (!activeDesignGates[g]) return;
+                activateGate(g, 'bg-gate-active-both');
+            });
+
+            // Activate center blocks when channels are defined
+            // A channel connects TWO centers. When both gates are active, BOTH centers become defined.
+            const CHANNELS = [
+                // Head (1) ↔ Ajna (2)
+                { gates: [64, 47], centers: ['head', 'ajna'] },
+                { gates: [61, 24], centers: ['head', 'ajna'] },
+                { gates: [63, 4],  centers: ['head', 'ajna'] },
+
+                // Ajna (2) ↔ Throat (3)
+                { gates: [17, 62], centers: ['ajna', 'throat'] },
+                { gates: [43, 23], centers: ['ajna', 'throat'] },
+                { gates: [11, 56], centers: ['ajna', 'throat'] },
+
+                // Throat (3) ↔ Spleen (6)
+                { gates: [16, 48], centers: ['throat', 'spleen'] },
+                { gates: [20, 57], centers: ['throat', 'spleen'] },
+
+                // Throat (3) ↔ G Center (4)
+                { gates: [31, 7],  centers: ['throat', 'gcenter'] },
+                { gates: [8, 1],   centers: ['throat', 'gcenter'] },
+                { gates: [33, 13], centers: ['throat', 'gcenter'] },
+                { gates: [20, 10], centers: ['throat', 'gcenter'] },
+
+                // Throat (3) ↔ Sacral (7)
+                { gates: [20, 34], centers: ['throat', 'sacral'] },
+
+                // Throat (3) ↔ Heart (5)
+                { gates: [45, 21], centers: ['throat', 'heart'] },
+
+                // Throat (3) ↔ Solar Plexus (8)
+                { gates: [35, 36], centers: ['throat', 'solar'] },
+                { gates: [12, 22], centers: ['throat', 'solar'] },
+
+                // G Center (4) ↔ Spleen (6)
+                { gates: [10, 57], centers: ['gcenter', 'spleen'] },
+
+                // G Center (4) ↔ Sacral (7)
+                { gates: [2, 14],  centers: ['gcenter', 'sacral'] },
+                { gates: [15, 5],  centers: ['gcenter', 'sacral'] },
+                { gates: [46, 29], centers: ['gcenter', 'sacral'] },
+                { gates: [10, 34], centers: ['gcenter', 'sacral'] },
+
+                // G Center (4) ↔ Heart (5)
+                { gates: [25, 51], centers: ['gcenter', 'heart'] },
+
+                // Heart (5) ↔ Spleen (6)
+                { gates: [44, 26], centers: ['heart', 'spleen'] },
+
+                // Heart (5) ↔ Solar Plexus (8)
+                { gates: [40, 37], centers: ['heart', 'solar'] },
+
+                // Spleen (6) ↔ Sacral (7)
+                { gates: [50, 27], centers: ['spleen', 'sacral'] },
+                { gates: [34, 57], centers: ['spleen', 'sacral'] },
+
+                // Spleen (6) ↔ Root (9)
+                { gates: [32, 54], centers: ['spleen', 'root'] },
+                { gates: [28, 38], centers: ['spleen', 'root'] },
+                { gates: [18, 58], centers: ['spleen', 'root'] },
+
+                // Sacral (7) ↔ Solar Plexus (8)
+                { gates: [59, 6],  centers: ['sacral', 'solar'] },
+
+                // Sacral (7) ↔ Root (9)
+                { gates: [3, 60],  centers: ['sacral', 'root'] },
+                { gates: [9, 52],  centers: ['sacral', 'root'] },
+                { gates: [42, 53], centers: ['sacral', 'root'] },
+
+                // Solar Plexus (8) ↔ Root (9)
+                { gates: [19, 49], centers: ['solar', 'root'] },
+                { gates: [39, 55], centers: ['solar', 'root'] },
+                { gates: [41, 30], centers: ['solar', 'root'] }
+            ];
+
+            // Map each center to its corresponding SVG .block__N element
+            const centerBlockMap = {
+                'head':    { blockNum: 1 },
+                'ajna':    { blockNum: 2 },
+                'throat':  { blockNum: 3 },
+                'gcenter': { blockNum: 4 }, // Was missing
+                'heart':   { blockNum: 5 },
+                'spleen':  { blockNum: 6 },
+                'sacral':  { blockNum: 7 }, // Was wrongly mapped to 4
+                'solar':   { blockNum: 8 },
+                'root':    { blockNum: 9 }
+            };
+
+            const definedCenters = new Set();
+            const allActive = new Set([
+                ...Object.keys(activePersGates).map(Number),
+                ...Object.keys(activeDesignGates).map(Number)
+            ]);
+
+            CHANNELS.forEach(ch => {
+                if (allActive.has(ch.gates[0]) && allActive.has(ch.gates[1])) {
+                    definedCenters.add(ch.centers[0]);
+                    definedCenters.add(ch.centers[1]);
+                }
+            });
+
+            // Apply active center blocks
+            Object.entries(centerBlockMap).forEach(([center, info]) => {
+                const blockEl = svgWrap.querySelector('.block__' + info.blockNum);
+                if (blockEl) {
+                    if (definedCenters.has(center)) {
+                        blockEl.classList.add('block__' + info.blockNum + '-active');
+                    } else {
+                        blockEl.classList.remove('block__' + info.blockNum + '-active');
+                    }
+                }
+            });
+        }
+
+        // ── Planet symbols map ─────────────────────────────────────────
+        function getPlanetSym(name) {
+            const key = name === 'Северный Узел' ? 'Средний Северный Узел' : (name === 'Южный Узел' ? 'Средний Южный Узел' : name);
+            const meta = PLANET_META[key] || PLANET_META[name];
+            return meta ? meta.sym : name.substring(0,2);
+        }
+
+        // ── Build hexagram bars SVG icon ───────────────────────────────
+        function hexIcon(gate, colorCss) {
+            const [upperName, lowerName] = HEX_MAP[gate];
+            if (!upperName || !lowerName) return '';
+            const lower = TRIGRAMS[lowerName];
+            const upper = TRIGRAMS[upperName];
+            const lines = [...lower, ...upper]; // bottom-to-top (lines 1 to 6)
+            
+            const bars = [];
+            // Draw from top (line 6) to bottom (line 1)
+            for (let i = 5; i >= 0; i--) {
+                const solid = (lines[i] === 1);
+                bars.push(`<div class="hex-bar${solid ? '' : ' broken'}" style="color:${colorCss}"></div>`);
+            }
+            return `<div class="bg-hex-icon" style="color:${colorCss}">${bars.join('')}</div>`;
+        }
+
+        // ── Build a planet row ─────────────────────────────────────────
+        function buildPlanetRow(p, isDesign) {
+            const colorCss  = isDesign ? '#fe0000' : '#000000';
+            const sym       = getPlanetSym(p.name);
+            const gate      = p.hexagram ? p.hexagram.gate : '—';
+            const line      = p.hexagram ? p.hexagram.line : '';
+            const isRetro   = p.is_retrograde;
+            const targetSet = isDesign ? activeBgDesign : activeBgPers;
+            const isActive  = !targetSet || targetSet.has(p.name);
+
+            let zodiacSym = '';
+            if (p.longitude !== undefined) {
+                const signIdx = Math.floor(p.longitude / 30) % 12;
+                if (ZODIAC_META[signIdx]) zodiacSym = ZODIAC_META[signIdx].sym;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'bg-planet-row' + (isActive ? '' : ' bg-row-inactive');
+            row.dataset.planetName = p.name;
+            row.dataset.gate       = gate;
+            row.dataset.isDesign   = isDesign ? '1' : '0';
+            row.title              = `${p.displayName || p.name}: ворота ${gate}.${line}`;
+
+            if (isDesign) {
+                // Left column: Gate.Line | Planet | Zodiac
+                row.innerHTML = `
+                    <div class="bg-gate-info">
+                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
+                    </div>
+                    <div class="bg-planet-wrap">
+                        <span class="bg-planet-sym" style="color:${colorCss}">${sym}</span>
+                        ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
+                    </div>
+                    <span class="bg-zodiac-sym">${zodiacSym}</span>
+                `;
+            } else {
+                // Right column: Zodiac | Planet | Gate.Line
+                row.innerHTML = `
+                    <span class="bg-zodiac-sym">${zodiacSym}</span>
+                    <div class="bg-planet-wrap">
+                        <span class="bg-planet-sym" style="color:${colorCss}">${sym}</span>
+                        ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
+                    </div>
+                    <div class="bg-gate-info">
+                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
+                    </div>
+                `;
+            }
+
+            // Toggle on click: dim/undim the row
+            row.addEventListener('click', () => {
+                const name = row.dataset.planetName;
+                const isDes = row.dataset.isDesign === '1';
+                
+                if (isDes) {
+                    if (activeBgDesign.has(name)) {
+                        activeBgDesign.delete(name);
+                        row.classList.add('bg-row-inactive');
+                        row.classList.remove('bg-row-highlighted');
+                    } else {
+                        activeBgDesign.add(name);
+                        row.classList.remove('bg-row-inactive');
+                    }
+                } else {
+                    if (activeBgPers.has(name)) {
+                        activeBgPers.delete(name);
+                        row.classList.add('bg-row-inactive');
+                        row.classList.remove('bg-row-highlighted');
+                    } else {
+                        activeBgPers.add(name);
+                        row.classList.remove('bg-row-inactive');
+                    }
+                }
+                
+                applyGatesToSvg();
+            });
+
+            return row;
+        }
+
+        // ── Populate left column (Design / red) ────────────────────────
+        designList.innerHTML = '';
+        designPlanets.forEach(p => {
+            if (!p.hexagram) return;
+            designList.appendChild(buildPlanetRow(p, true));
+        });
+
+        // ── Populate right column (Personality / black) ────────────────
+        persList.innerHTML = '';
+        personalityPlanets.forEach(p => {
+            if (!p.hexagram) return;
+            persList.appendChild(buildPlanetRow(p, false));
+        });
+
+        // ── Apply initial gate state ───────────────────────────────────
+        applyGatesToSvg();
+
+        // ── Bodygraph interactivity ────────────────────────────────────
+        function initBodygraphInteractivity() {
+
+            // ─ 64 gate names in Russian (I-Ching Human Design names) ──
+            const GATE_NAMES = {
+                1:'Самовыражение',       2:'Направление Я',        3:'Упорядочивание',
+                4:'Формулирование',      5:'Фиксированные ритмы',  6:'Трение',
+                7:'Роль Я в Социуме',   8:'Вклад',                9:'Сосредоточенность',
+                10:'Поведение Я',       11:'Идеи',                12:'Осторожность',
+                13:'Слушатель',         14:'Мощная Сила',         15:'Крайности',
+                16:'Энтузиазм',         17:'Мнения',              18:'Исправление',
+                19:'Хотение',           20:'Созерцание',          21:'Охотник',
+                22:'Изящество',         23:'Ассимиляция',         24:'Рационализация',
+                25:'Дух Я',             26:'Эгоист',              27:'Забота',
+                28:'Игрок',             29:'Да',                  30:'Огни Судьбы',
+                31:'Влияние',           32:'Непрерывность',       33:'Укрытие',
+                34:'Сила',              35:'Прогресс',            36:'Сумерки',
+                37:'Дружба',            38:'Оппозиция',           39:'Провокация',
+                40:'Одиночество',       41:'Убывание',            42:'Рост',
+                43:'Прозрение',         44:'Бдительность',        45:'Собиратель',
+                46:'Удача Я',           47:'Угнетение',           48:'Глубина',
+                49:'Принципы',          50:'Ценности',            51:'Потрясение',
+                52:'Неподвижность',     53:'Начало',              54:'Честолюбие',
+                55:'Дух',               56:'Рассказчик',          57:'Интуиция',
+                58:'Жизнеспособность',  59:'Сексуальность',       60:'Ограничение',
+                61:'Тайное Знание',     62:'Детали',              63:'Сомнение',
+                64:'Смятение'
+            };
+
+            // ─ Center metadata ─────────────────────────────────────────
+            const CENTER_META = {
+                head:   { name: 'Голова',              blockNum: 1 },
+                ajna:   { name: 'Аджна',               blockNum: 2 },
+                throat: { name: 'Горло',               blockNum: 3 },
+                sacral: { name: 'Сакральный',          blockNum: 4 },
+                heart:  { name: 'Сердце / Эго',        blockNum: 5 },
+                spleen: { name: 'Селезёнка',           blockNum: 6 },
+                solar:  { name: 'Солнечное Сплетение', blockNum: 8 },
+                root:   { name: 'Корень',              blockNum: 9 },
+            };
+
+            // ─ Build gate → planets lookup ─────────────────────────────
+            const gateLookup = {};
+            personalityPlanets.forEach(p => {
+                if (!p.hexagram) return;
+                const g = p.hexagram.gate;
+                if (!gateLookup[g]) gateLookup[g] = { design: [], personality: [] };
+                gateLookup[g].personality.push(p.displayName || p.name);
+            });
+            designPlanets.forEach(p => {
+                if (!p.hexagram) return;
+                const g = p.hexagram.gate;
+                if (!gateLookup[g]) gateLookup[g] = { design: [], personality: [] };
+                gateLookup[g].design.push(p.displayName || p.name);
+            });
+
+            // ─ Create tooltip DOM elements (once) ─────────────────────
+            let gateTooltip = document.getElementById('bg-gate-tt');
+            if (!gateTooltip) {
+                gateTooltip = document.createElement('div');
+                gateTooltip.id = 'bg-gate-tt';
+                gateTooltip.className = 'bg-gate-tooltip';
+                document.body.appendChild(gateTooltip);
+            }
+
+            let centerTooltip = document.getElementById('bg-center-tt');
+            if (!centerTooltip) {
+                centerTooltip = document.createElement('div');
+                centerTooltip.id = 'bg-center-tt';
+                centerTooltip.className = 'bg-center-tooltip';
+                document.body.appendChild(centerTooltip);
+            }
+
+            // ─ Tooltip positioning ─────────────────────────────────────
+            function positionEl(el, x, y) {
+                const margin = 12;
+                const w = el.offsetWidth  || 200;
+                const h = el.offsetHeight || 80;
+                let tx = x + 16;
+                let ty = y - 8;
+                if (tx + w + margin > window.innerWidth)   tx = x - w - 16;
+                if (ty + h + margin > window.innerHeight)  ty = y - h - 8;
+                if (ty < margin) ty = margin;
+                if (tx < margin) tx = margin;
+                el.style.left = tx + 'px';
+                el.style.top  = ty + 'px';
+            }
+
+            // ─ Gate tooltip show/hide ──────────────────────────────────
+            function showGateTT(gateNum, x, y) {
+                const name   = GATE_NAMES[gateNum] || '';
+                const act    = gateLookup[gateNum] || { design: [], personality: [] };
+                const hasDes = act.design.length > 0;
+                const hasPer = act.personality.length > 0;
+
+                const typeLabel = hasDes && hasPer ? 'Дизайн + Личность'
+                                : hasDes           ? 'Бессознательное'
+                                : hasPer           ? 'Сознательное'
+                                :                    'Не активировано';
+
+                let rows = '';
+                if (hasDes && hasPer) {
+                    const uniq = [...new Set([...act.design, ...act.personality])];
+                    rows = uniq.map(p =>
+                        `<div class="tt-planet-row"><div class="tt-dot-both"></div><span>${p}</span></div>`
+                    ).join('');
+                } else if (hasDes) {
+                    rows = act.design.map(p =>
+                        `<div class="tt-planet-row"><div class="tt-dot-design"></div><span>${p}</span></div>`
+                    ).join('');
+                } else if (hasPer) {
+                    rows = act.personality.map(p =>
+                        `<div class="tt-planet-row"><div class="tt-dot-personality"></div><span>${p}</span></div>`
+                    ).join('');
+                }
+
+                gateTooltip.innerHTML = `
+                    <span class="tt-gate-num">Ворота ${gateNum}</span>
+                    ${name ? `<span class="tt-gate-name">${name}</span>` : ''}
+                    <div style="font-size:10px;color:rgba(200,180,130,0.65);margin-bottom:${rows?'5px':'0'}">${typeLabel}</div>
+                    ${rows ? `<div class="tt-planets">${rows}</div>` : ''}
+                `;
+                gateTooltip.style.left = '-9999px';
+                gateTooltip.style.top  = '-9999px';
+                gateTooltip.classList.add('visible');
+                requestAnimationFrame(() => positionEl(gateTooltip, x, y));
+            }
+            function hideGateTT() { gateTooltip.classList.remove('visible'); }
+
+            // ─ Index gate SVG elements by gate number ─────────────────
+            const gateEls = {}; // gateNum → [element, …]
+            svgWrap.querySelectorAll('[class]').forEach(el => {
+                (el.getAttribute('class') || '').split(/\s+/).forEach(cls => {
+                    const m = cls.match(/^cls__(\d+)$/);
+                    if (m) {
+                        const g = Number(m[1]);
+                        if (!gateEls[g]) gateEls[g] = [];
+                        gateEls[g].push(el);
+                    }
+                });
+            });
+
+            // Hover on SVG gate shapes
+            Object.entries(gateEls).forEach(([gNum, els]) => {
+                els.forEach(el => {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('mouseenter', e => showGateTT(Number(gNum), e.clientX, e.clientY));
+                    el.addEventListener('mousemove',  e => positionEl(gateTooltip, e.clientX, e.clientY));
+                    el.addEventListener('mouseleave', hideGateTT);
+                });
+            });
+
+            // Hover on SVG text numbers
+            svgWrap.querySelectorAll('text').forEach(el => {
+                const n = parseInt(el.textContent.trim(), 10);
+                if (n >= 1 && n <= 64 && el.textContent.trim() === String(n)) {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('mouseenter', e => showGateTT(n, e.clientX, e.clientY));
+                    el.addEventListener('mousemove',  e => positionEl(gateTooltip, e.clientX, e.clientY));
+                    el.addEventListener('mouseleave', hideGateTT);
+                }
+            });
+
+            // ─ Cross-highlight: planet row ↔ SVG gate glow ────────────
+            let glowing = [];
+            function applyGlow(gateNum, color) {
+                (gateEls[gateNum] || []).forEach(el => {
+                    el.style.filter     = `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 2px ${color})`;
+                    el.style.transition = 'filter 0.18s ease';
+                    glowing.push(el);
+                });
+            }
+            function clearGlow() {
+                glowing.forEach(el => { el.style.filter = ''; });
+                glowing = [];
+            }
+
+            document.querySelectorAll('.bg-planet-row').forEach(row => {
+                const gate    = Number(row.dataset.gate);
+                const isDes   = row.dataset.isDesign === '1';
+                const glowClr = isDes ? '#ff4444' : '#555555';
+
+                row.addEventListener('mouseenter', () => {
+                    // Don't apply cross-highlight to inactive (dimmed) rows
+                    if (row.classList.contains('bg-row-inactive')) return;
+                    clearGlow();
+                    if (gate) applyGlow(gate, glowClr);
+                    row.classList.add('bg-row-highlighted');
+                });
+                row.addEventListener('mouseleave', () => {
+                    clearGlow();
+                    row.classList.remove('bg-row-highlighted');
+                });
+            });
+
+            // ─ Center tooltips ─────────────────────────────────────────
+            function showCenterTT(info, isDefined, x, y) {
+                const statusCls  = isDefined ? 'defined' : 'undefined';
+                const statusText = isDefined ? '● Определён' : '○ Не определён';
+                centerTooltip.innerHTML = `
+                    <span class="tt-center-name">${info.name}</span>
+                    <span class="tt-center-status ${statusCls}">${statusText}</span>
+                `;
+                centerTooltip.style.left = '-9999px';
+                centerTooltip.style.top  = '-9999px';
+                centerTooltip.classList.add('visible');
+                requestAnimationFrame(() => positionEl(centerTooltip, x, y));
+            }
+
+            Object.entries(CENTER_META).forEach(([key, info]) => {
+                const blockEl = svgWrap.querySelector('.block__' + info.blockNum);
+                if (!blockEl) return;
+                blockEl.style.cursor = 'pointer';
+                blockEl.addEventListener('mouseenter', e => {
+                    const isDefined = blockEl.classList.contains('block__' + info.blockNum + '-active');
+                    showCenterTT(info, isDefined, e.clientX, e.clientY);
+                });
+                blockEl.addEventListener('mousemove',  e => positionEl(centerTooltip, e.clientX, e.clientY));
+                blockEl.addEventListener('mouseleave', () => centerTooltip.classList.remove('visible'));
+            });
+
+            // ─ Staggered entrance animation ───────────────────────────
+            document.querySelectorAll('.bg-col-design .bg-planet-row').forEach((row, i) => {
+                row.style.animationDelay = (i * 35 + 50) + 'ms';
+            });
+            document.querySelectorAll('.bg-col-personality .bg-planet-row').forEach((row, i) => {
+                row.style.animationDelay = (i * 35 + 50) + 'ms';
+            });
+        }
+
+        initBodygraphInteractivity();
+    }
+
 });
+

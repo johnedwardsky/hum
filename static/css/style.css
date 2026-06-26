@@ -30,7 +30,7 @@
     --radius-lg:  16px;
     --shadow-sm:  0 1px 4px rgba(46, 42, 32, 0.05);
     --shadow-md:  0 8px 32px rgba(46, 42, 32, 0.08);
-    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
     --topnav-h:   56px;
     --sidebar-w:  290px;
@@ -2498,3 +2498,615 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     box-shadow: 0 2px 6px rgba(197, 158, 63, 0.1);
 }
 
+
+
+/* ═══════════════════════════════════════════════════════
+   SVG BODYGRAPH LAYOUT
+═══════════════════════════════════════════════════════ */
+.bg-layout {
+    display: grid;
+    grid-template-columns: 160px 1fr 160px;
+    gap: 0 12px;
+    align-items: start;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 16px 0;
+}
+
+.bg-center-wrap {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.bg-svg-wrap {
+    width: 100%;
+    max-width: 480px;
+}
+
+.bg-svg-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Reference SVG CSS reapplied in our theme */
+.bg-svg-wrap .cls-1,
+.bg-svg-wrap .cls-16,
+.bg-svg-wrap .cls-17,
+.bg-svg-wrap .cls-23,
+.bg-svg-wrap .cls-26 { fill: var(--primary, #C59E3F); }
+.bg-svg-wrap .cls-1,
+.bg-svg-wrap .cls-2  { clip-rule: evenodd; }
+.bg-svg-wrap .cls-2,
+.bg-svg-wrap .cls-25,
+.bg-svg-wrap .cls-36 { fill: var(--primary, #C59E3F); }
+.bg-svg-wrap .cls-10,
+.bg-svg-wrap .cls-12,
+.bg-svg-wrap .cls-15,
+.bg-svg-wrap .cls-21,
+.bg-svg-wrap .cls-3,
+.bg-svg-wrap .cls-30,
+.bg-svg-wrap .cls-31,
+.bg-svg-wrap .cls-32,
+.bg-svg-wrap .cls-35,
+.bg-svg-wrap .cls-4,
+.bg-svg-wrap .cls-6 { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.bg-svg-wrap .cls-3  { stroke: #ededed; stroke-width: 1.42px; }
+.bg-svg-wrap .cls-10,
+.bg-svg-wrap .cls-12,
+.bg-svg-wrap .cls-13,
+.bg-svg-wrap .cls-14,
+.bg-svg-wrap .cls-17,
+.bg-svg-wrap .cls-19,
+.bg-svg-wrap .cls-21,
+.bg-svg-wrap .cls-23,
+.bg-svg-wrap .cls-24,
+.bg-svg-wrap .cls-25,
+.bg-svg-wrap .cls-29,
+.bg-svg-wrap .cls-3,
+.bg-svg-wrap .cls-34,
+.bg-svg-wrap .cls-35,
+.bg-svg-wrap .cls-37,
+.bg-svg-wrap .cls-4,
+.bg-svg-wrap .cls-5,
+.bg-svg-wrap .cls-6,
+.bg-svg-wrap .cls-7,
+.bg-svg-wrap .cls-8  { fill-rule: evenodd; }
+.bg-svg-wrap .block__1 { fill: rgba(255,255,255,0.08); }
+.bg-svg-wrap .block__2 { fill: rgba(255,255,255,0.08); }
+.bg-svg-wrap .block__3 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
+.bg-svg-wrap .block__4 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
+.bg-svg-wrap .block__5 { fill: rgba(255,255,255,0.08); }
+.bg-svg-wrap .block__6 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.2); stroke-width: 1.3px; }
+.bg-svg-wrap .block__7 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
+.bg-svg-wrap .block__8 { fill: rgba(255,255,255,0.08); }
+.bg-svg-wrap .block__9 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
+.bg-svg-wrap .cls-4  { stroke: rgba(197,158,63,0.3); stroke-width: 3.97px; }
+.bg-svg-wrap .cls-5  { fill: rgba(197,158,63,0.04); }
+.bg-svg-wrap .cls-6  { stroke: rgba(255,255,255,0.05); }
+.bg-svg-wrap .cls-10,
+.bg-svg-wrap .cls-12,
+.bg-svg-wrap .cls-15,
+.bg-svg-wrap .cls-21,
+.bg-svg-wrap .cls-30,
+.bg-svg-wrap .cls-31,
+.bg-svg-wrap .cls-32,
+.bg-svg-wrap .cls-35,
+.bg-svg-wrap .cls-6  { stroke-width: 2.83px; }
+.bg-svg-wrap .cls-7  { fill: rgba(197,158,63,0.08); }
+.bg-svg-wrap .cls-8,
+.bg-svg-wrap .cls-9,
+.bg-svg-wrap .cls-24 { fill: rgba(255,255,255,0.04); }
+.bg-svg-wrap .cls-10 { stroke: rgba(197,158,63,0.2); }
+.bg-svg-wrap .cls-11,
+.bg-svg-wrap .cls-37 { fill: var(--text, #E5C87A); }
+.bg-svg-wrap .cls-12,
+.bg-svg-wrap .cls-32 { stroke: rgba(197,158,63,0.3); }
+.bg-svg-wrap .cls-13 { fill: var(--primary, #C59E3F); opacity: 0.9; }
+.bg-svg-wrap .cls-14 { fill: rgba(197,158,63,0.5); }
+.bg-svg-wrap .cls-15,
+.bg-svg-wrap .cls-21 { stroke: var(--primary, #C59E3F); }
+.bg-svg-wrap .cls-30 { stroke: #1a1a1a; }
+
+/* Gate elements — hidden by default */
+.bg-svg-wrap .cls__ { display: none; }
+
+/* When activated by personality (black) */
+/* When activated by personality (black) */
+#bodygraph-svg-wrap .cls__.bg-gate-active-personality { display: block !important; }
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-17,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-19,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-17,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-19 { fill: #000000 !important; }
+#bodygraph-svg-wrap .bg-gate-active-personality.red_border,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-15,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-21,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-23,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-26,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-30,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-31,
+#bodygraph-svg-wrap .bg-gate-active-personality.cls-35,
+#bodygraph-svg-wrap .bg-gate-active-personality .red_border,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-15,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-21,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-23,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-26,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-30,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-31,
+#bodygraph-svg-wrap .bg-gate-active-personality .cls-35 { stroke: #000000 !important; }
+
+/* When activated by design (red) */
+#bodygraph-svg-wrap .cls__.bg-gate-active-design { display: block !important; }
+#bodygraph-svg-wrap .bg-gate-active-design.cls-17,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-19,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-17,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-19 { fill: #fe0000 !important; }
+#bodygraph-svg-wrap .bg-gate-active-design.red_border,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-15,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-21,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-23,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-26,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-30,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-31,
+#bodygraph-svg-wrap .bg-gate-active-design.cls-35,
+#bodygraph-svg-wrap .bg-gate-active-design .red_border,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-15,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-21,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-23,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-26,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-30,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-31,
+#bodygraph-svg-wrap .bg-gate-active-design .cls-35 { stroke: #fe0000 !important; }
+
+/* When activated by BOTH (mixed red-black) */
+#bodygraph-svg-wrap .cls__.bg-gate-active-both { display: block !important; }
+
+/* Apply red base color to filled base paths in active-both */
+#bodygraph-svg-wrap .bg-gate-active-both.cls-17,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-17,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-1,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-1,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-16,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-16,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-23,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-23,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-26,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-26 { fill: #fe0000 !important; }
+
+/* Apply red base color to stroked base paths in active-both */
+#bodygraph-svg-wrap .bg-gate-active-both.red_border,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-15,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-21,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-30,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-31,
+#bodygraph-svg-wrap .bg-gate-active-both.cls-35,
+#bodygraph-svg-wrap .bg-gate-active-both .red_border,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-15,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-21,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-30,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-31,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-35 { stroke: #fe0000 !important; }
+
+/* Color native overlay gap rectangles black to create red-black stripes */
+#bodygraph-svg-wrap .bg-gate-active-both.cls-19,
+#bodygraph-svg-wrap .bg-gate-active-both .cls-19 { fill: #000000 !important; }
+
+/* Circle indicators on gates */
+.bg-svg-wrap .red_border { fill: none; stroke: #C59E3F; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.83px; }
+.bg-svg-wrap .red_bg     { fill: #ffffff; fill-rule: evenodd; }
+.bg-svg-wrap .cls-30.cls__.cls__21 { fill: none; stroke: #C59E3F; stroke-width: 2.83px; }
+
+/* Center blocks active */
+#bodygraph-svg-wrap .block__1-active { fill: #ffe500 !important; }
+#bodygraph-svg-wrap .block__2-active { fill: #76ce00 !important; }
+#bodygraph-svg-wrap .block__3-active { fill: #00a8dc !important; }
+#bodygraph-svg-wrap .block__4-active { fill: #ffe500 !important; }
+#bodygraph-svg-wrap .block__5-active { fill: #e02300 !important; }
+#bodygraph-svg-wrap .block__6-active { fill: #e67900 !important; }
+#bodygraph-svg-wrap .block__7-active { fill: #e02300 !important; }
+#bodygraph-svg-wrap .block__8-active { fill: #e67900 !important; }
+#bodygraph-svg-wrap .block__9-active { fill: #ff8900 !important; }
+
+/* Columns */
+.bg-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.bg-col-title {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: left;
+    padding: 0 0 12px 6px;
+    margin-bottom: 6px;
+    border-bottom: none;
+    line-height: 1.2;
+    min-height: 50px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.bg-col-title-design      { color: #fe0000; }
+.bg-col-title-personality { color: #000000; }
+
+.bg-planet-list {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.bg-planet-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 6px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.25s ease, box-shadow 0.15s, border-color 0.15s;
+    opacity: 1;
+    border: 1px solid transparent;
+    position: relative;
+    user-select: none;
+    overflow: hidden;
+}
+
+.bg-planet-row:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Inactive = clicked/dimmed */
+.bg-planet-row.bg-row-inactive {
+    background: rgba(120, 120, 120, 0.05);
+    border: 1px dashed var(--border);
+    opacity: 0.35;
+    filter: grayscale(100%);
+}
+.bg-planet-row.bg-row-inactive:hover {
+    background: rgba(120, 120, 120, 0.1);
+    border-style: solid;
+    border-color: rgba(120, 120, 120, 0.3);
+    opacity: 0.6;
+    filter: grayscale(50%);
+    cursor: pointer;
+}
+
+/* Cross-highlight: when a planet row is hovered, the gate glows */
+.bg-planet-row.bg-row-highlighted {
+    background: rgba(197, 158, 63, 0.12);
+    border-color: rgba(197, 158, 63, 0.35);
+    box-shadow: 0 0 0 2px rgba(197,158,63,0.15);
+}
+
+
+.bg-planet-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.bg-planet-wrap .bg-planet-sym {
+    font-size: 18px;
+    text-align: center;
+    line-height: 1;
+    display: inline-block;
+}
+
+.bg-col-design .bg-planet-sym     { color: #fe0000; }
+.bg-col-personality .bg-planet-sym { color: #222222; }
+
+.bg-planet-wrap .bg-retro-badge {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.bg-col-design .bg-planet-wrap .bg-retro-badge {
+    right: 100%;
+    margin-right: 2.5px;
+}
+
+.bg-col-personality .bg-planet-wrap .bg-retro-badge {
+    left: 100%;
+    margin-left: 2.5px;
+}
+
+.bg-planet-row .bg-zodiac-sym {
+    color: #888;
+    font-size: 15px;
+    display: inline-block;
+}
+
+.bg-planet-row .bg-gate-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Alignments inside design (left) column */
+.bg-col-design .bg-gate-info {
+    justify-content: flex-start;
+}
+.bg-col-design .bg-zodiac-sym {
+    flex: 1;
+    text-align: right;
+}
+
+/* Alignments inside personality (right) column */
+.bg-col-personality .bg-gate-info {
+    justify-content: flex-end;
+}
+.bg-col-personality .bg-zodiac-sym {
+    flex: 1;
+    text-align: left;
+}
+
+.bg-gate-num {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.bg-col-design .bg-gate-num     { color: #fe0000; }
+.bg-col-personality .bg-gate-num { color: #222222; }
+
+.bg-gate-line {
+    font-size: 10px;
+    line-height: 1;
+}
+.bg-col-design .bg-gate-line { color: rgba(254,0,0,0.6); }
+
+/* Hexagram icon */
+.bg-hex-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5px;
+    flex-shrink: 0;
+    width: 16px;
+    max-width: 16px;
+}
+.bg-hex-icon .hex-bar {
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 1px;
+}
+.bg-hex-icon .hex-bar.broken {
+    background: linear-gradient(to right, currentColor 40%, transparent 40%, transparent 60%, currentColor 60%);
+}
+
+/* Retro badge */
+.bg-retro-badge {
+    font-size: 7px;
+    font-weight: 700;
+    padding: 1px 3px;
+    border-radius: 3px;
+    background: rgba(197,158,63,0.15);
+    color: var(--primary, #C59E3F);
+    flex-shrink: 0;
+}
+
+/* ═══ GATE TOOLTIP ══════════════════════════════════════════════ */
+.bg-gate-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: rgba(30, 28, 22, 0.95);
+    color: #F5EDD8;
+    border: 1px solid rgba(197,158,63,0.4);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--font);
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 220px;
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.bg-gate-tooltip.visible { opacity: 1; }
+.bg-gate-tooltip .tt-gate-num {
+    font-size: 18px;
+    font-weight: 700;
+    color: #C59E3F;
+    display: block;
+    margin-bottom: 2px;
+}
+.bg-gate-tooltip .tt-gate-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #E5C87A;
+    display: block;
+    margin-bottom: 6px;
+}
+.bg-gate-tooltip .tt-planets {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.bg-gate-tooltip .tt-planet-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+.bg-gate-tooltip .tt-dot-design {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fe0000;
+    flex-shrink: 0;
+}
+.bg-gate-tooltip .tt-dot-personality {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #222222;
+    flex-shrink: 0;
+    border: 1px solid #888;
+}
+.bg-gate-tooltip .tt-dot-both {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fe0000 50%, #222 50%);
+    flex-shrink: 0;
+}
+
+/* ═══ CENTER TOOLTIP ════════════════════════════════════════════ */
+.bg-center-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: rgba(30, 28, 22, 0.95);
+    color: #F5EDD8;
+    border: 1px solid rgba(197,158,63,0.4);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-family: var(--font);
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    white-space: nowrap;
+}
+.bg-center-tooltip.visible { opacity: 1; }
+.bg-center-tooltip .tt-center-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #C59E3F;
+    display: block;
+    margin-bottom: 2px;
+}
+.bg-center-tooltip .tt-center-status {
+    font-size: 11px;
+    font-weight: 500;
+}
+.tt-center-status.defined   { color: #76ce00; }
+.tt-center-status.undefined { color: rgba(200,180,130,0.6); }
+
+/* ═══ SVG GATE GLOW (cross-highlight) ══════════════════════════ */
+.bg-gate-glow path,
+.bg-gate-glow rect,
+.bg-gate-glow polygon {
+    filter: drop-shadow(0 0 5px currentColor);
+    transition: filter 0.2s ease;
+}
+
+/* ═══ ENTRANCE ANIMATION ════════════════════════════════════════ */
+@keyframes gateAppear {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.bg-gate-animate {
+    animation: gateAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes channelDraw {
+    from { stroke-dashoffset: 1; opacity: 0; }
+    to   { stroke-dashoffset: 0; opacity: 1; }
+}
+
+/* Planet row entrance */
+@keyframes rowSlideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.bg-col-design .bg-planet-row {
+    animation: rowSlideIn 0.3s ease both;
+}
+@keyframes rowSlideInRight {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.bg-col-personality .bg-planet-row {
+    animation: rowSlideInRight 0.3s ease both;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .bg-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+    .bg-col { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+    .bg-col-title { width: 100%; }
+    .bg-planet-row { flex-direction: row !important; }
+    .bg-gate-info { text-align: left !important; }
+    .bg-col-design .bg-planet-sym { color: #E02300; }
+}
+
+/* SVG gate hidden base rule */
+#bodygraph-svg-wrap .cls__ { display: none !important; }
+
+
+/* SVG reference structural rules - scoped */
+#bodygraph-svg-wrap .cls-1,#bodygraph-svg-wrap .cls-16,#bodygraph-svg-wrap .cls-17,#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-26{fill:#fe0000}
+#bodygraph-svg-wrap .cls-1,#bodygraph-svg-wrap .cls-2{clip-rule:evenodd}
+#bodygraph-svg-wrap .cls-2,#bodygraph-svg-wrap .cls-25,#bodygraph-svg-wrap .cls-36{fill:#fe0000}
+#bodygraph-svg-wrap .cls-10,#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-15,#bodygraph-svg-wrap .cls-21,#bodygraph-svg-wrap .cls-3,#bodygraph-svg-wrap .cls-30,#bodygraph-svg-wrap .cls-31,#bodygraph-svg-wrap .cls-32,#bodygraph-svg-wrap .cls-35,#bodygraph-svg-wrap .cls-4,#bodygraph-svg-wrap .cls-6{fill:none;stroke-linecap:round;stroke-linejoin:round}
+#bodygraph-svg-wrap .cls-3{stroke:#ededed;stroke-width:1.42px}
+#bodygraph-svg-wrap .cls-10,#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-13,#bodygraph-svg-wrap .cls-14,#bodygraph-svg-wrap .cls-17,#bodygraph-svg-wrap .cls-19,#bodygraph-svg-wrap .cls-21,#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-24,#bodygraph-svg-wrap .cls-25,#bodygraph-svg-wrap .cls-29,#bodygraph-svg-wrap .cls-3,#bodygraph-svg-wrap .cls-34,#bodygraph-svg-wrap .cls-35,#bodygraph-svg-wrap .cls-37,#bodygraph-svg-wrap .cls-4,#bodygraph-svg-wrap .cls-5,#bodygraph-svg-wrap .cls-6,#bodygraph-svg-wrap .cls-7,#bodygraph-svg-wrap .cls-8{fill-rule:evenodd}
+#bodygraph-svg-wrap .block__1{fill:#fff}
+#bodygraph-svg-wrap .block__1_active{fill:#ffe500!important}
+#bodygraph-svg-wrap .block__2{fill:#fff}
+#bodygraph-svg-wrap .block__2_active{fill:#76ce00!important}
+#bodygraph-svg-wrap .block__3{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+#bodygraph-svg-wrap .block__3_active{fill:#00a8dc}
+#bodygraph-svg-wrap .block__4{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+#bodygraph-svg-wrap .block__4_active{fill:#ffe500}
+#bodygraph-svg-wrap .block__5{fill:#fff}
+#bodygraph-svg-wrap .block__5_active{fill:#e02300!important}
+#bodygraph-svg-wrap .block__6{fill:#fff;stroke:#706f6f;stroke-width:1.3px}
+#bodygraph-svg-wrap .block__6_active{fill:#e67900}
+#bodygraph-svg-wrap .block__7{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+#bodygraph-svg-wrap .block__7_active{fill:#e02300}
+#bodygraph-svg-wrap .block__8{fill:#fff}
+#bodygraph-svg-wrap .block__8_active{fill:#e67900}
+#bodygraph-svg-wrap .block__9{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+#bodygraph-svg-wrap .block__9_active{fill:#ff8900!important}
+#bodygraph-svg-wrap .cls-4{stroke:#878787;stroke-width:3.97px}
+#bodygraph-svg-wrap .cls-5{fill:url(#GradientFill_1)}
+#bodygraph-svg-wrap .cls-6{stroke:#fff}
+#bodygraph-svg-wrap .cls-10,#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-15,#bodygraph-svg-wrap .cls-21,#bodygraph-svg-wrap .cls-30,#bodygraph-svg-wrap .cls-31,#bodygraph-svg-wrap .cls-32,#bodygraph-svg-wrap .cls-35,#bodygraph-svg-wrap .cls-6{stroke-width:2.83px}
+#bodygraph-svg-wrap .cls-7{fill:#dadada}
+#bodygraph-svg-wrap .cls-8,#bodygraph-svg-wrap .cls-9{fill:#fff}
+#bodygraph-svg-wrap .cls-10{stroke:#9d9d9c}
+#bodygraph-svg-wrap .cls-11,#bodygraph-svg-wrap .cls-37{fill:#1d1d1b}
+#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-32{stroke:#706f6f}
+#bodygraph-svg-wrap .cls-13{fill:url(#GradientFill_2)}
+#bodygraph-svg-wrap .cls-14{fill:#64350d}
+#bodygraph-svg-wrap .cls-15,#bodygraph-svg-wrap .cls-21{stroke:#fe0000}
+#bodygraph-svg-wrap .cls-18{clip-path:url(#clip-path)}
+#bodygraph-svg-wrap .cls-20{clip-path:url(#clip-path-2)}
+#bodygraph-svg-wrap .cls-22{clip-path:url(#clip-path-3)}
+#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-26,#bodygraph-svg-wrap .cls-31,#bodygraph-svg-wrap .cls-35{stroke:#fe0000}
+#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-26{stroke-miterlimit:22.93;stroke-width:.22px}
+#bodygraph-svg-wrap .cls-24{fill:#fff}
+#bodygraph-svg-wrap .cls-27{clip-path:url(#clip-path-4)}
+#bodygraph-svg-wrap .cls-28{clip-path:url(#clip-path-5)}
+#bodygraph-svg-wrap .cls-29{fill:url(#GradientFill_2-2)}
+#bodygraph-svg-wrap .cls-30{stroke:#000}
+#bodygraph-svg-wrap .cls-33{clip-path:url(#clip-path-6)}
+#bodygraph-svg-wrap .cls-34{fill:url(#GradientFill_2-3)}

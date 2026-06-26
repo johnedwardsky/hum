@@ -1,14 +1,20 @@
 import os
+import ssl
+
+# Bypass SSL certificate verification on macOS globally and for geopy
+ssl._create_default_https_context = ssl._create_unverified_context
+try:
+    import geopy.geocoders
+    geopy.geocoders.options.default_ssl_context = ssl._create_unverified_context()
+except Exception as e:
+    pass
+
 import urllib.request
 import json
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 from geopy.geocoders import Nominatim
 import pytz
-import ssl
-
-# Bypass SSL certificate verification on macOS
-ssl._create_default_https_context = ssl._create_unverified_context
 
 import calculator
 import compatibility_data

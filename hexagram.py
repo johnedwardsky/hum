@@ -35,6 +35,10 @@ def calculate_hexagram(longitude):
     """
     Given an ecliptic longitude (0-360°), returns the Human Design gate details.
 
+    IMPORTANT: The longitude is truncated (NOT rounded) to 5 decimal places
+    before subdivision calculation. The 6th decimal digit is discarded.
+    Each interval boundary starts at +0.00001° from the previous interval's end.
+
     Returns a dict with:
         gate     - Gate/Hexagram number (1-64)
         line     - Line number (1-6)
@@ -44,6 +48,11 @@ def calculate_hexagram(longitude):
         theos    - Theos number (1-3)
         position - Position index on the wheel (1-64)
     """
+    import math
+
+    # Truncate longitude to 6 decimal places (discard 7th+, do NOT round)
+    longitude = math.floor(longitude * 1000000) / 1000000
+
     # Calculate offset from wheel start
     offset = (longitude - WHEEL_START) % 360.0
 
