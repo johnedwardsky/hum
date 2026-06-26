@@ -541,16 +541,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = cityInput.value.trim();
         cityClear.classList.toggle('hidden', !q);
         clearTimeout(debounce);
-        if (q.length < 2) { closeSuggestions(); return; }
-        
-        // If query is already in cache, show it instantly!
+        if (q.length < 1) { closeSuggestions(); return; }
+
+        // If query is already in cache, show it instantly
         const cacheKey = q.toLowerCase();
         if (geoCache.has(cacheKey)) {
             renderSuggestions(geoCache.get(cacheKey));
             return;
         }
-        
-        debounce = setTimeout(() => fetchCities(q), 80);
+
+        debounce = setTimeout(() => fetchCities(q), 120);
     });
 
     cityInput.addEventListener('keydown', (e) => {
@@ -574,11 +574,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         searchSpinner.classList.remove('hidden');
         try {
-            const res  = await fetch(`/api/geocode?query=${encodeURIComponent(q)}`);
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                geoCache.set(cacheKey, data);
-            }
+            // Direct Nominatim call from browser — no Flask proxy round-trip
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=7&accept-language=ru&addressdetails=0`;
+            const res  = await fetch(url, { headers: { 'Accept-Language': 'ru' } });
+            const raw  = await res.json();
+            const data = raw.map(r => ({ display_name: r.display_name, lat: r.lat, lon: r.lon }));
+            geoCache.set(cacheKey, data);
             renderSuggestions(data);
         } catch { closeSuggestions(); }
         finally  { searchSpinner.classList.add('hidden'); }
@@ -1915,15 +1916,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const q = cityInput.value.trim();
             cityClear.classList.toggle('hidden', !q);
             clearTimeout(debounce);
-            if (q.length < 2) { closeSuggestions(); return; }
-            
+            if (q.length < 1) { closeSuggestions(); return; }
+
             const cacheKey = q.toLowerCase();
             if (geoCache.has(cacheKey)) {
                 renderSuggestions(geoCache.get(cacheKey));
                 return;
             }
-            
-            debounce = setTimeout(() => fetchCities(q), 80);
+
+            debounce = setTimeout(() => fetchCities(q), 120);
         });
 
         cityInput.addEventListener('keydown', (e) => {
@@ -1947,11 +1948,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             searchSpinner.classList.remove('hidden');
             try {
-                const res  = await fetch(`/api/geocode?query=${encodeURIComponent(q)}`);
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    geoCache.set(cacheKey, data);
-                }
+                // Direct Nominatim call from browser — no Flask proxy round-trip
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=7&accept-language=ru&addressdetails=0`;
+                const res  = await fetch(url, { headers: { 'Accept-Language': 'ru' } });
+                const raw  = await res.json();
+                const data = raw.map(r => ({ display_name: r.display_name, lat: r.lat, lon: r.lon }));
+                geoCache.set(cacheKey, data);
                 renderSuggestions(data);
             } catch { closeSuggestions(); }
             finally  { searchSpinner.classList.add('hidden'); }
