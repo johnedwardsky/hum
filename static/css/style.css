@@ -3066,7 +3066,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     backdrop-filter: blur(12px);
     opacity: 0;
     transition: opacity 0.12s ease;
-    white-space: nowrap;
+    white-space: normal;
+    max-width: 260px;
 }
 .bg-center-tooltip.visible { opacity: 1; }
 .bg-center-tooltip .tt-center-name {
@@ -3074,7 +3075,15 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     font-weight: 700;
     color: #C59E3F;
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+}
+.bg-center-tooltip .tt-center-subtitle {
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(245, 237, 216, 0.65);
+    display: block;
+    margin-bottom: 5px;
+    line-height: 1.4;
 }
 .bg-center-tooltip .tt-center-status {
     font-size: 11px;

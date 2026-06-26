@@ -4083,14 +4083,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // ─ Center metadata ─────────────────────────────────────────
             const CENTER_META = {
-                head:   { name: 'Голова',              blockNum: 1 },
-                ajna:   { name: 'Аджна',               blockNum: 2 },
-                throat: { name: 'Горло',               blockNum: 3 },
-                sacral: { name: 'Сакральный',          blockNum: 4 },
-                heart:  { name: 'Сердце / Эго',        blockNum: 5 },
-                spleen: { name: 'Селезёнка',           blockNum: 6 },
-                solar:  { name: 'Солнечное Сплетение', blockNum: 8 },
-                root:   { name: 'Корень',              blockNum: 9 },
+                head:    { name: 'Голова',                    subtitle: 'Центр вдохновения и сомнения',                            blockNum: 1 },
+                ajna:    { name: 'Аджна',                     subtitle: 'Центр ума и концептуализации',                            blockNum: 2 },
+                throat:  { name: 'Горло',                     subtitle: 'Центр коммуникации и манифестации',                       blockNum: 3 },
+                gcenter: { name: 'G-Центр',                   subtitle: 'Центр Бога · Магнитный монополь · Любовь и Направление',  blockNum: 4 },
+                heart:   { name: 'Сердце / Эго',              subtitle: 'Центр воли и материального мира',                         blockNum: 5 },
+                spleen:  { name: 'Селезёнка',                 subtitle: 'Центр интуиции, инстинкта и здоровья',                    blockNum: 6 },
+                sacral:  { name: 'Сакральный',                subtitle: 'Центр истинных творцов · Жизненная сила',                 blockNum: 7 },
+                solar:   { name: 'Солнечное Сплетение',       subtitle: 'Центр эмоций и духовного дыхания',                       blockNum: 8 },
+                root:    { name: 'Корень',                    subtitle: 'Центр давления и адреналина',                            blockNum: 9 },
             };
 
             // ─ Build gate → planets lookup ─────────────────────────────
@@ -4253,6 +4254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const statusText = isDefined ? '● Определён' : '○ Не определён';
                 centerTooltip.innerHTML = `
                     <span class="tt-center-name">${info.name}</span>
+                    ${info.subtitle ? `<span class="tt-center-subtitle">${info.subtitle}</span>` : ''}
                     <span class="tt-center-status ${statusCls}">${statusText}</span>
                 `;
                 centerTooltip.style.left = '-9999px';
