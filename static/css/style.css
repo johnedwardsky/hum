@@ -584,12 +584,84 @@ input  { font-family: inherit; }
 }
 
 .natal-chart-layout {
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+/* MAXIMIZED (Default) */
+.natal-chart-layout.layout-maximized {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 24px;
-    width: 100%;
 }
+.natal-chart-layout.layout-maximized .chart-section {
+    width: 100%;
+    max-width: 540px; /* 500px canvas + 40px padding */
+}
+.natal-chart-layout.layout-maximized .table-section {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* MINIMIZED */
+.natal-chart-layout.layout-minimized {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: start;
+    justify-content: center;
+    gap: 20px;
+}
+.natal-chart-layout.layout-minimized .chart-section {
+    width: 420px; /* 380px canvas + 40px padding */
+    flex-shrink: 0;
+}
+.natal-chart-layout.layout-minimized .table-section {
+    flex-grow: 1;
+}
+
+/* Layout toggle buttons styling */
+.chart-action-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    display: flex;
+    transition: color 0.15s;
+    cursor: pointer;
+    padding: 4px;
+}
+.chart-action-btn:hover {
+    color: var(--primary) !important;
+}
+
+.natal-chart-layout.layout-maximized #chart-layout-toggle .icon-minimize {
+    display: block !important;
+}
+.natal-chart-layout.layout-maximized #chart-layout-toggle .icon-maximize {
+    display: none !important;
+}
+.natal-chart-layout.layout-minimized #chart-layout-toggle .icon-minimize {
+    display: none !important;
+}
+.natal-chart-layout.layout-minimized #chart-layout-toggle .icon-maximize {
+    display: block !important;
+}
+
+@media (max-width: 1150px) {
+    .natal-chart-layout.layout-minimized {
+        flex-direction: column;
+        align-items: center;
+    }
+    .natal-chart-layout.layout-minimized .chart-section {
+        width: 100%;
+        max-width: 540px;
+    }
+    .natal-chart-layout.layout-minimized .table-section {
+        width: 100%;
+        max-width: 800px;
+    }
+}
+
 
 /* Table */
 .table-section { 
@@ -1108,7 +1180,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     .chart-container canvas {
         width: 100% !important;
         height: auto !important;
-        max-width: min(360px, calc(100vw - 48px));
+        max-width: min(500px, calc(100vw - 48px));
         display: block;
         margin: 0 auto;
     }

@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=1.1.14">
+    <link rel="stylesheet" href="/static/css/style.css?v=1.1.15">
 </head>
 <body>
     <!-- ===== SVG SPRITE FOR GOLDEN LOGO ===== -->
@@ -392,17 +392,29 @@
 
                 <!-- === TAB: PLANETS === -->
                 <div class="tab-content active" id="content-planets">
-                    <div class="natal-chart-layout">
+                    <div class="natal-chart-layout layout-maximized">
                         <!-- Chart wheel -->
-                        <div class="chart-section" style="width: 100%; max-width: 600px;">
+                        <div class="chart-section">
                             <div class="chart-header">
                                 <h3 class="section-title">Карта рождения</h3>
-                                <button class="chart-info-btn" title="О карте">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <circle cx="8" cy="8" r="6.5" stroke="#7A7585" stroke-width="1.2"/>
-                                        <path d="M8 7v4M8 5.5v.5" stroke="#7A7585" stroke-width="1.3" stroke-linecap="round"/>
-                                    </svg>
-                                </button>
+                                <div class="chart-header-actions" style="display: flex; gap: 8px; align-items: center;">
+                                    <button class="chart-action-btn" id="chart-layout-toggle" title="Свернуть / Развернуть карту">
+                                        <!-- Minimize icon: inward arrows -->
+                                        <svg class="icon-minimize" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                            <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
+                                        </svg>
+                                        <!-- Maximize icon: outward arrows -->
+                                        <svg class="icon-maximize" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                                        </svg>
+                                    </button>
+                                    <button class="chart-info-btn" title="О карте">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="8" r="6.5" stroke="#7A7585" stroke-width="1.2"/>
+                                            <path d="M8 7v4M8 5.5v.5" stroke="#7A7585" stroke-width="1.3" stroke-linecap="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div class="chart-container">
                                 <canvas id="chart-canvas" width="500" height="500" style="max-width:100%;height:auto;"></canvas>
@@ -418,7 +430,7 @@
                         </div>
 
                         <!-- Planets table -->
-                        <div class="table-section" style="width: 100%; max-width: 800px;">
+                        <div class="table-section">
                             <h3 class="section-title">Планеты и Лунные Узлы</h3>
                             <div class="table-wrap">
                                 <table class="data-table" id="planets-table">
@@ -2200,6 +2212,6 @@
         </div>
     </div>
 
-    <script src="/static/js/main.js?v=1.2.10"></script>
+    <script src="/static/js/main.js?v=1.2.11"></script>
 </body>
 </html>

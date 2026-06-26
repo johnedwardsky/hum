@@ -440,6 +440,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('chart-canvas');
     const ctx    = canvas.getContext('2d');
 
+    // Layout Toggle (Maximized vs Minimized)
+    const chartLayoutContainer = document.querySelector('.natal-chart-layout');
+    const chartLayoutToggleBtn = document.getElementById('chart-layout-toggle');
+    if (chartLayoutContainer && chartLayoutToggleBtn) {
+        // Load initial state
+        const savedLayout = localStorage.getItem('humantica_natal_layout_mode') || 'maximized';
+        if (savedLayout === 'minimized') {
+            chartLayoutContainer.classList.remove('layout-maximized');
+            chartLayoutContainer.classList.add('layout-minimized');
+        } else {
+            chartLayoutContainer.classList.remove('layout-minimized');
+            chartLayoutContainer.classList.add('layout-maximized');
+        }
+
+        chartLayoutToggleBtn.addEventListener('click', () => {
+            if (chartLayoutContainer.classList.contains('layout-maximized')) {
+                chartLayoutContainer.classList.remove('layout-maximized');
+                chartLayoutContainer.classList.add('layout-minimized');
+                localStorage.setItem('humantica_natal_layout_mode', 'minimized');
+            } else {
+                chartLayoutContainer.classList.remove('layout-minimized');
+                chartLayoutContainer.classList.add('layout-maximized');
+                localStorage.setItem('humantica_natal_layout_mode', 'maximized');
+            }
+            // Redraw chart to fit the new size
+            if (lastChart) {
+                drawChart(lastChart, canvas);
+            }
+        });
+    }
+
     // ── Default date ──────────────────────────────────────────
     birthDateEl.value = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
 
