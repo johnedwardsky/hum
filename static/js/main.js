@@ -4090,7 +4090,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 heart:   { name: 'Сердце / Эго',              subtitle: 'Центр воли и материального мира',                         blockNum: 5 },
                 spleen:  { name: 'Селезёнка',                 subtitle: 'Центр интуиции, инстинкта и здоровья',                    blockNum: 6 },
                 sacral:  { name: 'Сакральный',                subtitle: 'Центр истинных творцов · Жизненная сила',                 blockNum: 7 },
-                solar:   { name: 'Солнечное Сплетение',       subtitle: 'Центр эмоций и духовного дыхания',                       blockNum: 8 },
+                solar:   { name: 'Эмоциональный центр',        subtitle: 'Солнечное Сплетение · Центр чувств и духовного дыхания',  blockNum: 8 },
                 root:    { name: 'Корень',                    subtitle: 'Центр давления и адреналина',                            blockNum: 9 },
             };
 
