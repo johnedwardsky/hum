@@ -4000,10 +4000,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
 
-        // Reset opacities
-        svg.querySelectorAll('[class*="block__"]').forEach(el => el.style.opacity = '');
-        svg.querySelectorAll('[class*="cls__"]').forEach(el => el.style.opacity = '');
-        svg.querySelectorAll('[class*="cls_"]').forEach(el => el.style.opacity = '');
+        // Reset opacities and filters
+        svg.querySelectorAll('[class*="block__"]').forEach(el => {
+            el.style.opacity = '';
+            el.style.filter = '';
+        });
+        svg.querySelectorAll('[class*="cls__"]').forEach(el => {
+            el.style.opacity = '';
+            el.style.filter = '';
+        });
+        svg.querySelectorAll('[class*="cls_"]').forEach(el => {
+            el.style.opacity = '';
+            el.style.filter = '';
+        });
+        svg.querySelectorAll('[class^="a"]').forEach(el => {
+            el.style.fill = '';
+            el.style.filter = '';
+        });
 
         function getQuarterNameForIdx(idx) {
             if (idx >= 56 || idx <= 7) return "Инициация";
@@ -4025,210 +4038,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Apply dimming / highlights based on hover
         if (hoverType === 'center') {
-            const connectedCenters = new Set([hoverTarget]);
-            CHANNELS_DATA.forEach(ch => {
-                const isActive = activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB);
-                if (isActive) {
-                    if (ch.centerA === hoverTarget) connectedCenters.add(ch.centerB);
-                    if (ch.centerB === hoverTarget) connectedCenters.add(ch.centerA);
-                }
-            });
-
             const centerBlockMap = {
                 'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
                 'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
             };
 
+            // Dim other centers
             Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
                 const el = svg.querySelector('.block__' + blockNum);
-                if (el && !connectedCenters.has(cName)) {
+                if (el && cName !== hoverTarget) {
                     el.style.opacity = '0.15';
                 }
             });
 
-            // Gates
+            // Dim other gates & channels
+            const centerGates = Object.keys(BG_CENTERS[hoverTarget].gates).map(Number);
             svg.querySelectorAll('[class*="cls__"]').forEach(el => {
                 const classList = Array.from(el.classList);
                 const gateClass = classList.find(c => c.startsWith('cls__'));
                 if (gateClass) {
                     const gateNum = parseInt(gateClass.replace('cls__', ''));
-                    const inConnected = Array.from(connectedCenters).some(c => {
-                        return Object.keys(BG_CENTERS[c].gates).map(Number).includes(gateNum);
-                    });
-                    if (!inConnected) el.style.opacity = '0.15';
+                    if (!centerGates.includes(gateNum)) {
+                        el.style.opacity = '0.15';
+                    }
                 }
             });
 
-            // Channels
             svg.querySelectorAll('[class*="cls_"]').forEach(el => {
                 const classList = Array.from(el.classList);
                 const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
                 if (chClass) {
                     const gateNum = parseInt(chClass.replace('cls_', ''));
-                    const ch = CHANNELS_DATA.find(c => c.gateA === gateNum || c.gateB === gateNum);
-                    if (ch) {
-                        const isConnected = ch.centerA === hoverTarget || ch.centerB === hoverTarget;
-                        if (!isConnected) el.style.opacity = '0.15';
+                    if (!centerGates.includes(gateNum)) {
+                        el.style.opacity = '0.15';
                     }
                 }
             });
         } else if (hoverType === 'gate') {
-            let gateCenter = null;
+            // Do NOT dim any activations! Keep all at 100% opacity.
+            // Apply beautiful golden glow to the hovered gate shapes
+            const num = String(hoverTarget);
+            svg.querySelectorAll('.cls__' + num + ', .cls_' + num + ', .cls____' + num).forEach(el => {
+                el.style.filter = 'drop-shadow(0 0 5px rgba(197, 158, 63, 0.95)) drop-shadow(0 0 10px rgba(197, 158, 63, 0.6))';
+            });
+
+            // Also highlight the text/path label of the gate number inside the center (class: .a[gateNum])
+            svg.querySelectorAll('.a' + num).forEach(el => {
+                el.style.fill = '#C59E3F';
+                el.style.filter = 'drop-shadow(0 0 4px #C59E3F)';
+            });
+
+            // Also highlight the parent center
+            let parentCenter = null;
             for (const [cName, c] of Object.entries(BG_CENTERS)) {
                 if (Object.keys(c.gates).map(Number).includes(hoverTarget)) {
-                    gateCenter = cName;
+                    parentCenter = cName;
                     break;
                 }
             }
-
-            if (gateCenter) {
-                const connectedCenters = new Set([gateCenter]);
-                CHANNELS_DATA.forEach(ch => {
-                    const isActive = activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB);
-                    if (isActive) {
-                        if (ch.centerA === gateCenter) connectedCenters.add(ch.centerB);
-                        if (ch.centerB === gateCenter) connectedCenters.add(ch.centerA);
-                    }
-                });
-
+            if (parentCenter) {
                 const centerBlockMap = {
                     'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
                     'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
                 };
-
-                Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
-                    const el = svg.querySelector('.block__' + blockNum);
-                    if (el && !connectedCenters.has(cName)) {
-                        el.style.opacity = '0.15';
-                    }
-                });
-
-                // Gates
-                svg.querySelectorAll('[class*="cls__"]').forEach(el => {
-                    const classList = Array.from(el.classList);
-                    const gateClass = classList.find(c => c.startsWith('cls__'));
-                    if (gateClass) {
-                        const gateNum = parseInt(gateClass.replace('cls__', ''));
-                        const inConnected = Array.from(connectedCenters).some(c => {
-                            return Object.keys(BG_CENTERS[c].gates).map(Number).includes(gateNum);
-                        });
-                        if (!inConnected && gateNum !== hoverTarget) el.style.opacity = '0.15';
-                    }
-                });
-
-                // Channels
-                svg.querySelectorAll('[class*="cls_"]').forEach(el => {
-                    const classList = Array.from(el.classList);
-                    const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
-                    if (chClass) {
-                        const gateNum = parseInt(chClass.replace('cls_', ''));
-                        const ch = CHANNELS_DATA.find(c => c.gateA === gateNum || c.gateB === gateNum);
-                        if (ch) {
-                            const isConnected = ch.centerA === gateCenter || ch.centerB === gateCenter;
-                            if (!isConnected) el.style.opacity = '0.15';
-                        }
-                    }
-                });
-            } else {
-                // Dim everything except the hovered gate itself
-                svg.querySelectorAll('[class*="block__"]').forEach(el => el.style.opacity = '0.15');
-                svg.querySelectorAll('[class*="cls_"]').forEach(el => el.style.opacity = '0.15');
-                svg.querySelectorAll('[class*="cls__"]').forEach(el => {
-                    const classList = Array.from(el.classList);
-                    const gateClass = classList.find(c => c.startsWith('cls__'));
-                    if (gateClass) {
-                        const gateNum = parseInt(gateClass.replace('cls__', ''));
-                        if (gateNum !== hoverTarget) el.style.opacity = '0.15';
-                    }
-                });
+                const blockNum = centerBlockMap[parentCenter];
+                const el = svg.querySelector('.block__' + blockNum);
+                if (el) {
+                    el.style.filter = 'drop-shadow(0 0 6px rgba(197, 158, 63, 0.8))';
+                }
             }
         } else if (hoverType === 'quarter') {
             const qName = getQuarterNameForIdx(hoverState.gateIdx);
             
-            const centerBlockMap = {
-                'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
-                'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
-            };
-
-            Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
-                const centerGates = Object.keys(BG_CENTERS[cName].gates).map(Number);
-                const hasGateInQuarter = centerGates.some(g => {
-                    const gIdx = GATE_ORDER.indexOf(g);
-                    return gIdx !== -1 && getQuarterNameForIdx(gIdx) === qName;
-                });
-                if (!hasGateInQuarter) {
-                    const el = svg.querySelector('.block__' + blockNum);
-                    if (el) el.style.opacity = '0.15';
-                }
-            });
-
-            // Gates
+            // Highlight active gates in the hovered quarter
             svg.querySelectorAll('[class*="cls__"]').forEach(el => {
                 const classList = Array.from(el.classList);
                 const gateClass = classList.find(c => c.startsWith('cls__'));
                 if (gateClass) {
                     const gateNum = parseInt(gateClass.replace('cls__', ''));
                     const gIdx = GATE_ORDER.indexOf(gateNum);
-                    if (gIdx === -1 || getQuarterNameForIdx(gIdx) !== qName) {
-                        el.style.opacity = '0.15';
-                    }
-                }
-            });
-
-            // Channels
-            svg.querySelectorAll('[class*="cls_"]').forEach(el => {
-                const classList = Array.from(el.classList);
-                const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
-                if (chClass) {
-                    const gateNum = parseInt(chClass.replace('cls_', ''));
-                    const gIdx = GATE_ORDER.indexOf(gateNum);
-                    if (gIdx === -1 || getQuarterNameForIdx(gIdx) !== qName) {
-                        el.style.opacity = '0.15';
+                    if (gIdx !== -1 && getQuarterNameForIdx(gIdx) === qName && activeGatesCombined.has(gateNum)) {
+                        el.style.filter = 'drop-shadow(0 0 5px rgba(197, 158, 63, 0.95))';
+                        // Highlight text label inside the center too
+                        svg.querySelectorAll('.a' + gateNum).forEach(lbl => {
+                            lbl.style.fill = '#C59E3F';
+                            lbl.style.filter = 'drop-shadow(0 0 3px #C59E3F)';
+                        });
                     }
                 }
             });
         } else if (hoverType === 'godhead') {
             const ghIdx = Math.floor(hoverState.gateIdx / 4);
 
-            const centerBlockMap = {
-                'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
-                'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
-            };
-
-            Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
-                const centerGates = Object.keys(BG_CENTERS[cName].gates).map(Number);
-                const hasGateInGodhead = centerGates.some(g => {
-                    const gIdx = GATE_ORDER.indexOf(g);
-                    return gIdx !== -1 && Math.floor(gIdx / 4) === ghIdx;
-                });
-                if (!hasGateInGodhead) {
-                    const el = svg.querySelector('.block__' + blockNum);
-                    if (el) el.style.opacity = '0.15';
-                }
-            });
-
-            // Gates
+            // Highlight active gates in the hovered godhead
             svg.querySelectorAll('[class*="cls__"]').forEach(el => {
                 const classList = Array.from(el.classList);
                 const gateClass = classList.find(c => c.startsWith('cls__'));
                 if (gateClass) {
                     const gateNum = parseInt(gateClass.replace('cls__', ''));
                     const gIdx = GATE_ORDER.indexOf(gateNum);
-                    if (gIdx === -1 || Math.floor(gIdx / 4) !== ghIdx) {
-                        el.style.opacity = '0.15';
-                    }
-                }
-            });
-
-            // Channels
-            svg.querySelectorAll('[class*="cls_"]').forEach(el => {
-                const classList = Array.from(el.classList);
-                const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
-                if (chClass) {
-                    const gateNum = parseInt(chClass.replace('cls_', ''));
-                    const gIdx = GATE_ORDER.indexOf(gateNum);
-                    if (gIdx === -1 || Math.floor(gIdx / 4) !== ghIdx) {
-                        el.style.opacity = '0.15';
+                    if (gIdx !== -1 && Math.floor(gIdx / 4) === ghIdx && activeGatesCombined.has(gateNum)) {
+                        el.style.filter = 'drop-shadow(0 0 5px rgba(197, 158, 63, 0.95))';
+                        // Highlight text label inside the center too
+                        svg.querySelectorAll('.a' + gateNum).forEach(lbl => {
+                            lbl.style.fill = '#C59E3F';
+                            lbl.style.filter = 'drop-shadow(0 0 3px #C59E3F)';
+                        });
                     }
                 }
             });

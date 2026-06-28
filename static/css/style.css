@@ -2991,7 +2991,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-gate-tooltip {
     position: fixed;
     z-index: 9999;
-    background: rgba(30, 28, 22, 0.95);
+    background: rgba(28, 26, 21, 0.82);
     color: #F5EDD8;
     border: 1px solid rgba(197,158,63,0.4);
     border-radius: 10px;
@@ -3056,7 +3056,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-center-tooltip {
     position: fixed;
     z-index: 9999;
-    background: rgba(30, 28, 22, 0.95);
+    background: rgba(28, 26, 21, 0.82);
     color: #F5EDD8;
     border: 1px solid rgba(197,158,63,0.4);
     border-radius: 10px;
