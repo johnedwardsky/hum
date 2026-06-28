@@ -3252,6 +3252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Mandala renderer (with bodygraph overlay inside) ── */
+    /* ── Mandala renderer (with bodygraph overlay inside) ── */
     function drawMandala(data, canvasEl) {
         if (!canvasEl) return;
         const ctx = canvasEl.getContext('2d');
@@ -3271,57 +3272,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        const rZodiacOuter = R;
-        const rZodiacInner = R - 28;
-        const rGatesOuter = rZodiacInner;
-        const rGatesInner = rGatesOuter - 38;
-        const rPlanetsBorder = rGatesInner;
-        const rPlanetsLabels = rPlanetsBorder - 38;
-        const rInnerBorder = rPlanetsLabels - 16;
+        // Proportional radii for responsive scaling
+        const rQuartersOuter = R;
+        const rQuartersInner = R * 0.94;
+        const rGodheadsOuter = rQuartersInner;
+        const rGodheadsInner = R * 0.88;
+        const rHexagramsOuter = rGodheadsInner;
+        const rHexagramsInner = R * 0.81;
+        const rGatesOuter = rHexagramsInner;
+        const rGatesInner = rGatesOuter - 24;
+        const rZodiacOuter = rGatesInner;
+        const rZodiacInner = R * 0.68;
+        const rInnerBorder = rZodiacInner;
 
         ctx.clearRect(0, 0, size, size);
 
-        // Background
+        // 1. Draw solid clean background
         ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.fill();
 
-        // 1. Zodiac ring (12 signs)
-        for (let i = 0; i < 12; i++) {
-            const startAngle = degToRad(i * 30 - 90);
-            const endAngle = degToRad((i + 1) * 30 - 90);
-
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
-            ctx.closePath();
-            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.03);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
-            ctx.strokeStyle = 'rgba(197,158,63,0.15)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            const midAngle = startAngle + degToRad(15);
-            const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
-            const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
-            ctx.font = 'bold 12px serif';
-            ctx.fillStyle = ZODIAC_COLORS[i];
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(ZODIAC_META[i].sym, gx, gy);
-        }
-
-        // Ring borders
-        ctx.beginPath(); ctx.arc(cx, cy, rZodiacOuter, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, rZodiacInner, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.25)'; ctx.lineWidth = 1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, rGatesInner, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.2)'; ctx.lineWidth = 1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, rInnerBorder, 0, Math.PI*2); ctx.strokeStyle = 'rgba(197,158,63,0.15)'; ctx.lineWidth = 1; ctx.stroke();
-
-        // 2. 64 Gates ring
         const GATE_ORDER = [
             25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
              8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
@@ -3334,99 +3305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
         const GATE_INTERVAL = 5.625;
 
-        const activeGates = new Set();
-        data.planets.forEach(p => {
-            if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
-                activeGates.add(p.hexagram.gate);
-        });
-
-        for (let i = 0; i < 64; i++) {
-            const gateNum = GATE_ORDER[i];
-            const isActive = activeGates.has(gateNum);
-            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
-            const startAngle = degToRad(startLon - 90);
-            const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
-
-            if (isActive) {
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = 'rgba(197,158,63,0.12)';
-                ctx.fill();
-            }
-
-            const xO = cx + rGatesOuter * Math.cos(startAngle);
-            const yO = cy + rGatesOuter * Math.sin(startAngle);
-            const xI = cx + rGatesInner * Math.cos(startAngle);
-            const yI = cy + rGatesInner * Math.sin(startAngle);
-            ctx.beginPath();
-            ctx.moveTo(xO, yO);
-            ctx.lineTo(xI, yI);
-            ctx.strokeStyle = isActive ? 'rgba(197,158,63,0.45)' : 'rgba(197,158,63,0.12)';
-            ctx.lineWidth = isActive ? 1.2 : 0.8;
-            ctx.stroke();
-
-            const midLon = startLon + GATE_INTERVAL / 2;
-            const midAngle = degToRad(midLon - 90);
-            const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
-            const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
-
-            ctx.font = isActive ? 'bold 9px Inter, sans-serif' : '8px Inter, sans-serif';
-            ctx.fillStyle = isActive ? '#C59E3F' : '#777166';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(gateNum.toString(), lx, ly);
-        }
-
-        // 3. Planet markers
-        const planets = data.planets.filter(p => p.hexagram && (!activePlanets || activePlanets.has(p.name)));
-        const placed = [];
-
-        planets.forEach(p => {
-            const meta = PLANET_META[p.name] || { sym: p.symbol };
-            const pColor = PLANET_COLORS[p.name] || '#2E2A20';
-            const lon = p.longitude;
-            let angle = lon;
-            for (let attempt = 0; attempt < 8; attempt++) {
-                if (!placed.some(a => Math.abs(angleDiff(a, angle)) < 11)) break;
-                angle += 12;
-            }
-            placed.push(angle);
-
-            const dotAngle = degToRad(lon - 90);
-            const labelAngle = degToRad(angle - 90);
-
-            const dx = cx + rPlanetsBorder * Math.cos(dotAngle);
-            const dy = cy + rPlanetsBorder * Math.sin(dotAngle);
-            ctx.beginPath();
-            ctx.arc(dx, dy, 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#C59E3F';
-            ctx.fill();
-
-            const lx = cx + rPlanetsLabels * Math.cos(labelAngle);
-            const ly = cy + rPlanetsLabels * Math.sin(labelAngle);
-            ctx.beginPath();
-            ctx.moveTo(dx, dy);
-            ctx.lineTo(lx, ly);
-            ctx.strokeStyle = 'rgba(197,158,63,0.2)';
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
-
-            ctx.font = '13px serif';
-            ctx.fillStyle = pColor;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(meta.sym, lx, ly);
-
-            const gx = cx + (rPlanetsLabels - 18) * Math.cos(labelAngle);
-            const gy = cy + (rPlanetsLabels - 18) * Math.sin(labelAngle);
-            ctx.font = 'bold 8px Inter, sans-serif';
-            ctx.fillStyle = '#9E978A';
-            ctx.fillText(`${p.hexagram.gate}.${p.hexagram.line}`, gx, gy);
-        });
-
-        // 4. Bodygraph overlay inside inner circle
+        // Compile active gates and planets
         const activeGatesPersonality = new Set();
         data.planets.forEach(p => {
             if (p.hexagram && (!activePlanets || activePlanets.has(p.name)))
@@ -3442,22 +3321,340 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
 
+        // Group activations by gate
+        const activationsByGate = {};
+        for (let g = 1; g <= 64; g++) {
+            activationsByGate[g] = [];
+        }
+        data.planets.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+                activationsByGate[p.hexagram.gate].push({
+                    type: 'personality',
+                    symbol: p.symbol || PLANET_META[p.name]?.sym || '?',
+                    color: '#2E2A20',
+                    line: p.hexagram.line
+                });
+            }
+        });
+        designPlanetsList.forEach(p => {
+            if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
+                activationsByGate[p.hexagram.gate].push({
+                    type: 'design',
+                    symbol: p.symbol || PLANET_META[p.name]?.sym || '?',
+                    color: 'rgb(255,96,96)',
+                    line: p.hexagram.line
+                });
+            }
+        });
+
+        // Helper function for rotated labels that corrects for upside-down reading
+        function drawRotatedText(text, r, angle, font, color) {
+            ctx.save();
+            ctx.font = font;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            ctx.translate(x, y);
+            
+            let rotation = angle + Math.PI / 2;
+            if (angle > 0 && angle < Math.PI) {
+                rotation = angle - Math.PI / 2;
+            }
+            ctx.rotate(rotation);
+            ctx.fillText(text, 0, 0);
+            ctx.restore();
+        }
+
+        // 1. Quarters segment drawing
+        const QUARTERS = [
+            { name: "Инициация", startIdx: 56, endIdx: 7, fill: 'rgba(45,185,150,0.04)', color: '#278A6E' },
+            { name: "Цивилизация", startIdx: 8, endIdx: 23, fill: 'rgba(245,180,60,0.04)', color: '#B37D14' },
+            { name: "Дуальность", startIdx: 24, endIdx: 39, fill: 'rgba(255,90,95,0.04)', color: '#C93B41' },
+            { name: "Мутация", startIdx: 40, endIdx: 55, fill: 'rgba(100,150,250,0.04)', color: '#3B6EC9' }
+        ];
+
+        QUARTERS.forEach(q => {
+            const startAng = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 90);
+            let endAng = degToRad(WHEEL_START + (q.endIdx + 1) * GATE_INTERVAL - 90);
+            if (endAng < startAng) {
+                endAng += Math.PI * 2;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, rQuartersOuter, startAng, endAng);
+            ctx.closePath();
+            ctx.fillStyle = q.fill;
+            ctx.fill();
+
+            // Label
+            let midAng = (startAng + endAng) / 2;
+            drawRotatedText(q.name, (rQuartersOuter + rQuartersInner) / 2, midAng, 'bold 10px Inter, sans-serif', q.color);
+        });
+
+        // 2. Godheads drawing (16 deities)
+        const GODHEADS = [
+            "Михаил", "Янус", "Майя", "Лакшми", 
+            "Парвати", "Маат", "Тот", "Гармония", 
+            "Христос", "Минерва", "Аид", "Прометей", 
+            "Вишну", "Хранители Колеса", "Кали", "Митра"
+        ];
+        for (let h = 0; h < 16; h++) {
+            const name = GODHEADS[h];
+            const startIdx = h * 4;
+            const startAng = degToRad(WHEEL_START + startIdx * GATE_INTERVAL - 90);
+            const endAng = degToRad(WHEEL_START + (startIdx + 4) * GATE_INTERVAL - 90);
+            const midAng = (startAng + endAng) / 2;
+
+            // Draw clean radial dividers between Godheads
+            ctx.beginPath();
+            ctx.moveTo(cx + rGodheadsInner * Math.cos(startAng), cy + rGodheadsInner * Math.sin(startAng));
+            ctx.lineTo(cx + rGodheadsOuter * Math.cos(startAng), cy + rGodheadsOuter * Math.sin(startAng));
+            ctx.strokeStyle = 'rgba(197,158,63,0.15)';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+
+            drawRotatedText(name, (rGodheadsOuter + rGodheadsInner) / 2, midAng, '8px Inter, sans-serif', '#5C5446');
+        }
+
+        // 3. Hexagrams and Gates rings rendering
+        const HEX_LINES = {
+            1: "111111", 2: "000000", 3: "100010", 4: "010001", 5: "111010", 6: "010111", 7: "010000", 8: "000010",
+            9: "111011", 10: "110111", 11: "111000", 12: "000111", 13: "101111", 14: "111101", 15: "001000", 16: "000100",
+            17: "100110", 18: "011001", 19: "110000", 20: "000011", 21: "100101", 22: "101001", 23: "000001", 24: "100000",
+            25: "100111", 26: "111001", 27: "100001", 28: "011110", 29: "010010", 30: "101101", 31: "001110", 32: "011100",
+            33: "001111", 34: "111100", 35: "000101", 36: "101000", 37: "101011", 38: "110101", 39: "001010", 40: "010100",
+            41: "110001", 42: "100011", 43: "111110", 44: "011111", 45: "000110", 46: "011000", 47: "010110", 48: "011010",
+            49: "101110", 50: "011101", 51: "100100", 52: "001001", 53: "001011", 54: "110100", 55: "101100", 56: "001101",
+            57: "011011", 58: "110110", 59: "010011", 60: "110010", 61: "110011", 62: "001100", 63: "101010", 64: "010101"
+        };
+
+        for (let i = 0; i < 64; i++) {
+            const gateNum = GATE_ORDER[i];
+            const isPersActive = activeGatesPersonality.has(gateNum);
+            const isDesActive = activeGatesDesign.has(gateNum);
+            const isCombinedActive = activeGatesCombined.has(gateNum);
+
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
+            const startAngle = degToRad(startLon - 90);
+            const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
+            const midAngle = (startAngle + endAngle) / 2;
+
+            // Highlight active gate cell background
+            if (isCombinedActive) {
+                ctx.beginPath();
+                ctx.moveTo(cx + rGatesInner * Math.cos(startAngle), cy + rGatesInner * Math.sin(startAngle));
+                ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle);
+                ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
+                ctx.closePath();
+                if (isPersActive && isDesActive) {
+                    ctx.fillStyle = 'rgba(197,158,63,0.18)';
+                } else if (isDesActive) {
+                    ctx.fillStyle = 'rgba(255,96,96,0.14)';
+                } else {
+                    ctx.fillStyle = 'rgba(197,158,63,0.12)';
+                }
+                ctx.fill();
+            }
+
+            // Radial divider lines for gates
+            ctx.beginPath();
+            ctx.moveTo(cx + rGatesInner * Math.cos(startAngle), cy + rGatesInner * Math.sin(startAngle));
+            ctx.lineTo(cx + rGatesOuter * Math.cos(startAngle), cy + rGatesOuter * Math.sin(startAngle));
+            ctx.strokeStyle = isCombinedActive ? 'rgba(197,158,63,0.45)' : 'rgba(197,158,63,0.12)';
+            ctx.lineWidth = isCombinedActive ? 1.0 : 0.6;
+            ctx.stroke();
+
+            // Draw Gate Number
+            const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
+            const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
+            ctx.font = isCombinedActive ? 'bold 9px Inter, sans-serif' : '8px Inter, sans-serif';
+            ctx.fillStyle = isPersActive ? '#C59E3F' : (isDesActive ? 'rgb(255,96,96)' : '#777166');
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(gateNum.toString(), lx, ly);
+
+            // Draw I Ching Hexagram (6 radial lines)
+            const lineStr = HEX_LINES[gateNum] || "000000";
+            const paddingRad = 0.007;
+            const gapRad = 0.006;
+            ctx.lineWidth = 1.3;
+            ctx.lineCap = 'round';
+
+            for (let j = 0; j < 6; j++) {
+                const lineType = lineStr[j]; // '1' = Yang, '0' = Yin
+                const r = rHexagramsInner + 3.5 + j * 3.2;
+
+                ctx.strokeStyle = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+
+                ctx.beginPath();
+                if (lineType === '1') {
+                    ctx.arc(cx, cy, r, startAngle + paddingRad, endAngle - paddingRad);
+                    ctx.stroke();
+                } else {
+                    ctx.arc(cx, cy, r, startAngle + paddingRad, midAngle - gapRad);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, midAngle + gapRad, endAngle - paddingRad);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // 4. Zodiac Ring and Ticks
+        for (let i = 0; i < 12; i++) {
+            const startAngle = degToRad(i * 30 - 90);
+            const endAngle = degToRad((i + 1) * 30 - 90);
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.03);
+            ctx.fill();
+
+            // Label
+            const midAngle = startAngle + degToRad(15);
+            const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
+            const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.fillStyle = ZODIAC_COLORS[i];
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(ZODIAC_META[i].sym, gx, gy);
+        }
+
+        // Ticks around the Zodiac Outer Border
+        for (let deg = 0; deg < 360; deg++) {
+            const rad = degToRad(deg - 90);
+            const cos = Math.cos(rad);
+            const sin = Math.sin(rad);
+            
+            let tickLen = 0;
+            let strokeStyle = 'rgba(197,158,63,0.15)';
+            let lineWidth = 0.5;
+            
+            if (deg % 30 === 0) {
+                tickLen = rZodiacOuter - rZodiacInner; // Full sector dividing line
+                strokeStyle = 'rgba(197,158,63,0.4)';
+                lineWidth = 1;
+            } else if (deg % 5 === 0) {
+                tickLen = 6;
+                strokeStyle = 'rgba(197,158,63,0.25)';
+                lineWidth = 0.8;
+            } else {
+                tickLen = 3;
+                strokeStyle = 'rgba(197,158,63,0.15)';
+                lineWidth = 0.5;
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(cx + rZodiacOuter * cos, cy + rZodiacOuter * sin);
+            ctx.lineTo(cx + (rZodiacOuter - tickLen) * cos, cy + (rZodiacOuter - tickLen) * sin);
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        // 5. Draw concentric circle dividing lines
+        const concentricBorders = [
+            rQuartersOuter, rQuartersInner, 
+            rGodheadsInner, rHexagramsInner, 
+            rGatesInner, rZodiacInner
+        ];
+        concentricBorders.forEach((r, idx) => {
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.strokeStyle = idx <= 1 ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.18)';
+            ctx.lineWidth = idx === 0 ? 1.5 : 1.0;
+            ctx.stroke();
+        });
+
+        // 6. Draw 4 Quarters dividing rods (Major golden axes)
+        QUARTERS.forEach(q => {
+            const axisAngle = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 90);
+            const cos = Math.cos(axisAngle);
+            const sin = Math.sin(axisAngle);
+            ctx.beginPath();
+            ctx.moveTo(cx + rInnerBorder * cos, cy + rInnerBorder * sin);
+            ctx.lineTo(cx + (R + 10) * cos, cy + (R + 10) * sin);
+            ctx.strokeStyle = '#C59E3F';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        });
+
+        // 7. Planet activation lines and symbols inside the wheel
+        for (let i = 0; i < 64; i++) {
+            const gateNum = GATE_ORDER[i];
+            const activations = activationsByGate[gateNum];
+            if (!activations || activations.length === 0) continue;
+
+            const midAngle = degToRad((WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2 - 90) % 360);
+            const cos = Math.cos(midAngle);
+            const sin = Math.sin(midAngle);
+
+            // Draw radial Ray connecting the gate to inner activations
+            ctx.beginPath();
+            ctx.moveTo(cx + rGatesInner * cos, cy + rGatesInner * sin);
+            ctx.lineTo(cx + (rInnerBorder - 10 - activations.length * 15) * cos, cy + (rInnerBorder - 10 - activations.length * 15) * sin);
+            
+            const isP = activations.some(a => a.type === 'personality');
+            const isD = activations.some(a => a.type === 'design');
+            ctx.strokeStyle = (isP && isD) ? 'rgba(197,158,63,0.35)' : (isD ? 'rgba(255,96,96,0.3)' : 'rgba(46,42,32,0.25)');
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+
+            // Draw stacked planet symbols
+            activations.forEach((act, aIdx) => {
+                const rAct = rInnerBorder - 12 - aIdx * 15;
+                const ax = cx + rAct * cos;
+                const ay = cy + rAct * sin;
+
+                // Draw planet glyph symbol
+                ctx.font = '12px Inter, sans-serif';
+                ctx.fillStyle = act.color;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(act.symbol, ax, ay);
+
+                // Draw tiny line offset next to symbol
+                const subAngle = midAngle + 0.024;
+                const sx = cx + rAct * Math.cos(subAngle);
+                const sy = cy + rAct * Math.sin(subAngle);
+                ctx.font = 'bold 7px Inter, sans-serif';
+                ctx.fillStyle = act.type === 'design' ? 'rgba(255,96,96,0.95)' : 'rgba(140,110,40,0.95)';
+                ctx.fillText(act.line.toString(), sx, sy);
+            });
+        }
+
+        // 8. Bodygraph overlay inside inner circle
+        const activeGatesCombinedForBG = new Set([...activeGatesPersonality, ...activeGatesDesign]);
         const definedCenters = new Set();
         CHANNELS_DATA.forEach(ch => {
-            if (activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB)) {
+            if (activeGatesCombinedForBG.has(ch.gateA) && activeGatesCombinedForBG.has(ch.gateB)) {
                 definedCenters.add(ch.centerA);
                 definedCenters.add(ch.centerB);
             }
         });
 
+        // Scale and draw central bodygraph
         const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
         const bgOffX = cx - (BG_W * bgScale) / 2;
         const bgOffY = cy - (BG_H * bgScale) / 2;
 
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder - 1, 0, Math.PI * 2);
+        ctx.arc(cx, cy, rInnerBorder - 2, 0, Math.PI * 2);
         ctx.clip();
+
+        // Draw bodygraph with transparent white background overlay for premium UX depth
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
 
         drawBodygraphOnCtx(ctx, data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters);
 
