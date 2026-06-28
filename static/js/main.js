@@ -566,11 +566,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         searchSpinner.classList.remove('hidden');
         try {
-            // Direct Nominatim call from browser — no Flask proxy round-trip
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=7&accept-language=ru&addressdetails=0`;
-            const res  = await fetch(url, { headers: { 'Accept-Language': 'ru' } });
-            const raw  = await res.json();
-            const data = raw.map(r => ({ display_name: r.display_name, lat: r.lat, lon: r.lon }));
+            const url = `/api/geocode?query=${encodeURIComponent(q)}`;
+            const res  = await fetch(url);
+            const data = await res.json();
             geoCache.set(cacheKey, data);
             renderSuggestions(data);
         } catch { closeSuggestions(); }
@@ -1940,11 +1938,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             searchSpinner.classList.remove('hidden');
             try {
-                // Direct Nominatim call from browser — no Flask proxy round-trip
-                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=7&accept-language=ru&addressdetails=0`;
-                const res  = await fetch(url, { headers: { 'Accept-Language': 'ru' } });
-                const raw  = await res.json();
-                const data = raw.map(r => ({ display_name: r.display_name, lat: r.lat, lon: r.lon }));
+                const url = `/api/geocode?query=${encodeURIComponent(q)}`;
+                const res  = await fetch(url);
+                const data = await res.json();
                 geoCache.set(cacheKey, data);
                 renderSuggestions(data);
             } catch { closeSuggestions(); }
