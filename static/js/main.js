@@ -2819,23 +2819,60 @@ document.addEventListener('DOMContentLoaded', () => {
             37, 63, 22, 36
         ];
 
+        const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
+
         function getBodygraphOpacity(centerName, gateNum) {
             if (!hoverType) return 1.0;
             
             if (hoverType === 'center') {
-                if (centerName && centerName === hoverTarget) return 1.0;
+                const connectedCenters = new Set([hoverTarget]);
+                CHANNELS_DATA.forEach(ch => {
+                    const isActive = activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB);
+                    if (isActive) {
+                        if (ch.centerA === hoverTarget) connectedCenters.add(ch.centerB);
+                        if (ch.centerB === hoverTarget) connectedCenters.add(ch.centerA);
+                    }
+                });
+
+                if (centerName && connectedCenters.has(centerName)) return 1.0;
                 if (gateNum) {
-                    const centerGates = Object.keys(BG_CENTERS[hoverTarget].gates).map(Number);
-                    if (centerGates.includes(gateNum)) return 1.0;
+                    const isGateInConnected = Array.from(connectedCenters).some(c => {
+                        return Object.keys(BG_CENTERS[c].gates).map(Number).includes(gateNum);
+                    });
+                    if (isGateInConnected) return 1.0;
                 }
                 return 0.15;
             }
             
             if (hoverType === 'gate') {
                 if (gateNum && gateNum === hoverTarget) return 1.0;
-                if (centerName) {
-                    const centerGates = Object.keys(BG_CENTERS[centerName].gates).map(Number);
-                    if (centerGates.includes(hoverTarget)) return 1.0;
+                
+                // Find the center containing the hovered gate
+                let gateCenter = null;
+                for (const [cName, c] of Object.entries(BG_CENTERS)) {
+                    if (Object.keys(c.gates).map(Number).includes(hoverTarget)) {
+                        gateCenter = cName;
+                        break;
+                    }
+                }
+                
+                if (gateCenter) {
+                    const connectedCenters = new Set([gateCenter]);
+                    CHANNELS_DATA.forEach(ch => {
+                        const isActive = activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB);
+                        if (isActive) {
+                            if (ch.centerA === gateCenter) connectedCenters.add(ch.centerB);
+                            if (ch.centerB === gateCenter) connectedCenters.add(ch.centerA);
+                        }
+                    });
+
+                    if (centerName && connectedCenters.has(centerName)) return 1.0;
+                    if (gateNum) {
+                        const isGateInConnected = Array.from(connectedCenters).some(c => {
+                            return Object.keys(BG_CENTERS[c].gates).map(Number).includes(gateNum);
+                        });
+                        if (isGateInConnected) return 1.0;
+                    }
                 }
                 return 0.15;
             }
@@ -2903,6 +2940,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (hoverType === 'center') {
                     if (ch.centerA === hoverTarget || ch.centerB === hoverTarget) op = 1.0;
                     else op = 0.15;
+                } else if (hoverType === 'gate') {
+                    let gateCenter = null;
+                    for (const [cName, c] of Object.entries(BG_CENTERS)) {
+                        if (Object.keys(c.gates).map(Number).includes(hoverTarget)) {
+                            gateCenter = cName;
+                            break;
+                        }
+                    }
+                    if (gateCenter && (ch.centerA === gateCenter || ch.centerB === gateCenter)) {
+                        op = 1.0;
+                    } else {
+                        op = 0.15;
+                    }
                 } else {
                     op = Math.max(getBodygraphOpacity(ch.centerA, ch.gateA), getBodygraphOpacity(ch.centerB, ch.gateB));
                 }
@@ -3853,6 +3903,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = lineCol;
                 ctx.fillText(act.line.toString(), sx, sy);
             });
+        }
+
+        // 7.5 Draw radial activation wedges (rays) from the center to the gates
+        for (let i = 0; i < 64; i++) {
+            const gateNum = GATE_ORDER[i];
+            const activations = activationsByGate[gateNum];
+            if (!activations || activations.length === 0) continue;
+
+            const isHighlighted = isGateHighlighted(gateNum, i);
+            const isAnyHovered = (hoverType !== null);
+
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
+            const startAngle = degToRad(startLon - 90);
+            const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
+
+            const isP = activations.some(a => a.type === 'personality');
+            const isD = activations.some(a => a.type === 'design');
+
+            let fillStyle = 'rgba(0,0,0,0)';
+            let opacity = 1.0;
+            
+            if (isAnyHovered) {
+                opacity = isHighlighted ? 1.0 : 0.08;
+            }
+
+            if (isP && isD) {
+                fillStyle = `rgba(197,158,63, ${0.1 * opacity})`;
+            } else if (isD) {
+                fillStyle = `rgba(255,96,96, ${0.1 * opacity})`;
+            } else {
+                fillStyle = `rgba(197,158,63, ${0.08 * opacity})`;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, rGatesInner, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = fillStyle;
+            ctx.fill();
         }
 
         // 8. Bodygraph overlay inside inner circle
