@@ -3041,15 +3041,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (aPers || aDes) {
                     ctx.font = fontActive;
-                    if (isCDef) {
-                        ctx.fillStyle = '#FFFFFF';
-                    } else {
-                        ctx.fillStyle = (aDes && !aPers) ? designColor : personalityColor;
-                    }
                 } else {
                     ctx.font = fontInactive;
-                    ctx.fillStyle = isCDef ? 'rgba(255,255,255,0.7)' : '#9E978A';
                 }
+                ctx.fillStyle = '#000000';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(g.toString(), pt[0], pt[1]);
