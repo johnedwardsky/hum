@@ -1542,7 +1542,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const midAng = degToRad(lonToAngle(midLon, asc));
             const hx = cx + (r2 + r3) / 2 * Math.cos(midAng);
             const hy = cy + (r2 + r3) / 2 * Math.sin(midAng);
-            ctx.font      = '9px Inter, sans-serif';
+            ctx.font      = '9px DM Sans, sans-serif';
             ctx.fillStyle = '#777166';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -1634,7 +1634,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Retrograde indicator
             if (p.is_retrograde) {
-                ctx.font      = 'bold 9px Inter, sans-serif';
+                ctx.font      = 'bold 9px DM Sans, sans-serif';
                 ctx.fillStyle = '#E06D53'; // terracotta/red highlight
                 ctx.fillText('R', px + 9, py - 7);
             }
@@ -1651,7 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const a = degToRad(lonToAngle(lon % 360, asc));
             const lx = cx + (R + 4) * Math.cos(a);
             const ly = cy + (R + 4) * Math.sin(a);
-            ctx.font      = 'bold 10px Inter, sans-serif';
+            ctx.font      = 'bold 10px DM Sans, sans-serif';
             ctx.fillStyle = '#C59E3F';
             ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
             ctx.textBaseline = ly < cy ? 'bottom' : 'top';
@@ -1798,7 +1798,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText(meta.sym, px, py);
             if (p.is_retrograde) {
-                ctx.font = 'bold 7px Inter,sans-serif'; ctx.fillStyle = '#E06D53';
+                ctx.font = 'bold 7px DM Sans,sans-serif'; ctx.fillStyle = '#E06D53';
                 ctx.fillText('R', px + 7, py - 5);
             }
         });
@@ -1813,7 +1813,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const a = degToRad(lonToAngle(lon % 360, asc));
             const lx = cx + (R + 3) * Math.cos(a);
             const ly = cy + (R + 3) * Math.sin(a);
-            ctx.font = 'bold 8px Inter,sans-serif'; ctx.fillStyle = '#C59E3F';
+            ctx.font = 'bold 8px DM Sans,sans-serif'; ctx.fillStyle = '#C59E3F';
             ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
             ctx.textBaseline = ly < cy ? 'bottom' : 'top';
             ctx.fillText(label, lx, ly);
@@ -2525,7 +2525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = '#C59E3F';
         ctx.fillText('❤️', cx, cy - 5);
         
-        ctx.font = '500 13px Inter, sans-serif';
+        ctx.font = '500 13px DM Sans, sans-serif';
         ctx.fillStyle = '#2E2A20';
         ctx.fillText(`${sign1} + ${sign2}`, cx, cy + 60);
     }
@@ -2609,7 +2609,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const midAng = degToRad(lonToAngle(midLon, asc));
             const hx = cx + (r2 + r3) / 2 * Math.cos(midAng);
             const hy = cy + (r2 + r3) / 2 * Math.sin(midAng);
-            ctx.font      = '8px Inter, sans-serif';
+            ctx.font      = '8px DM Sans, sans-serif';
             ctx.fillStyle = '#C59E3F';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -2795,33 +2795,88 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     /* ── shared drawing core (used by standalone bodygraph + mandala overlay) ── */
-    function drawBodygraphOnCtx(ctx, data, sc, ox, oy, activeGatesPersonality, activeGatesDesign, definedCenters) {
+    function drawBodygraphOnCtx(ctx, data, sc, ox, oy, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState = null) {
         const S = (p) => [p[0] * sc + ox, p[1] * sc + oy];
 
-        // Helper to draw a line segment
-        function strokeLine(pts, color, width) {
-            ctx.beginPath();
-            ctx.moveTo(pts[0][0], pts[0][1]);
-            for (let i = 1; i < pts.length; i++) {
-                ctx.lineTo(pts[i][0], pts[i][1]);
-            }
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
-            ctx.stroke();
+        const hoverType = hoverState ? hoverState.type : null;
+        const hoverTarget = hoverState ? hoverState.target : null;
+
+        function getQuarterNameForIdx(idx) {
+            if (idx >= 56 || idx <= 7) return "Инициация";
+            if (idx >= 8 && idx <= 23) return "Цивилизация";
+            if (idx >= 24 && idx <= 39) return "Дуальность";
+            if (idx >= 40 && idx <= 55) return "Мутация";
+            return "";
         }
 
-        function strokeHalf(pts, color, width, firstHalf) {
-            if (pts.length === 2) {
-                const mid = [(pts[0][0]+pts[1][0])/2, (pts[0][1]+pts[1][1])/2];
-                if (firstHalf) strokeLine([pts[0], mid], color, width);
-                else strokeLine([mid, pts[1]], color, width);
-            } else if (pts.length === 4) {
-                // Bent 34-20
-                if (firstHalf) strokeLine([pts[0], pts[1], pts[2]], color, width);
-                else strokeLine([pts[2], pts[3]], color, width);
+        const GATE_ORDER = [
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
+        ];
+
+        function getBodygraphOpacity(centerName, gateNum) {
+            if (!hoverType) return 1.0;
+            
+            if (hoverType === 'center') {
+                if (centerName && centerName === hoverTarget) return 1.0;
+                if (gateNum) {
+                    const centerGates = Object.keys(BG_CENTERS[hoverTarget].gates).map(Number);
+                    if (centerGates.includes(gateNum)) return 1.0;
+                }
+                return 0.15;
             }
+            
+            if (hoverType === 'gate') {
+                if (gateNum && gateNum === hoverTarget) return 1.0;
+                if (centerName) {
+                    const centerGates = Object.keys(BG_CENTERS[centerName].gates).map(Number);
+                    if (centerGates.includes(hoverTarget)) return 1.0;
+                }
+                return 0.15;
+            }
+            
+            if (hoverType === 'quarter') {
+                if (gateNum) {
+                    const q = getQuarterNameForIdx(hoverState.gateIdx);
+                    const gIdx = GATE_ORDER.indexOf(gateNum);
+                    if (gIdx !== -1 && getQuarterNameForIdx(gIdx) === q) return 1.0;
+                }
+                if (centerName) {
+                    const centerGates = Object.keys(BG_CENTERS[centerName].gates).map(Number);
+                    const q = getQuarterNameForIdx(hoverState.gateIdx);
+                    const hasGateInQuarter = centerGates.some(g => {
+                        const gIdx = GATE_ORDER.indexOf(g);
+                        return gIdx !== -1 && getQuarterNameForIdx(gIdx) === q;
+                    });
+                    if (hasGateInQuarter) return 1.0;
+                }
+                return 0.15;
+            }
+
+            if (hoverType === 'godhead') {
+                if (gateNum) {
+                    const ghIdx = Math.floor(hoverState.gateIdx / 4);
+                    const gIdx = GATE_ORDER.indexOf(gateNum);
+                    if (gIdx !== -1 && Math.floor(gIdx / 4) === ghIdx) return 1.0;
+                }
+                if (centerName) {
+                    const centerGates = Object.keys(BG_CENTERS[centerName].gates).map(Number);
+                    const ghIdx = Math.floor(hoverState.gateIdx / 4);
+                    const hasGateInGodhead = centerGates.some(g => {
+                        const gIdx = GATE_ORDER.indexOf(g);
+                        return gIdx !== -1 && Math.floor(gIdx / 4) === ghIdx;
+                    });
+                    if (hasGateInGodhead) return 1.0;
+                }
+                return 0.15;
+            }
+
+            return 1.0;
         }
 
         // ── Channels ──
@@ -2842,6 +2897,19 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (ch.type === 'bent_34_20') {
                 path = [S(pA), S([145, 235]), S([145, 425]), S(pB)];
             }
+
+            let op = 1.0;
+            if (hoverType) {
+                if (hoverType === 'center') {
+                    if (ch.centerA === hoverTarget || ch.centerB === hoverTarget) op = 1.0;
+                    else op = 0.15;
+                } else {
+                    op = Math.max(getBodygraphOpacity(ch.centerA, ch.gateA), getBodygraphOpacity(ch.centerB, ch.gateB));
+                }
+            }
+
+            ctx.save();
+            ctx.globalAlpha = op;
 
             // Draw background
             strokeLine(path, inactiveColor, bgWidth);
@@ -2870,6 +2938,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (aB_des) {
                 strokeHalf(path, designColor, fgWidth, false);
             }
+
+            ctx.restore();
         });
 
         // ── Center shapes ──
@@ -2880,18 +2950,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.entries(BG_CENTERS).forEach(([name, c]) => {
             const isDef = definedCenters.has(name);
-            const fill = isDef ? dFill : uFill;
-            const stroke = isDef ? dStroke : uStroke;
+            let fill = isDef ? dFill : uFill;
+            let stroke = isDef ? dStroke : uStroke;
+
+            let op = getBodygraphOpacity(name, null);
+
+            ctx.save();
+            ctx.globalAlpha = op;
+
+            if (hoverType === 'center' && name === hoverTarget) {
+                fill = isDef ? '#DFB135' : 'rgba(197,158,63,0.18)';
+                stroke = '#C59E3F';
+            }
 
             if (c.poly) {
                 const pts = c.poly.map(p => S(p));
                 drawPolygon(ctx, pts, fill, stroke);
             }
+            ctx.restore();
         });
 
         // ── Gate labels ──
-        const fontActive = `bold ${Math.max(Math.round(9*sc),5)}px Inter, sans-serif`;
-        const fontInactive = `${Math.max(Math.round(8*sc),4)}px Inter, sans-serif`;
+        const fontActive = `bold ${Math.max(Math.round(9*sc),5)}px DM Sans, sans-serif`;
+        const fontInactive = `${Math.max(Math.round(8*sc),4)}px DM Sans, sans-serif`;
 
         Object.entries(BG_CENTERS).forEach(([cName, c]) => {
             const isCDef = definedCenters.has(cName);
@@ -2900,6 +2981,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const aPers = activeGatesPersonality.has(g);
                 const aDes = activeGatesDesign.has(g);
                 const pt = S(pos);
+
+                let op = getBodygraphOpacity(cName, g);
+                ctx.save();
+                ctx.globalAlpha = op;
 
                 if (aPers || aDes) {
                     ctx.font = fontActive;
@@ -2915,12 +3000,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(g.toString(), pt[0], pt[1]);
+                ctx.restore();
             });
         });
 
         // ── Center labels ──
         const labelSz = Math.max(Math.round(9 * sc), 5);
-        ctx.font = `bold ${labelSz}px Inter, sans-serif`;
+        ctx.font = `bold ${labelSz}px DM Sans, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
@@ -2938,10 +3024,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         Object.entries(BG_CENTERS).forEach(([name, c]) => {
+            let op = getBodygraphOpacity(name, null);
+            ctx.save();
+            ctx.globalAlpha = op;
             ctx.fillStyle = definedCenters.has(name) ? 'rgba(255,255,255,0.9)' : 'rgba(197,158,63,0.5)';
             const off = labelOffsets[name] || [0,0];
             const pt = S([c.cx + off[0], c.cy + off[1]]);
             ctx.fillText(c.label, pt[0], pt[1]);
+            ctx.restore();
         });
     }
     /* ── Standalone Bodygraph renderer ── */
@@ -3125,14 +3215,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillText(pPers.symbol, xCenter, y);
 
                 const xText = xCenter - 35.85;
-                ctx.font = 'normal 13px Inter, sans-serif';
+                ctx.font = 'normal 13px DM Sans, sans-serif';
                 ctx.fillStyle = persColor;
                 ctx.fillText(hx.gate.toString(), xText - 6, y);
                 
-                ctx.font = 'normal 9px Inter, sans-serif';
+                ctx.font = 'normal 9px DM Sans, sans-serif';
                 ctx.fillText(hx.line.toString(), xText + 8, y - 4);
 
-                ctx.font = 'normal 10px Inter, sans-serif';
+                ctx.font = 'normal 10px DM Sans, sans-serif';
                 ctx.fillStyle = persBaseColor;
                 ctx.fillText(`${hx.color}.${hx.tone}.${hx.base}`, xText, y + 14);
 
@@ -3174,14 +3264,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillText(pDes.symbol, xCenter, y);
 
                 const xText = xCenter + 35.85;
-                ctx.font = 'normal 13px Inter, sans-serif';
+                ctx.font = 'normal 13px DM Sans, sans-serif';
                 ctx.fillStyle = desColor;
                 ctx.fillText(hx.gate.toString(), xText - 6, y);
                 
-                ctx.font = 'normal 9px Inter, sans-serif';
+                ctx.font = 'normal 9px DM Sans, sans-serif';
                 ctx.fillText(hx.line.toString(), xText + 8, y - 4);
 
-                ctx.font = 'normal 10px Inter, sans-serif';
+                ctx.font = 'normal 10px DM Sans, sans-serif';
                 ctx.fillStyle = desBaseColor;
                 ctx.fillText(`${hx.color}.${hx.tone}.${hx.base}`, xText, y + 14);
 
@@ -3253,7 +3343,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Mandala renderer (with bodygraph overlay inside) ── */
     /* ── Mandala renderer (with bodygraph overlay inside) ── */
-    function drawMandala(data, canvasEl) {
+    function drawMandala(data, canvasEl, hoverState = null) {
         if (!canvasEl) return;
         const ctx = canvasEl.getContext('2d');
 
@@ -3347,6 +3437,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Hover state helper variables
+        const hoverType = hoverState ? hoverState.type : null;
+        const hoverTarget = hoverState ? hoverState.target : null;
+
+        function getQuarterNameForIdx(idx) {
+            if (idx >= 56 || idx <= 7) return "Инициация";
+            if (idx >= 8 && idx <= 23) return "Цивилизация";
+            if (idx >= 24 && idx <= 39) return "Дуальность";
+            if (idx >= 40 && idx <= 55) return "Мутация";
+            return "";
+        }
+
+        function isGateHighlighted(gateNum, gateIdx) {
+            if (!hoverType) return true;
+            if (hoverType === 'gate') {
+                return gateNum === hoverTarget;
+            }
+            if (hoverType === 'center') {
+                const centerGates = Object.keys(BG_CENTERS[hoverTarget].gates).map(Number);
+                return centerGates.includes(gateNum);
+            }
+            if (hoverType === 'quarter') {
+                const qIdx = hoverState.gateIdx;
+                return getQuarterNameForIdx(qIdx) === getQuarterNameForIdx(gateIdx);
+            }
+            if (hoverType === 'godhead') {
+                const ghIdx = Math.floor(hoverState.gateIdx / 4);
+                return ghIdx === Math.floor(gateIdx / 4);
+            }
+            return true;
+        }
+
         // Helper function for rotated labels that corrects for upside-down reading
         function drawRotatedText(text, r, angle, font, color) {
             ctx.save();
@@ -3383,16 +3505,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 endAng += Math.PI * 2;
             }
 
+            const isHovered = (hoverType === 'quarter' && q.name === hoverTarget);
+            const isAnyHovered = (hoverType === 'quarter');
+
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, rQuartersOuter, startAng, endAng);
             ctx.closePath();
-            ctx.fillStyle = q.fill;
+            
+            if (isHovered) {
+                ctx.fillStyle = q.fill.replace('0.04', '0.12');
+            } else if (isAnyHovered) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.01)';
+            } else {
+                ctx.fillStyle = q.fill;
+            }
             ctx.fill();
 
             // Label
             let midAng = (startAng + endAng) / 2;
-            drawRotatedText(q.name, (rQuartersOuter + rQuartersInner) / 2, midAng, 'bold 10px Inter, sans-serif', q.color);
+            let labelColor = q.color;
+            let labelFont = 'bold 10px DM Sans, sans-serif';
+            if (isHovered) {
+                labelFont = 'bold 12px DM Sans, sans-serif';
+            } else if (isAnyHovered) {
+                labelColor = 'rgba(150, 150, 150, 0.2)';
+            }
+            drawRotatedText(q.name, (rQuartersOuter + rQuartersInner) / 2, midAng, labelFont, labelColor);
         });
 
         // 2. Godheads drawing (16 deities)
@@ -3409,15 +3548,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const endAng = degToRad(WHEEL_START + (startIdx + 4) * GATE_INTERVAL - 90);
             const midAng = (startAng + endAng) / 2;
 
+            const isHovered = (hoverType === 'godhead' && name === hoverTarget);
+            const isAnyHovered = (hoverType === 'godhead');
+
             // Draw clean radial dividers between Godheads
             ctx.beginPath();
             ctx.moveTo(cx + rGodheadsInner * Math.cos(startAng), cy + rGodheadsInner * Math.sin(startAng));
             ctx.lineTo(cx + rGodheadsOuter * Math.cos(startAng), cy + rGodheadsOuter * Math.sin(startAng));
-            ctx.strokeStyle = 'rgba(197,158,63,0.15)';
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = isHovered ? '#C59E3F' : 'rgba(197,158,63,0.15)';
+            ctx.lineWidth = isHovered ? 1.5 : 0.8;
             ctx.stroke();
 
-            drawRotatedText(name, (rGodheadsOuter + rGodheadsInner) / 2, midAng, '8px Inter, sans-serif', '#5C5446');
+            let font = '8px DM Sans, sans-serif';
+            let color = '#5C5446';
+            if (isHovered) {
+                font = 'bold 9px DM Sans, sans-serif';
+                color = '#C59E3F';
+                // Draw a highlight arc behind the text
+                ctx.beginPath();
+                ctx.arc(cx, cy, (rGodheadsOuter + rGodheadsInner) / 2, startAng, endAng);
+                ctx.strokeStyle = 'rgba(197,158,63,0.1)';
+                ctx.lineWidth = rGodheadsOuter - rGodheadsInner;
+                ctx.stroke();
+            } else if (isAnyHovered) {
+                color = 'rgba(150, 150, 150, 0.2)';
+            }
+
+            drawRotatedText(name, (rGodheadsOuter + rGodheadsInner) / 2, midAng, font, color);
         }
 
         // 3. Hexagrams and Gates rings rendering
@@ -3438,6 +3595,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const isDesActive = activeGatesDesign.has(gateNum);
             const isCombinedActive = activeGatesCombined.has(gateNum);
 
+            const isHighlighted = isGateHighlighted(gateNum, i);
+            const isAnyHovered = (hoverType !== null);
+
             const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
             const startAngle = degToRad(startLon - 90);
             const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
@@ -3450,12 +3610,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle);
                 ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
                 ctx.closePath();
+
+                let opacityScale = 1.0;
+                if (isAnyHovered && !isHighlighted) opacityScale = 0.15;
+
                 if (isPersActive && isDesActive) {
-                    ctx.fillStyle = 'rgba(197,158,63,0.18)';
+                    ctx.fillStyle = `rgba(197,158,63,${0.18 * opacityScale})`;
                 } else if (isDesActive) {
-                    ctx.fillStyle = 'rgba(255,96,96,0.14)';
+                    ctx.fillStyle = `rgba(255,96,96,${0.14 * opacityScale})`;
                 } else {
-                    ctx.fillStyle = 'rgba(197,158,63,0.12)';
+                    ctx.fillStyle = `rgba(197,158,63,${0.12 * opacityScale})`;
                 }
                 ctx.fill();
             }
@@ -3464,15 +3628,36 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath();
             ctx.moveTo(cx + rGatesInner * Math.cos(startAngle), cy + rGatesInner * Math.sin(startAngle));
             ctx.lineTo(cx + rGatesOuter * Math.cos(startAngle), cy + rGatesOuter * Math.sin(startAngle));
-            ctx.strokeStyle = isCombinedActive ? 'rgba(197,158,63,0.45)' : 'rgba(197,158,63,0.12)';
-            ctx.lineWidth = isCombinedActive ? 1.0 : 0.6;
+            
+            let strokeColor = isCombinedActive ? 'rgba(197,158,63,0.45)' : 'rgba(197,158,63,0.12)';
+            if (isAnyHovered) {
+                if (isHighlighted) {
+                    strokeColor = '#C59E3F';
+                } else {
+                    strokeColor = 'rgba(197,158,63,0.03)';
+                }
+            }
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
             ctx.stroke();
 
             // Draw Gate Number
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
             const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
-            ctx.font = isCombinedActive ? 'bold 9px Inter, sans-serif' : '8px Inter, sans-serif';
-            ctx.fillStyle = isPersActive ? '#C59E3F' : (isDesActive ? 'rgb(255,96,96)' : '#777166');
+            
+            let font = isCombinedActive ? 'bold 9px DM Sans, sans-serif' : '8px DM Sans, sans-serif';
+            let fillStyle = isPersActive ? '#C59E3F' : (isDesActive ? 'rgb(255,96,96)' : '#777166');
+            
+            if (isAnyHovered) {
+                if (isHighlighted) {
+                    font = 'bold 11px DM Sans, sans-serif';
+                } else {
+                    fillStyle = 'rgba(120, 120, 120, 0.15)';
+                }
+            }
+
+            ctx.font = font;
+            ctx.fillStyle = fillStyle;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(gateNum.toString(), lx, ly);
@@ -3488,7 +3673,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lineType = lineStr[j]; // '1' = Yang, '0' = Yin
                 const r = rHexagramsInner + 3.5 + j * 3.2;
 
-                ctx.strokeStyle = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+                let strokeStyle = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        strokeStyle = isPersActive ? '#000000' : (isDesActive ? 'rgb(255,96,96)' : '#C59E3F');
+                    } else {
+                        strokeStyle = 'rgba(120, 120, 120, 0.1)';
+                    }
+                }
+                ctx.strokeStyle = strokeStyle;
 
                 ctx.beginPath();
                 if (lineType === '1') {
@@ -3505,23 +3698,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 4. Zodiac Ring and Ticks
+        const hoveredSignIdx = (hoverType === 'gate') 
+            ? Math.floor(((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL) % 360) / 30) % 12
+            : -1;
+
         for (let i = 0; i < 12; i++) {
             const startAngle = degToRad(i * 30 - 90);
             const endAngle = degToRad((i + 1) * 30 - 90);
+            const isAnyHovered = (hoverType !== null);
+            const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx) : true;
 
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
             ctx.closePath();
-            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.03);
+            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], isAnyHovered ? (isHighlightedSign ? 0.03 : 0.005) : 0.03);
             ctx.fill();
 
             // Label
             const midAngle = startAngle + degToRad(15);
             const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
             const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
-            ctx.font = 'bold 12px Inter, sans-serif';
-            ctx.fillStyle = ZODIAC_COLORS[i];
+            ctx.font = 'bold 12px DM Sans, sans-serif';
+            ctx.fillStyle = isAnyHovered ? (isHighlightedSign ? ZODIAC_COLORS[i] : 'rgba(150,150,150,0.15)') : ZODIAC_COLORS[i];
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(ZODIAC_META[i].sym, gx, gy);
@@ -3592,6 +3791,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const activations = activationsByGate[gateNum];
             if (!activations || activations.length === 0) continue;
 
+            const isHighlighted = isGateHighlighted(gateNum, i);
+            const isAnyHovered = (hoverType !== null);
+
             const midAngle = degToRad((WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2 - 90) % 360);
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
@@ -3603,8 +3805,17 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const isP = activations.some(a => a.type === 'personality');
             const isD = activations.some(a => a.type === 'design');
-            ctx.strokeStyle = (isP && isD) ? 'rgba(197,158,63,0.35)' : (isD ? 'rgba(255,96,96,0.3)' : 'rgba(46,42,32,0.25)');
-            ctx.lineWidth = 0.8;
+            
+            let rayStrokeStyle = (isP && isD) ? 'rgba(197,158,63,0.35)' : (isD ? 'rgba(255,96,96,0.3)' : 'rgba(46,42,32,0.25)');
+            if (isAnyHovered) {
+                if (isHighlighted) {
+                    rayStrokeStyle = (isP && isD) ? 'rgba(197,158,63,0.85)' : (isD ? 'rgba(255,96,96,0.85)' : 'rgba(46,42,32,0.85)');
+                } else {
+                    rayStrokeStyle = 'rgba(150, 150, 150, 0.03)';
+                }
+            }
+            ctx.strokeStyle = rayStrokeStyle;
+            ctx.lineWidth = isAnyHovered && isHighlighted ? 1.5 : 0.8;
             ctx.stroke();
 
             // Draw stacked planet symbols
@@ -3613,9 +3824,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ax = cx + rAct * cos;
                 const ay = cy + rAct * sin;
 
+                let planetColor = act.color;
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        planetColor = act.color;
+                    } else {
+                        planetColor = 'rgba(150, 150, 150, 0.1)';
+                    }
+                }
+
                 // Draw planet glyph symbol
-                ctx.font = '12px Inter, sans-serif';
-                ctx.fillStyle = act.color;
+                ctx.font = isAnyHovered && isHighlighted ? 'bold 13px DM Sans, sans-serif' : '12px DM Sans, sans-serif';
+                ctx.fillStyle = planetColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(act.symbol, ax, ay);
@@ -3624,8 +3844,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const subAngle = midAngle + 0.024;
                 const sx = cx + rAct * Math.cos(subAngle);
                 const sy = cy + rAct * Math.sin(subAngle);
-                ctx.font = 'bold 7px Inter, sans-serif';
-                ctx.fillStyle = act.type === 'design' ? 'rgba(255,96,96,0.95)' : 'rgba(140,110,40,0.95)';
+                ctx.font = 'bold 7px DM Sans, sans-serif';
+                
+                let lineCol = act.type === 'design' ? 'rgba(255,96,96,0.95)' : 'rgba(140,110,40,0.95)';
+                if (isAnyHovered && !isHighlighted) {
+                    lineCol = 'rgba(150, 150, 150, 0.1)';
+                }
+                ctx.fillStyle = lineCol;
                 ctx.fillText(act.line.toString(), sx, sy);
             });
         }
@@ -3656,7 +3881,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
 
-        drawBodygraphOnCtx(ctx, data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters);
+        drawBodygraphOnCtx(ctx, data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState);
 
         ctx.restore();
     }
@@ -4474,6 +4699,319 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         initBodygraphInteractivity();
+
+        // ── Mandala Canvas Interactivity (Hover effects & tooltips) ──
+        function initMandalaInteractivity() {
+            const canvasEl = document.getElementById('mandala-canvas');
+            if (!canvasEl) return;
+            
+            let mandalaHoverState = { type: null, target: null, mx: 0, my: 0, cx: 0, cy: 0, gateIdx: -1 };
+            
+            // Point-in-polygon helper
+            function isPointInPoly(pt, poly) {
+                const x = pt[0], y = pt[1];
+                let inside = false;
+                for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+                    const xi = poly[i][0], yi = poly[i][1];
+                    const xj = poly[j][0], yj = poly[j][1];
+                    const intersect = ((yi > y) !== (yj > y))
+                        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            // Get quarter name based on gate index
+            function getQuarterNameForIdx(idx) {
+                if (idx >= 56 || idx <= 7) return "Инициация";
+                if (idx >= 8 && idx <= 23) return "Цивилизация";
+                if (idx >= 24 && idx <= 39) return "Дуальность";
+                if (idx >= 40 && idx <= 55) return "Мутация";
+                return "";
+            }
+
+            const GODHEADS = [
+                "Михаил", "Янус", "Майя", "Лакшми", 
+                "Парвати", "Маат", "Тот", "Гармония", 
+                "Христос", "Минерва", "Аид", "Прометей", 
+                "Вишну", "Хранители Колеса", "Кали", "Митра"
+            ];
+
+            const GATE_ORDER = [
+                25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                 8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                 1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                37, 63, 22, 36
+            ];
+            
+            const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+            const GATE_INTERVAL = 5.625;
+
+            // Tooltip elements
+            let gateTooltip = document.getElementById('bg-gate-tt');
+            let centerTooltip = document.getElementById('bg-center-tt');
+
+            canvasEl.addEventListener('mousemove', (e) => {
+                if (!lastChart) return;
+                
+                const rect = canvasEl.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+                
+                // Current display width of the canvas
+                const displayW = rect.width;
+                const cx = displayW / 2;
+                const cy = displayW / 2;
+                const R = displayW / 2 - 8;
+                
+                const rQuartersOuter = R;
+                const rQuartersInner = R * 0.94;
+                const rGodheadsOuter = rQuartersInner;
+                const rGodheadsInner = R * 0.88;
+                const rZodiacInner = R * 0.68;
+                const rInnerBorder = rZodiacInner;
+
+                const dx = mx - cx;
+                const dy = my - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                let type = null;
+                let target = null;
+                let gateIdx = -1;
+
+                if (dist < rInnerBorder) {
+                    // Inside bodygraph
+                    const bgScale = (rInnerBorder * 2 * 0.88) / 650; // BG_H = 650
+                    const bgOffX = cx - (400 * bgScale) / 2;       // BG_W = 400
+                    const bgOffY = cy - (650 * bgScale) / 2;
+                    const lx = (mx - bgOffX) / bgScale;
+                    const ly = (my - bgOffY) / bgScale;
+                    
+                    for (const [name, c] of Object.entries(BG_CENTERS)) {
+                        if (c.poly && isPointInPoly([lx, ly], c.poly)) {
+                            type = 'center';
+                            target = name;
+                            break;
+                        }
+                    }
+                } else if (dist <= R) {
+                    // On the wheel
+                    let angle = Math.atan2(dy, dx);
+                    let deg = angle * (180 / Math.PI) + 90;
+                    if (deg < 0) deg += 360;
+                    let offset = (deg - WHEEL_START) % 360;
+                    if (offset < 0) offset += 360;
+                    gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
+                    const gateNum = GATE_ORDER[gateIdx];
+
+                    if (dist >= rQuartersInner && dist <= R) {
+                        type = 'quarter';
+                        target = getQuarterNameForIdx(gateIdx);
+                    } else if (dist >= rGodheadsInner && dist < rQuartersInner) {
+                        type = 'godhead';
+                        target = GODHEADS[Math.floor(gateIdx / 4) % 16];
+                    } else {
+                        type = 'gate';
+                        target = gateNum;
+                    }
+                }
+
+                const changed = (type !== mandalaHoverState.type || target !== mandalaHoverState.target);
+                
+                mandalaHoverState = { type, target, mx, my, cx: e.clientX, cy: e.clientY, gateIdx };
+
+                if (changed) {
+                    drawMandala(lastChart, canvasEl, mandalaHoverState);
+                    updateTooltip();
+                } else if (type) {
+                    // Just update tooltip position
+                    if (type === 'center') {
+                        if (centerTooltip) positionEl(centerTooltip, e.clientX, e.clientY);
+                    } else {
+                        if (gateTooltip) positionEl(gateTooltip, e.clientX, e.clientY);
+                    }
+                }
+            });
+
+            canvasEl.addEventListener('mouseleave', () => {
+                if (!lastChart) return;
+                if (mandalaHoverState.type) {
+                    mandalaHoverState = { type: null, target: null, mx: 0, my: 0, cx: 0, cy: 0, gateIdx: -1 };
+                    drawMandala(lastChart, canvasEl, mandalaHoverState);
+                    if (gateTooltip) gateTooltip.classList.remove('visible');
+                    if (centerTooltip) centerTooltip.classList.remove('visible');
+                }
+            });
+
+            function positionEl(el, x, y) {
+                const margin = 12;
+                const w = el.offsetWidth  || 200;
+                const h = el.offsetHeight || 80;
+                let tx = x + 16;
+                let ty = y - 8;
+                if (tx + w + margin > window.innerWidth)   tx = x - w - 16;
+                if (ty + h + margin > window.innerHeight)  ty = y - h - 8;
+                if (ty < margin) ty = margin;
+                if (tx < margin) tx = margin;
+                el.style.left = tx + 'px';
+                el.style.top  = ty + 'px';
+            }
+
+            // Russian names of centers and info for tooltips
+            const CENTER_META = {
+                'Head': { name: 'Голова', subtitle: 'Центр вдохновения и сомнения' },
+                'Ajna': { name: 'Аджна', subtitle: 'Центр ума и концептуализации' },
+                'Throat': { name: 'Горло', subtitle: 'Центр коммуникации и манифестации' },
+                'G-Center': { name: 'G-Центр', subtitle: 'Центр любви, направления и самоидентификации' },
+                'Heart': { name: 'Сердце / Эго', subtitle: 'Центр воли и материального мира' },
+                'Spleen': { name: 'Селезёнка', subtitle: 'Центр интуиции, инстинкта и здоровья' },
+                'Sacral': { name: 'Сакральный', subtitle: 'Центр жизненной силы и работоспособности' },
+                'SolarPlexus': { name: 'Эмоциональный центр', subtitle: 'Центр чувств и эмоциональной ясности' },
+                'Root': { name: 'Корень', subtitle: 'Центр давления и стрессоустойчивости' }
+            };
+
+            const GATE_NAMES = {
+                1:'Самовыражение',       2:'Направление Я',        3:'Упорядочивание',
+                4:'Формулирование',      5:'Фиксированные ритмы',  6:'Трение',
+                7:'Роль Я в Социуме',   8:'Вклад',                9:'Сосредоточенность',
+                10:'Поведение Я',       11:'Идеи',                12:'Осторожность',
+                13:'Слушатель',         14:'Мощная Сила',         15:'Крайности',
+                16:'Энтузиазм',         17:'Мнения',              18:'Исправление',
+                19:'Хотение',           20:'Созерцание',          21:'Охотник',
+                22:'Изящество',         23:'Ассимиляция',         24:'Рационализация',
+                25:'Дух Я',             26:'Эгоист',              27:'Забота',
+                28:'Игрок',             29:'Да',                  30:'Огни Судьбы',
+                31:'Влияние',           32:'Непрерывность',       33:'Укрытие',
+                34:'Сила',              35:'Прогресс',            36:'Сумерки',
+                37:'Дружба',            38:'Оппозиция',           39:'Провокация',
+                40:'Одиночество',       41:'Убывание',            42:'Рост',
+                43:'Прозрение',         44:'Бдительность',        45:'Собиратель',
+                46:'Удача Я',           47:'Угнетение',           48:'Глубина',
+                49:'Принципы',          50:'Ценности',            51:'Потрясение',
+                52:'Неподвижность',     53:'Начало',              54:'Честолюбие',
+                55:'Дух',               56:'Рассказчик',          57:'Интуиция',
+                58:'Жизнеспособность',  59:'Сексуальность',       60:'Ограничение',
+                61:'Тайное Знание',     62:'Детали',              63:'Сомнение',
+                64:'Смятение'
+            };
+
+            function updateTooltip() {
+                if (!gateTooltip || !centerTooltip) return;
+                
+                const { type, target, cx, cy, gateIdx } = mandalaHoverState;
+                
+                // Hide all first
+                gateTooltip.classList.remove('visible');
+                centerTooltip.classList.remove('visible');
+
+                if (!type) return;
+
+                if (type === 'center') {
+                    const info = CENTER_META[target];
+                    if (!info) return;
+
+                    // Determine if defined
+                    const activeGatesPersonality = new Set(lastChart.planets.filter(p => p.hexagram && (!activePlanets || activePlanets.has(p.name))).map(p => p.hexagram.gate));
+                    const activeGatesDesign = new Set((lastChart.design_planets || []).filter(p => p.hexagram && (!activePlanets || activePlanets.has(p.name))).map(p => p.hexagram.gate));
+                    const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
+                    
+                    const definedCenters = new Set();
+                    CHANNELS_DATA.forEach(ch => {
+                        if (activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB)) {
+                            definedCenters.add(ch.centerA);
+                            definedCenters.add(ch.centerB);
+                        }
+                    });
+
+                    const isDefined = definedCenters.has(target);
+                    const statusCls = isDefined ? 'defined' : 'undefined';
+                    const statusText = isDefined ? '● Определён' : '○ Не определён';
+
+                    centerTooltip.innerHTML = `
+                        <span class="tt-center-name">${info.name}</span>
+                        ${info.subtitle ? `<span class="tt-center-subtitle">${info.subtitle}</span>` : ''}
+                        <span class="tt-center-status ${statusCls}">${statusText}</span>
+                    `;
+                    centerTooltip.style.left = '-9999px';
+                    centerTooltip.style.top  = '-9999px';
+                    centerTooltip.classList.add('visible');
+                    requestAnimationFrame(() => positionEl(centerTooltip, cx, cy));
+                } else if (type === 'gate') {
+                    const gateNum = target;
+                    const name = GATE_NAMES[gateNum] || '';
+                    
+                    // Collect activations
+                    const act = { design: [], personality: [] };
+                    lastChart.planets.forEach(p => {
+                        if (p.hexagram && p.hexagram.gate === gateNum && (!activePlanets || activePlanets.has(p.name))) {
+                            act.personality.push(p.displayName || p.name);
+                        }
+                    });
+                    (lastChart.design_planets || []).forEach(p => {
+                        if (p.hexagram && p.hexagram.gate === gateNum && (!activePlanets || activePlanets.has(p.name))) {
+                            act.design.push(p.displayName || p.name);
+                        }
+                    });
+
+                    const hasDes = act.design.length > 0;
+                    const hasPer = act.personality.length > 0;
+                    const typeLabel = hasDes && hasPer ? 'Дизайн + Личность'
+                                    : hasDes           ? 'Бессознательное'
+                                    : hasPer           ? 'Сознательное'
+                                    :                    'Не активировано';
+
+                    let rows = '';
+                    if (hasDes && hasPer) {
+                        const uniq = [...new Set([...act.design, ...act.personality])];
+                        rows = uniq.map(p =>
+                            `<div class="tt-planet-row"><div class="tt-dot-both"></div><span>${p}</span></div>`
+                        ).join('');
+                    } else if (hasDes) {
+                        rows = act.design.map(p =>
+                            `<div class="tt-planet-row"><div class="tt-dot-design"></div><span>${p}</span></div>`
+                        ).join('');
+                    } else if (hasPer) {
+                        rows = act.personality.map(p =>
+                            `<div class="tt-planet-row"><div class="tt-dot-personality"></div><span>${p}</span></div>`
+                        ).join('');
+                    }
+
+                    gateTooltip.innerHTML = `
+                        <span class="tt-gate-num">Ворота ${gateNum}</span>
+                        ${name ? `<span class="tt-gate-name">${name}</span>` : ''}
+                        <div style="font-size:10px;color:rgba(200,180,130,0.65);margin-bottom:${rows?'5px':'0'}">${typeLabel}</div>
+                        ${rows ? `<div class="tt-planets">${rows}</div>` : ''}
+                    `;
+                    gateTooltip.style.left = '-9999px';
+                    gateTooltip.style.top  = '-9999px';
+                    gateTooltip.classList.add('visible');
+                    requestAnimationFrame(() => positionEl(gateTooltip, cx, cy));
+                } else if (type === 'quarter') {
+                    centerTooltip.innerHTML = `
+                        <span class="tt-center-name">Четверть: ${target}</span>
+                        <span class="tt-center-subtitle" style="margin-bottom:0;">Сектор из 16 ворот на внешнем колесе.</span>
+                    `;
+                    centerTooltip.style.left = '-9999px';
+                    centerTooltip.style.top  = '-9999px';
+                    centerTooltip.classList.add('visible');
+                    requestAnimationFrame(() => positionEl(centerTooltip, cx, cy));
+                } else if (type === 'godhead') {
+                    centerTooltip.innerHTML = `
+                        <span class="tt-center-name">Божество: ${target}</span>
+                        <span class="tt-center-subtitle" style="margin-bottom:0;">Сектор из 4 ворот под влиянием этого архетипа.</span>
+                    `;
+                    centerTooltip.style.left = '-9999px';
+                    centerTooltip.style.top  = '-9999px';
+                    centerTooltip.classList.add('visible');
+                    requestAnimationFrame(() => positionEl(centerTooltip, cx, cy));
+                }
+            }
+        }
+
+        initMandalaInteractivity();
     }
 
 });

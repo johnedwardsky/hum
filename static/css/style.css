@@ -1378,7 +1378,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
         padding: 0 !important;
         background: #FAF8F5 !important;
         color: #2E2A20 !important;
-        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-family: 'DM Sans', -apple-system, sans-serif !important;
         font-size: 10pt !important;
         line-height: 1.4 !important;
         -webkit-print-color-adjust: exact !important;
@@ -1391,7 +1391,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
         width: 100% !important;
         background: #FAF8F5 !important;
         color: #2E2A20 !important;
-        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-family: 'DM Sans', -apple-system, sans-serif !important;
         font-size: 10pt !important;
         line-height: 1.4 !important;
         -webkit-print-color-adjust: exact !important;
@@ -1419,7 +1419,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     }
 
     .print-brand-title {
-        font-family: 'Outfit', 'Inter', sans-serif !important;
+        font-family: 'Outfit', 'DM Sans', sans-serif !important;
         font-size: 18pt !important;
         font-weight: 700 !important;
         color: #5E52B0 !important; /* Mockup brand accent */
@@ -2585,7 +2585,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 ═══════════════════════════════════════════════════════ */
 .bg-layout {
     display: grid;
-    grid-template-columns: 160px 1fr 160px;
+    grid-template-columns: 170px 1fr 170px;
     gap: 0 12px;
     align-items: start;
     width: 100%;
