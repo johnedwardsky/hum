@@ -3395,7 +3395,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Mandala renderer (with bodygraph overlay inside) ── */
-    /* ── Mandala renderer (with bodygraph overlay inside) ── */
     function drawMandala(data, canvasEl, hoverState = null) {
         if (!canvasEl) return;
         const ctx = canvasEl.getContext('2d');
@@ -3523,8 +3522,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Draw Incarnation Cross — exact axes through center ──────────────────────
         // Drawn at exact planet longitudes.
-        // Default: very faint (almost invisible). Hovering on any of the 4 cross gates activates it.
-        function drawCrossAxisExact(sunLon, earthLon, strokeColorDefault, strokeColorHover, lineWDefault, lineWHover) {
+        // Default: moderately visible. Hovering on any of the 4 cross gates highlights them.
+        // Thickness remains constant (does not increase), shadow blur is removed.
+        function drawCrossAxisExact(sunLon, earthLon, strokeColorDefault, strokeColorHover, lineW) {
             if (sunLon === null || earthLon === null) return;
 
             const isHovered = (hoverType === 'gate' && (
@@ -3539,27 +3539,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const rLine = rQuartersOuter + 28; // slightly beyond outer rim
             
-            ctx.save();
-            if (isHovered) {
-                ctx.shadowColor = strokeColorHover;
-                ctx.shadowBlur = 12;
-            }
-            
             ctx.beginPath();
             ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
             ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
             ctx.strokeStyle = isHovered ? strokeColorHover : strokeColorDefault;
-            ctx.lineWidth   = isHovered ? lineWHover : lineWDefault;
+            ctx.lineWidth   = lineW;
             ctx.lineCap     = 'round';
             ctx.setLineDash([]);
             ctx.stroke();
-            ctx.restore();
         }
 
         // Personality axis (black/charcoal)
-        drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.70)', 3.5, 6.5);
+        drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.88)', 3.2);
         // Design axis (red)
-        drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.70)', 3.5, 6.5);
+        drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.88)', 3.2);
 
 
 
@@ -3575,6 +3568,22 @@ document.addEventListener('DOMContentLoaded', () => {
         function isGateHighlighted(gateNum, gateIdx) {
             if (!hoverType) return true;
             if (hoverType === 'gate') {
+                // If hovering over one of the incarnation cross gates,
+                // keep all 4 cross gates highlighted (Personality & Design Sun/Earth)
+                const isCrossHovered = (
+                    hoverTarget === pSunGate || 
+                    hoverTarget === pEarthGate || 
+                    hoverTarget === dSunGate || 
+                    hoverTarget === dEarthGate
+                );
+                if (isCrossHovered) {
+                    return (
+                        gateNum === pSunGate || 
+                        gateNum === pEarthGate || 
+                        gateNum === dSunGate || 
+                        gateNum === dEarthGate
+                    );
+                }
                 return gateNum === hoverTarget;
             }
             if (hoverType === 'center') {
