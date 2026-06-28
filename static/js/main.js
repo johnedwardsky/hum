@@ -3693,6 +3693,24 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
             ctx.stroke();
 
+            // 6 slots per gate (5 internal ticks)
+            const tickSpacing = GATE_INTERVAL / 6;
+            ctx.beginPath();
+            for (let t = 1; t <= 5; t++) {
+                const tickLon = startLon + t * tickSpacing;
+                const tickAngle = degToRad(tickLon - 180);
+                const tickLen = 4;
+                ctx.moveTo(cx + rGatesOuter * Math.cos(tickAngle), cy + rGatesOuter * Math.sin(tickAngle));
+                ctx.lineTo(cx + (rGatesOuter - tickLen) * Math.cos(tickAngle), cy + (rGatesOuter - tickLen) * Math.sin(tickAngle));
+            }
+            let tickStrokeColor = 'rgba(197,158,63,0.15)';
+            if (isAnyHovered) {
+                tickStrokeColor = isHighlighted ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.03)';
+            }
+            ctx.strokeStyle = tickStrokeColor;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+
             // Draw Gate Number
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
             const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
@@ -3778,37 +3796,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillText(ZODIAC_META[i].sym, gx, gy);
         }
 
-        // Ticks around the Zodiac Outer Border
-        for (let deg = 0; deg < 360; deg++) {
-            const rad = degToRad(deg - 180);
-            const cos = Math.cos(rad);
-            const sin = Math.sin(rad);
-            
-            let tickLen = 0;
-            let strokeStyle = 'rgba(197,158,63,0.15)';
-            let lineWidth = 0.5;
-            
-            if (deg % 30 === 0) {
-                tickLen = rZodiacOuter - rZodiacInner; // Full sector dividing line
-                strokeStyle = 'rgba(197,158,63,0.4)';
-                lineWidth = 1;
-            } else if (deg % 5 === 0) {
-                tickLen = 6;
-                strokeStyle = 'rgba(197,158,63,0.25)';
-                lineWidth = 0.8;
-            } else {
-                tickLen = 3;
-                strokeStyle = 'rgba(197,158,63,0.15)';
-                lineWidth = 0.5;
-            }
-            
-            ctx.beginPath();
-            ctx.moveTo(cx + rZodiacOuter * cos, cy + rZodiacOuter * sin);
-            ctx.lineTo(cx + (rZodiacOuter - tickLen) * cos, cy + (rZodiacOuter - tickLen) * sin);
-            ctx.strokeStyle = strokeStyle;
-            ctx.lineWidth = lineWidth;
-            ctx.stroke();
-        }
+        // Ticks around the Zodiac Outer Border removed as requested
 
         // 5. Draw concentric circle dividing lines
         const concentricBorders = [
