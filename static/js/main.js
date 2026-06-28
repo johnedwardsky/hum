@@ -4834,6 +4834,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 : hasPer           ? 'Сознательное'
                                 :                    'Не активировано';
 
+                let gateCenterName = '';
+                for (const [cName, c] of Object.entries(BG_CENTERS)) {
+                    if (Object.keys(c.gates).map(Number).includes(gateNum)) {
+                        const ruNames = {
+                            'Head': 'Теменной центр',
+                            'Ajna': 'Аджна центр',
+                            'Throat': 'Горловой центр',
+                            'G-Center': 'Джи центр',
+                            'Heart': 'Эго центр (Сердце)',
+                            'Spleen': 'Селезёночный центр',
+                            'Sacral': 'Сакральный центр',
+                            'SolarPlexus': 'Солнечное Сплетение',
+                            'Root': 'Корневой центр'
+                        };
+                        gateCenterName = ruNames[cName] || cName;
+                        break;
+                    }
+                }
+
                 let rows = '';
                 if (hasDes && hasPer) {
                     const uniq = [...new Set([...act.design, ...act.personality])];
@@ -4853,6 +4872,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gateTooltip.innerHTML = `
                     <span class="tt-gate-num">Ворота ${gateNum}</span>
                     ${name ? `<span class="tt-gate-name">${name}</span>` : ''}
+                    ${gateCenterName ? `<div style="font-size:11px;color:#E5C87A;margin-top:2px;margin-bottom:4px;font-weight:500;">${gateCenterName}</div>` : ''}
                     <div style="font-size:10px;color:rgba(200,180,130,0.65);margin-bottom:${rows?'5px':'0'}">${typeLabel}</div>
                     ${rows ? `<div class="tt-planets">${rows}</div>` : ''}
                 `;
