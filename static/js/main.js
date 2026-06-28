@@ -3975,16 +3975,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fill();
 
         // 8.5 Draw the Incarnation Cross lines (Sun-Earth axes)
-        let pSunGate = null, pEarthGate = null;
-        let dSunGate = null, dEarthGate = null;
-        data.planets.forEach(p => {
-            if (p.name === 'Sun') pSunGate = p.hexagram?.gate;
-            if (p.name === 'Earth') pEarthGate = p.hexagram?.gate;
-        });
-        designPlanetsList.forEach(p => {
-            if (p.name === 'Sun') dSunGate = p.hexagram?.gate;
-            if (p.name === 'Earth') dEarthGate = p.hexagram?.gate;
-        });
 
         // Personality Sun-Earth Axis (Black/Dark gold)
         if (pSunGate !== null && pEarthGate !== null) {
