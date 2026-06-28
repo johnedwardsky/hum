@@ -3982,44 +3982,52 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fill();
 
         // 8.5 Draw the Incarnation Cross lines (Sun-Earth axes)
+        // Each axis runs from the Sun gate on the outer rim → through center → to the Earth gate
 
-        // Personality Sun-Earth Axis (Black/Dark gold)
+        function drawCrossAxis(gSun, gEarth, lineColor, dotColor) {
+            const idxSun   = GATE_ORDER.indexOf(gSun);
+            const idxEarth = GATE_ORDER.indexOf(gEarth);
+            if (idxSun === -1 || idxEarth === -1) return;
+
+            const aSun   = degToRad((WHEEL_START + idxSun   * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+            const aEarth = degToRad((WHEEL_START + idxEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+
+            // Draw full line: from Sun gate outer edge → through center → to Earth gate outer edge
+            const rLine = rQuartersOuter; // reach the outer rim
+            ctx.beginPath();
+            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
+            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth   = 1.8;
+            ctx.setLineDash([]);
+            ctx.stroke();
+
+            // Small glow dot at Sun gate position (mid of gate band)
+            const rDot = (rGatesOuter + rGatesInner) / 2;
+            [[aSun, '☉'], [aEarth, '⊕']].forEach(([ang]) => {
+                ctx.beginPath();
+                ctx.arc(cx + rDot * Math.cos(ang), cy + rDot * Math.sin(ang), 4, 0, Math.PI * 2);
+                ctx.fillStyle = dotColor;
+                ctx.fill();
+            });
+        }
+
+        // Personality axis: black Sun (☉) / black Earth (⊕)
         if (pSunGate !== null && pEarthGate !== null) {
-            const idxSun = GATE_ORDER.indexOf(pSunGate);
-            const idxEarth = GATE_ORDER.indexOf(pEarthGate);
-            if (idxSun !== -1 && idxEarth !== -1) {
-                const aSun = degToRad((WHEEL_START + idxSun * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-                const aEarth = degToRad((WHEEL_START + idxEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-                ctx.beginPath();
-                ctx.moveTo(cx + rGatesInner * Math.cos(aSun), cy + rGatesInner * Math.sin(aSun));
-                ctx.lineTo(cx + rGatesInner * Math.cos(aEarth), cy + rGatesInner * Math.sin(aEarth));
-                ctx.strokeStyle = 'rgba(46, 42, 32, 0.45)';
-                ctx.lineWidth = 2.0;
-                ctx.stroke();
-            }
+            drawCrossAxis(pSunGate, pEarthGate, 'rgba(46, 42, 32, 0.50)', 'rgba(46, 42, 32, 0.80)');
         }
 
-        // Design Sun-Earth Axis (Red)
+        // Design axis: red Sun (☉) / red Earth (⊕)
         if (dSunGate !== null && dEarthGate !== null) {
-            const idxSun = GATE_ORDER.indexOf(dSunGate);
-            const idxEarth = GATE_ORDER.indexOf(dEarthGate);
-            if (idxSun !== -1 && idxEarth !== -1) {
-                const aSun = degToRad((WHEEL_START + idxSun * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-                const aEarth = degToRad((WHEEL_START + idxEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-                ctx.beginPath();
-                ctx.moveTo(cx + rGatesInner * Math.cos(aSun), cy + rGatesInner * Math.sin(aSun));
-                ctx.lineTo(cx + rGatesInner * Math.cos(aEarth), cy + rGatesInner * Math.sin(aEarth));
-                ctx.strokeStyle = 'rgba(255, 96, 96, 0.55)';
-                ctx.lineWidth = 2.0;
-                ctx.stroke();
-            }
+            drawCrossAxis(dSunGate, dEarthGate, 'rgba(220, 70, 70, 0.55)', 'rgba(220, 70, 70, 0.85)');
         }
 
-        // Anchor circle at the center intersection
+        // Small gold anchor dot at center intersection
         ctx.beginPath();
-        ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
         ctx.fillStyle = '#C59E3F';
         ctx.fill();
+
 
         // Position and update the HTML SVG overlay
         const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
