@@ -269,7 +269,8 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp
             "number": i,
             "name": house_names[i-1],
             "longitude": cusp_lon,
-            "formatted": formatted
+            "formatted": formatted,
+            "hexagram": hexagram.calculate_hexagram(cusp_lon)
         })
         
     # Store Ascendant and MC explicitly

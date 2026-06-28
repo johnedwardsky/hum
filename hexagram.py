@@ -48,10 +48,8 @@ def calculate_hexagram(longitude):
         theos    - Theos number (1-3)
         position - Position index on the wheel (1-64)
     """
-    import math
-
-    # Truncate longitude to 6 decimal places (discard 7th+, do NOT round)
-    longitude = math.floor(longitude * 1000000) / 1000000
+    # No truncation — Swiss Ephemeris precision (~0.001") is sufficient.
+    # Truncation was causing ~0.004" boundary errors at gate transitions.
 
     # Calculate offset from wheel start
     offset = (longitude - WHEEL_START) % 360.0
