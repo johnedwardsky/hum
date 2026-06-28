@@ -3503,41 +3503,38 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.name === 'Земля')  dEarthGate = p.hexagram?.gate;
         });
 
-        // ── Draw Incarnation Cross bars EARLY so they appear BEHIND the mandala rings ──
-        // 4 thick radial bars protrude outward at the Sun/Earth gate positions.
-        // They form a visual cross by their opposition (Sun always 180° opposite Earth).
-        function drawCrossBar(gateNum, colorInner, colorOuter) {
-            const idx = GATE_ORDER.indexOf(gateNum);
-            if (idx === -1) return;
-            const angle = degToRad((WHEEL_START + idx * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-            const rStart = rZodiacInner - 4;    // start just inside inner border
-            const rEnd   = rQuartersOuter + 28; // protrude beyond outer rim
-            const halfW  = 7;
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
-            const grad = ctx.createLinearGradient(rStart, 0, rEnd, 0);
-            grad.addColorStop(0,    'rgba(0,0,0,0)');
-            grad.addColorStop(0.15, colorInner);
-            grad.addColorStop(0.6,  colorOuter);
-            grad.addColorStop(1,    colorOuter);
-            ctx.fillStyle = grad;
+        // ── Draw Incarnation Cross — full axes through center ──────────────────────
+        // Each axis is a thick line from the Sun gate position on the rim,
+        // through the center, to the Earth gate on the opposite rim.
+        // Black axis = Personality (☉Sun ↔ ⊕Earth)
+        // Red  axis = Design     (☉Sun ↔ ⊕Earth)
+        function drawCrossAxis(sunGate, earthGate, strokeColor, lineW) {
+            const iSun   = GATE_ORDER.indexOf(sunGate);
+            const iEarth = GATE_ORDER.indexOf(earthGate);
+            if (iSun === -1 || iEarth === -1) return;
+
+            const aSun   = degToRad((WHEEL_START + iSun   * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+            const aEarth = degToRad((WHEEL_START + iEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+
+            // Full line: outer rim at Sun side → outer rim at Earth side (passes through center)
+            const rLine = rQuartersOuter + 28; // slightly beyond outer rim
             ctx.beginPath();
-            const len = rEnd - rStart;
-            ctx.roundRect(rStart, -halfW, len, halfW * 2, [2, 6, 6, 2]);
-            ctx.fill();
-            ctx.restore();
+            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
+            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth   = lineW;
+            ctx.lineCap     = 'round';
+            ctx.setLineDash([]);
+            ctx.stroke();
         }
 
-        // Personality bars — dark bronze (black)
+        // Personality axis — dark charcoal line (Солнце ↔ Земля Личности)
         if (pSunGate !== null && pEarthGate !== null) {
-            drawCrossBar(pSunGate,   'rgba(90, 70, 15, 0.55)', 'rgba(120, 92, 25, 0.82)');
-            drawCrossBar(pEarthGate, 'rgba(90, 70, 15, 0.55)', 'rgba(120, 92, 25, 0.82)');
+            drawCrossAxis(pSunGate, pEarthGate, 'rgba(40, 35, 20, 0.60)', 6);
         }
-        // Design bars — bright gold
+        // Design axis — red line (Солнце ↔ Земля Дизайна)
         if (dSunGate !== null && dEarthGate !== null) {
-            drawCrossBar(dSunGate,   'rgba(197, 158, 63, 0.50)', 'rgba(218, 185, 90, 0.92)');
-            drawCrossBar(dEarthGate, 'rgba(197, 158, 63, 0.50)', 'rgba(218, 185, 90, 0.92)');
+            drawCrossAxis(dSunGate, dEarthGate, 'rgba(210, 60, 60, 0.60)', 6);
         }
 
 
