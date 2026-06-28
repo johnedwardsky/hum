@@ -3414,18 +3414,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // Proportional radii for responsive scaling
-        const rQuartersOuter = R;
-        const rQuartersInner = R * 0.94;
-        const rGodheadsOuter = rQuartersInner;
-        const rGodheadsInner = R * 0.88;
-        const rHexagramsOuter = rGodheadsInner;
-        const rHexagramsInner = R * 0.81;
+        // Proportional radii for responsive scaling (scaled up to fill full R)
+        const rHexagramsOuter = R;
+        const rHexagramsInner = R * 0.92;
         const rGatesOuter = rHexagramsInner;
-        const rGatesInner = rGatesOuter - 24;
+        const rGatesInner = rGatesOuter - 28;
         const rZodiacOuter = rGatesInner;
-        const rZodiacInner = R * 0.68;
+        const rZodiacInner = R * 0.77;
         const rInnerBorder = rZodiacInner;
+
 
         ctx.clearRect(0, 0, size, size);
 
@@ -3537,7 +3534,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const aSun   = degToRad(sunLon - 180);
             const aEarth = degToRad(earthLon - 180);
 
-            const rLine = rQuartersOuter + 28; // slightly beyond outer rim
+            const rLine = R + 28; // slightly beyond outer rim
             
             ctx.beginPath();
             ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
@@ -3622,92 +3619,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         }
 
-        // 1. Quarters segment drawing
-        const QUARTERS = [
-            { name: "Инициация", startIdx: 56, endIdx: 7, fill: 'rgba(45,185,150,0.04)', color: '#278A6E' },
-            { name: "Цивилизация", startIdx: 8, endIdx: 23, fill: 'rgba(245,180,60,0.04)', color: '#B37D14' },
-            { name: "Дуальность", startIdx: 24, endIdx: 39, fill: 'rgba(255,90,95,0.04)', color: '#C93B41' },
-            { name: "Мутация", startIdx: 40, endIdx: 55, fill: 'rgba(100,150,250,0.04)', color: '#3B6EC9' }
-        ];
+        // 1. Quarters segment drawing removed as requested
+        // 2. Godheads drawing removed as requested
 
-        QUARTERS.forEach(q => {
-            const startAng = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 180);
-            let endAng = degToRad(WHEEL_START + (q.endIdx + 1) * GATE_INTERVAL - 180);
-            if (endAng < startAng) {
-                endAng += Math.PI * 2;
-            }
-
-            const isHovered = (hoverType === 'quarter' && q.name === hoverTarget);
-            const isAnyHovered = (hoverType === 'quarter');
-
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, rQuartersOuter, startAng, endAng);
-            ctx.closePath();
-            
-            if (isHovered) {
-                ctx.fillStyle = q.fill.replace('0.04', '0.12');
-            } else if (isAnyHovered) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.01)';
-            } else {
-                ctx.fillStyle = q.fill;
-            }
-            ctx.fill();
-
-            // Label
-            let midAng = (startAng + endAng) / 2;
-            let labelColor = q.color;
-            let labelFont = 'bold 10px DM Sans, sans-serif';
-            if (isHovered) {
-                labelFont = 'bold 12px DM Sans, sans-serif';
-            } else if (isAnyHovered) {
-                labelColor = 'rgba(150, 150, 150, 0.2)';
-            }
-            drawRotatedText(q.name, (rQuartersOuter + rQuartersInner) / 2, midAng, labelFont, labelColor);
-        });
-
-        // 2. Godheads drawing (16 deities)
-        const GODHEADS = [
-            "Михаил", "Янус", "Майя", "Лакшми", 
-            "Парвати", "Маат", "Тот", "Гармония", 
-            "Христос", "Минерва", "Аид", "Прометей", 
-            "Вишну", "Хранители Колеса", "Кали", "Митра"
-        ];
-        for (let h = 0; h < 16; h++) {
-            const name = GODHEADS[h];
-            const startIdx = h * 4;
-            const startAng = degToRad(WHEEL_START + startIdx * GATE_INTERVAL - 180);
-            const endAng = degToRad(WHEEL_START + (startIdx + 4) * GATE_INTERVAL - 180);
-            const midAng = (startAng + endAng) / 2;
-
-            const isHovered = (hoverType === 'godhead' && name === hoverTarget);
-            const isAnyHovered = (hoverType === 'godhead');
-
-            // Draw clean radial dividers between Godheads
-            ctx.beginPath();
-            ctx.moveTo(cx + rGodheadsInner * Math.cos(startAng), cy + rGodheadsInner * Math.sin(startAng));
-            ctx.lineTo(cx + rGodheadsOuter * Math.cos(startAng), cy + rGodheadsOuter * Math.sin(startAng));
-            ctx.strokeStyle = isHovered ? '#C59E3F' : 'rgba(197,158,63,0.15)';
-            ctx.lineWidth = isHovered ? 1.5 : 0.8;
-            ctx.stroke();
-
-            let font = '8px DM Sans, sans-serif';
-            let color = '#5C5446';
-            if (isHovered) {
-                font = 'bold 9px DM Sans, sans-serif';
-                color = '#C59E3F';
-                // Draw a highlight arc behind the text
-                ctx.beginPath();
-                ctx.arc(cx, cy, (rGodheadsOuter + rGodheadsInner) / 2, startAng, endAng);
-                ctx.strokeStyle = 'rgba(197,158,63,0.1)';
-                ctx.lineWidth = rGodheadsOuter - rGodheadsInner;
-                ctx.stroke();
-            } else if (isAnyHovered) {
-                color = 'rgba(150, 150, 150, 0.2)';
-            }
-
-            drawRotatedText(name, (rGodheadsOuter + rGodheadsInner) / 2, midAng, font, color);
-        }
 
         // 3. Hexagrams and Gates rings rendering
         const HEX_LINES = {
@@ -3898,14 +3812,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 5. Draw concentric circle dividing lines
         const concentricBorders = [
-            rQuartersOuter, rQuartersInner, 
-            rGodheadsInner, rHexagramsInner, 
+            rHexagramsOuter, rHexagramsInner, 
             rGatesInner, rZodiacInner
         ];
         concentricBorders.forEach((r, idx) => {
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.strokeStyle = idx <= 1 ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.18)';
+            ctx.strokeStyle = idx === 0 ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.18)';
             ctx.lineWidth = idx === 0 ? 1.5 : 1.0;
             ctx.stroke();
         });
@@ -5133,11 +5046,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cy = displayW / 2;
                 const R = displayW / 2 - 8;
                 
-                const rQuartersOuter = R;
-                const rQuartersInner = R * 0.94;
-                const rGodheadsOuter = rQuartersInner;
-                const rGodheadsInner = R * 0.88;
-                const rZodiacInner = R * 0.68;
+                const rZodiacInner = R * 0.77;
                 const rInnerBorder = rZodiacInner;
 
                 const dx = mx - cx;
@@ -5178,16 +5087,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
                     const gateNum = GATE_ORDER[gateIdx];
 
-                    if (dist >= rQuartersInner && dist <= R) {
-                        type = 'quarter';
-                        target = getQuarterNameForIdx(gateIdx);
-                    } else if (dist >= rGodheadsInner && dist < rQuartersInner) {
-                        type = 'godhead';
-                        target = GODHEADS[Math.floor(gateIdx / 4) % 16];
-                    } else {
-                        type = 'gate';
-                        target = gateNum;
-                    }
+                    type = 'gate';
+                    target = gateNum;
                 }
 
                 const changed = (type !== mandalaHoverState.type || target !== mandalaHoverState.target);
