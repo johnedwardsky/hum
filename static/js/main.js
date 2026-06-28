@@ -3490,57 +3490,78 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Incarnation Cross gates (Sun and Earth)
+        // Incarnation Cross gates & exact longitudes (Sun and Earth)
         // Planet names come from backend in Russian: 'Солнце', 'Земля'
         let pSunGate = null, pEarthGate = null;
         let dSunGate = null, dEarthGate = null;
+        let pSunLon = null, pEarthLon = null;
+        let dSunLon = null, dEarthLon = null;
         data.planets.forEach(p => {
-            if (p.name === 'Солнце') pSunGate = p.hexagram?.gate;
-            if (p.name === 'Земля')  pEarthGate = p.hexagram?.gate;
+            if (p.name === 'Солнце') {
+                pSunGate = p.hexagram?.gate;
+                pSunLon = p.longitude;
+            }
+            if (p.name === 'Земля') {
+                pEarthGate = p.hexagram?.gate;
+                pEarthLon = p.longitude;
+            }
         });
         designPlanetsList.forEach(p => {
-            if (p.name === 'Солнце') dSunGate = p.hexagram?.gate;
-            if (p.name === 'Земля')  dEarthGate = p.hexagram?.gate;
+            if (p.name === 'Солнце') {
+                dSunGate = p.hexagram?.gate;
+                dSunLon = p.longitude;
+            }
+            if (p.name === 'Земля') {
+                dEarthGate = p.hexagram?.gate;
+                dEarthLon = p.longitude;
+            }
         });
-
-        // ── Draw Incarnation Cross — full axes through center ──────────────────────
-        // Each axis is a thick line from the Sun gate position on the rim,
-        // through the center, to the Earth gate on the opposite rim.
-        // Black axis = Personality (☉Sun ↔ ⊕Earth)
-        // Red  axis = Design     (☉Sun ↔ ⊕Earth)
-        function drawCrossAxis(sunGate, earthGate, strokeColor, lineW) {
-            const iSun   = GATE_ORDER.indexOf(sunGate);
-            const iEarth = GATE_ORDER.indexOf(earthGate);
-            if (iSun === -1 || iEarth === -1) return;
-
-            const aSun   = degToRad((WHEEL_START + iSun   * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-            const aEarth = degToRad((WHEEL_START + iEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-
-            // Full line: outer rim at Sun side → outer rim at Earth side (passes through center)
-            const rLine = rQuartersOuter + 28; // slightly beyond outer rim
-            ctx.beginPath();
-            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
-            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth   = lineW;
-            ctx.lineCap     = 'round';
-            ctx.setLineDash([]);
-            ctx.stroke();
-        }
-
-        // Personality axis — dark charcoal line (Солнце ↔ Земля Личности)
-        if (pSunGate !== null && pEarthGate !== null) {
-            drawCrossAxis(pSunGate, pEarthGate, 'rgba(40, 35, 20, 0.60)', 6);
-        }
-        // Design axis — red line (Солнце ↔ Земля Дизайна)
-        if (dSunGate !== null && dEarthGate !== null) {
-            drawCrossAxis(dSunGate, dEarthGate, 'rgba(210, 60, 60, 0.60)', 6);
-        }
-
 
         // Hover state helper variables
         const hoverType = hoverState ? hoverState.type : null;
         const hoverTarget = hoverState ? hoverState.target : null;
+
+        // ── Draw Incarnation Cross — exact axes through center ──────────────────────
+        // Drawn at exact planet longitudes.
+        // Default: very faint (almost invisible). Hovering on any of the 4 cross gates activates it.
+        function drawCrossAxisExact(sunLon, earthLon, strokeColorDefault, strokeColorHover, lineWDefault, lineWHover) {
+            if (sunLon === null || earthLon === null) return;
+
+            const isHovered = (hoverType === 'gate' && (
+                hoverTarget === pSunGate || 
+                hoverTarget === pEarthGate || 
+                hoverTarget === dSunGate || 
+                hoverTarget === dEarthGate
+            ));
+
+            const aSun   = degToRad(sunLon - 180);
+            const aEarth = degToRad(earthLon - 180);
+
+            const rLine = rQuartersOuter + 28; // slightly beyond outer rim
+            
+            ctx.save();
+            if (isHovered) {
+                ctx.shadowColor = strokeColorHover;
+                ctx.shadowBlur = 12;
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
+            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
+            ctx.strokeStyle = isHovered ? strokeColorHover : strokeColorDefault;
+            ctx.lineWidth   = isHovered ? lineWHover : lineWDefault;
+            ctx.lineCap     = 'round';
+            ctx.setLineDash([]);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Personality axis (black/charcoal)
+        drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.05)', 'rgba(40, 35, 20, 0.65)', 2.5, 6.0);
+        // Design axis (red)
+        drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.05)', 'rgba(210, 60, 60, 0.65)', 2.5, 6.0);
+
+
 
         function getQuarterNameForIdx(idx) {
             if (idx >= 56 || idx <= 7) return "Инициация";
@@ -3878,19 +3899,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = idx === 0 ? 1.5 : 1.0;
             ctx.stroke();
         });
-
-        // 6. Draw 4 Quarters dividing rods (Major golden axes)
-        QUARTERS.forEach(q => {
-            const axisAngle = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 180);
-            const cos = Math.cos(axisAngle);
-            const sin = Math.sin(axisAngle);
-            ctx.beginPath();
-            ctx.moveTo(cx + rInnerBorder * cos, cy + rInnerBorder * sin);
-            ctx.lineTo(cx + (R + 10) * cos, cy + (R + 10) * sin);
-            ctx.strokeStyle = '#C59E3F';
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
-        });
+        // 6. Quarters dividing rods removed as requested
 
         // 7. Planet activation lines and symbols inside the wheel
         for (let i = 0; i < 64; i++) {
