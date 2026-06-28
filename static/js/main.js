@@ -3557,9 +3557,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Personality axis (black/charcoal)
-        drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.05)', 'rgba(40, 35, 20, 0.65)', 2.5, 6.0);
+        drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.70)', 3.5, 6.5);
         // Design axis (red)
-        drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.05)', 'rgba(210, 60, 60, 0.65)', 2.5, 6.0);
+        drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.70)', 3.5, 6.5);
+
 
 
 
