@@ -3491,16 +3491,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Incarnation Cross gates (Sun and Earth)
+        // Planet names come from backend in Russian: 'Солнце', 'Земля'
         let pSunGate = null, pEarthGate = null;
         let dSunGate = null, dEarthGate = null;
         data.planets.forEach(p => {
-            if (p.name === 'Sun') pSunGate = p.hexagram?.gate;
-            if (p.name === 'Earth') pEarthGate = p.hexagram?.gate;
+            if (p.name === 'Солнце') pSunGate = p.hexagram?.gate;
+            if (p.name === 'Земля')  pEarthGate = p.hexagram?.gate;
         });
         designPlanetsList.forEach(p => {
-            if (p.name === 'Sun') dSunGate = p.hexagram?.gate;
-            if (p.name === 'Earth') dEarthGate = p.hexagram?.gate;
+            if (p.name === 'Солнце') dSunGate = p.hexagram?.gate;
+            if (p.name === 'Земля')  dEarthGate = p.hexagram?.gate;
         });
+
+        // ── Draw Incarnation Cross bars EARLY so they appear BEHIND the mandala rings ──
+        // 4 thick radial bars protrude outward at the Sun/Earth gate positions.
+        // They form a visual cross by their opposition (Sun always 180° opposite Earth).
+        function drawCrossBar(gateNum, colorInner, colorOuter) {
+            const idx = GATE_ORDER.indexOf(gateNum);
+            if (idx === -1) return;
+            const angle = degToRad((WHEEL_START + idx * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+            const rStart = rZodiacInner - 4;    // start just inside inner border
+            const rEnd   = rQuartersOuter + 28; // protrude beyond outer rim
+            const halfW  = 7;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            const grad = ctx.createLinearGradient(rStart, 0, rEnd, 0);
+            grad.addColorStop(0,    'rgba(0,0,0,0)');
+            grad.addColorStop(0.15, colorInner);
+            grad.addColorStop(0.6,  colorOuter);
+            grad.addColorStop(1,    colorOuter);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            const len = rEnd - rStart;
+            ctx.roundRect(rStart, -halfW, len, halfW * 2, [2, 6, 6, 2]);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Personality bars — dark bronze (black)
+        if (pSunGate !== null && pEarthGate !== null) {
+            drawCrossBar(pSunGate,   'rgba(90, 70, 15, 0.55)', 'rgba(120, 92, 25, 0.82)');
+            drawCrossBar(pEarthGate, 'rgba(90, 70, 15, 0.55)', 'rgba(120, 92, 25, 0.82)');
+        }
+        // Design bars — bright gold
+        if (dSunGate !== null && dEarthGate !== null) {
+            drawCrossBar(dSunGate,   'rgba(197, 158, 63, 0.50)', 'rgba(218, 185, 90, 0.92)');
+            drawCrossBar(dEarthGate, 'rgba(197, 158, 63, 0.50)', 'rgba(218, 185, 90, 0.92)');
+        }
+
 
         // Hover state helper variables
         const hoverType = hoverState ? hoverState.type : null;
@@ -3981,54 +4020,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
 
-        // 8.5 Draw the Incarnation Cross — 4 thick radial bars protruding from the outer rim
-        // Each of the 4 gates (personality Sun, personality Earth, design Sun, design Earth)
-        // gets a thick rectangular stick extending outward from the wheel edge
-
-        function drawCrossBar(gateNum, colorInner, colorOuter) {
-            const idx = GATE_ORDER.indexOf(gateNum);
-            if (idx === -1) return;
-
-            // Gate center angle (same formula as gate drawing)
-            const angle = degToRad((WHEEL_START + idx * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-
-            // Bar dimensions: starts inside zodiac ring, protrudes well beyond outer rim
-            const rStart = rZodiacInner - 4;       // slightly inside the inner ring border
-            const rEnd   = rQuartersOuter + 28;    // protrude beyond the outer rim
-            const halfW  = 7;                      // half-width of the bar
-
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
-
-            // Gradient: fade in from inner end, solid in middle, slight fade at outer tip
-            const grad = ctx.createLinearGradient(rStart, 0, rEnd, 0);
-            grad.addColorStop(0,    'rgba(0,0,0,0)');
-            grad.addColorStop(0.15, colorInner);
-            grad.addColorStop(0.6,  colorOuter);
-            grad.addColorStop(1,    colorOuter);
-
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            // Slightly rounded rect: draw as rect with rounded tip at the outer end
-            const len = rEnd - rStart;
-            ctx.roundRect(rStart, -halfW, len, halfW * 2, [2, 6, 6, 2]);
-            ctx.fill();
-
-            ctx.restore();
-        }
-
-        // Personality bars — dark gold / dark bronze (black personality color)
-        if (pSunGate !== null && pEarthGate !== null) {
-            drawCrossBar(pSunGate,   'rgba(100, 80, 20, 0.60)', 'rgba(130, 100, 30, 0.85)');
-            drawCrossBar(pEarthGate, 'rgba(100, 80, 20, 0.60)', 'rgba(130, 100, 30, 0.85)');
-        }
-
-        // Design bars — bright gold (design/red personality color, but shown as gold like reference)
-        if (dSunGate !== null && dEarthGate !== null) {
-            drawCrossBar(dSunGate,   'rgba(197, 158, 63, 0.55)', 'rgba(218, 185, 90, 0.95)');
-            drawCrossBar(dEarthGate, 'rgba(197, 158, 63, 0.55)', 'rgba(218, 185, 90, 0.95)');
-        }
+        // 8.5 Incarnation Cross bars already drawn early (step after gate setup above)
 
 
         // Position and update the HTML SVG overlay
