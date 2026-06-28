@@ -3487,6 +3487,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Incarnation Cross gates (Sun and Earth)
+        let pSunGate = null, pEarthGate = null;
+        let dSunGate = null, dEarthGate = null;
+        data.planets.forEach(p => {
+            if (p.name === 'Sun') pSunGate = p.hexagram?.gate;
+            if (p.name === 'Earth') pEarthGate = p.hexagram?.gate;
+        });
+        designPlanetsList.forEach(p => {
+            if (p.name === 'Sun') dSunGate = p.hexagram?.gate;
+            if (p.name === 'Earth') dEarthGate = p.hexagram?.gate;
+        });
+
         // Hover state helper variables
         const hoverType = hoverState ? hoverState.type : null;
         const hoverTarget = hoverState ? hoverState.target : null;
@@ -3549,8 +3561,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
         QUARTERS.forEach(q => {
-            const startAng = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 90);
-            let endAng = degToRad(WHEEL_START + (q.endIdx + 1) * GATE_INTERVAL - 90);
+            const startAng = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 180);
+            let endAng = degToRad(WHEEL_START + (q.endIdx + 1) * GATE_INTERVAL - 180);
             if (endAng < startAng) {
                 endAng += Math.PI * 2;
             }
@@ -3594,8 +3606,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let h = 0; h < 16; h++) {
             const name = GODHEADS[h];
             const startIdx = h * 4;
-            const startAng = degToRad(WHEEL_START + startIdx * GATE_INTERVAL - 90);
-            const endAng = degToRad(WHEEL_START + (startIdx + 4) * GATE_INTERVAL - 90);
+            const startAng = degToRad(WHEEL_START + startIdx * GATE_INTERVAL - 180);
+            const endAng = degToRad(WHEEL_START + (startIdx + 4) * GATE_INTERVAL - 180);
             const midAng = (startAng + endAng) / 2;
 
             const isHovered = (hoverType === 'godhead' && name === hoverTarget);
@@ -3649,8 +3661,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isAnyHovered = (hoverType !== null);
 
             const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
-            const startAngle = degToRad(startLon - 90);
-            const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
+            const startAngle = degToRad(startLon - 180);
+            const endAngle = degToRad(startLon + GATE_INTERVAL - 180);
             const midAngle = (startAngle + endAngle) / 2;
 
             // Highlight active gate cell background
@@ -3664,12 +3676,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 let opacityScale = 1.0;
                 if (isAnyHovered && !isHighlighted) opacityScale = 0.15;
 
-                if (isPersActive && isDesActive) {
-                    ctx.fillStyle = `rgba(197,158,63,${0.18 * opacityScale})`;
-                } else if (isDesActive) {
-                    ctx.fillStyle = `rgba(255,96,96,${0.14 * opacityScale})`;
+                const isCrossGate = (gateNum === pSunGate || gateNum === pEarthGate || gateNum === dSunGate || gateNum === dEarthGate);
+                if (isCrossGate) {
+                    const isDesign = (gateNum === dSunGate || gateNum === dEarthGate);
+                    ctx.fillStyle = isDesign ? `rgba(255, 96, 96, ${0.30 * opacityScale})` : `rgba(197, 158, 63, ${0.30 * opacityScale})`;
                 } else {
-                    ctx.fillStyle = `rgba(197,158,63,${0.12 * opacityScale})`;
+                    if (isPersActive && isDesActive) {
+                        ctx.fillStyle = `rgba(197,158,63,${0.18 * opacityScale})`;
+                    } else if (isDesActive) {
+                        ctx.fillStyle = `rgba(255,96,96,${0.14 * opacityScale})`;
+                    } else {
+                        ctx.fillStyle = `rgba(197,158,63,${0.12 * opacityScale})`;
+                    }
                 }
                 ctx.fill();
             }
@@ -3753,8 +3771,8 @@ document.addEventListener('DOMContentLoaded', () => {
             : -1;
 
         for (let i = 0; i < 12; i++) {
-            const startAngle = degToRad(i * 30 - 90);
-            const endAngle = degToRad((i + 1) * 30 - 90);
+            const startAngle = degToRad(i * 30 - 180);
+            const endAngle = degToRad((i + 1) * 30 - 180);
             const isAnyHovered = (hoverType !== null);
             const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx) : true;
 
@@ -3778,7 +3796,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ticks around the Zodiac Outer Border
         for (let deg = 0; deg < 360; deg++) {
-            const rad = degToRad(deg - 90);
+            const rad = degToRad(deg - 180);
             const cos = Math.cos(rad);
             const sin = Math.sin(rad);
             
@@ -3824,7 +3842,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 6. Draw 4 Quarters dividing rods (Major golden axes)
         QUARTERS.forEach(q => {
-            const axisAngle = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 90);
+            const axisAngle = degToRad(WHEEL_START + q.startIdx * GATE_INTERVAL - 180);
             const cos = Math.cos(axisAngle);
             const sin = Math.sin(axisAngle);
             ctx.beginPath();
@@ -3844,7 +3862,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const midAngle = degToRad((WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2 - 90) % 360);
+            const midAngle = degToRad((WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
 
@@ -3915,8 +3933,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isAnyHovered = (hoverType !== null);
 
             const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
-            const startAngle = degToRad(startLon - 90);
-            const endAngle = degToRad(startLon + GATE_INTERVAL - 90);
+            const startAngle = degToRad(startLon - 180);
+            const endAngle = degToRad(startLon + GATE_INTERVAL - 180);
 
             const isP = activations.some(a => a.type === 'personality');
             const isD = activations.some(a => a.type === 'design');
@@ -3958,6 +3976,56 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 8.5 Draw the Incarnation Cross lines (Sun-Earth axes)
+        let pSunGate = null, pEarthGate = null;
+        let dSunGate = null, dEarthGate = null;
+        data.planets.forEach(p => {
+            if (p.name === 'Sun') pSunGate = p.hexagram?.gate;
+            if (p.name === 'Earth') pEarthGate = p.hexagram?.gate;
+        });
+        designPlanetsList.forEach(p => {
+            if (p.name === 'Sun') dSunGate = p.hexagram?.gate;
+            if (p.name === 'Earth') dEarthGate = p.hexagram?.gate;
+        });
+
+        // Personality Sun-Earth Axis (Black/Dark gold)
+        if (pSunGate !== null && pEarthGate !== null) {
+            const idxSun = GATE_ORDER.indexOf(pSunGate);
+            const idxEarth = GATE_ORDER.indexOf(pEarthGate);
+            if (idxSun !== -1 && idxEarth !== -1) {
+                const aSun = degToRad((WHEEL_START + idxSun * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+                const aEarth = degToRad((WHEEL_START + idxEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+                ctx.beginPath();
+                ctx.moveTo(cx + rGatesInner * Math.cos(aSun), cy + rGatesInner * Math.sin(aSun));
+                ctx.lineTo(cx + rGatesInner * Math.cos(aEarth), cy + rGatesInner * Math.sin(aEarth));
+                ctx.strokeStyle = 'rgba(46, 42, 32, 0.45)';
+                ctx.lineWidth = 2.0;
+                ctx.stroke();
+            }
+        }
+
+        // Design Sun-Earth Axis (Red)
+        if (dSunGate !== null && dEarthGate !== null) {
+            const idxSun = GATE_ORDER.indexOf(dSunGate);
+            const idxEarth = GATE_ORDER.indexOf(dEarthGate);
+            if (idxSun !== -1 && idxEarth !== -1) {
+                const aSun = degToRad((WHEEL_START + idxSun * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+                const aEarth = degToRad((WHEEL_START + idxEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+                ctx.beginPath();
+                ctx.moveTo(cx + rGatesInner * Math.cos(aSun), cy + rGatesInner * Math.sin(aSun));
+                ctx.lineTo(cx + rGatesInner * Math.cos(aEarth), cy + rGatesInner * Math.sin(aEarth));
+                ctx.strokeStyle = 'rgba(255, 96, 96, 0.55)';
+                ctx.lineWidth = 2.0;
+                ctx.stroke();
+            }
+        }
+
+        // Anchor circle at the center intersection
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#C59E3F';
         ctx.fill();
 
         // Position and update the HTML SVG overlay
@@ -5092,7 +5160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (dist <= R) {
                     // On the wheel
                     let angle = Math.atan2(dy, dx);
-                    let deg = angle * (180 / Math.PI) + 90;
+                    let deg = angle * (180 / Math.PI) + 180;
                     if (deg < 0) deg += 360;
                     let offset = (deg - WHEEL_START) % 360;
                     if (offset < 0) offset += 360;
