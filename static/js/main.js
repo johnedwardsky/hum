@@ -3986,7 +3986,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 svg = mainSvg.cloneNode(true);
                 svg.setAttribute('width', '100%');
                 svg.setAttribute('height', '100%');
-                svg.removeAttribute('viewBox'); // Ensure it scales correctly using width/height
                 // Remove id to prevent duplication issues
                 svg.removeAttribute('id');
                 wrap.innerHTML = '';
