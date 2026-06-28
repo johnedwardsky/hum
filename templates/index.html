@@ -1448,9 +1448,9 @@
 
                 <!-- === TAB: MANDALA === -->
                 <div class="tab-content" id="content-mandala">
-                    <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-                        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-md); backdrop-filter: blur(16px); display:inline-block; margin-bottom: 24px;">
-                            <canvas id="mandala-canvas" width="780" height="780"></canvas>
+                        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-md); backdrop-filter: blur(16px); display:inline-block; margin-bottom: 24px; position: relative;" id="mandala-container">
+                            <canvas id="mandala-canvas" width="780" height="780" style="display: block;"></canvas>
+                            <div id="mandala-bodygraph-wrap" style="position: absolute; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center;"></div>
                         </div>
                         <div class="table-section" style="width:100%; max-width:700px;">
                             <h3 class="section-title">Порядок ворот на колесе</h3>
@@ -2212,6 +2212,6 @@
         </div>
     </div>
 
-    <script src="/static/js/main.js?v=1.2.21"></script>
+    <script src="/static/js/main.js?v=1.2.22"></script>
 </body>
 </html>

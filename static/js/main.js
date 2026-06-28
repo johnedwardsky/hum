@@ -3954,25 +3954,286 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Scale and draw central bodygraph
-        const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
-        const bgOffX = cx - (BG_W * bgScale) / 2;
-        const bgOffY = cy - (BG_H * bgScale) / 2;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder - 2, 0, Math.PI * 2);
-        ctx.clip();
-
-        // Draw bodygraph with transparent white background overlay for premium UX depth
+        // Draw bodygraph with transparent white background overlay for premium UX depth on canvas
         ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
 
-        drawBodygraphOnCtx(ctx, data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState);
+        // Position and update the HTML SVG overlay
+        const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
+        const bgOffX = cx - (BG_W * bgScale) / 2;
+        const bgOffY = cy - (BG_H * bgScale) / 2;
 
-        ctx.restore();
+        updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState);
+    }
+
+    function updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState) {
+        const wrap = document.getElementById('mandala-bodygraph-wrap');
+        if (!wrap) return;
+
+        // Position the wrapper exactly over the canvas inner circle
+        wrap.style.left = bgOffX + 'px';
+        wrap.style.top = bgOffY + 'px';
+        wrap.style.width = (400 * bgScale) + 'px';
+        wrap.style.height = (650 * bgScale) + 'px';
+
+        // Copy the main SVG bodygraph if not already cloned
+        let svg = wrap.querySelector('svg');
+        if (!svg) {
+            const mainSvg = document.querySelector('#bodygraph-svg-wrap svg');
+            if (mainSvg) {
+                svg = mainSvg.cloneNode(true);
+                svg.setAttribute('width', '100%');
+                svg.setAttribute('height', '100%');
+                svg.removeAttribute('viewBox'); // Ensure it scales correctly using width/height
+                // Remove id to prevent duplication issues
+                svg.removeAttribute('id');
+                wrap.innerHTML = '';
+                wrap.appendChild(svg);
+            }
+        }
+
+        if (!svg) return;
+
+        const hoverType = hoverState ? hoverState.type : null;
+        const hoverTarget = hoverState ? hoverState.target : null;
+
+        const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
+
+        // Reset opacities
+        svg.querySelectorAll('[class*="block__"]').forEach(el => el.style.opacity = '');
+        svg.querySelectorAll('[class*="cls__"]').forEach(el => el.style.opacity = '');
+        svg.querySelectorAll('[class*="cls_"]').forEach(el => el.style.opacity = '');
+
+        function getQuarterNameForIdx(idx) {
+            if (idx >= 56 || idx <= 7) return "Инициация";
+            if (idx >= 8 && idx <= 23) return "Цивилизация";
+            if (idx >= 24 && idx <= 39) return "Дуальность";
+            if (idx >= 40 && idx <= 55) return "Мутация";
+            return "";
+        }
+
+        const GATE_ORDER = [
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
+        ];
+
+        // Apply dimming / highlights based on hover
+        if (hoverType === 'center') {
+            const connectedCenters = new Set([hoverTarget]);
+            CHANNELS_DATA.forEach(ch => {
+                const isActive = activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB);
+                if (isActive) {
+                    if (ch.centerA === hoverTarget) connectedCenters.add(ch.centerB);
+                    if (ch.centerB === hoverTarget) connectedCenters.add(ch.centerA);
+                }
+            });
+
+            const centerBlockMap = {
+                'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
+                'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
+            };
+
+            Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
+                const el = svg.querySelector('.block__' + blockNum);
+                if (el && !connectedCenters.has(cName)) {
+                    el.style.opacity = '0.15';
+                }
+            });
+
+            // Gates
+            svg.querySelectorAll('[class*="cls__"]').forEach(el => {
+                const classList = Array.from(el.classList);
+                const gateClass = classList.find(c => c.startsWith('cls__'));
+                if (gateClass) {
+                    const gateNum = parseInt(gateClass.replace('cls__', ''));
+                    const inConnected = Array.from(connectedCenters).some(c => {
+                        return Object.keys(BG_CENTERS[c].gates).map(Number).includes(gateNum);
+                    });
+                    if (!inConnected) el.style.opacity = '0.15';
+                }
+            });
+
+            // Channels
+            svg.querySelectorAll('[class*="cls_"]').forEach(el => {
+                const classList = Array.from(el.classList);
+                const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
+                if (chClass) {
+                    const gateNum = parseInt(chClass.replace('cls_', ''));
+                    const ch = CHANNELS_DATA.find(c => c.gateA === gateNum || c.gateB === gateNum);
+                    if (ch) {
+                        const isConnected = ch.centerA === hoverTarget || ch.centerB === hoverTarget;
+                        if (!isConnected) el.style.opacity = '0.15';
+                    }
+                }
+            });
+        } else if (hoverType === 'gate') {
+            let gateCenter = null;
+            for (const [cName, c] of Object.entries(BG_CENTERS)) {
+                if (Object.keys(c.gates).map(Number).includes(hoverTarget)) {
+                    gateCenter = cName;
+                    break;
+                }
+            }
+
+            if (gateCenter) {
+                const connectedCenters = new Set([gateCenter]);
+                CHANNELS_DATA.forEach(ch => {
+                    const isActive = activeGatesCombined.has(ch.gateA) && activeGatesCombined.has(ch.gateB);
+                    if (isActive) {
+                        if (ch.centerA === gateCenter) connectedCenters.add(ch.centerB);
+                        if (ch.centerB === gateCenter) connectedCenters.add(ch.centerA);
+                    }
+                });
+
+                const centerBlockMap = {
+                    'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
+                    'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
+                };
+
+                Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
+                    const el = svg.querySelector('.block__' + blockNum);
+                    if (el && !connectedCenters.has(cName)) {
+                        el.style.opacity = '0.15';
+                    }
+                });
+
+                // Gates
+                svg.querySelectorAll('[class*="cls__"]').forEach(el => {
+                    const classList = Array.from(el.classList);
+                    const gateClass = classList.find(c => c.startsWith('cls__'));
+                    if (gateClass) {
+                        const gateNum = parseInt(gateClass.replace('cls__', ''));
+                        const inConnected = Array.from(connectedCenters).some(c => {
+                            return Object.keys(BG_CENTERS[c].gates).map(Number).includes(gateNum);
+                        });
+                        if (!inConnected && gateNum !== hoverTarget) el.style.opacity = '0.15';
+                    }
+                });
+
+                // Channels
+                svg.querySelectorAll('[class*="cls_"]').forEach(el => {
+                    const classList = Array.from(el.classList);
+                    const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
+                    if (chClass) {
+                        const gateNum = parseInt(chClass.replace('cls_', ''));
+                        const ch = CHANNELS_DATA.find(c => c.gateA === gateNum || c.gateB === gateNum);
+                        if (ch) {
+                            const isConnected = ch.centerA === gateCenter || ch.centerB === gateCenter;
+                            if (!isConnected) el.style.opacity = '0.15';
+                        }
+                    }
+                });
+            } else {
+                // Dim everything except the hovered gate itself
+                svg.querySelectorAll('[class*="block__"]').forEach(el => el.style.opacity = '0.15');
+                svg.querySelectorAll('[class*="cls_"]').forEach(el => el.style.opacity = '0.15');
+                svg.querySelectorAll('[class*="cls__"]').forEach(el => {
+                    const classList = Array.from(el.classList);
+                    const gateClass = classList.find(c => c.startsWith('cls__'));
+                    if (gateClass) {
+                        const gateNum = parseInt(gateClass.replace('cls__', ''));
+                        if (gateNum !== hoverTarget) el.style.opacity = '0.15';
+                    }
+                });
+            }
+        } else if (hoverType === 'quarter') {
+            const qName = getQuarterNameForIdx(hoverState.gateIdx);
+            
+            const centerBlockMap = {
+                'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
+                'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
+            };
+
+            Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
+                const centerGates = Object.keys(BG_CENTERS[cName].gates).map(Number);
+                const hasGateInQuarter = centerGates.some(g => {
+                    const gIdx = GATE_ORDER.indexOf(g);
+                    return gIdx !== -1 && getQuarterNameForIdx(gIdx) === qName;
+                });
+                if (!hasGateInQuarter) {
+                    const el = svg.querySelector('.block__' + blockNum);
+                    if (el) el.style.opacity = '0.15';
+                }
+            });
+
+            // Gates
+            svg.querySelectorAll('[class*="cls__"]').forEach(el => {
+                const classList = Array.from(el.classList);
+                const gateClass = classList.find(c => c.startsWith('cls__'));
+                if (gateClass) {
+                    const gateNum = parseInt(gateClass.replace('cls__', ''));
+                    const gIdx = GATE_ORDER.indexOf(gateNum);
+                    if (gIdx === -1 || getQuarterNameForIdx(gIdx) !== qName) {
+                        el.style.opacity = '0.15';
+                    }
+                }
+            });
+
+            // Channels
+            svg.querySelectorAll('[class*="cls_"]').forEach(el => {
+                const classList = Array.from(el.classList);
+                const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
+                if (chClass) {
+                    const gateNum = parseInt(chClass.replace('cls_', ''));
+                    const gIdx = GATE_ORDER.indexOf(gateNum);
+                    if (gIdx === -1 || getQuarterNameForIdx(gIdx) !== qName) {
+                        el.style.opacity = '0.15';
+                    }
+                }
+            });
+        } else if (hoverType === 'godhead') {
+            const ghIdx = Math.floor(hoverState.gateIdx / 4);
+
+            const centerBlockMap = {
+                'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
+                'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
+            };
+
+            Object.entries(centerBlockMap).forEach(([cName, blockNum]) => {
+                const centerGates = Object.keys(BG_CENTERS[cName].gates).map(Number);
+                const hasGateInGodhead = centerGates.some(g => {
+                    const gIdx = GATE_ORDER.indexOf(g);
+                    return gIdx !== -1 && Math.floor(gIdx / 4) === ghIdx;
+                });
+                if (!hasGateInGodhead) {
+                    const el = svg.querySelector('.block__' + blockNum);
+                    if (el) el.style.opacity = '0.15';
+                }
+            });
+
+            // Gates
+            svg.querySelectorAll('[class*="cls__"]').forEach(el => {
+                const classList = Array.from(el.classList);
+                const gateClass = classList.find(c => c.startsWith('cls__'));
+                if (gateClass) {
+                    const gateNum = parseInt(gateClass.replace('cls__', ''));
+                    const gIdx = GATE_ORDER.indexOf(gateNum);
+                    if (gIdx === -1 || Math.floor(gIdx / 4) !== ghIdx) {
+                        el.style.opacity = '0.15';
+                    }
+                }
+            });
+
+            // Channels
+            svg.querySelectorAll('[class*="cls_"]').forEach(el => {
+                const classList = Array.from(el.classList);
+                const chClass = classList.find(c => c.startsWith('cls_') && !c.startsWith('cls__'));
+                if (chClass) {
+                    const gateNum = parseInt(chClass.replace('cls_', ''));
+                    const gIdx = GATE_ORDER.indexOf(gateNum);
+                    if (gIdx === -1 || Math.floor(gIdx / 4) !== ghIdx) {
+                        el.style.opacity = '0.15';
+                    }
+                }
+            });
+        }
     }
 
 
@@ -4146,6 +4407,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * Each planet row click toggles that planet's gate on/off.
      */
     function renderSvgBodygraph(data) {
+        const mandalaWrap = document.getElementById('mandala-bodygraph-wrap');
+        if (mandalaWrap) mandalaWrap.innerHTML = '';
+
         const svgWrap = document.getElementById('bodygraph-svg-wrap');
         const designList = document.getElementById('bg-design-list');
         const persList   = document.getElementById('bg-personality-list');
