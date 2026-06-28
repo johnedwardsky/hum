@@ -3981,52 +3981,54 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
 
-        // 8.5 Draw the Incarnation Cross lines (Sun-Earth axes)
-        // Each axis runs from the Sun gate on the outer rim → through center → to the Earth gate
+        // 8.5 Draw the Incarnation Cross — 4 thick radial bars protruding from the outer rim
+        // Each of the 4 gates (personality Sun, personality Earth, design Sun, design Earth)
+        // gets a thick rectangular stick extending outward from the wheel edge
 
-        function drawCrossAxis(gSun, gEarth, lineColor, dotColor) {
-            const idxSun   = GATE_ORDER.indexOf(gSun);
-            const idxEarth = GATE_ORDER.indexOf(gEarth);
-            if (idxSun === -1 || idxEarth === -1) return;
+        function drawCrossBar(gateNum, colorInner, colorOuter) {
+            const idx = GATE_ORDER.indexOf(gateNum);
+            if (idx === -1) return;
 
-            const aSun   = degToRad((WHEEL_START + idxSun   * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-            const aEarth = degToRad((WHEEL_START + idxEarth * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
+            // Gate center angle (same formula as gate drawing)
+            const angle = degToRad((WHEEL_START + idx * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
 
-            // Draw full line: from Sun gate outer edge → through center → to Earth gate outer edge
-            const rLine = rQuartersOuter; // reach the outer rim
+            // Bar dimensions: starts inside zodiac ring, protrudes well beyond outer rim
+            const rStart = rZodiacInner - 4;       // slightly inside the inner ring border
+            const rEnd   = rQuartersOuter + 28;    // protrude beyond the outer rim
+            const halfW  = 7;                      // half-width of the bar
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            // Gradient: fade in from inner end, solid in middle, slight fade at outer tip
+            const grad = ctx.createLinearGradient(rStart, 0, rEnd, 0);
+            grad.addColorStop(0,    'rgba(0,0,0,0)');
+            grad.addColorStop(0.15, colorInner);
+            grad.addColorStop(0.6,  colorOuter);
+            grad.addColorStop(1,    colorOuter);
+
+            ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
-            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
-            ctx.strokeStyle = lineColor;
-            ctx.lineWidth   = 1.8;
-            ctx.setLineDash([]);
-            ctx.stroke();
+            // Slightly rounded rect: draw as rect with rounded tip at the outer end
+            const len = rEnd - rStart;
+            ctx.roundRect(rStart, -halfW, len, halfW * 2, [2, 6, 6, 2]);
+            ctx.fill();
 
-            // Small glow dot at Sun gate position (mid of gate band)
-            const rDot = (rGatesOuter + rGatesInner) / 2;
-            [[aSun, '☉'], [aEarth, '⊕']].forEach(([ang]) => {
-                ctx.beginPath();
-                ctx.arc(cx + rDot * Math.cos(ang), cy + rDot * Math.sin(ang), 4, 0, Math.PI * 2);
-                ctx.fillStyle = dotColor;
-                ctx.fill();
-            });
+            ctx.restore();
         }
 
-        // Personality axis: black Sun (☉) / black Earth (⊕)
+        // Personality bars — dark gold / dark bronze (black personality color)
         if (pSunGate !== null && pEarthGate !== null) {
-            drawCrossAxis(pSunGate, pEarthGate, 'rgba(46, 42, 32, 0.50)', 'rgba(46, 42, 32, 0.80)');
+            drawCrossBar(pSunGate,   'rgba(100, 80, 20, 0.60)', 'rgba(130, 100, 30, 0.85)');
+            drawCrossBar(pEarthGate, 'rgba(100, 80, 20, 0.60)', 'rgba(130, 100, 30, 0.85)');
         }
 
-        // Design axis: red Sun (☉) / red Earth (⊕)
+        // Design bars — bright gold (design/red personality color, but shown as gold like reference)
         if (dSunGate !== null && dEarthGate !== null) {
-            drawCrossAxis(dSunGate, dEarthGate, 'rgba(220, 70, 70, 0.55)', 'rgba(220, 70, 70, 0.85)');
+            drawCrossBar(dSunGate,   'rgba(197, 158, 63, 0.55)', 'rgba(218, 185, 90, 0.95)');
+            drawCrossBar(dEarthGate, 'rgba(197, 158, 63, 0.55)', 'rgba(218, 185, 90, 0.95)');
         }
-
-        // Small gold anchor dot at center intersection
-        ctx.beginPath();
-        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#C59E3F';
-        ctx.fill();
 
 
         // Position and update the HTML SVG overlay
