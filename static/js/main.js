@@ -575,6 +575,13 @@ document.addEventListener('DOMContentLoaded', () => {
         finally  { searchSpinner.classList.add('hidden'); }
     }
 
+    function repositionSuggestions() {
+        const rect = cityInput.getBoundingClientRect();
+        suggestions.style.top   = (rect.bottom + 4) + 'px';
+        suggestions.style.left  = rect.left + 'px';
+        suggestions.style.width = rect.width + 'px';
+    }
+
     function renderSuggestions(items) {
         suggestions.innerHTML = '';
         activeIdx = -1;
@@ -593,7 +600,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Text
             const body    = document.createElement('div');
             body.className = 'sug-body';
-            // Split display_name: first part is city name, rest is country
             const parts   = item.display_name.split(',');
             const primary = parts.slice(0, 2).join(',').trim();
             const sub     = parts.slice(2).join(',').trim();
@@ -619,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
             suggestions.appendChild(li);
         });
 
+        repositionSuggestions();
         suggestions.classList.add('open');
     }
 
