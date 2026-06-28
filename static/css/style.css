@@ -2695,83 +2695,83 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 /* When activated by personality (black) */
 /* When activated by personality (black) */
-#bodygraph-svg-wrap .cls__.bg-gate-active-personality { display: block !important; }
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-17,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-19,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-17,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-19 { fill: #000000 !important; }
-#bodygraph-svg-wrap .bg-gate-active-personality.red_border,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-15,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-21,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-23,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-26,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-30,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-31,
-#bodygraph-svg-wrap .bg-gate-active-personality.cls-35,
-#bodygraph-svg-wrap .bg-gate-active-personality .red_border,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-15,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-21,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-23,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-26,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-30,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-31,
-#bodygraph-svg-wrap .bg-gate-active-personality .cls-35 { stroke: #000000 !important; }
+.bg-svg-wrap .cls__.bg-gate-active-personality { display: block !important; }
+.bg-svg-wrap .bg-gate-active-personality.cls-17,
+.bg-svg-wrap .bg-gate-active-personality.cls-19,
+.bg-svg-wrap .bg-gate-active-personality .cls-17,
+.bg-svg-wrap .bg-gate-active-personality .cls-19 { fill: #000000 !important; }
+.bg-svg-wrap .bg-gate-active-personality.red_border,
+.bg-svg-wrap .bg-gate-active-personality.cls-15,
+.bg-svg-wrap .bg-gate-active-personality.cls-21,
+.bg-svg-wrap .bg-gate-active-personality.cls-23,
+.bg-svg-wrap .bg-gate-active-personality.cls-26,
+.bg-svg-wrap .bg-gate-active-personality.cls-30,
+.bg-svg-wrap .bg-gate-active-personality.cls-31,
+.bg-svg-wrap .bg-gate-active-personality.cls-35,
+.bg-svg-wrap .bg-gate-active-personality .red_border,
+.bg-svg-wrap .bg-gate-active-personality .cls-15,
+.bg-svg-wrap .bg-gate-active-personality .cls-21,
+.bg-svg-wrap .bg-gate-active-personality .cls-23,
+.bg-svg-wrap .bg-gate-active-personality .cls-26,
+.bg-svg-wrap .bg-gate-active-personality .cls-30,
+.bg-svg-wrap .bg-gate-active-personality .cls-31,
+.bg-svg-wrap .bg-gate-active-personality .cls-35 { stroke: #000000 !important; }
 
 /* When activated by design (red) */
-#bodygraph-svg-wrap .cls__.bg-gate-active-design { display: block !important; }
-#bodygraph-svg-wrap .bg-gate-active-design.cls-17,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-19,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-17,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-19 { fill: #fe0000 !important; }
-#bodygraph-svg-wrap .bg-gate-active-design.red_border,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-15,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-21,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-23,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-26,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-30,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-31,
-#bodygraph-svg-wrap .bg-gate-active-design.cls-35,
-#bodygraph-svg-wrap .bg-gate-active-design .red_border,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-15,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-21,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-23,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-26,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-30,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-31,
-#bodygraph-svg-wrap .bg-gate-active-design .cls-35 { stroke: #fe0000 !important; }
+.bg-svg-wrap .cls__.bg-gate-active-design { display: block !important; }
+.bg-svg-wrap .bg-gate-active-design.cls-17,
+.bg-svg-wrap .bg-gate-active-design.cls-19,
+.bg-svg-wrap .bg-gate-active-design .cls-17,
+.bg-svg-wrap .bg-gate-active-design .cls-19 { fill: #fe0000 !important; }
+.bg-svg-wrap .bg-gate-active-design.red_border,
+.bg-svg-wrap .bg-gate-active-design.cls-15,
+.bg-svg-wrap .bg-gate-active-design.cls-21,
+.bg-svg-wrap .bg-gate-active-design.cls-23,
+.bg-svg-wrap .bg-gate-active-design.cls-26,
+.bg-svg-wrap .bg-gate-active-design.cls-30,
+.bg-svg-wrap .bg-gate-active-design.cls-31,
+.bg-svg-wrap .bg-gate-active-design.cls-35,
+.bg-svg-wrap .bg-gate-active-design .red_border,
+.bg-svg-wrap .bg-gate-active-design .cls-15,
+.bg-svg-wrap .bg-gate-active-design .cls-21,
+.bg-svg-wrap .bg-gate-active-design .cls-23,
+.bg-svg-wrap .bg-gate-active-design .cls-26,
+.bg-svg-wrap .bg-gate-active-design .cls-30,
+.bg-svg-wrap .bg-gate-active-design .cls-31,
+.bg-svg-wrap .bg-gate-active-design .cls-35 { stroke: #fe0000 !important; }
 
 /* When activated by BOTH (mixed red-black) */
-#bodygraph-svg-wrap .cls__.bg-gate-active-both { display: block !important; }
+.bg-svg-wrap .cls__.bg-gate-active-both { display: block !important; }
 
 /* Apply red base color to filled base paths in active-both */
-#bodygraph-svg-wrap .bg-gate-active-both.cls-17,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-17,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-1,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-1,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-16,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-16,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-23,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-23,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-26,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-26 { fill: #fe0000 !important; }
+.bg-svg-wrap .bg-gate-active-both.cls-17,
+.bg-svg-wrap .bg-gate-active-both .cls-17,
+.bg-svg-wrap .bg-gate-active-both.cls-1,
+.bg-svg-wrap .bg-gate-active-both .cls-1,
+.bg-svg-wrap .bg-gate-active-both.cls-16,
+.bg-svg-wrap .bg-gate-active-both .cls-16,
+.bg-svg-wrap .bg-gate-active-both.cls-23,
+.bg-svg-wrap .bg-gate-active-both .cls-23,
+.bg-svg-wrap .bg-gate-active-both.cls-26,
+.bg-svg-wrap .bg-gate-active-both .cls-26 { fill: #fe0000 !important; }
 
 /* Apply red base color to stroked base paths in active-both */
-#bodygraph-svg-wrap .bg-gate-active-both.red_border,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-15,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-21,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-30,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-31,
-#bodygraph-svg-wrap .bg-gate-active-both.cls-35,
-#bodygraph-svg-wrap .bg-gate-active-both .red_border,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-15,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-21,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-30,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-31,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-35 { stroke: #fe0000 !important; }
+.bg-svg-wrap .bg-gate-active-both.red_border,
+.bg-svg-wrap .bg-gate-active-both.cls-15,
+.bg-svg-wrap .bg-gate-active-both.cls-21,
+.bg-svg-wrap .bg-gate-active-both.cls-30,
+.bg-svg-wrap .bg-gate-active-both.cls-31,
+.bg-svg-wrap .bg-gate-active-both.cls-35,
+.bg-svg-wrap .bg-gate-active-both .red_border,
+.bg-svg-wrap .bg-gate-active-both .cls-15,
+.bg-svg-wrap .bg-gate-active-both .cls-21,
+.bg-svg-wrap .bg-gate-active-both .cls-30,
+.bg-svg-wrap .bg-gate-active-both .cls-31,
+.bg-svg-wrap .bg-gate-active-both .cls-35 { stroke: #fe0000 !important; }
 
 /* Color native overlay gap rectangles black to create red-black stripes */
-#bodygraph-svg-wrap .bg-gate-active-both.cls-19,
-#bodygraph-svg-wrap .bg-gate-active-both .cls-19 { fill: #000000 !important; }
+.bg-svg-wrap .bg-gate-active-both.cls-19,
+.bg-svg-wrap .bg-gate-active-both .cls-19 { fill: #000000 !important; }
 
 /* Circle indicators on gates */
 .bg-svg-wrap .red_border { fill: none; stroke: #C59E3F; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.83px; }
@@ -2779,15 +2779,15 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .cls-30.cls__.cls__21 { fill: none; stroke: #C59E3F; stroke-width: 2.83px; }
 
 /* Center blocks active */
-#bodygraph-svg-wrap .block__1-active { fill: #ffe500 !important; }
-#bodygraph-svg-wrap .block__2-active { fill: #76ce00 !important; }
-#bodygraph-svg-wrap .block__3-active { fill: #00a8dc !important; }
-#bodygraph-svg-wrap .block__4-active { fill: #ffe500 !important; }
-#bodygraph-svg-wrap .block__5-active { fill: #e02300 !important; }
-#bodygraph-svg-wrap .block__6-active { fill: #e67900 !important; }
-#bodygraph-svg-wrap .block__7-active { fill: #e02300 !important; }
-#bodygraph-svg-wrap .block__8-active { fill: #e67900 !important; }
-#bodygraph-svg-wrap .block__9-active { fill: #ff8900 !important; }
+.bg-svg-wrap .block__1-active { fill: #ffe500 !important; }
+.bg-svg-wrap .block__2-active { fill: #76ce00 !important; }
+.bg-svg-wrap .block__3-active { fill: #00a8dc !important; }
+.bg-svg-wrap .block__4-active { fill: #ffe500 !important; }
+.bg-svg-wrap .block__5-active { fill: #e02300 !important; }
+.bg-svg-wrap .block__6-active { fill: #e67900 !important; }
+.bg-svg-wrap .block__7-active { fill: #e02300 !important; }
+.bg-svg-wrap .block__8-active { fill: #e67900 !important; }
+.bg-svg-wrap .block__9-active { fill: #ff8900 !important; }
 
 /* Columns */
 .bg-col {
@@ -3146,55 +3146,55 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 /* SVG gate hidden base rule */
-#bodygraph-svg-wrap .cls__ { display: none !important; }
+.bg-svg-wrap .cls__ { display: none !important; }
 
 
 /* SVG reference structural rules - scoped */
-#bodygraph-svg-wrap .cls-1,#bodygraph-svg-wrap .cls-16,#bodygraph-svg-wrap .cls-17,#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-26{fill:#fe0000}
-#bodygraph-svg-wrap .cls-1,#bodygraph-svg-wrap .cls-2{clip-rule:evenodd}
-#bodygraph-svg-wrap .cls-2,#bodygraph-svg-wrap .cls-25,#bodygraph-svg-wrap .cls-36{fill:#fe0000}
-#bodygraph-svg-wrap .cls-10,#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-15,#bodygraph-svg-wrap .cls-21,#bodygraph-svg-wrap .cls-3,#bodygraph-svg-wrap .cls-30,#bodygraph-svg-wrap .cls-31,#bodygraph-svg-wrap .cls-32,#bodygraph-svg-wrap .cls-35,#bodygraph-svg-wrap .cls-4,#bodygraph-svg-wrap .cls-6{fill:none;stroke-linecap:round;stroke-linejoin:round}
-#bodygraph-svg-wrap .cls-3{stroke:#ededed;stroke-width:1.42px}
-#bodygraph-svg-wrap .cls-10,#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-13,#bodygraph-svg-wrap .cls-14,#bodygraph-svg-wrap .cls-17,#bodygraph-svg-wrap .cls-19,#bodygraph-svg-wrap .cls-21,#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-24,#bodygraph-svg-wrap .cls-25,#bodygraph-svg-wrap .cls-29,#bodygraph-svg-wrap .cls-3,#bodygraph-svg-wrap .cls-34,#bodygraph-svg-wrap .cls-35,#bodygraph-svg-wrap .cls-37,#bodygraph-svg-wrap .cls-4,#bodygraph-svg-wrap .cls-5,#bodygraph-svg-wrap .cls-6,#bodygraph-svg-wrap .cls-7,#bodygraph-svg-wrap .cls-8{fill-rule:evenodd}
-#bodygraph-svg-wrap .block__1{fill:#fff}
-#bodygraph-svg-wrap .block__1_active{fill:#ffe500!important}
-#bodygraph-svg-wrap .block__2{fill:#fff}
-#bodygraph-svg-wrap .block__2_active{fill:#76ce00!important}
-#bodygraph-svg-wrap .block__3{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-#bodygraph-svg-wrap .block__3_active{fill:#00a8dc}
-#bodygraph-svg-wrap .block__4{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-#bodygraph-svg-wrap .block__4_active{fill:#ffe500}
-#bodygraph-svg-wrap .block__5{fill:#fff}
-#bodygraph-svg-wrap .block__5_active{fill:#e02300!important}
-#bodygraph-svg-wrap .block__6{fill:#fff;stroke:#706f6f;stroke-width:1.3px}
-#bodygraph-svg-wrap .block__6_active{fill:#e67900}
-#bodygraph-svg-wrap .block__7{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-#bodygraph-svg-wrap .block__7_active{fill:#e02300}
-#bodygraph-svg-wrap .block__8{fill:#fff}
-#bodygraph-svg-wrap .block__8_active{fill:#e67900}
-#bodygraph-svg-wrap .block__9{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-#bodygraph-svg-wrap .block__9_active{fill:#ff8900!important}
-#bodygraph-svg-wrap .cls-4{stroke:#878787;stroke-width:3.97px}
-#bodygraph-svg-wrap .cls-5{fill:url(#GradientFill_1)}
-#bodygraph-svg-wrap .cls-6{stroke:#fff}
-#bodygraph-svg-wrap .cls-10,#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-15,#bodygraph-svg-wrap .cls-21,#bodygraph-svg-wrap .cls-30,#bodygraph-svg-wrap .cls-31,#bodygraph-svg-wrap .cls-32,#bodygraph-svg-wrap .cls-35,#bodygraph-svg-wrap .cls-6{stroke-width:2.83px}
-#bodygraph-svg-wrap .cls-7{fill:#dadada}
-#bodygraph-svg-wrap .cls-8,#bodygraph-svg-wrap .cls-9{fill:#fff}
-#bodygraph-svg-wrap .cls-10{stroke:#9d9d9c}
-#bodygraph-svg-wrap .cls-11,#bodygraph-svg-wrap .cls-37{fill:#1d1d1b}
-#bodygraph-svg-wrap .cls-12,#bodygraph-svg-wrap .cls-32{stroke:#706f6f}
-#bodygraph-svg-wrap .cls-13{fill:url(#GradientFill_2)}
-#bodygraph-svg-wrap .cls-14{fill:#64350d}
-#bodygraph-svg-wrap .cls-15,#bodygraph-svg-wrap .cls-21{stroke:#fe0000}
-#bodygraph-svg-wrap .cls-18{clip-path:url(#clip-path)}
-#bodygraph-svg-wrap .cls-20{clip-path:url(#clip-path-2)}
-#bodygraph-svg-wrap .cls-22{clip-path:url(#clip-path-3)}
-#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-26,#bodygraph-svg-wrap .cls-31,#bodygraph-svg-wrap .cls-35{stroke:#fe0000}
-#bodygraph-svg-wrap .cls-23,#bodygraph-svg-wrap .cls-26{stroke-miterlimit:22.93;stroke-width:.22px}
-#bodygraph-svg-wrap .cls-24{fill:#fff}
-#bodygraph-svg-wrap .cls-27{clip-path:url(#clip-path-4)}
-#bodygraph-svg-wrap .cls-28{clip-path:url(#clip-path-5)}
-#bodygraph-svg-wrap .cls-29{fill:url(#GradientFill_2-2)}
-#bodygraph-svg-wrap .cls-30{stroke:#000}
-#bodygraph-svg-wrap .cls-33{clip-path:url(#clip-path-6)}
-#bodygraph-svg-wrap .cls-34{fill:url(#GradientFill_2-3)}
+.bg-svg-wrap .cls-1,.bg-svg-wrap .cls-16,.bg-svg-wrap .cls-17,.bg-svg-wrap .cls-23,.bg-svg-wrap .cls-26{fill:#fe0000}
+.bg-svg-wrap .cls-1,.bg-svg-wrap .cls-2{clip-rule:evenodd}
+.bg-svg-wrap .cls-2,.bg-svg-wrap .cls-25,.bg-svg-wrap .cls-36{fill:#fe0000}
+.bg-svg-wrap .cls-10,.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-15,.bg-svg-wrap .cls-21,.bg-svg-wrap .cls-3,.bg-svg-wrap .cls-30,.bg-svg-wrap .cls-31,.bg-svg-wrap .cls-32,.bg-svg-wrap .cls-35,.bg-svg-wrap .cls-4,.bg-svg-wrap .cls-6{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.bg-svg-wrap .cls-3{stroke:#ededed;stroke-width:1.42px}
+.bg-svg-wrap .cls-10,.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-13,.bg-svg-wrap .cls-14,.bg-svg-wrap .cls-17,.bg-svg-wrap .cls-19,.bg-svg-wrap .cls-21,.bg-svg-wrap .cls-23,.bg-svg-wrap .cls-24,.bg-svg-wrap .cls-25,.bg-svg-wrap .cls-29,.bg-svg-wrap .cls-3,.bg-svg-wrap .cls-34,.bg-svg-wrap .cls-35,.bg-svg-wrap .cls-37,.bg-svg-wrap .cls-4,.bg-svg-wrap .cls-5,.bg-svg-wrap .cls-6,.bg-svg-wrap .cls-7,.bg-svg-wrap .cls-8{fill-rule:evenodd}
+.bg-svg-wrap .block__1{fill:#fff}
+.bg-svg-wrap .block__1_active{fill:#ffe500!important}
+.bg-svg-wrap .block__2{fill:#fff}
+.bg-svg-wrap .block__2_active{fill:#76ce00!important}
+.bg-svg-wrap .block__3{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+.bg-svg-wrap .block__3_active{fill:#00a8dc}
+.bg-svg-wrap .block__4{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+.bg-svg-wrap .block__4_active{fill:#ffe500}
+.bg-svg-wrap .block__5{fill:#fff}
+.bg-svg-wrap .block__5_active{fill:#e02300!important}
+.bg-svg-wrap .block__6{fill:#fff;stroke:#706f6f;stroke-width:1.3px}
+.bg-svg-wrap .block__6_active{fill:#e67900}
+.bg-svg-wrap .block__7{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+.bg-svg-wrap .block__7_active{fill:#e02300}
+.bg-svg-wrap .block__8{fill:#fff}
+.bg-svg-wrap .block__8_active{fill:#e67900}
+.bg-svg-wrap .block__9{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+.bg-svg-wrap .block__9_active{fill:#ff8900!important}
+.bg-svg-wrap .cls-4{stroke:#878787;stroke-width:3.97px}
+.bg-svg-wrap .cls-5{fill:url(#GradientFill_1)}
+.bg-svg-wrap .cls-6{stroke:#fff}
+.bg-svg-wrap .cls-10,.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-15,.bg-svg-wrap .cls-21,.bg-svg-wrap .cls-30,.bg-svg-wrap .cls-31,.bg-svg-wrap .cls-32,.bg-svg-wrap .cls-35,.bg-svg-wrap .cls-6{stroke-width:2.83px}
+.bg-svg-wrap .cls-7{fill:#dadada}
+.bg-svg-wrap .cls-8,.bg-svg-wrap .cls-9{fill:#fff}
+.bg-svg-wrap .cls-10{stroke:#9d9d9c}
+.bg-svg-wrap .cls-11,.bg-svg-wrap .cls-37{fill:#1d1d1b}
+.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-32{stroke:#706f6f}
+.bg-svg-wrap .cls-13{fill:url(#GradientFill_2)}
+.bg-svg-wrap .cls-14{fill:#64350d}
+.bg-svg-wrap .cls-15,.bg-svg-wrap .cls-21{stroke:#fe0000}
+.bg-svg-wrap .cls-18{clip-path:url(#clip-path)}
+.bg-svg-wrap .cls-20{clip-path:url(#clip-path-2)}
+.bg-svg-wrap .cls-22{clip-path:url(#clip-path-3)}
+.bg-svg-wrap .cls-23,.bg-svg-wrap .cls-26,.bg-svg-wrap .cls-31,.bg-svg-wrap .cls-35{stroke:#fe0000}
+.bg-svg-wrap .cls-23,.bg-svg-wrap .cls-26{stroke-miterlimit:22.93;stroke-width:.22px}
+.bg-svg-wrap .cls-24{fill:#fff}
+.bg-svg-wrap .cls-27{clip-path:url(#clip-path-4)}
+.bg-svg-wrap .cls-28{clip-path:url(#clip-path-5)}
+.bg-svg-wrap .cls-29{fill:url(#GradientFill_2-2)}
+.bg-svg-wrap .cls-30{stroke:#000}
+.bg-svg-wrap .cls-33{clip-path:url(#clip-path-6)}
+.bg-svg-wrap .cls-34{fill:url(#GradientFill_2-3)}
