@@ -3648,6 +3648,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const endAngle = degToRad(startLon + GATE_INTERVAL - 180);
             const midAngle = (startAngle + endAngle) / 2;
 
+            const activations = activationsByGate[gateNum] || [];
+            const byLine = {};
+            activations.forEach(act => {
+                const ln = act.line || 1;
+                if (!byLine[ln]) byLine[ln] = [];
+                byLine[ln].push(act);
+            });
+
             // Highlight active gate cell background
             if (isCombinedActive) {
                 ctx.beginPath();
@@ -3674,6 +3682,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 ctx.fill();
             }
+
+            // Draw colored activation blocks inside the 6 dial cells
+            const slotSize = GATE_INTERVAL / 6;
+            Object.entries(byLine).forEach(([lineStr, acts]) => {
+                const lineNum = parseInt(lineStr); // 1-6
+                const slotStartLon = startLon + (lineNum - 1) * slotSize;
+                const N = acts.length;
+                
+                acts.forEach((act, idx) => {
+                    // Divide cell angularly if there are multiple activations in this line
+                    const subStartLon = slotStartLon + idx * (slotSize / N);
+                    const subEndLon = slotStartLon + (idx + 1) * (slotSize / N);
+                    const aStart = degToRad(subStartLon - 180);
+                    const aEnd = degToRad(subEndLon - 180);
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx + rDialInner * Math.cos(aStart), cy + rDialInner * Math.sin(aStart));
+                    ctx.arc(cx, cy, rGatesInner, aStart, aEnd);
+                    ctx.lineTo(cx + rDialInner * Math.cos(aEnd), cy + rDialInner * Math.sin(aEnd));
+                    ctx.arc(cx, cy, rDialInner, aEnd, aStart, true);
+                    ctx.closePath();
+
+                    let fillColor = act.color;
+                    if (isAnyHovered) {
+                        fillColor = isHighlighted ? act.color : 'rgba(150, 150, 150, 0.08)';
+                    }
+                    ctx.fillStyle = fillColor;
+                    ctx.fill();
+                });
+            });
 
             // Radial divider lines for gates (extended through dial ring to rDialInner)
             ctx.beginPath();
@@ -5201,42 +5239,93 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (type === 'gate') {
                     const gateNum = target;
                     const name = GATE_NAMES[gateNum] || '';
+
+                    const HD_COLORS = {
+                        1: "1. Страх",
+                        2: "2. Надежда",
+                        3: "3. Желание",
+                        4: "4. Нужда",
+                        5: "5. Вина",
+                        6: "6. Невинность"
+                    };
+
+                    const HD_TONES = {
+                        1: "1. Запах",
+                        2: "2. Вкус",
+                        3: "3. Внешнее видение",
+                        4: "4. Внутреннее видение",
+                        5: "5. Чувство",
+                        6: "6. Прикосновение"
+                    };
+
+                    const HD_BASES = {
+                        1: "1. Активная",
+                        2: "2. Реактивная",
+                        3: "3. Интегративная",
+                        4: "4. Объективная",
+                        5: "5. Субъективная"
+                    };
+
+                    const HD_THEOSES = {
+                        1: "1. Теос",
+                        2: "2. Хаос",
+                        3: "3. Космос"
+                    };
                     
                     // Collect activations
-                    const act = { design: [], personality: [] };
+                    const activePers = [];
+                    const activeDes = [];
                     lastChart.planets.forEach(p => {
                         if (p.hexagram && p.hexagram.gate === gateNum && (!activePlanets || activePlanets.has(p.name))) {
-                            act.personality.push(p.displayName || p.name);
+                            activePers.push(p);
                         }
                     });
                     (lastChart.design_planets || []).forEach(p => {
                         if (p.hexagram && p.hexagram.gate === gateNum && (!activePlanets || activePlanets.has(p.name))) {
-                            act.design.push(p.displayName || p.name);
+                            activeDes.push(p);
                         }
                     });
 
-                    const hasDes = act.design.length > 0;
-                    const hasPer = act.personality.length > 0;
+                    const hasDes = activeDes.length > 0;
+                    const hasPer = activePers.length > 0;
                     const typeLabel = hasDes && hasPer ? 'Дизайн + Личность'
-                                    : hasDes           ? 'Бессознательное'
-                                    : hasPer           ? 'Сознательное'
+                                    : hasDes           ? 'Бессознательное (Дизайн)'
+                                    : hasPer           ? 'Сознательное (Личность)'
                                     :                    'Не активировано';
 
                     let rows = '';
-                    if (hasDes && hasPer) {
-                        const uniq = [...new Set([...act.design, ...act.personality])];
-                        rows = uniq.map(p =>
-                            `<div class="tt-planet-row"><div class="tt-dot-both"></div><span>${p}</span></div>`
-                        ).join('');
-                    } else if (hasDes) {
-                        rows = act.design.map(p =>
-                            `<div class="tt-planet-row"><div class="tt-dot-design"></div><span>${p}</span></div>`
-                        ).join('');
-                    } else if (hasPer) {
-                        rows = act.personality.map(p =>
-                            `<div class="tt-planet-row"><div class="tt-dot-personality"></div><span>${p}</span></div>`
-                        ).join('');
-                    }
+                    const renderActivationRow = (p, isDesign) => {
+                        const hx = p.hexagram;
+                        const dotClass = isDesign ? 'tt-dot-design' : 'tt-dot-personality';
+                        const labelType = isDesign ? 'Дизайн' : 'Личность';
+                        
+                        const colorName = HD_COLORS[hx.color] || hx.color;
+                        const toneName = HD_TONES[hx.tone] || hx.tone;
+                        const baseName = HD_BASES[hx.base] || hx.base;
+                        const theosName = HD_THEOSES[hx.theos] || hx.theos;
+                        const dispName = p.displayName || p.name;
+                        
+                        return `
+                            <div class="tt-planet-row-detail">
+                                <div class="tt-planet-header">
+                                    <div class="${dotClass}"></div>
+                                    <span class="tt-planet-name-spec">${dispName} (${labelType})</span>
+                                    <span class="tt-planet-line-badge">Линия ${hx.line}</span>
+                                </div>
+                                <div class="tt-planet-metrics">
+                                    <span>Цвет: <strong>${colorName}</strong></span>
+                                    <span>Тон: <strong>${toneName}</strong></span>
+                                    <span>База: <strong>${baseName}</strong></span>
+                                    <span>Теос: <strong>${theosName}</strong></span>
+                                </div>
+                            </div>
+                        `;
+                    };
+
+                    const allRows = [];
+                    activePers.forEach(p => allRows.push(renderActivationRow(p, false)));
+                    activeDes.forEach(p => allRows.push(renderActivationRow(p, true)));
+                    rows = allRows.join('');
 
                     gateTooltip.innerHTML = `
                         <span class="tt-gate-num">Ворота ${gateNum}</span>
