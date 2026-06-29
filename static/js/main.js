@@ -3416,7 +3416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rGatesInner = rGatesOuter - 28;
         // Planet dial ring: the wide band where planet symbols are placed by line slot
         const rDialOuter = rGatesInner;
-        const rDialInner = R * 0.795;
+        const rDialInner = R * 0.811;
         // Zodiac ring: thin strip below the dial
         const rZodiacOuter = rDialInner;
         const rZodiacInner = R * 0.77;
