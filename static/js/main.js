@@ -3414,7 +3414,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const rHexagramsInner = R * 0.92;
         const rGatesOuter = rHexagramsInner;
         const rGatesInner = rGatesOuter - 28;
-        const rZodiacOuter = rGatesInner;
+        // Planet dial ring: the wide band where planet symbols are placed by line slot
+        const rDialOuter = rGatesInner;
+        const rDialInner = R * 0.795;
+        // Zodiac ring: thin strip below the dial
+        const rZodiacOuter = rDialInner;
         const rZodiacInner = R * 0.77;
         const rInnerBorder = rZodiacInner;
 
@@ -3688,23 +3692,22 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
             ctx.stroke();
 
-            // 6 slots per gate (5 internal ticks)
+            // 6 slots per gate: full-height divider lines from rGatesOuter to rDialInner (covering gate ring + dial ring)
             const tickSpacing = GATE_INTERVAL / 6;
-            ctx.beginPath();
             for (let t = 1; t <= 5; t++) {
                 const tickLon = startLon + t * tickSpacing;
                 const tickAngle = degToRad(tickLon - 180);
-                const tickLen = 4;
+                let tickColor = 'rgba(197,158,63,0.18)';
+                if (isAnyHovered) {
+                    tickColor = isHighlighted ? 'rgba(197,158,63,0.4)' : 'rgba(197,158,63,0.03)';
+                }
+                ctx.beginPath();
                 ctx.moveTo(cx + rGatesOuter * Math.cos(tickAngle), cy + rGatesOuter * Math.sin(tickAngle));
-                ctx.lineTo(cx + (rGatesOuter - tickLen) * Math.cos(tickAngle), cy + (rGatesOuter - tickLen) * Math.sin(tickAngle));
+                ctx.lineTo(cx + rDialInner * Math.cos(tickAngle), cy + rDialInner * Math.sin(tickAngle));
+                ctx.strokeStyle = tickColor;
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
             }
-            let tickStrokeColor = 'rgba(197,158,63,0.15)';
-            if (isAnyHovered) {
-                tickStrokeColor = isHighlighted ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.03)';
-            }
-            ctx.strokeStyle = tickStrokeColor;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
 
             // Draw Gate Number
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
@@ -3796,7 +3799,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 5. Draw concentric circle dividing lines
         const concentricBorders = [
             rHexagramsOuter, rHexagramsInner, 
-            rGatesInner, rZodiacInner
+            rGatesInner, rDialInner, rZodiacInner
         ];
         concentricBorders.forEach((r, idx) => {
             ctx.beginPath();
@@ -3807,77 +3810,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         // 6. Quarters dividing rods removed as requested
 
-        // 7. Planet activation lines and symbols inside the wheel
-        for (let i = 0; i < 64; i++) {
-            const gateNum = GATE_ORDER[i];
-            const activations = activationsByGate[gateNum];
-            if (!activations || activations.length === 0) continue;
+        // 7. Planet symbols placed in the dial ring at their hexagram line slot
+        // Each gate has 6 line slots. Planet sits at the arc-center of its slot.
+        // Multiple planets on the same gate+line stack RADIALLY (inward).
+        // The dial ring spans rDialOuter → rDialInner.
+        const dialRingWidth = rDialOuter - rDialInner;
+        const dialRingMid = (rDialOuter + rDialInner) / 2;
+        const planetSymbolSize = Math.min(dialRingWidth * 0.52, 8); // font size in px
+        const planetFontStr = `${Math.round(planetSymbolSize)}px DM Sans, sans-serif`;
 
-            const isHighlighted = isGateHighlighted(gateNum, i);
-            const isAnyHovered = (hoverType !== null);
-
-            const midAngle = degToRad((WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
-            const cos = Math.cos(midAngle);
-            const sin = Math.sin(midAngle);
-
-            // Draw radial Ray connecting the gate to inner activations
-            ctx.beginPath();
-            ctx.moveTo(cx + rGatesInner * cos, cy + rGatesInner * sin);
-            ctx.lineTo(cx + (rInnerBorder - 10 - activations.length * 15) * cos, cy + (rInnerBorder - 10 - activations.length * 15) * sin);
-            
-            const isP = activations.some(a => a.type === 'personality');
-            const isD = activations.some(a => a.type === 'design');
-            
-            let rayStrokeStyle = (isP && isD) ? 'rgba(197,158,63,0.35)' : (isD ? 'rgba(255,96,96,0.3)' : 'rgba(46,42,32,0.25)');
-            if (isAnyHovered) {
-                if (isHighlighted) {
-                    rayStrokeStyle = (isP && isD) ? 'rgba(197,158,63,0.85)' : (isD ? 'rgba(255,96,96,0.85)' : 'rgba(46,42,32,0.85)');
-                } else {
-                    rayStrokeStyle = 'rgba(150, 150, 150, 0.03)';
-                }
-            }
-            ctx.strokeStyle = rayStrokeStyle;
-            ctx.lineWidth = isAnyHovered && isHighlighted ? 1.5 : 0.8;
-            ctx.stroke();
-
-            // Draw stacked planet symbols
-            activations.forEach((act, aIdx) => {
-                const rAct = rInnerBorder - 12 - aIdx * 15;
-                const ax = cx + rAct * cos;
-                const ay = cy + rAct * sin;
-
-                let planetColor = act.color;
-                if (isAnyHovered) {
-                    if (isHighlighted) {
-                        planetColor = act.color;
-                    } else {
-                        planetColor = 'rgba(150, 150, 150, 0.1)';
-                    }
-                }
-
-                // Draw planet glyph symbol
-                ctx.font = isAnyHovered && isHighlighted ? 'bold 13px DM Sans, sans-serif' : '12px DM Sans, sans-serif';
-                ctx.fillStyle = planetColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(act.symbol, ax, ay);
-
-                // Draw tiny line offset next to symbol
-                const subAngle = midAngle + 0.024;
-                const sx = cx + rAct * Math.cos(subAngle);
-                const sy = cy + rAct * Math.sin(subAngle);
-                ctx.font = 'bold 7px DM Sans, sans-serif';
-                
-                let lineCol = act.type === 'design' ? 'rgba(255,96,96,0.95)' : 'rgba(140,110,40,0.95)';
-                if (isAnyHovered && !isHighlighted) {
-                    lineCol = 'rgba(150, 150, 150, 0.1)';
-                }
-                ctx.fillStyle = lineCol;
-                ctx.fillText(act.line.toString(), sx, sy);
-            });
-        }
-
-        // 7.5 Draw radial activation wedges (rays) from the center to the gates
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
             const activations = activationsByGate[gateNum];
@@ -3887,34 +3828,49 @@ document.addEventListener('DOMContentLoaded', () => {
             const isAnyHovered = (hoverType !== null);
 
             const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
-            const startAngle = degToRad(startLon - 180);
-            const endAngle = degToRad(startLon + GATE_INTERVAL - 180);
+            const slotSize = GATE_INTERVAL / 6; // angular width of each line slot
 
-            const isP = activations.some(a => a.type === 'personality');
-            const isD = activations.some(a => a.type === 'design');
+            // Group activations by line (1-6) to handle radial stacking
+            const byLine = {};
+            activations.forEach(act => {
+                const ln = act.line || 1;
+                if (!byLine[ln]) byLine[ln] = [];
+                byLine[ln].push(act);
+            });
 
-            let fillStyle = 'rgba(0,0,0,0)';
-            let opacity = 1.0;
-            
-            if (isAnyHovered) {
-                opacity = isHighlighted ? 1.0 : 0.08;
-            }
+            Object.entries(byLine).forEach(([lineStr, acts]) => {
+                const lineNum = parseInt(lineStr); // 1-6
 
-            if (isP && isD) {
-                fillStyle = `rgba(197,158,63, ${0.1 * opacity})`;
-            } else if (isD) {
-                fillStyle = `rgba(255,96,96, ${0.1 * opacity})`;
-            } else {
-                fillStyle = `rgba(197,158,63, ${0.08 * opacity})`;
-            }
+                // Angular center of this line's slot within the gate sector
+                // Line 1 is the first slot (startLon side), line 6 is the last
+                const slotCenter = startLon + (lineNum - 0.5) * slotSize;
+                const slotAngle = degToRad(slotCenter - 180);
 
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, rGatesInner, startAngle, endAngle);
-            ctx.closePath();
-            ctx.fillStyle = fillStyle;
-            ctx.fill();
+                // Stack radially: first planet at mid-radius, then move inward
+                acts.forEach((act, stackIdx) => {
+                    // Spread across dial ring radially
+                    const stackStep = dialRingWidth / (acts.length + 1);
+                    const rAct = rDialOuter - stackStep * (stackIdx + 1);
+
+                    const ax = cx + rAct * Math.cos(slotAngle);
+                    const ay = cy + rAct * Math.sin(slotAngle);
+
+                    let planetColor = act.color;
+                    if (isAnyHovered) {
+                        planetColor = isHighlighted ? act.color : 'rgba(150, 150, 150, 0.08)';
+                    }
+
+                    ctx.save();
+                    ctx.font = planetFontStr;
+                    ctx.fillStyle = planetColor;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(act.symbol, ax, ay);
+                    ctx.restore();
+                });
+            });
         }
+
 
         // 8. Bodygraph overlay inside inner circle
         const activeGatesCombinedForBG = new Set([...activeGatesPersonality, ...activeGatesDesign]);
