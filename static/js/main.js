@@ -3823,9 +3823,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
 
-            // Draw radial Ray connecting the gate to inner activations (starts at rDialInner)
+            // Draw radial Ray connecting the gate to inner activations (starts at rGatesInner)
             ctx.beginPath();
-            ctx.moveTo(cx + rDialInner * cos, cy + rDialInner * sin);
+            ctx.moveTo(cx + rGatesInner * cos, cy + rGatesInner * sin);
             ctx.lineTo(cx + (rInnerBorder - 10 - activations.length * 15) * cos, cy + (rInnerBorder - 10 - activations.length * 15) * sin);
             
             const isP = activations.some(a => a.type === 'personality');
