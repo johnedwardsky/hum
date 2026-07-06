@@ -1,19 +1,10 @@
 import os
 import ssl
-
-# Bypass SSL certificate verification on macOS globally and for geopy
-ssl._create_default_https_context = ssl._create_unverified_context
-try:
-    import geopy.geocoders
-    geopy.geocoders.options.default_ssl_context = ssl._create_unverified_context()
-except Exception as e:
-    pass
-
 import urllib.request
+import urllib.parse
 import json
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
-from geopy.geocoders import Nominatim
 import pytz
 
 import calculator
@@ -21,8 +12,12 @@ import compatibility_data
 
 app = Flask(__name__)
 
-# Initialize geolocator
-geolocator = Nominatim(user_agent="humantica_astrology_app")
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+NOMINATIM_HEADERS = {
+    "User-Agent": "Humantica/1.0 (humantica.app; contact@humantica.app)",
+    "Accept-Language": "ru,en",
+    "Accept": "application/json",
+}
 
 def get_timezone_by_coords(lat, lon):
     """
@@ -58,24 +53,35 @@ def index():
 @app.route('/api/geocode', methods=['GET'])
 def geocode():
     query = request.args.get('query', '')
-    if not query:
+    if not query or len(query.strip()) < 2:
         return jsonify([])
-    
+
     try:
-        locations = geolocator.geocode(query, exactly_one=False, limit=5, language="ru")
-        if not locations:
-            return jsonify([])
-        
+        params = urllib.parse.urlencode({
+            "q": query,
+            "format": "json",
+            "limit": 7,
+            "addressdetails": 1,
+            "accept-language": "ru",
+        })
+        url = f"{NOMINATIM_URL}?{params}"
+        req = urllib.request.Request(url, headers=NOMINATIM_HEADERS)
+
+        ctx = ssl._create_unverified_context()
+        with urllib.request.urlopen(req, timeout=8, context=ctx) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+
         results = []
-        for loc in locations:
+        for loc in data:
             results.append({
-                "display_name": loc.address,
-                "lat": loc.latitude,
-                "lon": loc.longitude
+                "display_name": loc.get("display_name", ""),
+                "lat": float(loc["lat"]),
+                "lon": float(loc["lon"]),
             })
         return jsonify(results)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"[geocode error] {e}")
+        return jsonify([]), 200
 
 def calculate_person_chart(data):
     birth_date = data.get('birth_date')  # YYYY-MM-DD
