@@ -2700,8 +2700,9 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .bg-gate-active-personality.cls-19,
 .bg-svg-wrap .bg-gate-active-personality .cls-17,
 .bg-svg-wrap .bg-gate-active-personality .cls-19 { fill: #000000 !important; }
-/* Hide hexagram bar dashes inside the group on personality-only channels — unwanted black stripes under solid channel line */
-.bg-svg-wrap g.bg-gate-active-personality rect.cls-19 { display: none !important; }
+/* Hide hexagram bar dashes inside the group on personality-only and design-only channels — removes black/red stripes under solid channel lines */
+.bg-svg-wrap g.bg-gate-active-personality * { display: none !important; }
+.bg-svg-wrap g.bg-gate-active-design * { display: none !important; }
 .bg-svg-wrap .bg-gate-active-personality.red_border,
 .bg-svg-wrap .bg-gate-active-personality.cls-15,
 .bg-svg-wrap .bg-gate-active-personality.cls-21,
