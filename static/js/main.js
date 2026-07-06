@@ -3477,7 +3477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
                 activationsByGate[p.hexagram.gate].push({
                     type: 'personality',
-                    symbol: p.symbol || PLANET_META[p.name]?.sym || '?',
+                    symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
                     color: '#2E2A20',
                     line: p.hexagram.line
                 });
@@ -3487,7 +3487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.hexagram && (!activePlanets || activePlanets.has(p.name))) {
                 activationsByGate[p.hexagram.gate].push({
                     type: 'design',
-                    symbol: p.symbol || PLANET_META[p.name]?.sym || '?',
+                    symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
                     color: 'rgb(255,96,96)',
                     line: p.hexagram.line
                 });

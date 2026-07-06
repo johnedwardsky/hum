@@ -174,7 +174,7 @@ def _calculate_planets_only(jd_ut):
     planets.append({
         "id": -3,
         "name": "Земля",
-        "symbol": "♁",
+        "symbol": "⊕",
         "longitude": earth_lon,
         "speed": sun_speed,
         "is_retrograde": False,
