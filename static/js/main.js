@@ -3988,7 +3988,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Position and update the HTML SVG overlay
         const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
-        const bgOffX = cx - (BG_W * bgScale) / 2 + (17 * bgScale);
+        const bgOffX = cx - (BG_W * bgScale) / 2 + (10 * bgScale);
         const bgOffY = cy - (BG_H * bgScale) / 2;
 
         updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState);
@@ -3998,9 +3998,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrap = document.getElementById('mandala-bodygraph-wrap');
         if (!wrap) return;
 
-        // Position the wrapper exactly over the canvas inner circle
-        wrap.style.left = bgOffX + 'px';
-        wrap.style.top = bgOffY + 'px';
+        // Position the wrapper exactly over the canvas inner circle (adding 20px to compensate for #mandala-container padding)
+        wrap.style.left = (bgOffX + 20) + 'px';
+        wrap.style.top = (bgOffY + 20) + 'px';
         wrap.style.width = (400 * bgScale) + 'px';
         wrap.style.height = (650 * bgScale) + 'px';
 
@@ -5145,7 +5145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (dist < rInnerBorder) {
                     // Inside bodygraph
                     const bgScale = (rInnerBorder * 2 * 0.88) / 650; // BG_H = 650
-                    const bgOffX = cx - (400 * bgScale) / 2 + (17 * bgScale);       // BG_W = 400
+                    const bgOffX = cx - (400 * bgScale) / 2 + (10 * bgScale);       // BG_W = 400
                     const bgOffY = cy - (650 * bgScale) / 2;
                     const lx = (mx - bgOffX) / bgScale;
                     const ly = (my - bgOffY) / bgScale;
