@@ -4004,22 +4004,18 @@ document.addEventListener('DOMContentLoaded', () => {
         wrap.style.width = (400 * bgScale) + 'px';
         wrap.style.height = (650 * bgScale) + 'px';
 
-        // Copy the main SVG bodygraph if not already cloned
-        let svg = wrap.querySelector('svg');
-        if (!svg) {
-            const mainSvg = document.querySelector('#bodygraph-svg-wrap svg');
-            if (mainSvg) {
-                svg = mainSvg.cloneNode(true);
-                svg.setAttribute('width', '100%');
-                svg.setAttribute('height', '100%');
-                // Remove id to prevent duplication issues
-                svg.removeAttribute('id');
-                wrap.innerHTML = '';
-                wrap.appendChild(svg);
-            }
-        }
-
-        if (!svg) return;
+        // Always copy the main SVG bodygraph to ensure it mirrors the main chart perfectly
+        const mainSvg = document.querySelector('#bodygraph-svg-wrap svg');
+        if (!mainSvg) return;
+        
+        let svg = mainSvg.cloneNode(true);
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        svg.removeAttribute('id');
+        
+        // Remove old bodygraph completely and append new
+        wrap.innerHTML = '';
+        wrap.appendChild(svg);
 
         const hoverType = hoverState ? hoverState.type : null;
         const hoverTarget = hoverState ? hoverState.target : null;
