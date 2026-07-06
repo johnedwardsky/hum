@@ -2935,69 +2935,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const bgWidth = Math.max(8 * sc, 2);
         const fgWidth = Math.max(6 * sc, 1.5);
 
-        // Draws a polyline through all points in path[]
-        function strokeLine(path, color, width) {
-            if (!path || path.length < 2) return;
-            ctx.beginPath();
-            ctx.moveTo(path[0][0], path[0][1]);
-            for (let k = 1; k < path.length; k++) ctx.lineTo(path[k][0], path[k][1]);
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.stroke();
-        }
-
-        // Draws the first half (firstHalf=true) or second half (firstHalf=false)
-        // of a channel path in the given color and width
-        function strokeHalf(path, color, width, firstHalf) {
-            if (!path || path.length < 2) return;
-            // Compute total path length and find midpoint
-            const pts = path;
-            let totalLen = 0;
-            const segs = [];
-            for (let k = 0; k < pts.length - 1; k++) {
-                const dx = pts[k+1][0] - pts[k][0];
-                const dy = pts[k+1][1] - pts[k][1];
-                const len = Math.hypot(dx, dy);
-                segs.push(len);
-                totalLen += len;
-            }
-            const halfLen = totalLen / 2;
-            // Find the midpoint
-            let accumulated = 0;
-            let midPt = null;
-            let midSeg = 0;
-            for (let k = 0; k < segs.length; k++) {
-                if (accumulated + segs[k] >= halfLen) {
-                    const t = (halfLen - accumulated) / segs[k];
-                    midPt = [
-                        pts[k][0] + t * (pts[k+1][0] - pts[k][0]),
-                        pts[k][1] + t * (pts[k+1][1] - pts[k][1])
-                    ];
-                    midSeg = k;
-                    break;
-                }
-                accumulated += segs[k];
-            }
-            if (!midPt) midPt = pts[pts.length - 1];
-            // Draw the appropriate half
-            ctx.beginPath();
-            if (firstHalf) {
-                ctx.moveTo(pts[0][0], pts[0][1]);
-                for (let k = 0; k < midSeg; k++) ctx.lineTo(pts[k+1][0], pts[k+1][1]);
-                ctx.lineTo(midPt[0], midPt[1]);
-            } else {
-                ctx.moveTo(midPt[0], midPt[1]);
-                for (let k = midSeg + 1; k < pts.length; k++) ctx.lineTo(pts[k][0], pts[k][1]);
-            }
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.stroke();
-        }
-
         CHANNELS_DATA.forEach(ch => {
             const pA = BG_CENTERS[ch.centerA].gates[ch.gateA];
             const pB = BG_CENTERS[ch.centerB].gates[ch.gateB];
