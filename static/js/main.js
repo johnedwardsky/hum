@@ -574,7 +574,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             const data = await res.json();
-            console.log('[geocode] results:', data.length, 'for query:', q);
             geoCache.set(cacheKey, data);
             renderSuggestions(data);
         } catch(err) {
@@ -1958,7 +1957,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res  = await fetch(url);
                 if (!res.ok) { console.error('[geocode-compat] HTTP error:', res.status); closeSuggestions(); return; }
                 const data = await res.json();
-                console.log('[geocode-compat] results:', data.length, 'for:', q);
                 geoCache.set(cacheKey, data);
                 renderSuggestions(data);
             } catch { closeSuggestions(); }
