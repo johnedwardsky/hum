@@ -2767,6 +2767,14 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .bg-gate-active-both.cls-31,
 .bg-svg-wrap .bg-gate-active-both.cls-35 { stroke: url(#half_black_red) !important; }
 
+/* The mandala clones the SVG and adds '-mandala' to all IDs, so we need a specific rule for it */
+#mandala-bodygraph-wrap .bg-gate-active-both.red_border,
+#mandala-bodygraph-wrap .bg-gate-active-both.cls-15,
+#mandala-bodygraph-wrap .bg-gate-active-both.cls-21,
+#mandala-bodygraph-wrap .bg-gate-active-both.cls-30,
+#mandala-bodygraph-wrap .bg-gate-active-both.cls-31,
+#mandala-bodygraph-wrap .bg-gate-active-both.cls-35 { stroke: url(#half_black_red-mandala) !important; }
+
 /* Color the dashes inside the group BLACK to create the red-black stripes */
 .bg-svg-wrap g.bg-gate-active-both * { fill: #000000 !important; }
 
