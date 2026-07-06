@@ -4013,6 +4013,41 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.setAttribute('height', '100%');
         svg.removeAttribute('id');
         
+        // Make all IDs inside the cloned SVG unique to avoid ID conflicts and browser rendering/clip-path bugs
+        const suffix = '-mandala';
+        svg.querySelectorAll('[id]').forEach(el => {
+            const oldId = el.getAttribute('id');
+            el.setAttribute('id', oldId + suffix);
+        });
+
+        // Update all references in attributes and styles
+        const attrsToUpdate = ['clip-path', 'fill', 'filter', 'mask', 'marker-start', 'marker-mid', 'marker-end'];
+        const hrefAttrs = ['href', 'xlink:href'];
+        svg.querySelectorAll('*').forEach(el => {
+            attrsToUpdate.forEach(attr => {
+                if (el.hasAttribute(attr)) {
+                    const val = el.getAttribute(attr);
+                    const match = val.match(/^url\(#(.+)\)$/);
+                    if (match) {
+                        el.setAttribute(attr, `url(#${match[1]}${suffix})`);
+                    }
+                }
+            });
+            hrefAttrs.forEach(attr => {
+                if (el.hasAttribute(attr)) {
+                    const val = el.getAttribute(attr);
+                    if (val.startsWith('#')) {
+                        el.setAttribute(attr, val + suffix);
+                    }
+                }
+            });
+            if (el.hasAttribute('style')) {
+                let style = el.getAttribute('style');
+                style = style.replace(/url\(#([^)]+)\)/g, (m, oldId) => `url(#${oldId}${suffix})`);
+                el.setAttribute('style', style);
+            }
+        });
+        
         // Remove old bodygraph completely and append new
         wrap.innerHTML = '';
         wrap.appendChild(svg);
