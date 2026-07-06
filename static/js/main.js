@@ -4047,6 +4047,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.setAttribute('style', style);
             }
         });
+
+        // Override external CSS references to clip-paths and gradients by setting them inline with !important
+        const cssIdOverrides = {
+            'cls-18': { prop: 'clip-path', id: 'clip-path' },
+            'cls-20': { prop: 'clip-path', id: 'clip-path-2' },
+            'cls-22': { prop: 'clip-path', id: 'clip-path-3' },
+            'cls-27': { prop: 'clip-path', id: 'clip-path-4' },
+            'cls-28': { prop: 'clip-path', id: 'clip-path-5' },
+            'cls-33': { prop: 'clip-path', id: 'clip-path-6' },
+            
+            'cls-5':  { prop: 'fill', id: 'GradientFill_1' },
+            'cls-13': { prop: 'fill', id: 'GradientFill_2' },
+            'cls-29': { prop: 'fill', id: 'GradientFill_2-2' },
+            'cls-34': { prop: 'fill', id: 'GradientFill_2-3' }
+        };
+        Object.entries(cssIdOverrides).forEach(([cls, target]) => {
+            svg.querySelectorAll(`.${cls}`).forEach(el => {
+                el.style.setProperty(target.prop, `url(#${target.id}${suffix})`, 'important');
+            });
+        });
         
         // Remove old bodygraph completely and append new
         wrap.innerHTML = '';
