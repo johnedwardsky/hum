@@ -2746,8 +2746,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 /* When activated by BOTH (mixed red-black) */
 .bg-svg-wrap .cls__.bg-gate-active-both { display: block !important; }
 
-/* Color the solid line of active-both gates RED */
-.bg-svg-wrap path.bg-gate-active-both,
+/* Color the solid line of active-both gates RED, except circle backgrounds */
+.bg-svg-wrap path.bg-gate-active-both:not(.cls-8):not(.red_bg),
 .bg-svg-wrap rect.bg-gate-active-both,
 .bg-svg-wrap polygon.bg-gate-active-both { fill: #fe0000 !important; }
 
@@ -2759,13 +2759,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap path.bg-gate-active-both.cls-31,
 .bg-svg-wrap path.bg-gate-active-both.cls-35 { fill: none !important; }
 
-/* Apply red color to stroked base paths in active-both */
-.bg-svg-wrap .bg-gate-active-both.red_border,
-.bg-svg-wrap .bg-gate-active-both.cls-15,
-.bg-svg-wrap .bg-gate-active-both.cls-21,
-.bg-svg-wrap .bg-gate-active-both.cls-30,
-.bg-svg-wrap .bg-gate-active-both.cls-31,
-.bg-svg-wrap .bg-gate-active-both.cls-35,
+/* Apply red color to stroked base paths in active-both (excluding circle borders) */
 .bg-svg-wrap .bg-gate-active-both .red_border,
 .bg-svg-wrap .bg-gate-active-both .cls-15,
 .bg-svg-wrap .bg-gate-active-both .cls-21,
@@ -2773,8 +2767,26 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .bg-gate-active-both .cls-31,
 .bg-svg-wrap .bg-gate-active-both .cls-35 { stroke: #fe0000 !important; }
 
+/* Apply half-black half-red stroke to active-both circle borders */
+.bg-svg-wrap .bg-gate-active-both.red_border,
+.bg-svg-wrap .bg-gate-active-both.cls-15,
+.bg-svg-wrap .bg-gate-active-both.cls-21,
+.bg-svg-wrap .bg-gate-active-both.cls-30,
+.bg-svg-wrap .bg-gate-active-both.cls-31,
+.bg-svg-wrap .bg-gate-active-both.cls-35 { stroke: url(#half_black_red) !important; }
+
 /* Color the dashes inside the group BLACK to create the red-black stripes */
 .bg-svg-wrap g.bg-gate-active-both * { fill: #000000 !important; }
+
+/* Force white fill for all active circle backgrounds so they are completely opaque */
+.bg-svg-wrap path.bg-gate-active-personality.cls-8,
+.bg-svg-wrap path.bg-gate-active-personality.red_bg,
+.bg-svg-wrap path.bg-gate-active-design.cls-8,
+.bg-svg-wrap path.bg-gate-active-design.red_bg,
+.bg-svg-wrap path.bg-gate-active-both.cls-8,
+.bg-svg-wrap path.bg-gate-active-both.red_bg {
+    fill: #ffffff !important;
+}
 
 /* Circle indicators on gates */
 .bg-svg-wrap .red_border { fill: none; stroke: #C59E3F; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.83px; }
