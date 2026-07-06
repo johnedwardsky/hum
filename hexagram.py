@@ -5,6 +5,17 @@ Divides the 360° zodiac wheel into 64 gates (programs/hexagrams),
 each further subdivided into lines, colors, tones, bases, and theoses.
 
 The wheel follows the I Ching Rave Mandala order, starting at 358°15'01".
+
+Boundary convention (right-closed intervals):
+    Every interval is defined as [start, end] — closed on BOTH sides.
+    A longitude that falls exactly ON a boundary belongs to the interval
+    that ENDS there (the previous interval), NOT the one that starts there.
+    This matches the PDF report where the displayed start of each next
+    interval is shown as previous_end + 0.01" to avoid visual ambiguity.
+
+    Implemented via: if remainder < BOUNDARY_EPS and index > 0 → use index-1
+    BOUNDARY_EPS = 1e-9° ≈ 3.6e-6" (far smaller than 0.01", handles only
+    exact floating-point boundary hits from Swiss Ephemeris output).
 """
 
 # The I Ching Rave Mandala gate order (64 gates around the wheel)
@@ -24,20 +35,59 @@ WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0  # 358.25027778°
 
 # Subdivision intervals in degrees
 GATE_INTERVAL  = 5.625                    # 360 / 64
-LINE_INTERVAL  = GATE_INTERVAL / 6        # 0.9375
-COLOR_INTERVAL = LINE_INTERVAL / 6        # 0.15625
-TONE_INTERVAL  = COLOR_INTERVAL / 6       # 0.026041666...
-BASE_INTERVAL  = TONE_INTERVAL / 5        # 0.005208333...  (divided by 5, not 6!)
-THEOS_INTERVAL = BASE_INTERVAL / 3        # 0.001736111...
+LINE_INTERVAL  = GATE_INTERVAL / 6        # 0.9375°
+COLOR_INTERVAL = LINE_INTERVAL / 6        # 0.15625°
+TONE_INTERVAL  = COLOR_INTERVAL / 6       # 0.02604166...°
+BASE_INTERVAL  = TONE_INTERVAL / 5        # 0.00520833...°  (÷5, not ÷6!)
+THEOS_INTERVAL = BASE_INTERVAL / 3        # 0.00173611...°
+
+# Epsilon for right-closed boundary semantics.
+# If a computed offset is < BOUNDARY_EPS from a lower boundary (i.e. the
+# value sits exactly ON the mathematical boundary due to floating-point),
+# it is attributed to the PREVIOUS interval (as its END point).
+# 1e-9° ≈ 3.6e-6" — much smaller than Swiss Ephemeris precision (~0.001")
+# so this only fires on true exact-boundary hits, not on normal values.
+BOUNDARY_EPS = 1e-9
+
+
+def _right_closed_index(value, interval, max_idx):
+    """
+    Return the 0-based index for `value` within intervals of `interval` width,
+    using right-closed [start, end] semantics.
+
+    A value exactly on a boundary (remainder ≈ 0) belongs to the PREVIOUS
+    interval (index - 1), unless it is the very first interval (index 0).
+
+    Parameters
+    ----------
+    value    : float  offset within the current level (≥ 0)
+    interval : float  width of each sub-interval
+    max_idx  : int    maximum allowed index (safety clamp)
+
+    Returns
+    -------
+    (index, remainder)  where remainder = value - index * interval
+    """
+    idx = int(value / interval)
+    if idx >= max_idx:
+        idx = max_idx - 1
+    remainder = value - idx * interval
+    # Right-closed: exact boundary hit → attribute to previous interval
+    if remainder < BOUNDARY_EPS and idx > 0:
+        idx -= 1
+        remainder = value - idx * interval
+    return idx, remainder
 
 
 def calculate_hexagram(longitude):
     """
-    Given an ecliptic longitude (0-360°), returns the Human Design gate details.
+    Given an ecliptic longitude (0–360°), returns the Human Design gate details.
 
-    IMPORTANT: The longitude is truncated (NOT rounded) to 5 decimal places
-    before subdivision calculation. The 6th decimal digit is discarded.
-    Each interval boundary starts at +0.00001° from the previous interval's end.
+    Boundary convention: right-closed intervals [start, end].
+    A longitude exactly on a mathematical boundary belongs to the interval
+    that ENDS there (previous interval), not the one that begins there.
+    This is consistent with the Rave Mandala PDF report where successive
+    interval starts are displayed as previous_end + 0.01".
 
     Returns a dict with:
         gate     - Gate/Hexagram number (1-64)
@@ -46,88 +96,88 @@ def calculate_hexagram(longitude):
         tone     - Tone number (1-6)
         base     - Base number (1-5)
         theos    - Theos number (1-3)
-        position - Position index on the wheel (1-64)
+        position - Position index on the wheel (1-based)
     """
-    # No truncation — Swiss Ephemeris precision (~0.001") is sufficient.
-    # Truncation was causing ~0.004" boundary errors at gate transitions.
-
-    # Calculate offset from wheel start
+    # Calculate offset from wheel start (0° … 360°)
     offset = (longitude - WHEEL_START) % 360.0
 
-    # Determine gate position (0-63)
-    gate_index = int(offset / GATE_INTERVAL)
-    if gate_index >= 64:
-        gate_index = 63  # safety clamp
-
+    # ── Gate (0–63) ──────────────────────────────────────────────────────────
+    gate_index, gate_offset = _right_closed_index(offset, GATE_INTERVAL, 64)
     gate_number = GATE_ORDER[gate_index]
 
-    # Offset within the gate
-    gate_offset = offset - gate_index * GATE_INTERVAL
+    # ── Line (1–6) ───────────────────────────────────────────────────────────
+    line_index, line_offset = _right_closed_index(gate_offset, LINE_INTERVAL, 6)
+    line = line_index + 1
 
-    # Line (1-6)
-    line = int(gate_offset / LINE_INTERVAL) + 1
-    if line > 6:
-        line = 6
-    line_offset = gate_offset - (line - 1) * LINE_INTERVAL
+    # ── Color (1–6) ──────────────────────────────────────────────────────────
+    color_index, color_offset = _right_closed_index(line_offset, COLOR_INTERVAL, 6)
+    color = color_index + 1
 
-    # Color (1-6)
-    color = int(line_offset / COLOR_INTERVAL) + 1
-    if color > 6:
-        color = 6
-    color_offset = line_offset - (color - 1) * COLOR_INTERVAL
+    # ── Tone (1–6) ───────────────────────────────────────────────────────────
+    tone_index, tone_offset = _right_closed_index(color_offset, TONE_INTERVAL, 6)
+    tone = tone_index + 1
 
-    # Tone (1-6)
-    tone = int(color_offset / TONE_INTERVAL) + 1
-    if tone > 6:
-        tone = 6
-    tone_offset = color_offset - (tone - 1) * TONE_INTERVAL
+    # ── Base (1–5) ───────────────────────────────────────────────────────────
+    base_index, base_offset = _right_closed_index(tone_offset, BASE_INTERVAL, 5)
+    base = base_index + 1
 
-    # Base (1-5)
-    base = int(tone_offset / BASE_INTERVAL) + 1
-    if base > 5:
-        base = 5
-    base_offset = tone_offset - (base - 1) * BASE_INTERVAL
-
-    # Theos (1-3)
-    theos = int(base_offset / THEOS_INTERVAL) + 1
-    if theos > 3:
-        theos = 3
+    # ── Theos (1–3) ──────────────────────────────────────────────────────────
+    theos_index, _ = _right_closed_index(base_offset, THEOS_INTERVAL, 3)
+    theos = theos_index + 1
 
     return {
-        "gate": gate_number,
-        "line": line,
-        "color": color,
-        "tone": tone,
-        "base": base,
-        "theos": theos,
-        "position": gate_index + 1  # 1-based position on the wheel
+        "gate":     gate_number,
+        "line":     line,
+        "color":    color,
+        "tone":     tone,
+        "base":     base,
+        "theos":    theos,
+        "position": gate_index + 1,  # 1-based position on the wheel
     }
 
 
 if __name__ == "__main__":
-    # Quick verification with known boundaries
     print("=== Hexagram Calculation Verification ===\n")
 
-    # Test: start of Gate 25 at 358°15'01"
-    h = calculate_hexagram(358.25027778)
-    print(f"358°15'01\" -> Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']} (expected Gate 25)")
+    # ── Gate-level boundary tests ────────────────────────────────────────────
+    THEOS_EPSILON = 0.01 / 3600.0   # 0.01" in degrees (display gap)
 
-    # Test: end of Gate 25 / start of Gate 17 boundary
-    h = calculate_hexagram(3.875)  # 3°52'30"
-    print(f"3°52'30\"  -> Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']} (expected Gate 25, line 6)")
+    # Gate 25 starts at WHEEL_START = 358°15'01"
+    h = calculate_hexagram(WHEEL_START)
+    print(f"358°15'01\" (start of Gate 25) → Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected 25)")
 
-    h = calculate_hexagram(3.875 + 1.0/3600.0)  # 3°52'31"
-    print(f"3°52'31\"  -> Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']} (expected Gate 17)")
+    # The mathematical boundary between Gate 25 and Gate 17 is at 3°52'31"
+    boundary_25_17 = (WHEEL_START + GATE_INTERVAL) % 360.0   # = 3.87527...°
+    h = calculate_hexagram(boundary_25_17 - THEOS_EPSILON)   # just before → Gate 25
+    print(f"3°52'30.99\" (end of Gate 25)   → Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected 25)")
 
-    # Test: Sun at 93.164° (from earlier test)
-    h = calculate_hexagram(93.164)
-    print(f"\nSun 93°09'50\" -> Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']}")
+    h = calculate_hexagram(boundary_25_17)                    # exactly on boundary → Gate 25 (right-closed)
+    print(f"3°52'31.00\" (boundary, right-closed) → Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected 25)")
 
-    # Test all 64 gate boundaries
-    print("\n--- All 64 gate starts ---")
+    h = calculate_hexagram(boundary_25_17 + THEOS_EPSILON)   # just after → Gate 17
+    print(f"3°52'31.01\" (start of Gate 17) → Gate {h['gate']}.{h['line']}.{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected 17)")
+
+    # ── Theos-level boundary test (Line 1, Color 1, Tone 1, Base 1) ─────────
+    print("\n── Theos boundary (Gate 25 · L1 · C1 · T1 · B1) ──")
+    theos_boundary = WHEEL_START + THEOS_INTERVAL             # end of Theos 1
+    h = calculate_hexagram(theos_boundary - THEOS_EPSILON)
+    print(f"  Theos 1 end   → ...{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected Theos 1)")
+    h = calculate_hexagram(theos_boundary)
+    print(f"  Exactly on boundary → ...{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected Theos 1, right-closed)")
+    h = calculate_hexagram(theos_boundary + THEOS_EPSILON)
+    print(f"  Theos 2 start → ...{h['color']}.{h['tone']}.{h['base']}.{h['theos']}  (expected Theos 2)")
+
+    # ── All 64 gate boundaries ───────────────────────────────────────────────
+    print("\n── All 64 gate boundary checks ──")
+    all_ok = True
     for i in range(64):
         start_lon = (WHEEL_START + i * GATE_INTERVAL) % 360.0
-        h = calculate_hexagram(start_lon)
+        # Just after boundary → should be gate i
+        h = calculate_hexagram(start_lon + THEOS_EPSILON)
         expected = GATE_ORDER[i]
-        status = "✓" if h["gate"] == expected else "✗"
-        print(f"  {status} Position {i+1:2d}: {start_lon:10.4f}° -> Gate {h['gate']:2d} (expected {expected:2d})")
+        ok = h["gate"] == expected
+        if not ok:
+            all_ok = False
+            print(f"  ✗ Position {i+1:2d}: {start_lon:.4f}°+ε → Gate {h['gate']} (expected {expected})")
+    if all_ok:
+        print("  ✓ All 64 gate start+ε checks passed")
