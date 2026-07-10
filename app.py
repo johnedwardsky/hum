@@ -9,6 +9,7 @@ import pytz
 
 import calculator
 import compatibility_data
+import cities_data
 
 app = Flask(__name__)
 
@@ -27,7 +28,8 @@ def get_timezone_by_coords(lat, lon):
     try:
         url = f"https://timeapi.io/api/TimeZone/coordinate?latitude={lat}&longitude={lon}"
         req = urllib.request.Request(url, headers={'User-Agent': 'humantica_astrology_app'})
-        with urllib.request.urlopen(req, timeout=4) as response:
+        ctx = ssl._create_unverified_context()
+        with urllib.request.urlopen(req, timeout=4, context=ctx) as response:
             res_data = json.loads(response.read().decode('utf-8'))
             tz_name = res_data.get('timeZone')
             if tz_name in pytz.all_timezones:
@@ -56,6 +58,14 @@ def geocode():
     if not query or len(query.strip()) < 2:
         return jsonify([])
 
+    results = []
+    # 1. Search local popular cities first (for offline support / fast access / fix missing cities like Klaipėda)
+    try:
+        results = cities_data.search_local_cities(query)
+    except Exception as e:
+        print(f"[local geocode error] {e}")
+
+    # 2. Try Nominatim search and merge results
     try:
         params = urllib.parse.urlencode({
             "q": query,
@@ -71,17 +81,25 @@ def geocode():
         with urllib.request.urlopen(req, timeout=8, context=ctx) as resp:
             data = json.loads(resp.read().decode("utf-8"))
 
-        results = []
         for loc in data:
-            results.append({
-                "display_name": loc.get("display_name", ""),
-                "lat": float(loc["lat"]),
-                "lon": float(loc["lon"]),
-            })
-        return jsonify(results)
+            lat = float(loc["lat"])
+            lon = float(loc["lon"])
+            # Prevent duplicate results by checking if coords are close
+            is_dup = False
+            for existing in results:
+                if abs(existing["lat"] - lat) < 0.05 and abs(existing["lon"] - lon) < 0.05:
+                    is_dup = True
+                    break
+            if not is_dup:
+                results.append({
+                    "display_name": loc.get("display_name", ""),
+                    "lat": lat,
+                    "lon": lon,
+                })
     except Exception as e:
-        print(f"[geocode error] {e}")
-        return jsonify([]), 200
+        print(f"[nominatim geocode error] {e}")
+        
+    return jsonify(results[:10])
 
 def calculate_person_chart(data):
     birth_date = data.get('birth_date')  # YYYY-MM-DD
