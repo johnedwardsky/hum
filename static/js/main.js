@@ -4447,10 +4447,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (map['Солнце']) result.push(map['Солнце']);
             if (map['Земля']) result.push(map['Земля']);
             
-            const nNode = map['Средний Северный Узел'] || map['Истинный Северный Узел'] || map['Северный Узел'];
+            const nNode = map['Истинный Северный Узел'] || map['Средний Северный Узел'] || map['Северный Узел'];
             if (nNode) result.push({ ...nNode, displayName: 'Северный Узел' });
             
-            const sNode = map['Средний Южный Узел'] || map['Истинный Южный Узел'] || map['Южный Узел'];
+            const sNode = map['Истинный Южный Узел'] || map['Средний Южный Узел'] || map['Южный Узел'];
             if (sNode) result.push({ ...sNode, displayName: 'Южный Узел' });
             
             if (map['Луна']) result.push(map['Луна']);
@@ -4691,7 +4691,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Planet symbols map ─────────────────────────────────────────
         function getPlanetSym(name) {
-            const key = name === 'Северный Узел' ? 'Средний Северный Узел' : (name === 'Южный Узел' ? 'Средний Южный Узел' : name);
+            const key = name === 'Северный Узел' ? 'Истинный Северный Узел' : (name === 'Южный Узел' ? 'Истинный Южный Узел' : name);
             const meta = PLANET_META[key] || PLANET_META[name];
             return meta ? meta.sym : name.substring(0,2);
         }
