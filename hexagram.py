@@ -38,13 +38,14 @@ GATE_ORDER = [
 # Wheel start: 358°15'00" = 358 + 15/60
 WHEEL_START = 358.0 + 15.0 / 60.0  # 358.25°
 
-# Subdivision intervals in degrees
+# Subdivision intervals in degrees (aligned with HexagramParserV3)
 GATE_INTERVAL  = 5.625                    # 360 / 64
 LINE_INTERVAL  = GATE_INTERVAL / 6        # 0.9375°
 COLOR_INTERVAL = LINE_INTERVAL / 6        # 0.15625°
-TONE_INTERVAL  = COLOR_INTERVAL / 6       # 0.02604166...°
-BASE_INTERVAL  = TONE_INTERVAL / 5        # 0.00520833...°  (÷5, not ÷6!)
+TONE_INTERVAL  = 0.02606166666667         # Hardcoded in HexagramParserV3 (with minor typo)
+BASE_INTERVAL  = 0.00520833333333         # Hardcoded in HexagramParserV3
 THEOS_INTERVAL = BASE_INTERVAL / 3        # 0.00173611...°
+
 
 
 def _left_closed_index(value, interval, max_idx):
