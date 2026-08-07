@@ -3803,31 +3803,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
             
             let font = isCombinedActive ? 'bold 9px DM Sans, sans-serif' : '8px DM Sans, sans-serif';
-            // Color logic: Personality=black, Design=red, Both=black+red-stroke, inactive=grey
+            // Color logic: Personality=black, Design=red, Both=black, inactive=grey
             const gBoth = isPersActive && isDesActive;
-            let fillStyle = gBoth ? '#2E2A20'
-                          : isPersActive  ? '#2E2A20'
-                          : isDesActive   ? 'rgb(255,96,96)'
+            let fillStyle = (gBoth || isPersActive) ? '#2E2A20'
+                          : isDesActive             ? 'rgb(255,96,96)'
                           : '#777166';
-            let strokeGate = gBoth ? 'rgba(255,96,96,0.75)' : null;
 
             if (isAnyHovered) {
                 if (isHighlighted) {
                     font = 'bold 11px DM Sans, sans-serif';
                 } else {
-                    fillStyle  = 'rgba(120, 120, 120, 0.15)';
-                    strokeGate = null;
+                    fillStyle = 'rgba(120, 120, 120, 0.15)';
                 }
             }
 
             ctx.font = font;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            if (strokeGate) {
-                ctx.strokeStyle = strokeGate;
-                ctx.lineWidth = 0.5;
-                ctx.strokeText(gateNum.toString(), lx, ly);
-            }
             ctx.fillStyle = fillStyle;
             ctx.fillText(gateNum.toString(), lx, ly);
 
@@ -3952,23 +3944,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 let numColor, numFont, mirrorStroke;
                 if (hasAct) {
                     const mBoth = isP && isD;
-                    numColor     = mBoth ? '#2E2A20' : isP ? '#2E2A20' : 'rgb(220,80,80)';
-                    mirrorStroke = mBoth ? 'rgba(255,96,96,0.75)' : null;
-                    numFont = `bold ${fontSize}px DM Sans, sans-serif`;
+                    numColor = (mBoth || isP) ? '#2E2A20' : 'rgb(220,80,80)';
+                    numFont  = `bold ${fontSize}px DM Sans, sans-serif`;
                 } else {
-                    numColor     = 'rgba(150,145,130,0.28)';
-                    mirrorStroke = null;
-                    numFont      = `${fontSize - 1}px DM Sans, sans-serif`;
+                    numColor = 'rgba(150,145,130,0.28)';
+                    numFont  = `${fontSize - 1}px DM Sans, sans-serif`;
                 }
 
                 ctx.font = numFont;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                if (mirrorStroke) {
-                    ctx.strokeStyle = mirrorStroke;
-                    ctx.lineWidth = 0.5;
-                    ctx.strokeText(gateNum.toString(), gnx, gny);
-                }
                 ctx.fillStyle = numColor;
                 ctx.fillText(gateNum.toString(), gnx, gny);
             }
