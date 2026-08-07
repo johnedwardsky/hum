@@ -4254,25 +4254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
 
-            // Draw radial Ray connecting the gate to inner activations (starts at rGatesInner)
-            ctx.beginPath();
-            ctx.moveTo(cx + rGatesInner * cos, cy + rGatesInner * sin);
-            ctx.lineTo(cx + (rInnerBorder - 10 - activations.length * 15) * cos, cy + (rInnerBorder - 10 - activations.length * 15) * sin);
-            
-            const isP = activations.some(a => a.type === 'personality');
-            const isD = activations.some(a => a.type === 'design');
-            
-            let rayStrokeStyle = (isP && isD) ? 'rgba(197,158,63,0.35)' : (isD ? 'rgba(255,96,96,0.3)' : 'rgba(46,42,32,0.25)');
-            if (isAnyHovered) {
-                if (isHighlighted) {
-                    rayStrokeStyle = (isP && isD) ? 'rgba(197,158,63,0.85)' : (isD ? 'rgba(255,96,96,0.85)' : 'rgba(46,42,32,0.85)');
-                } else {
-                    rayStrokeStyle = 'rgba(150, 150, 150, 0.03)';
-                }
-            }
-            ctx.strokeStyle = rayStrokeStyle;
-            ctx.lineWidth = isAnyHovered && isHighlighted ? 1.5 : 0.8;
-            ctx.stroke();
+            // Radial ray lines removed (per user request)
 
             // Draw stacked planet symbols inside the inner circle
             activations.forEach((act, aIdx) => {
