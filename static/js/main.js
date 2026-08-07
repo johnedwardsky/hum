@@ -3831,10 +3831,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = fillStyle;
             ctx.fillText(gateNum.toString(), lx, ly);
 
-            // Draw Program (Gate) Number in outermost ring, rotated gracefully along circle (never upside down)
-            const rHexMid = (rHexagramsOuter + rHexagramsInner) / 2;
-            const xHex = cx + rHexMid * Math.cos(midAngle);
-            const yHex = cy + rHexMid * Math.sin(midAngle);
+            // Draw I Ching Hexagram (6 stacked parallel bars: Line 1 inner to Line 6 outer)
+            const lineStr = HEX_LINES[gateNum] || "000000";
+            const hexW = Math.max(10, R * 0.034); // Width of each line bar
+            const hexGap = Math.max(2.5, R * 0.007); // Gap in Yin (broken) line
+            const lineSpacing = Math.max(2.4, (rHexagramsOuter - rHexagramsInner - 6) / 5);
+
+            let hexStroke = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+            if (isAnyHovered) {
+                if (isHighlighted) {
+                    hexStroke = isPersActive ? '#000000' : (isDesActive ? 'rgb(255,96,96)' : '#C59E3F');
+                } else {
+                    hexStroke = 'rgba(120, 120, 120, 0.12)';
+                }
+            }
 
             let normA = midAngle;
             while (normA > Math.PI) normA -= 2 * Math.PI;
@@ -3845,37 +3855,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 rotHex = normA - Math.PI / 2;
             }
 
-            ctx.save();
-            ctx.translate(xHex, yHex);
-            ctx.rotate(rotHex);
+            ctx.lineWidth = 1.4;
+            ctx.lineCap = 'butt';
+            ctx.strokeStyle = hexStroke;
 
-            let hexFont = isCombinedActive ? 'bold 11px DM Sans, sans-serif' : '10px DM Sans, sans-serif';
-            let hexFill = gBoth ? '#2E2A20'
-                        : isPersActive ? '#2E2A20'
-                        : isDesActive  ? 'rgb(255,96,96)'
-                        : '#7C776D';
-            let hexStroke = gBoth ? 'rgba(255,96,96,0.75)' : null;
+            for (let j = 0; j < 6; j++) {
+                const lineType = lineStr[j]; // '1' = Yang, '0' = Yin
+                const r_j = rHexagramsInner + 3.5 + j * lineSpacing;
+                const x_j = cx + r_j * Math.cos(midAngle);
+                const y_j = cy + r_j * Math.sin(midAngle);
 
-            if (isAnyHovered) {
-                if (isHighlighted) {
-                    hexFont = 'bold 12px DM Sans, sans-serif';
+                ctx.save();
+                ctx.translate(x_j, y_j);
+                ctx.rotate(rotHex);
+
+                ctx.beginPath();
+                if (lineType === '1') {
+                    // Solid Yang line
+                    ctx.moveTo(-hexW / 2, 0);
+                    ctx.lineTo(hexW / 2, 0);
                 } else {
-                    hexFill = 'rgba(120, 120, 120, 0.15)';
-                    hexStroke = null;
+                    // Broken Yin line
+                    ctx.moveTo(-hexW / 2, 0);
+                    ctx.lineTo(-hexGap / 2, 0);
+                    ctx.moveTo(hexGap / 2, 0);
+                    ctx.lineTo(hexW / 2, 0);
                 }
+                ctx.stroke();
+                ctx.restore();
             }
-
-            ctx.font = hexFont;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            if (hexStroke) {
-                ctx.strokeStyle = hexStroke;
-                ctx.lineWidth = 0.5;
-                ctx.strokeText(gateNum.toString(), 0, 0);
-            }
-            ctx.fillStyle = hexFill;
-            ctx.fillText(gateNum.toString(), 0, 0);
-            ctx.restore();
         }
 
         // 3.5 Mirror Ring — Зеркало Жизни
