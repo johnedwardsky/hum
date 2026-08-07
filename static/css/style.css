@@ -3240,3 +3240,99 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .cls-30{stroke:#000}
 .bg-svg-wrap .cls-33{clip-path:url(#clip-path-6)}
 .bg-svg-wrap .cls-34{fill:url(#GradientFill_2-3)}
+
+/* Rulers info column layout inside planet rows */
+.bg-rulers-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    font-size: 8.5px;
+    font-weight: bold;
+    width: 32px;
+    flex-shrink: 0;
+    user-select: none;
+}
+.bg-ruler-up {
+    color: #A85B10;
+}
+.bg-ruler-down {
+    color: #3040B8;
+}
+
+/* Custom Earth Glyph to avoid font rendering issues */
+.planet-glyph.glyph-earth,
+.bg-planet-sym.glyph-earth {
+    position: relative !important;
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Earth symbol dimensions inside bodygraph lists */
+.bg-planet-sym.glyph-earth::before {
+    content: '' !important;
+    position: absolute !important;
+    width: 15px !important;
+    height: 15px !important;
+    border: 1.5px solid currentColor !important;
+    border-radius: 50% !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    box-sizing: border-box !important;
+}
+.bg-planet-sym.glyph-earth::after {
+    content: '' !important;
+    position: absolute !important;
+    width: 15px !important;
+    height: 15px !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: 
+        linear-gradient(to right, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important,
+        linear-gradient(to bottom, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important;
+    box-sizing: border-box !important;
+}
+
+/* Earth symbol dimensions inside general tables */
+.planet-glyph.glyph-earth::before {
+    content: '' !important;
+    position: absolute !important;
+    width: 14px !important;
+    height: 14px !important;
+    border: 1.5px solid currentColor !important;
+    border-radius: 50% !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    box-sizing: border-box !important;
+}
+.planet-glyph.glyph-earth::after {
+    content: '' !important;
+    position: absolute !important;
+    width: 14px !important;
+    height: 14px !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: 
+        linear-gradient(to right, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important,
+        linear-gradient(to bottom, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important;
+    box-sizing: border-box !important;
+}
+
+/* Custom size increases to match Earth glyph size */
+.bg-planet-sym {
+    font-size: 21px !important;
+}
+.planet-glyph {
+    font-size: 19px !important;
+}
+
+
+
+
