@@ -3831,37 +3831,39 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = fillStyle;
             ctx.fillText(gateNum.toString(), lx, ly);
 
-            // Draw I Ching Hexagram (6 concentric arc lines following the circle)
-            const lineStr = HEX_LINES[gateNum] || "000000";
-            const paddingRad = 0.007;
-            const gapRad = 0.006;
-            ctx.lineWidth = 1.3;
-            ctx.lineCap = 'round';
+            // Draw I Ching Hexagram (only for active gates)
+            if (isCombinedActive) {
+                const lineStr = HEX_LINES[gateNum] || "000000";
+                const paddingRad = 0.007;
+                const gapRad = 0.006;
+                ctx.lineWidth = 1.3;
+                ctx.lineCap = 'round';
 
-            for (let j = 0; j < 6; j++) {
-                const lineType = lineStr[j]; // '1' = Yang, '0' = Yin
-                const r = rHexagramsInner + 3.5 + j * 3.2;
+                for (let j = 0; j < 6; j++) {
+                    const lineType = lineStr[j]; // '1' = Yang, '0' = Yin
+                    const r = rHexagramsInner + 3.5 + j * 3.2;
 
-                let hexStrokeStyle = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
-                if (isAnyHovered) {
-                    if (isHighlighted) {
-                        hexStrokeStyle = isPersActive ? '#000000' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
-                    } else {
-                        hexStrokeStyle = 'rgba(120, 120, 120, 0.1)';
+                    let hexStrokeStyle = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+                    if (isAnyHovered) {
+                        if (isHighlighted) {
+                            hexStrokeStyle = isPersActive ? '#000000' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+                        } else {
+                            hexStrokeStyle = 'rgba(120, 120, 120, 0.1)';
+                        }
                     }
-                }
-                ctx.strokeStyle = hexStrokeStyle;
+                    ctx.strokeStyle = hexStrokeStyle;
 
-                ctx.beginPath();
-                if (lineType === '1') {
-                    ctx.arc(cx, cy, r, startAngle + paddingRad, endAngle - paddingRad);
-                    ctx.stroke();
-                } else {
-                    ctx.arc(cx, cy, r, startAngle + paddingRad, midAngle - gapRad);
-                    ctx.stroke();
                     ctx.beginPath();
-                    ctx.arc(cx, cy, r, midAngle + gapRad, endAngle - paddingRad);
-                    ctx.stroke();
+                    if (lineType === '1') {
+                        ctx.arc(cx, cy, r, startAngle + paddingRad, endAngle - paddingRad);
+                        ctx.stroke();
+                    } else {
+                        ctx.arc(cx, cy, r, startAngle + paddingRad, midAngle - gapRad);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, r, midAngle + gapRad, endAngle - paddingRad);
+                        ctx.stroke();
+                    }
                 }
             }
         }
@@ -3869,7 +3871,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3.5 Mirror Ring — Зеркало Жизни
         // Placed between hexagram lines (outer) and gate numbers ring.
         // Gate sequence starts at the Ascendant (AS = 0°), step 5.625°.
-        // Shows only gate numbers — activated sectors bold/highlighted, others dimmed.
+        // Shows ONLY activated gate numbers — inactive ones are completely hidden.
         const MIRROR_GATE_ORDER = [
             41, 61, 60, 10, 58, 54, 38, 24, 27, 42,  3, 25, 17, 51, 21, 13, 49, 55, 30, 36,
             22, 37, 63,  2, 23, 20,  8, 12, 45, 16, 35, 33, 31, 62, 56, 15, 52, 53, 39, 44,
@@ -3908,6 +3910,10 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < 64; i++) {
                 const gateNum  = MIRROR_GATE_ORDER[i];
                 const hasAct   = mirrorActivated.has(i);
+
+                // Completely hide inactive (dimmed) mirror programs
+                if (!hasAct) continue;
+
                 const isP      = mirrorHasPers.has(i);
                 const isD      = mirrorHasDes.has(i);
 
