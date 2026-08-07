@@ -3831,58 +3831,38 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = fillStyle;
             ctx.fillText(gateNum.toString(), lx, ly);
 
-            // Draw I Ching Hexagram (6 stacked parallel bars: Line 1 inner to Line 6 outer)
+            // Draw I Ching Hexagram (6 concentric arc lines following the circle)
             const lineStr = HEX_LINES[gateNum] || "000000";
-            const hexW = Math.max(10, R * 0.034); // Width of each line bar
-            const hexGap = Math.max(2.5, R * 0.007); // Gap in Yin (broken) line
-            const lineSpacing = Math.max(2.4, (rHexagramsOuter - rHexagramsInner - 6) / 5);
-
-            let hexStroke = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
-            if (isAnyHovered) {
-                if (isHighlighted) {
-                    hexStroke = isPersActive ? '#000000' : (isDesActive ? 'rgb(255,96,96)' : '#C59E3F');
-                } else {
-                    hexStroke = 'rgba(120, 120, 120, 0.12)';
-                }
-            }
-
-            let normA = midAngle;
-            while (normA > Math.PI) normA -= 2 * Math.PI;
-            while (normA < -Math.PI) normA += 2 * Math.PI;
-
-            let rotHex = normA + Math.PI / 2;
-            if (normA > 0 && normA < Math.PI) {
-                rotHex = normA - Math.PI / 2;
-            }
-
-            ctx.lineWidth = 1.4;
-            ctx.lineCap = 'butt';
-            ctx.strokeStyle = hexStroke;
+            const paddingRad = 0.007;
+            const gapRad = 0.006;
+            ctx.lineWidth = 1.3;
+            ctx.lineCap = 'round';
 
             for (let j = 0; j < 6; j++) {
                 const lineType = lineStr[j]; // '1' = Yang, '0' = Yin
-                const r_j = rHexagramsInner + 3.5 + j * lineSpacing;
-                const x_j = cx + r_j * Math.cos(midAngle);
-                const y_j = cy + r_j * Math.sin(midAngle);
+                const r = rHexagramsInner + 3.5 + j * 3.2;
 
-                ctx.save();
-                ctx.translate(x_j, y_j);
-                ctx.rotate(rotHex);
+                let hexStrokeStyle = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        hexStrokeStyle = isPersActive ? '#000000' : (isDesActive ? 'rgb(255,96,96)' : '#7C776D');
+                    } else {
+                        hexStrokeStyle = 'rgba(120, 120, 120, 0.1)';
+                    }
+                }
+                ctx.strokeStyle = hexStrokeStyle;
 
                 ctx.beginPath();
                 if (lineType === '1') {
-                    // Solid Yang line
-                    ctx.moveTo(-hexW / 2, 0);
-                    ctx.lineTo(hexW / 2, 0);
+                    ctx.arc(cx, cy, r, startAngle + paddingRad, endAngle - paddingRad);
+                    ctx.stroke();
                 } else {
-                    // Broken Yin line
-                    ctx.moveTo(-hexW / 2, 0);
-                    ctx.lineTo(-hexGap / 2, 0);
-                    ctx.moveTo(hexGap / 2, 0);
-                    ctx.lineTo(hexW / 2, 0);
+                    ctx.arc(cx, cy, r, startAngle + paddingRad, midAngle - gapRad);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, midAngle + gapRad, endAngle - paddingRad);
+                    ctx.stroke();
                 }
-                ctx.stroke();
-                ctx.restore();
             }
         }
 
