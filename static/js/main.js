@@ -4104,15 +4104,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gate = h.hexagram ? h.hexagram.gate : '?';
                 const line = h.hexagram ? h.hexagram.line : '?';
 
-                // Space elements out along the circular arc of rMid
-                const halfSpan = (endAngle - startAngle) / 2;
-                const angleOffset = halfSpan * 0.58; // Rulers offset to the right
+                // --- 3-Column Balanced Layout inside the 30° Gold Sector Band ---
+                // Left Column: House Number (1..12) inside a subtle circular badge
+                // Center Column: Gate.Line (e.g. 38.1)
+                // Right Column: Planetary Rulers (▲ Exaltation / ▽ Detriment)
 
-                // Keep rulers on the viewer's right for both top/bottom halves
+                const halfSpan = (endAngle - startAngle) / 2;
+                const angleOffset = halfSpan * 0.62; // Spacing for left and right columns
+
                 const isLowerHalf = (midAngle > 0 && midAngle < Math.PI);
+                const angleHouse  = isLowerHalf ? (midAngle + angleOffset) : (midAngle - angleOffset);
+                const angleCenter = midAngle;
                 const angleRulers = isLowerHalf ? (midAngle - angleOffset) : (midAngle + angleOffset);
 
-                // Helper to normalize angle to [-PI, PI] for correct flip checks
                 const normAngle = (a) => {
                     let res = a;
                     while (res > Math.PI) res -= 2 * Math.PI;
@@ -4120,53 +4124,51 @@ document.addEventListener('DOMContentLoaded', () => {
                     return res;
                 };
 
-                const nG = normAngle(midAngle);
+                const nH = normAngle(angleHouse);
+                const nC = normAngle(angleCenter);
                 const nR = normAngle(angleRulers);
 
-                // --- 1. Draw House Number (Inner ring, below gold band, strictly centered) ---
+                // 1. House Number (Left column, inside gold band)
                 ctx.save();
-                const rNumInner = rHousesInner - 12.5; // Adjusted slightly inwards for larger font size
-                const xH = cx + rNumInner * Math.cos(nG);
-                const yH = cy + rNumInner * Math.sin(nG);
+                const xH = cx + rMid * Math.cos(nH);
+                const yH = cy + rMid * Math.sin(nH);
                 ctx.translate(xH, yH);
-                let rotH = nG + Math.PI / 2;
-                if (nG > 0 && nG < Math.PI) {
-                    rotH = nG - Math.PI / 2;
-                }
+                let rotH = nH + Math.PI / 2;
+                if (nH > 0 && nH < Math.PI) rotH = nH - Math.PI / 2;
                 ctx.rotate(rotH);
-                ctx.font = 'bold 16px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba('#C59E3F', textAlpha); // Gold color matching mandala accents
+
+                // Subtle circular badge for house number
+                ctx.beginPath();
+                ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
+                ctx.fillStyle = hexToRgba('rgba(197, 158, 63, 0.14)', textAlpha);
+                ctx.fill();
+                ctx.strokeStyle = hexToRgba('rgba(197, 158, 63, 0.40)', textAlpha);
+                ctx.lineWidth = 0.7;
+                ctx.stroke();
+
+                ctx.font = 'bold 11px "DM Sans", sans-serif';
+                ctx.fillStyle = hexToRgba('#2E2A20', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-
-                const strNum = houseNum.toString();
-                if (strNum.length === 2) {
-                    // Draw first and second digit with extra spacing to prevent overlapping
-                    ctx.fillText(strNum[0], -4.0, 0);
-                    ctx.fillText(strNum[1], 4.0, 0);
-                } else {
-                    ctx.fillText(strNum, 0, 0);
-                }
+                ctx.fillText(houseNum.toString(), 0, 0);
                 ctx.restore();
 
-                // --- 2. Draw Gate.Line (Center of gold ring, rMid) ---
+                // 2. Gate.Line (Center column, inside gold band)
                 ctx.save();
-                const xG = cx + rMid * Math.cos(nG);
-                const yG = cy + rMid * Math.sin(nG);
-                ctx.translate(xG, yG);
-                let rotG = nG + Math.PI / 2;
-                if (nG > 0 && nG < Math.PI) {
-                    rotG = nG - Math.PI / 2;
-                }
-                ctx.rotate(rotG);
+                const xC = cx + rMid * Math.cos(nC);
+                const yC = cy + rMid * Math.sin(nC);
+                ctx.translate(xC, yC);
+                let rotC = nC + Math.PI / 2;
+                if (nC > 0 && nC < Math.PI) rotC = nC - Math.PI / 2;
+                ctx.rotate(rotC);
                 ctx.font = 'bold italic 11px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba('#2E2A20', textAlpha); // Dark color for program/gate
+                ctx.fillStyle = hexToRgba('#2E2A20', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`${gate}.${line}`, 0, 0);
                 ctx.restore();
 
-                // --- 3. Draw Rulers (Right of gold ring, stacked vertically, rMid) ---
+                // 3. Rulers (Right column, inside gold band)
                 const rulers = (typeof getNidanaRulers === 'function')
                     ? getNidanaRulers(gate, line) : null;
 
@@ -4176,9 +4178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const yR = cy + rMid * Math.sin(nR);
                     ctx.translate(xR, yR);
                     let rotR = nR + Math.PI / 2;
-                    if (nR > 0 && nR < Math.PI) {
-                        rotR = nR - Math.PI / 2;
-                    }
+                    if (nR > 0 && nR < Math.PI) rotR = nR - Math.PI / 2;
                     ctx.rotate(rotR);
                     ctx.textBaseline = 'middle';
 
