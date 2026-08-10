@@ -3433,22 +3433,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // Proportional radii for responsive scaling (scaled up to fill full R)
+        // Proportional radii for responsive scaling (spacious, airy layout)
         const rHexagramsOuter = R;
-        const rHexagramsInner = R * 0.92;
-        // Mirror ring (Зеркало Жизни) — inserted between hexagrams and gates
+        const rHexagramsInner = R * 0.905;   // ~9.5% band
         const rMirrorOuter = rHexagramsInner;
-        const rMirrorInner = R * 0.868;      // ~5.2% band ≈ 20px
+        const rMirrorInner = R * 0.835;      // ~7.0% band
         const rGatesOuter = rMirrorInner;
-        const rGatesInner = rGatesOuter - 22;
-        // Planet dial ring: the wide band where planet symbols are placed by line slot
+        const rGatesInner = R * 0.745;      // ~9.0% band for gate numbers
         const rDialOuter = rGatesInner;
-        const rDialInner = R * 0.790;
-        // Zodiac ring: thin strip below the dial
+        const rDialInner = R * 0.665;      // ~8.0% band for planet activation slots
         const rZodiacOuter = rDialInner;
-        const rZodiacInner = R * 0.720;
+        const rZodiacInner = R * 0.575;      // ~9.0% band for zodiac symbols
         const rHousesOuter = rZodiacInner;   // flush against zodiac inner edge
-        const rHousesInner = R * 0.630;      // ~9% band
+        const rHousesInner = R * 0.440;      // ~13.5% spacious band for 12 houses!
         const rInnerBorder = rHousesInner;
 
 
@@ -5542,8 +5539,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cy = displayW / 2;
                 const R = displayW / 2 - 8;
                 
-                const rHousesOuter = R * 0.740;
-                const rHousesInner = R * 0.650;
+                const rHousesOuter = R * 0.575;
+                const rHousesInner = R * 0.440;
                 const rInnerBorder = rHousesInner;
 
                 const dx = mx - cx;
