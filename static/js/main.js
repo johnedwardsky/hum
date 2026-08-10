@@ -4136,18 +4136,69 @@ document.addEventListener('DOMContentLoaded', () => {
                     const upColor   = hexToRgba('#2E2A20', textAlpha);
                     const downColor = hexToRgba('#2E2A20', textAlpha);
 
-                    // ▲ Exaltation planet
-                    ctx.font = '10px "DM Sans", sans-serif';
-                    ctx.fillStyle = upColor;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    const upSym = rulers.up === '⊕' ? '⊕' : rulers.up;
-                    ctx.fillText('▲' + upSym, xRP, yRP - 5);
+                    const tx = xRP - 6.0; // Column for triangles (one strictly above the other)
+                    const px = xRP + 4.5; // Column for planet symbols
 
-                    // ▽ Detriment planet
-                    ctx.fillStyle = downColor;
+                    // ▲ Exaltation triangle (filled, pointing UP)
+                    const yUp = yRP - 5.5;
+                    ctx.beginPath();
+                    ctx.moveTo(tx,       yUp - 2.6); // apex
+                    ctx.lineTo(tx - 2.4, yUp + 2.2); // bottom-left
+                    ctx.lineTo(tx + 2.4, yUp + 2.2); // bottom-right
+                    ctx.closePath();
+                    ctx.fillStyle = upColor;
+                    ctx.fill();
+
+                    // ▲ Exaltation planet symbol
+                    const upSym = rulers.up === '⊕' ? '⊕' : rulers.up;
+                    if (upSym === '⊕') {
+                        ctx.strokeStyle = upColor;
+                        ctx.lineWidth = 1.0;
+                        ctx.beginPath();
+                        ctx.arc(px, yUp, 3.2, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(px - 3.2, yUp); ctx.lineTo(px + 3.2, yUp);
+                        ctx.moveTo(px, yUp - 3.2); ctx.lineTo(px, yUp + 3.2);
+                        ctx.stroke();
+                    } else {
+                        ctx.font = '10.5px "DM Sans", sans-serif';
+                        ctx.fillStyle = upColor;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(upSym, px, yUp);
+                    }
+
+                    // ▽ Detriment triangle (stroke, pointing DOWN - strictly under Exaltation triangle)
+                    const yDown = yRP + 5.5;
+                    ctx.beginPath();
+                    ctx.moveTo(tx,       yDown + 2.6); // nadir
+                    ctx.lineTo(tx - 2.4, yDown - 2.2); // top-left
+                    ctx.lineTo(tx + 2.4, yDown - 2.2); // top-right
+                    ctx.closePath();
+                    ctx.strokeStyle = downColor;
+                    ctx.lineWidth = 0.9;
+                    ctx.stroke();
+
+                    // ▽ Detriment planet symbol
                     const downSym = rulers.down === '⊕' ? '⊕' : rulers.down;
-                    ctx.fillText('▽' + downSym, xRP, yRP + 5);
+                    if (downSym === '⊕') {
+                        ctx.strokeStyle = downColor;
+                        ctx.lineWidth = 1.0;
+                        ctx.beginPath();
+                        ctx.arc(px, yDown, 3.2, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(px - 3.2, yDown); ctx.lineTo(px + 3.2, yDown);
+                        ctx.moveTo(px, yDown - 3.2); ctx.lineTo(px, yDown + 3.2);
+                        ctx.stroke();
+                    } else {
+                        ctx.font = '10.5px "DM Sans", sans-serif';
+                        ctx.fillStyle = downColor;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(downSym, px, yDown);
+                    }
                 }
             }
         }
