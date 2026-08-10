@@ -4099,138 +4099,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gate = h.hexagram ? h.hexagram.gate : '?';
                 const line = h.hexagram ? h.hexagram.line : '?';
 
-                // --- 3-Column Balanced Layout inside the 30° Gold Sector Band ---
-                // Left Column: House Number (1..12) inside a subtle circular badge
-                // Center Column: Gate.Line (e.g. 38.1)
-                // Right Column: Planetary Rulers (▲ Exaltation / ▽ Detriment)
-
-                const halfSpan = (endAngle - startAngle) / 2;
-                const angleOffset = halfSpan * 0.62; // Spacing for left and right columns
-
-                const isLowerHalf = (midAngle > 0 && midAngle < Math.PI);
-                const angleHouse  = isLowerHalf ? (midAngle + angleOffset) : (midAngle - angleOffset);
-                const angleCenter = midAngle;
-                const angleRulers = isLowerHalf ? (midAngle - angleOffset) : (midAngle + angleOffset);
-
-                const normAngle = (a) => {
-                    let res = a;
-                    while (res > Math.PI) res -= 2 * Math.PI;
-                    while (res < -Math.PI) res += 2 * Math.PI;
-                    return res;
-                };
-
-                const nH = normAngle(angleHouse);
-                const nC = normAngle(angleCenter);
-                const nR = normAngle(angleRulers);
-
-                // 1. House Number (Left column, inside gold band)
-                ctx.save();
-                const xH = cx + rMid * Math.cos(nH);
-                const yH = cy + rMid * Math.sin(nH);
-                ctx.translate(xH, yH);
-                let rotH = nH + Math.PI / 2;
-                if (nH > 0 && nH < Math.PI) rotH = nH - Math.PI / 2;
-                ctx.rotate(rotH);
-
-                // Subtle circular badge for house number
-                ctx.beginPath();
-                ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
-                ctx.fillStyle = hexToRgba('rgba(197, 158, 63, 0.14)', textAlpha);
-                ctx.fill();
-                ctx.strokeStyle = hexToRgba('rgba(197, 158, 63, 0.40)', textAlpha);
-                ctx.lineWidth = 0.7;
-                ctx.stroke();
-
+                // --- House Number: horizontal (unrotated), near start cusp, inside gold band ---
+                const houseAngleOffset = (endAngle - startAngle) * 0.15;
+                const angleHouseNum = startAngle + houseAngleOffset;
+                const xHN = cx + rMid * Math.cos(angleHouseNum);
+                const yHN = cy + rMid * Math.sin(angleHouseNum);
                 ctx.font = 'bold 11px "DM Sans", sans-serif';
+                ctx.fillStyle = hexToRgba('#C59E3F', textAlpha);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(houseNum.toString(), xHN, yHN);
+
+                // --- Gate.Line: horizontal (unrotated), centered in sector ---
+                const xGL = cx + rMid * Math.cos(midAngle);
+                const yGL = cy + rMid * Math.sin(midAngle);
+                ctx.font = 'bold italic 12px "DM Sans", sans-serif';
                 ctx.fillStyle = hexToRgba('#2E2A20', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(houseNum.toString(), 0, 0);
-                ctx.restore();
+                ctx.fillText(`${gate}.${line}`, xGL, yGL);
 
-                // 2. Gate.Line (Center column, inside gold band)
-                ctx.save();
-                const xC = cx + rMid * Math.cos(nC);
-                const yC = cy + rMid * Math.sin(nC);
-                ctx.translate(xC, yC);
-                let rotC = nC + Math.PI / 2;
-                if (nC > 0 && nC < Math.PI) rotC = nC - Math.PI / 2;
-                ctx.rotate(rotC);
-                ctx.font = 'bold italic 11px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba('#2E2A20', textAlpha);
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(`${gate}.${line}`, 0, 0);
-                ctx.restore();
-
-                // 3. Rulers (Right column, inside gold band)
+                // --- Rulers: near end cusp, inside gold band ---
                 const rulers = (typeof getNidanaRulers === 'function')
                     ? getNidanaRulers(gate, line) : null;
 
                 if (rulers) {
-                    ctx.save();
-                    const xR = cx + rMid * Math.cos(nR);
-                    const yR = cy + rMid * Math.sin(nR);
-                    ctx.translate(xR, yR);
-                    let rotR = nR + Math.PI / 2;
-                    if (nR > 0 && nR < Math.PI) rotR = nR - Math.PI / 2;
-                    ctx.rotate(rotR);
-                    ctx.textBaseline = 'middle';
+                    const rulerAngleOffset = (endAngle - startAngle) * 0.82;
+                    const angleRulerPos = startAngle + rulerAngleOffset;
+                    const xRP = cx + rMid * Math.cos(angleRulerPos);
+                    const yRP = cy + rMid * Math.sin(angleRulerPos);
 
                     const upColor   = hexToRgba('#2E2A20', textAlpha);
                     const downColor = hexToRgba('#2E2A20', textAlpha);
 
-                    // Helper to draw a planet symbol or manual Earth
-                    const drawRulerPlanet = (sym, px, py, color) => {
-                        if (sym === '⊕') {
-                            ctx.strokeStyle = color;
-                            ctx.lineWidth = 1.0;
-                            ctx.beginPath();
-                            ctx.arc(px, py, 3.2, 0, Math.PI * 2);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(px - 3.2, py);
-                            ctx.lineTo(px + 3.2, py);
-                            ctx.moveTo(px, py - 3.2);
-                            ctx.lineTo(px, py + 3.2);
-                            ctx.stroke();
-                        } else {
-                            ctx.font = '9.5px "DM Sans", sans-serif';
-                            ctx.fillStyle = color;
-                            ctx.textAlign = 'center';
-                            ctx.fillText(sym, px, py);
-                        }
-                    };
-
-                    // Triangle size — same for both, centered at x=-5
-                    const tHalf = 2.8;  // half-width of base
-                    const tH    = 3.2;  // height
-                    const tCx   = -5.0; // x-center
-                    const tGap  =  4.8; // distance from midline (y=0) to triangle center
-
-                    // ▲ Exaltation — solid filled, pointing up, centered at (tCx, -tGap)
-                    ctx.beginPath();
-                    ctx.moveTo(tCx,          -tGap - tH / 2); // apex
-                    ctx.lineTo(tCx - tHalf,  -tGap + tH / 2); // bottom-left
-                    ctx.lineTo(tCx + tHalf,  -tGap + tH / 2); // bottom-right
-                    ctx.closePath();
+                    // ▲ Exaltation planet
+                    ctx.font = '10px "DM Sans", sans-serif';
                     ctx.fillStyle = upColor;
-                    ctx.fill();
-                    drawRulerPlanet(rulers.up, 4.5, -4.5, upColor);
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const upSym = rulers.up === '⊕' ? '⊕' : rulers.up;
+                    ctx.fillText('▲' + upSym, xRP, yRP - 5);
 
-                    // ▽ Detriment — stroke only (empty), pointing down, centered at (tCx, +tGap)
-                    ctx.beginPath();
-                    ctx.moveTo(tCx,          tGap + tH / 2); // nadir (bottom vertex)
-                    ctx.lineTo(tCx - tHalf,  tGap - tH / 2); // top-left
-                    ctx.lineTo(tCx + tHalf,  tGap - tH / 2); // top-right
-                    ctx.closePath();
-                    ctx.strokeStyle = downColor;
-                    ctx.lineWidth = 0.9;
-                    ctx.stroke();
-                    drawRulerPlanet(rulers.down, 4.5, 4.5, downColor);
-
-                    ctx.restore();
+                    // ▽ Detriment planet
+                    ctx.fillStyle = downColor;
+                    const downSym = rulers.down === '⊕' ? '⊕' : rulers.down;
+                    ctx.fillText('▽' + downSym, xRP, yRP + 5);
                 }
             }
         }
@@ -4268,7 +4181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Draw stacked planet symbols inside the inner circle
             activations.forEach((act, aIdx) => {
-                const rAct = rInnerBorder - 12 - aIdx * 15;
+                const rAct = rInnerBorder - 14 - aIdx * 20;
                 const ax = cx + rAct * cos;
                 const ay = cy + rAct * sin;
 
@@ -4281,35 +4194,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Draw planet glyph symbol
+                // Draw planet glyph symbol (enlarged for readability)
                 if (act.symbol === '⊕') {
                     ctx.strokeStyle = planetColor;
-                    ctx.lineWidth = 1.0;
+                    ctx.lineWidth = 1.4;
                     ctx.beginPath();
-                    ctx.arc(ax, ay, 4.5, 0, Math.PI * 2);
+                    ctx.arc(ax, ay, 6.5, 0, Math.PI * 2);
                     ctx.stroke();
 
                     ctx.beginPath();
-                    ctx.moveTo(ax - 4.5, ay);
-                    ctx.lineTo(ax + 4.5, ay);
-                    ctx.moveTo(ax, ay - 4.5);
-                    ctx.lineTo(ax, ay + 4.5);
+                    ctx.moveTo(ax - 6.5, ay);
+                    ctx.lineTo(ax + 6.5, ay);
+                    ctx.moveTo(ax, ay - 6.5);
+                    ctx.lineTo(ax, ay + 6.5);
                     ctx.stroke();
                 } else {
-                    ctx.font = isAnyHovered && isHighlighted ? 'bold 14.5px "DM Sans", sans-serif' : '13.5px "DM Sans", sans-serif';
+                    ctx.font = isAnyHovered && isHighlighted ? 'bold 18px "DM Sans", sans-serif' : 'bold 16px "DM Sans", sans-serif';
                     ctx.fillStyle = planetColor;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(act.symbol, ax, ay);
                 }
 
-                // Draw tiny line offset next to symbol
-                const subAngle = midAngle + 0.024;
-                const sx = cx + rAct * Math.cos(subAngle);
-                const sy = cy + rAct * Math.sin(subAngle);
-                ctx.font = 'bold 7px DM Sans, sans-serif';
+                // Draw line number subscript next to planet symbol
+                const subAngle = midAngle + 0.032;
+                const sx = cx + (rAct + 1) * Math.cos(subAngle);
+                const sy = cy + (rAct + 1) * Math.sin(subAngle);
+                ctx.font = 'bold 9px DM Sans, sans-serif';
                 
-                let lineCol = act.type === 'design' ? 'rgba(255,96,96,0.95)' : 'rgba(140,110,40,0.95)';
+                let lineCol = act.type === 'design' ? 'rgba(220,60,60,1.0)' : 'rgba(46,42,32,0.95)';
                 if (isAnyHovered && !isHighlighted) {
                     lineCol = 'rgba(150, 150, 150, 0.1)';
                 }
