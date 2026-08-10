@@ -4136,15 +4136,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const upColor   = hexToRgba('#2E2A20', textAlpha);
                     const downColor = hexToRgba('#2E2A20', textAlpha);
 
-                    const tx = xRP - 6.0; // Column for triangles (one strictly above the other)
-                    const px = xRP + 4.5; // Column for planet symbols
+                    const tx = xRP - 8.0; // Column for triangles (strictly aligned vertically)
+                    const px = xRP + 5.0; // Column for planet symbols
+
+                    const tHalf = 3.5; // Base half-width = 7.0px
+                    const tH    = 3.25; // Half-height = 6.5px total height
 
                     // ▲ Exaltation triangle (filled, pointing UP)
-                    const yUp = yRP - 5.5;
+                    const yUp = yRP - 6.5;
                     ctx.beginPath();
-                    ctx.moveTo(tx,       yUp - 2.6); // apex
-                    ctx.lineTo(tx - 2.4, yUp + 2.2); // bottom-left
-                    ctx.lineTo(tx + 2.4, yUp + 2.2); // bottom-right
+                    ctx.moveTo(tx,         yUp - tH); // apex
+                    ctx.lineTo(tx - tHalf, yUp + tH); // bottom-left
+                    ctx.lineTo(tx + tHalf, yUp + tH); // bottom-right
                     ctx.closePath();
                     ctx.fillStyle = upColor;
                     ctx.fill();
@@ -4153,16 +4156,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const upSym = rulers.up === '⊕' ? '⊕' : rulers.up;
                     if (upSym === '⊕') {
                         ctx.strokeStyle = upColor;
-                        ctx.lineWidth = 1.0;
+                        ctx.lineWidth = 1.2;
                         ctx.beginPath();
-                        ctx.arc(px, yUp, 3.2, 0, Math.PI * 2);
+                        ctx.arc(px, yUp, 4.2, 0, Math.PI * 2);
                         ctx.stroke();
                         ctx.beginPath();
-                        ctx.moveTo(px - 3.2, yUp); ctx.lineTo(px + 3.2, yUp);
-                        ctx.moveTo(px, yUp - 3.2); ctx.lineTo(px, yUp + 3.2);
+                        ctx.moveTo(px - 4.2, yUp); ctx.lineTo(px + 4.2, yUp);
+                        ctx.moveTo(px, yUp - 4.2); ctx.lineTo(px, yUp + 4.2);
                         ctx.stroke();
                     } else {
-                        ctx.font = '10.5px "DM Sans", sans-serif';
+                        ctx.font = 'bold 13px "DM Sans", sans-serif';
                         ctx.fillStyle = upColor;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
@@ -4170,30 +4173,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     // ▽ Detriment triangle (stroke, pointing DOWN - strictly under Exaltation triangle)
-                    const yDown = yRP + 5.5;
+                    const yDown = yRP + 6.5;
                     ctx.beginPath();
-                    ctx.moveTo(tx,       yDown + 2.6); // nadir
-                    ctx.lineTo(tx - 2.4, yDown - 2.2); // top-left
-                    ctx.lineTo(tx + 2.4, yDown - 2.2); // top-right
+                    ctx.moveTo(tx,         yDown + tH); // nadir
+                    ctx.lineTo(tx - tHalf, yDown - tH); // top-left
+                    ctx.lineTo(tx + tHalf, yDown - tH); // top-right
                     ctx.closePath();
                     ctx.strokeStyle = downColor;
-                    ctx.lineWidth = 0.9;
+                    ctx.lineWidth = 1.2;
                     ctx.stroke();
 
                     // ▽ Detriment planet symbol
                     const downSym = rulers.down === '⊕' ? '⊕' : rulers.down;
                     if (downSym === '⊕') {
                         ctx.strokeStyle = downColor;
-                        ctx.lineWidth = 1.0;
+                        ctx.lineWidth = 1.2;
                         ctx.beginPath();
-                        ctx.arc(px, yDown, 3.2, 0, Math.PI * 2);
+                        ctx.arc(px, yDown, 4.2, 0, Math.PI * 2);
                         ctx.stroke();
                         ctx.beginPath();
-                        ctx.moveTo(px - 3.2, yDown); ctx.lineTo(px + 3.2, yDown);
-                        ctx.moveTo(px, yDown - 3.2); ctx.lineTo(px, yDown + 3.2);
+                        ctx.moveTo(px - 4.2, yDown); ctx.lineTo(px + 4.2, yDown);
+                        ctx.moveTo(px, yDown - 4.2); ctx.lineTo(px, yDown + 4.2);
                         ctx.stroke();
                     } else {
-                        ctx.font = '10.5px "DM Sans", sans-serif';
+                        ctx.font = 'bold 13px "DM Sans", sans-serif';
                         ctx.fillStyle = downColor;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
