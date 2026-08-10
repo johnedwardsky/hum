@@ -3965,8 +3965,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 4. Zodiac Ring and Ticks
 
-        const hoveredSignIdx = (hoverType === 'gate') 
-            ? Math.floor(((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL) % 360) / 30) % 12
+        const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
+            ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
             : -1;
 
         const hoveredSignIdxs = new Set();
