@@ -3460,6 +3460,16 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.fill();
 
+        // Soft radial gradient for central bodygraph area
+        const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
+        centerGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+        centerGrad.addColorStop(0.70, 'rgba(253, 251, 248, 0.95)');
+        centerGrad.addColorStop(1, 'rgba(240, 236, 225, 0.35)');
+        ctx.fillStyle = centerGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
+
         const GATE_ORDER = [
             25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
             10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
@@ -3796,18 +3806,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
             const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
             
-            let font = isCombinedActive ? 'bold 9px DM Sans, sans-serif' : '8px DM Sans, sans-serif';
-            // Color logic: Personality=black, Design=red, Both=black, inactive=grey
+            let font = isCombinedActive ? 'bold 9px DM Sans, sans-serif' : '500 8px DM Sans, sans-serif';
+            // Color logic: Personality=black, Design=red, Both=black, inactive=softer grey
             const gBoth = isPersActive && isDesActive;
             let fillStyle = (gBoth || isPersActive) ? '#2E2A20'
-                          : isDesActive             ? 'rgb(255,96,96)'
-                          : '#777166';
+                          : isDesActive             ? 'rgb(220,60,60)'
+                          : 'rgba(175, 168, 155, 0.40)';
 
             if (isAnyHovered) {
                 if (isHighlighted) {
                     font = 'bold 11px DM Sans, sans-serif';
                 } else {
-                    fillStyle = 'rgba(120, 120, 120, 0.15)';
+                    fillStyle = 'rgba(180, 180, 180, 0.12)';
                 }
             }
 
@@ -3829,7 +3839,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const halfLen = lineLen / 2;
             const halfGap = gap / 2;
 
-            let hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(180, 175, 165, 0.45)');
+            let hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
             if (isAnyHovered) {
                 if (isHighlighted) {
                     hexColor = isPersActive ? '#000000' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(80, 80, 80, 0.9)');
