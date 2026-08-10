@@ -3433,19 +3433,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // Proportional radii for responsive scaling (spacious, airy layout)
+        // Restored original proportions for hexagrams, dial lines and zodiac rings
         const rHexagramsOuter = R;
-        const rHexagramsInner = R * 0.905;   // ~9.5% band
+        const rHexagramsInner = R * 0.92;
         const rMirrorOuter = rHexagramsInner;
-        const rMirrorInner = R * 0.835;      // ~7.0% band
+        const rMirrorInner = R * 0.868;
         const rGatesOuter = rMirrorInner;
-        const rGatesInner = R * 0.745;      // ~9.0% band for gate numbers
+        const rGatesInner = rGatesOuter - 22;
         const rDialOuter = rGatesInner;
-        const rDialInner = R * 0.665;      // ~8.0% band for planet activation slots
+        const rDialInner = R * 0.790;
         const rZodiacOuter = rDialInner;
-        const rZodiacInner = R * 0.575;      // ~9.0% band for zodiac symbols
+        const rZodiacInner = R * 0.720;
         const rHousesOuter = rZodiacInner;   // flush against zodiac inner edge
-        const rHousesInner = R * 0.440;      // ~13.5% spacious band for 12 houses!
+        const rHousesInner = R * 0.540;      // spacious band for 12 houses!
         const rInnerBorder = rHousesInner;
 
 
@@ -5539,8 +5539,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cy = displayW / 2;
                 const R = displayW / 2 - 8;
                 
-                const rHousesOuter = R * 0.575;
-                const rHousesInner = R * 0.440;
+                const rHousesOuter = R * 0.720;
+                const rHousesInner = R * 0.540;
                 const rInnerBorder = rHousesInner;
 
                 const dx = mx - cx;
