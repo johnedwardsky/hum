@@ -3472,7 +3472,7 @@ document.addEventListener('DOMContentLoaded', () => {
             38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
             37, 63, 22, 36
         ];
-        const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+        const WHEEL_START = 177.1875;
         const GATE_INTERVAL = 5.625;
 
         // Compile active gates and planets
@@ -4617,7 +4617,7 @@ document.addEventListener('DOMContentLoaded', () => {
             38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
             37, 63, 22, 36
         ];
-        const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+        const WHEEL_START = 177.1875;
         const GATE_INTERVAL = 5.625;
 
         const gateActivators = {};
@@ -5433,7 +5433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 37, 63, 22, 36
             ];
             
-            const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+            const WHEEL_START = 177.1875;
             const GATE_INTERVAL = 5.625;
 
             // Tooltip elements
