@@ -3806,16 +3806,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
             const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
             
-            let font = isCombinedActive ? 'bold 9px DM Sans, sans-serif' : '500 8px DM Sans, sans-serif';
+            let font = isCombinedActive ? 'bold 11px DM Sans, sans-serif' : '600 9.5px DM Sans, sans-serif';
             // Color logic: Personality=black, Design=red, Both=black, inactive=softer grey
             const gBoth = isPersActive && isDesActive;
             let fillStyle = (gBoth || isPersActive) ? '#2E2A20'
                           : isDesActive             ? 'rgb(220,60,60)'
-                          : 'rgba(175, 168, 155, 0.40)';
+                          : 'rgba(165, 158, 145, 0.48)';
 
             if (isAnyHovered) {
                 if (isHighlighted) {
-                    font = 'bold 11px DM Sans, sans-serif';
+                    font = 'bold 13px DM Sans, sans-serif';
                 } else {
                     fillStyle = 'rgba(180, 180, 180, 0.12)';
                 }
@@ -3911,7 +3911,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const rMirrorMid = (rMirrorOuter + rMirrorInner) / 2;
             const mirrorBand = rMirrorOuter - rMirrorInner;
-            const fontSize   = Math.round(mirrorBand * 0.52);
+            const fontSize   = Math.round(mirrorBand * 0.65);
 
             for (let i = 0; i < 64; i++) {
                 const gateNum  = MIRROR_GATE_ORDER[i];
@@ -4108,7 +4108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const angleHouseNum = startAngle + houseAngleOffset;
                 const xHN = cx + rMid * Math.cos(angleHouseNum);
                 const yHN = cy + rMid * Math.sin(angleHouseNum);
-                ctx.font = 'bold 11px "DM Sans", sans-serif';
+                ctx.font = 'bold 12.5px "DM Sans", sans-serif';
                 ctx.fillStyle = hexToRgba('#C59E3F', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -4117,7 +4117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // --- Gate.Line: horizontal (unrotated), centered in sector ---
                 const xGL = cx + rMid * Math.cos(midAngle);
                 const yGL = cy + rMid * Math.sin(midAngle);
-                ctx.font = 'bold italic 12px "DM Sans", sans-serif';
+                ctx.font = 'bold italic 13.5px "DM Sans", sans-serif';
                 ctx.fillStyle = hexToRgba('#2E2A20', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
