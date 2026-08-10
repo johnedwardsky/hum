@@ -5071,9 +5071,53 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="bg-hex-icon" style="color:${colorCss}">${bars.join('')}</div>`;
         }
 
+        // Helper to compute fixation symbol (▲, ▽, ☆, →) for a planet in a gate/line
+        function getPlanetFixationBadgeHtml(planetName, gate, line, isRetro) {
+            if (!gate || !line) return '';
+            const rulerKey = `${gate}.${line}`;
+            const entry = (typeof RULERS_NIDANA !== 'undefined') ? RULERS_NIDANA[rulerKey] : null;
+            
+            const pLower = (planetName || '').toLowerCase().trim();
+
+            let isUp = false;
+            let isDown = false;
+
+            if (entry) {
+                const matchName = (list) => (list || []).some(n => {
+                    const l = (n || '').toLowerCase().trim();
+                    if (l === pLower) return true;
+                    if (pLower.includes('узел') && l.includes('узел')) return true;
+                    if (pLower.includes('солнце') && l.includes('солнце')) return true;
+                    if (pLower.includes('земля') && l.includes('земля')) return true;
+                    return false;
+                });
+
+                isUp = matchName(entry.up);
+                isDown = matchName(entry.down);
+            }
+
+            let sym = '';
+            let title = '';
+            if (isUp && isDown) {
+                sym = '☆'; title = 'Юкста-позиция';
+            } else if (isUp) {
+                sym = '▲'; title = 'Экзальтация';
+            } else if (isDown) {
+                sym = '▽'; title = 'Падение';
+            } else {
+                const outerPlanets = ['сатурн', 'уран', 'нептун', 'плутон', 'юпитер'];
+                if (outerPlanets.some(op => pLower.includes(op)) || isRetro) {
+                    sym = '→'; title = 'Направление';
+                }
+            }
+
+            if (!sym) return '';
+            return `<span class="bg-fix-badge" title="${title}">${sym}</span>`;
+        }
+
         // ── Build a planet row ─────────────────────────────────────────
         function buildPlanetRow(p, isDesign) {
-            const colorCss  = isDesign ? '#fe0000' : '#000000';
+            const colorCss  = isDesign ? '#fe0000' : '#2E2A20';
             const sym       = getPlanetSym(p.name);
             const gate      = p.hexagram ? p.hexagram.gate : '—';
             const line      = p.hexagram ? p.hexagram.line : '';
@@ -5098,69 +5142,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const pMeta = PLANET_META[key] || PLANET_META[p.name] || {};
             const glyphCls = pMeta.cls || '';
 
-            // Look up activated rulers for this gate & line
-            const rulerKey = `${gate}.${line}`;
-            const entry = (typeof RULERS_NIDANA !== 'undefined') ? RULERS_NIDANA[rulerKey] : null;
+            const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro);
 
-            let showUp = false;
-            let showDown = false;
-
-            if (entry) {
-                const upNames = (entry.up || []).map(n => (n || '').toLowerCase().trim());
-                const downNames = (entry.down || []).map(n => (n || '').toLowerCase().trim());
-
-                // Check all active planets in personality and design for this gate & line
-                (data.planets || []).forEach(pl => {
-                    if (pl.hexagram && pl.hexagram.gate === gate && (!line || pl.hexagram.line === line)) {
-                        const nLower = (pl.name || '').toLowerCase().trim();
-                        if (upNames.includes(nLower)) showUp = true;
-                        if (downNames.includes(nLower)) showDown = true;
-                    }
-                });
-                (data.design_planets || []).forEach(pl => {
-                    if (pl.hexagram && pl.hexagram.gate === gate && (!line || pl.hexagram.line === line)) {
-                        const nLower = (pl.name || '').toLowerCase().trim();
-                        if (upNames.includes(nLower)) showUp = true;
-                        if (downNames.includes(nLower)) showDown = true;
-                    }
-                });
-
-                // Also check if current row's planet matches
-                const curNameLower = (p.name || '').toLowerCase().trim();
-                if (upNames.includes(curNameLower)) showUp = true;
-                if (downNames.includes(curNameLower)) showDown = true;
-            }
-
-            const upSym = (entry && typeof getRulerSymbols === 'function') ? getRulerSymbols(entry.up) : '';
-            const downSym = (entry && typeof getRulerSymbols === 'function') ? getRulerSymbols(entry.down) : '';
-
-            const upSpan = showUp ? `<span class="bg-ruler-up" title="Экзальтация">▲ ${upSym}</span>` : '';
-            const downSpan = showDown ? `<span class="bg-ruler-down" title="Упадок">▽ ${downSym}</span>` : '';
-            const rulersHtml = (showUp || showDown) 
-                ? `<div class="bg-rulers-info">${upSpan}${downSpan}</div>` 
-                : `<div class="bg-rulers-info"></div>`;
+            const gateCellHtml = `
+                <div class="bg-gate-cell" style="color:${colorCss}">
+                    <span class="bg-gate-main">${gate}</span>
+                    <div class="bg-line-stack">
+                        ${fixBadge}
+                        <span class="bg-line-sub">${line || ''}</span>
+                    </div>
+                </div>
+            `;
 
             if (isDesign) {
-                // Left column: Planet | Gate.Line | Rulers | Zodiac
+                // Left column: Planet | Gate.Line.Fixation | Zodiac
                 row.innerHTML = `
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym ${glyphCls}" style="color:${colorCss}">${sym}</span>
                         ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
                     </div>
-                    <div class="bg-gate-info">
-                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
-                    </div>
-                    ${rulersHtml}
+                    ${gateCellHtml}
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
                 `;
             } else {
-                // Right column: Zodiac | Rulers | Gate.Line | Planet
+                // Right column: Zodiac | Gate.Line.Fixation | Planet
                 row.innerHTML = `
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
-                    ${rulersHtml}
-                    <div class="bg-gate-info">
-                        <span class="bg-gate-num" style="color:${colorCss}">${gate}${line ? '.' + line : ''}</span>
-                    </div>
+                    ${gateCellHtml}
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym ${glyphCls}" style="color:${colorCss}">${sym}</span>
                         ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
