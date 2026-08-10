@@ -5098,15 +5098,47 @@ document.addEventListener('DOMContentLoaded', () => {
             const pMeta = PLANET_META[key] || PLANET_META[p.name] || {};
             const glyphCls = pMeta.cls || '';
 
-            // Look up rulers for this gate & line
-            const rulers = (typeof getNidanaRulers === 'function')
-                ? getNidanaRulers(gate, line) : null;
-            const rulersHtml = rulers ? `
-                <div class="bg-rulers-info">
-                    <span class="bg-ruler-up" title="Экзальтация">▲ ${rulers.up}</span>
-                    <span class="bg-ruler-down" title="Упадок">▽ ${rulers.down}</span>
-                </div>
-            ` : '<div class="bg-rulers-info"></div>';
+            // Look up activated rulers for this gate & line
+            const rulerKey = `${gate}.${line}`;
+            const entry = (typeof RULERS_NIDANA !== 'undefined') ? RULERS_NIDANA[rulerKey] : null;
+
+            let showUp = false;
+            let showDown = false;
+
+            if (entry) {
+                const upNames = (entry.up || []).map(n => (n || '').toLowerCase().trim());
+                const downNames = (entry.down || []).map(n => (n || '').toLowerCase().trim());
+
+                // Check all active planets in personality and design for this gate & line
+                (data.planets || []).forEach(pl => {
+                    if (pl.hexagram && pl.hexagram.gate === gate && (!line || pl.hexagram.line === line)) {
+                        const nLower = (pl.name || '').toLowerCase().trim();
+                        if (upNames.includes(nLower)) showUp = true;
+                        if (downNames.includes(nLower)) showDown = true;
+                    }
+                });
+                (data.design_planets || []).forEach(pl => {
+                    if (pl.hexagram && pl.hexagram.gate === gate && (!line || pl.hexagram.line === line)) {
+                        const nLower = (pl.name || '').toLowerCase().trim();
+                        if (upNames.includes(nLower)) showUp = true;
+                        if (downNames.includes(nLower)) showDown = true;
+                    }
+                });
+
+                // Also check if current row's planet matches
+                const curNameLower = (p.name || '').toLowerCase().trim();
+                if (upNames.includes(curNameLower)) showUp = true;
+                if (downNames.includes(curNameLower)) showDown = true;
+            }
+
+            const upSym = (entry && typeof getRulerSymbols === 'function') ? getRulerSymbols(entry.up) : '';
+            const downSym = (entry && typeof getRulerSymbols === 'function') ? getRulerSymbols(entry.down) : '';
+
+            const upSpan = showUp ? `<span class="bg-ruler-up" title="Экзальтация">▲ ${upSym}</span>` : '';
+            const downSpan = showDown ? `<span class="bg-ruler-down" title="Упадок">▽ ${downSym}</span>` : '';
+            const rulersHtml = (showUp || showDown) 
+                ? `<div class="bg-rulers-info">${upSpan}${downSpan}</div>` 
+                : `<div class="bg-rulers-info"></div>`;
 
             if (isDesign) {
                 // Left column: Planet | Gate.Line | Rulers | Zodiac
