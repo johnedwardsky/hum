@@ -3829,9 +3829,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const hx = cx + rHexMid * Math.cos(midAngle);
             const hy = cy + rHexMid * Math.sin(midAngle);
 
-            const lineLen = 10.0;     // Total width of each line in px
-            const lineSpacing = 2.1;  // Vertical distance between lines in px
-            const gap = 2.2;          // Center gap in Yin (broken) line in px
+            const lineLen = 14.0;     // Total width of each line in px
+            const lineSpacing = 2.8;  // Equal vertical distance between all lines
+            const gap = 3.0;          // Center gap in Yin (broken) line in px
             const halfLen = lineLen / 2;
             const halfGap = gap / 2;
 
