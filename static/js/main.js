@@ -3955,14 +3955,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gnx = cx + rMirrorMid * Math.cos(midAngle);
                 const gny = cy + rMirrorMid * Math.sin(midAngle);
 
-                let numColor, numFont, mirrorStroke;
+                let numColor, numFont;
                 if (hasAct) {
                     const mBoth = isP && isD;
                     numColor = (mBoth || isP) ? '#2E2A20' : 'rgb(220,80,80)';
-                    numFont  = `bold ${fontSize}px DM Sans, sans-serif`;
+                    numFont  = 'bold 10.5px "DM Sans", sans-serif';
                 } else {
                     numColor = 'rgba(150,145,130,0.28)';
-                    numFont  = `${fontSize - 1}px DM Sans, sans-serif`;
+                    numFont  = '500 9px "DM Sans", sans-serif';
                 }
 
                 ctx.font = numFont;
