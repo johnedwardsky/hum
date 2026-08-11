@@ -5771,7 +5771,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!btnToggleAll) return;
                 const allKeys = Object.keys(mandalaSettings);
                 const areAllOn = allKeys.every(k => mandalaSettings[k]);
-                btnToggleAll.innerHTML = areAllOn ? '↺ Сбросить' : '✨ Включить всё';
+                btnToggleAll.innerHTML = areAllOn ? '↺ Сбросить' : 'Всё';
             }
 
             if (btnToggleAll) {
