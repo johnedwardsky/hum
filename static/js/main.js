@@ -1132,25 +1132,84 @@ document.addEventListener('DOMContentLoaded', () => {
         { sym: '♓\uFE0E', name: 'Рыбы' },
     ];
 
-    function drawPlutoCanvas(ctx, ax, ay, size, color) {
-        ctx.save();
-        ctx.font = `${size}px "Times New Roman", "Apple Symbols", serif`;
-        ctx.fillStyle = color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('♇', ax, ay);
-        ctx.restore();
-    }
-
-    function drawJupiterCanvas(ctx, ax, ay, size, color) {
-        ctx.save();
-        ctx.font = `${size}px "Times New Roman", "Apple Symbols", serif`;
-        ctx.fillStyle = color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('♃', ax, ay);
-        ctx.restore();
-    }
+    const PLANET_VECTORS = {
+        'солнце': (ctx) => {
+            ctx.beginPath(); ctx.arc(8, 8, 5.6, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(8, 8, 1.1, 0, 2*Math.PI); ctx.fill();
+        },
+        'земля': (ctx) => {
+            ctx.beginPath(); ctx.arc(8, 8, 5.6, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(2.4, 8); ctx.lineTo(13.6, 8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 2.4); ctx.lineTo(8, 13.6); ctx.stroke();
+        },
+        'луна': (ctx) => {
+            const p = new Path2D("M 10.5 2.6 A 5.8 5.8 0 0 0 10.5 13.4 A 4.6 4.6 0 0 1 10.5 2.6 Z");
+            ctx.stroke(p);
+        },
+        'северный узел': (ctx) => {
+            const p = new Path2D("M 3.8 11.2 A 4.6 4.6 0 0 1 12.2 11.2");
+            ctx.stroke(p);
+            ctx.beginPath(); ctx.arc(3.8, 11.8, 1.3, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(12.2, 11.8, 1.3, 0, 2*Math.PI); ctx.stroke();
+        },
+        'южный узел': (ctx) => {
+            const p = new Path2D("M 3.8 4.8 A 4.6 4.6 0 0 0 12.2 4.8");
+            ctx.stroke(p);
+            ctx.beginPath(); ctx.arc(3.8, 4.2, 1.3, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(12.2, 4.2, 1.3, 0, 2*Math.PI); ctx.stroke();
+        },
+        'меркурий': (ctx) => {
+            const p = new Path2D("M 4.2 2.4 A 3.8 3.8 0 0 0 11.8 2.4");
+            ctx.stroke(p);
+            ctx.beginPath(); ctx.arc(8, 6.8, 2.8, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 9.6); ctx.lineTo(8, 14.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(5.2, 12.5); ctx.lineTo(10.8, 12.5); ctx.stroke();
+        },
+        'венера': (ctx) => {
+            ctx.beginPath(); ctx.arc(8, 5.4, 3.8, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 9.2); ctx.lineTo(8, 14.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(5.0, 12.2); ctx.lineTo(11.0, 12.2); ctx.stroke();
+        },
+        'марс': (ctx) => {
+            ctx.beginPath(); ctx.arc(6.5, 9.5, 3.8, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(9.2, 6.8); ctx.lineTo(14.0, 2.0); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(10.2, 2.0); ctx.lineTo(14.0, 2.0); ctx.lineTo(14.0, 5.8); ctx.stroke();
+        },
+        'юпитер': (ctx) => {
+            const p = new Path2D("M 2.0 6.5 C 2.0 1.5 6.5 0.8 6.5 4.5 C 6.5 7.0 2.5 8.5 2.5 9.8 L 13.5 9.8");
+            ctx.stroke(p);
+            ctx.beginPath(); ctx.moveTo(9.8, 1.8); ctx.lineTo(9.8, 14.8); ctx.stroke();
+        },
+        'сатурн': (ctx) => {
+            ctx.beginPath(); ctx.moveTo(5.2, 2.0); ctx.lineTo(5.2, 14.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(2.6, 4.8); ctx.lineTo(7.8, 4.8); ctx.stroke();
+            const p = new Path2D("M 5.2 8.2 C 9.5 8.2 11.8 10.5 9.5 13.8 C 8.5 15.2 7.0 14.5 7.5 13.2");
+            ctx.stroke(p);
+        },
+        'уран': (ctx) => {
+            ctx.beginPath(); ctx.arc(8, 12.8, 2.0, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 2.0); ctx.lineTo(8, 10.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(3.2, 5.2); ctx.lineTo(12.8, 5.2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(3.2, 2.0); ctx.lineTo(3.2, 8.4); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(12.8, 2.0); ctx.lineTo(12.8, 8.4); ctx.stroke();
+        },
+        'нептун': (ctx) => {
+            const p = new Path2D("M 3.2 3.2 L 3.2 6.8 C 3.2 9.2 12.8 9.2 12.8 6.8 L 12.8 3.2");
+            ctx.stroke(p);
+            ctx.beginPath(); ctx.moveTo(8, 2.0); ctx.lineTo(8, 14.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(5.0, 12.5); ctx.lineTo(11.0, 12.5); ctx.stroke();
+            const p2 = new Path2D("M 2.2 4.0 L 3.2 2.4 L 4.2 4.0"); ctx.stroke(p2);
+            const p3 = new Path2D("M 7.0 2.8 L 8.0 1.5 L 9.0 2.8"); ctx.stroke(p3);
+            const p4 = new Path2D("M 11.8 4.0 L 12.8 2.4 L 13.8 4.0"); ctx.stroke(p4);
+        },
+        'плутон': (ctx) => {
+            ctx.beginPath(); ctx.arc(8, 3.6, 2.5, 0, 2*Math.PI); ctx.stroke();
+            const p = new Path2D("M 2.4 6.0 A 5.6 5.6 0 0 0 13.6 6.0");
+            ctx.stroke(p);
+            ctx.beginPath(); ctx.moveTo(8, 9.4); ctx.lineTo(8, 14.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(4.8, 12.4); ctx.lineTo(11.2, 12.4); ctx.stroke();
+        }
+    };
 
     function getPlanetHtmlSymbol(name) {
         if (!name) return '';
@@ -1174,97 +1233,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return meta ? meta.sym : name.substring(0,2);
     }
 
-    function drawPlanetOnCanvas(ctx, pName, sym, x, y, size = 15, color = '#000000') {
+    function drawPlanetOnCanvas(ctx, pName, symStr, x, y, size = 15, color = '#000000') {
         const nameStr = (pName || '').toLowerCase();
-        const symStr  = (sym || '');
         ctx.save();
         ctx.strokeStyle = color;
         ctx.fillStyle = color;
-        ctx.lineWidth = Math.max(1.1, size * 0.09);
+        ctx.lineWidth = Math.max(1.1, size * 0.08);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        const s = size / 16;
 
-        if (nameStr.includes('солнце') || symStr === '☉') {
-            ctx.beginPath(); ctx.arc(x, y, 5.6 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x, y, 1.1 * s, 0, Math.PI * 2); ctx.fill();
-        } else if (nameStr.includes('земля') || symStr === '⊕') {
-            ctx.beginPath(); ctx.arc(x, y, 5.6 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x - 5.6 * s, y); ctx.lineTo(x + 5.6 * s, y);
-            ctx.moveTo(x, y - 5.6 * s); ctx.lineTo(x, y + 5.6 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('луна') || symStr === '☽') {
-            ctx.beginPath();
-            ctx.arc(x + 2.5 * s, y, 5.8 * s, 0.65 * Math.PI, 1.35 * Math.PI, false);
-            ctx.arc(x + 2.5 * s, y, 4.6 * s, 1.35 * Math.PI, 0.65 * Math.PI, true);
-            ctx.closePath();
-            ctx.stroke();
-        } else if (nameStr.includes('северный узел') || symStr === '☊') {
-            ctx.beginPath();
-            ctx.arc(x, y - 1.2 * s, 4.6 * s, 1.05 * Math.PI, 1.95 * Math.PI, false);
-            ctx.stroke();
-            ctx.beginPath(); ctx.arc(x - 4.0 * s, y + 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x + 4.0 * s, y + 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
-        } else if (nameStr.includes('южный узел') || symStr === '☋') {
-            ctx.beginPath();
-            ctx.arc(x, y + 1.2 * s, 4.6 * s, 0.05 * Math.PI, 0.95 * Math.PI, false);
-            ctx.stroke();
-            ctx.beginPath(); ctx.arc(x - 4.0 * s, y - 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x + 4.0 * s, y - 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
-        } else if (nameStr.includes('меркурий') || symStr === '☿') {
-            ctx.beginPath(); ctx.arc(x, y - 5.6 * s, 3.8 * s, 0.15 * Math.PI, 0.85 * Math.PI, false); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x, y - 1.2 * s, 2.8 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y + 1.6 * s); ctx.lineTo(x, y + 6.8 * s);
-            ctx.moveTo(x - 2.8 * s, y + 4.5 * s); ctx.lineTo(x + 2.8 * s, y + 4.5 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('венера') || symStr === '♀') {
-            ctx.beginPath(); ctx.arc(x, y - 2.6 * s, 3.8 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y + 1.2 * s); ctx.lineTo(x, y + 6.8 * s);
-            ctx.moveTo(x - 3.0 * s, y + 4.2 * s); ctx.lineTo(x + 3.0 * s, y + 4.2 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('марс') || symStr === '♂') {
-            ctx.beginPath(); ctx.arc(x - 1.5 * s, y + 1.5 * s, 3.8 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x + 1.2 * s, y - 1.2 * s); ctx.lineTo(x + 6.0 * s, y - 6.0 * s);
-            ctx.moveTo(x + 2.2 * s, y - 6.0 * s); ctx.lineTo(x + 6.0 * s, y - 6.0 * s); ctx.lineTo(x + 6.0 * s, y - 2.2 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('юпитер') || symStr === '♃') {
-            drawJupiterCanvas(ctx, x, y, size, color);
-        } else if (nameStr.includes('сатурн') || symStr === '♄') {
-            ctx.beginPath();
-            ctx.moveTo(x - 2.8 * s, y - 6.0 * s); ctx.lineTo(x - 2.8 * s, y + 6.8 * s);
-            ctx.moveTo(x - 5.4 * s, y - 3.2 * s); ctx.lineTo(x - 0.2 * s, y - 3.2 * s);
-            ctx.moveTo(x - 2.8 * s, y + 0.2 * s);
-            ctx.bezierCurveTo(x + 1.5 * s, y + 0.2 * s, x + 3.8 * s, y + 2.5 * s, x + 1.5 * s, y + 5.8 * s);
-            ctx.bezierCurveTo(x + 0.5 * s, y + 7.2 * s, x - 1.0 * s, y + 6.5 * s, x - 0.5 * s, y + 5.2 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('уран') || symStr === '♅') {
-            ctx.beginPath(); ctx.arc(x, y + 4.8 * s, 2.0 * s, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y - 6.0 * s); ctx.lineTo(x, y + 2.8 * s);
-            ctx.moveTo(x - 4.8 * s, y - 2.8 * s); ctx.lineTo(x + 4.8 * s, y - 2.8 * s);
-            ctx.moveTo(x - 4.8 * s, y - 6.0 * s); ctx.lineTo(x - 4.8 * s, y + 0.4 * s);
-            ctx.moveTo(x + 4.8 * s, y - 6.0 * s); ctx.lineTo(x + 4.8 * s, y + 0.4 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('нептун') || symStr === '♆') {
-            ctx.beginPath();
-            ctx.moveTo(x - 4.8 * s, y - 4.8 * s); ctx.lineTo(x - 4.8 * s, y - 1.2 * s);
-            ctx.bezierCurveTo(x - 4.8 * s, y + 1.2 * s, x + 4.8 * s, y + 1.2 * s, x + 4.8 * s, y - 1.2 * s);
-            ctx.lineTo(x + 4.8 * s, y - 4.8 * s);
-            ctx.moveTo(x, y - 6.0 * s); ctx.lineTo(x, y + 6.8 * s);
-            ctx.moveTo(x - 3.0 * s, y + 4.5 * s); ctx.lineTo(x + 3.0 * s, y + 4.5 * s);
-            ctx.stroke();
-        } else if (nameStr.includes('плутон') || symStr === '♇') {
-            drawPlutoCanvas(ctx, x, y, size, color);
+        let drawFn = null;
+        for (const [key, fn] of Object.entries(PLANET_VECTORS)) {
+            if (nameStr.includes(key)) {
+                drawFn = fn;
+                break;
+            }
+        }
+        
+        if (!drawFn) {
+            if (symStr === "☊") drawFn = PLANET_VECTORS["северный узел"];
+            else if (symStr === "☋") drawFn = PLANET_VECTORS["южный узел"];
+        }
+
+        if (drawFn) {
+            ctx.translate(x - size/2, y - size/2);
+            ctx.scale(size/16, size/16);
+            drawFn(ctx);
         } else {
             ctx.font = `bold ${size}px "DM Sans", "Segoe UI Symbol", sans-serif`;
-            ctx.fillStyle = color;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(symStr, x, y);
+            ctx.fillText(symStr || '', x, y);
         }
         ctx.restore();
     }
