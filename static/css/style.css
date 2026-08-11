@@ -3537,6 +3537,32 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
+.mandala-chip-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--primary);
+    background: linear-gradient(135deg, rgba(197, 158, 63, 0.16) 0%, rgba(217, 180, 85, 0.26) 100%);
+    color: var(--text-dark);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(197, 158, 63, 0.15);
+    margin-left: 4px;
+}
+
+.mandala-chip-all:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(197, 158, 63, 0.25);
+    background: linear-gradient(135deg, rgba(197, 158, 63, 0.26) 0%, rgba(217, 180, 85, 0.36) 100%);
+}
+
+
 
 
 

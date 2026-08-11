@@ -5765,6 +5765,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const canvasEl = document.getElementById('mandala-canvas');
             if (!canvasEl) return;
 
+            const btnToggleAll = document.getElementById('mandala-toggle-all');
+
+            function updateToggleAllBtnState() {
+                if (!btnToggleAll) return;
+                const allKeys = Object.keys(mandalaSettings);
+                const areAllOn = allKeys.every(k => mandalaSettings[k]);
+                btnToggleAll.innerHTML = areAllOn ? '↺ Сбросить' : '✨ Включить всё';
+            }
+
+            if (btnToggleAll) {
+                btnToggleAll.addEventListener('click', () => {
+                    const allKeys = Object.keys(mandalaSettings);
+                    const areAllOn = allKeys.every(k => mandalaSettings[k]);
+
+                    const newState = !areAllOn;
+                    allKeys.forEach(k => {
+                        mandalaSettings[k] = newState;
+                    });
+
+                    document.querySelectorAll('.mandala-chip').forEach(chip => {
+                        const ring = chip.getAttribute('data-ring');
+                        chip.classList.toggle('active', mandalaSettings[ring]);
+                    });
+
+                    updateToggleAllBtnState();
+
+                    const wrap = document.getElementById('mandala-bodygraph-wrap');
+                    if (wrap) {
+                        wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
+                        wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
+                    }
+
+                    animateMandala();
+                });
+            }
+
             // Bind click listeners to Mandala ring toggle chips
             document.querySelectorAll('.mandala-chip').forEach(chip => {
                 chip.addEventListener('click', () => {
@@ -5773,6 +5809,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         mandalaSettings[ring] = !mandalaSettings[ring];
                         chip.classList.toggle('active', mandalaSettings[ring]);
                         
+                        updateToggleAllBtnState();
+
                         // Update bodygraph CSS overlay transition immediately
                         const wrap = document.getElementById('mandala-bodygraph-wrap');
                         if (wrap) {
