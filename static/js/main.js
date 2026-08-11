@@ -1134,59 +1134,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drawPlutoCanvas(ctx, ax, ay, size, color) {
         ctx.save();
-        ctx.strokeStyle = color;
+        ctx.font = `${size}px "Times New Roman", "Apple Symbols", serif`;
         ctx.fillStyle = color;
-        ctx.lineWidth = Math.max(1.1, size * 0.09);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        const s = size / 16;
-        ctx.beginPath();
-        ctx.arc(ax, ay - 4.2 * s, 2.5 * s, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(ax, ay - 1.8 * s, 5.6 * s, 0.15 * Math.PI, 0.85 * Math.PI, false);
-        ctx.stroke();
-
-        const botY = ay + 3.8 * s;
-        const endY = ay + 8.2 * s;
-        const barY = ay + 6.0 * s;
-        const barW = 3.2 * s;
-
-        ctx.beginPath();
-        ctx.moveTo(ax, botY);
-        ctx.lineTo(ax, endY);
-        ctx.moveTo(ax - barW, barY);
-        ctx.lineTo(ax + barW, barY);
-        ctx.stroke();
-
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('♇', ax, ay);
         ctx.restore();
     }
 
     function drawJupiterCanvas(ctx, ax, ay, size, color) {
         ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = Math.max(1.1, size * 0.09);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        const s = size / 16;
-        const hY = ay + 1.8 * s;
-
-        ctx.beginPath();
-        ctx.moveTo(ax - 6.0 * s, ay - 1.2 * s);
-        ctx.bezierCurveTo(ax - 6.0 * s, ay - 6.5 * s, ax - 1.5 * s, ay - 7.2 * s, ax - 1.5 * s, ay - 3.2 * s);
-        ctx.bezierCurveTo(ax - 1.5 * s, ay - 1.0 * s, ax - 5.5 * s, ay + 0.2 * s, ax - 5.5 * s, hY);
-        ctx.lineTo(ax + 5.5 * s, hY);
-        ctx.stroke();
-
-        const vX = ax + 1.8 * s;
-        ctx.beginPath();
-        ctx.moveTo(vX, ay - 6.2 * s);
-        ctx.lineTo(vX, ay + 7.5 * s);
-        ctx.stroke();
-
+        ctx.font = `${size}px "Times New Roman", "Apple Symbols", serif`;
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('♃', ax, ay);
         ctx.restore();
     }
 
