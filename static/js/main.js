@@ -3528,6 +3528,50 @@ document.addEventListener('DOMContentLoaded', () => {
         cross: false
     };
 
+    const mandalaAnimState = {
+        hexagrams: { progress: 0, startAngle: -0.22 },
+        mirror:    { progress: 0, startAngle:  0.22 },
+        zodiac:    { progress: 0, startAngle: -0.18 },
+        houses:    { progress: 0, startAngle:  0.18 },
+        cross:     { progress: 0, startAngle: -0.25 }
+    };
+
+    let mandalaAnimFrameId = null;
+
+    function animateMandala() {
+        if (mandalaAnimFrameId) cancelAnimationFrame(mandalaAnimFrameId);
+
+        const canvasEl = document.getElementById('mandala-canvas');
+        if (!canvasEl || !lastChart) return;
+
+        const speed = 0.12;
+
+        function step() {
+            let stillMoving = false;
+
+            for (const [key, state] of Object.entries(mandalaAnimState)) {
+                const target = mandalaSettings[key] ? 1 : 0;
+                const diff = target - state.progress;
+                if (Math.abs(diff) > 0.001) {
+                    state.progress += diff * speed;
+                    stillMoving = true;
+                } else {
+                    state.progress = target;
+                }
+            }
+
+            drawMandala(lastChart, canvasEl, typeof mandalaHoverState !== 'undefined' ? mandalaHoverState : null);
+
+            if (stillMoving) {
+                mandalaAnimFrameId = requestAnimationFrame(step);
+            } else {
+                mandalaAnimFrameId = null;
+            }
+        }
+
+        step();
+    }
+
     /* ── Mandala renderer (with bodygraph overlay inside) ── */
     function drawMandala(data, canvasEl, hoverState = null) {
         if (!canvasEl) return;
@@ -3693,11 +3737,21 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
         }
 
-        if (mandalaSettings.cross) {
+        const pCross = mandalaAnimState.cross.progress;
+        if (pCross > 0.001) {
+            ctx.save();
+            ctx.globalAlpha = pCross;
+            const rotCross = (1 - pCross) * mandalaAnimState.cross.startAngle;
+            if (Math.abs(rotCross) > 0.0001) {
+                ctx.translate(cx, cy);
+                ctx.rotate(rotCross);
+                ctx.translate(-cx, -cy);
+            }
             // Personality axis (black/charcoal)
             drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.88)', 3.2);
             // Design axis (red)
             drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.88)', 3.2);
+            ctx.restore();
         }
 
 
@@ -3927,7 +3981,17 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = fillStyle;
             ctx.fillText(gateNum.toString(), lx, ly);
 
-            if (mandalaSettings.hexagrams) {
+            const pHex = mandalaAnimState.hexagrams.progress;
+            if (pHex > 0.001) {
+                ctx.save();
+                ctx.globalAlpha = pHex;
+                const rotHex = (1 - pHex) * mandalaAnimState.hexagrams.startAngle;
+                if (Math.abs(rotHex) > 0.0001) {
+                    ctx.translate(cx, cy);
+                    ctx.rotate(rotHex);
+                    ctx.translate(-cx, -cy);
+                }
+
                 // Draw I Ching Hexagram (6 stacked horizontal lines, unrotated, matching reference)
                 const lineStr = HEX_LINES[gateNum] || "000000";
                 const rHexMid = (rHexagramsInner + rHexagramsOuter) / 2;
@@ -3973,6 +4037,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     ctx.stroke();
                 }
+                ctx.restore();
             }
         }
 
@@ -3987,7 +4052,17 @@ document.addEventListener('DOMContentLoaded', () => {
             26,  9,  5, 19
         ];
 
-        if (mandalaSettings.mirror && data.houses && data.houses.length >= 1) {
+        const pMir = mandalaAnimState.mirror.progress;
+        if (pMir > 0.001 && data.houses && data.houses.length >= 1) {
+            ctx.save();
+            ctx.globalAlpha = pMir;
+            const rotMir = (1 - pMir) * mandalaAnimState.mirror.startAngle;
+            if (Math.abs(rotMir) > 0.0001) {
+                ctx.translate(cx, cy);
+                ctx.rotate(rotMir);
+                ctx.translate(-cx, -cy);
+            }
+
             const AS = data.houses[0].longitude;
             const MIRROR_INTERVAL = GATE_INTERVAL; // same 5.625°
 
@@ -4073,11 +4148,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = numColor;
                 ctx.fillText(gateNum.toString(), gnx, gny);
             }
+            ctx.restore();
         }
 
         // 4. Zodiac Ring and Ticks
 
-        if (mandalaSettings.zodiac) {
+        const pZod = mandalaAnimState.zodiac.progress;
+        if (pZod > 0.001) {
+            ctx.save();
+            ctx.globalAlpha = pZod;
+            const rotZod = (1 - pZod) * mandalaAnimState.zodiac.startAngle;
+            if (Math.abs(rotZod) > 0.0001) {
+                ctx.translate(cx, cy);
+                ctx.rotate(rotZod);
+                ctx.translate(-cx, -cy);
+            }
+
             const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
                 ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
                 : -1;
@@ -4150,12 +4236,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText(ZODIAC_META[i].sym, gx, gy);
             }
+            ctx.restore();
         }
 
         // 4.5 Nidana (Houses) Ring — Spatial layout matching reference
         // Gold transparent background, house# (inner ring), gate.line (center), stacked ▲/▽ rulers (right)
         // Visually drawn as 12 equal 30-degree sectors starting from the Ascendant
-        if (mandalaSettings.houses && data.houses && data.houses.length === 12) {
+        const pHou = mandalaAnimState.houses.progress;
+        if (pHou > 0.001 && data.houses && data.houses.length === 12) {
+            ctx.save();
+            ctx.globalAlpha = pHou;
+            const rotHou = (1 - pHou) * mandalaAnimState.houses.startAngle;
+            if (Math.abs(rotHou) > 0.0001) {
+                ctx.translate(cx, cy);
+                ctx.rotate(rotHou);
+                ctx.translate(-cx, -cy);
+            }
+
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
             const asc = data.houses[0].longitude;
@@ -4308,27 +4405,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+            ctx.restore();
         }
 
         // Ticks around the Zodiac Outer Border removed as requested
 
         // 5. Draw concentric circle dividing lines
         const concentricBorders = [
-            { r: rInnerBorder, show: true },
-            { r: rDialInner, show: true },
-            { r: rGatesInner, show: true },
-            { r: rZodiacInner, show: mandalaSettings.zodiac || mandalaSettings.houses },
-            { r: rMirrorInner, show: mandalaSettings.mirror },
-            { r: rHexagramsInner, show: mandalaSettings.hexagrams },
-            { r: rHexagramsOuter, show: mandalaSettings.hexagrams }
+            { r: rInnerBorder, alpha: 1.0 },
+            { r: rDialInner, alpha: 1.0 },
+            { r: rGatesInner, alpha: 1.0 },
+            { r: rZodiacInner, alpha: Math.max(mandalaAnimState.zodiac.progress, mandalaAnimState.houses.progress) },
+            { r: rMirrorInner, alpha: mandalaAnimState.mirror.progress },
+            { r: rHexagramsInner, alpha: mandalaAnimState.hexagrams.progress },
+            { r: rHexagramsOuter, alpha: mandalaAnimState.hexagrams.progress }
         ];
-        concentricBorders.forEach(({ r, show }, idx) => {
-            if (!show) return;
+        concentricBorders.forEach(({ r, alpha }, idx) => {
+            if (alpha < 0.001) return;
+            ctx.save();
+            ctx.globalAlpha = alpha;
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
             ctx.strokeStyle = idx === 0 ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.18)';
             ctx.lineWidth = idx === 0 ? 1.5 : 1.0;
             ctx.stroke();
+            ctx.restore();
         });
         // 6. Quarters dividing rods removed as requested
 
@@ -4513,8 +4614,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrap = document.getElementById('mandala-bodygraph-wrap');
         if (!wrap) return;
 
-        wrap.style.display = mandalaSettings.bodygraph ? 'flex' : 'none';
-        if (!mandalaSettings.bodygraph) return;
+        wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
+        wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
+        wrap.style.pointerEvents = 'none';
 
         // Position the wrapper exactly over the canvas inner circle (adding 20px to compensate for #mandala-container padding)
         wrap.style.left = (bgOffX + 20) + 'px';
@@ -5671,10 +5773,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         mandalaSettings[ring] = !mandalaSettings[ring];
                         chip.classList.toggle('active', mandalaSettings[ring]);
                         
-                        // Re-draw mandala canvas & update SVG bodygraph overlay
-                        if (lastChart) {
-                            drawMandala(lastChart, canvasEl, mandalaHoverState);
+                        // Update bodygraph CSS overlay transition immediately
+                        const wrap = document.getElementById('mandala-bodygraph-wrap');
+                        if (wrap) {
+                            wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
+                            wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
                         }
+
+                        // Trigger smooth rotation & fade animation loop for rings on canvas
+                        animateMandala();
                     }
                 });
             });
