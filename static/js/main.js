@@ -3521,19 +3521,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mandalaSettings = {
         bodygraph: true,
-        hexagrams: false,
-        mirror: false,
-        zodiac: false,
-        houses: false,
-        cross: false
+        hexagrams: true,
+        mirror: true,
+        zodiac: true,
+        houses: true,
+        cross: true
     };
 
     const mandalaAnimState = {
-        hexagrams: { progress: 0, startAngle: -0.22 },
-        mirror:    { progress: 0, startAngle:  0.22 },
-        zodiac:    { progress: 0, startAngle: -0.18 },
-        houses:    { progress: 0, startAngle:  0.18 },
-        cross:     { progress: 0, startAngle: -0.25 }
+        hexagrams: { progress: 1, startAngle: -0.22 },
+        mirror:    { progress: 1, startAngle:  0.22 },
+        zodiac:    { progress: 1, startAngle: -0.18 },
+        houses:    { progress: 1, startAngle:  0.18 },
+        cross:     { progress: 1, startAngle: -0.25 }
     };
 
     let mandalaAnimFrameId = null;
