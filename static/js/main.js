@@ -1098,11 +1098,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'Меркурий':     { sym: '☿', cls: 'glyph-mercury' },
         'Венера':       { sym: '♀', cls: 'glyph-venus' },
         'Марс':         { sym: '♂', cls: 'glyph-mars' },
-        'Юпитер':       { sym: typeof SVG_JUPITER !== 'undefined' ? SVG_JUPITER : '♃', cls: 'glyph-jupiter' },
+        'Юпитер':       { sym: '♃', cls: 'glyph-jupiter' },
         'Сатурн':       { sym: '♄', cls: 'glyph-saturn' },
         'Уран':         { sym: '♅', cls: 'glyph-uranus' },
         'Нептун':       { sym: '♆', cls: 'glyph-neptune' },
-        'Плутон':       { sym: typeof SVG_PLUTO !== 'undefined' ? SVG_PLUTO : '♇', cls: 'glyph-pluto' },
+        'Плутон':       { sym: '♇', cls: 'glyph-pluto' },
         'Северный Узел':{ sym: '☊', cls: 'glyph-node' },
         'Южный Узел':   { sym: '☋', cls: 'glyph-node' },
         'Истинный Северный Узел':{ sym: '☊', cls: 'glyph-node' },
@@ -1131,6 +1131,96 @@ document.addEventListener('DOMContentLoaded', () => {
         { sym: '♒\uFE0E', name: 'Водолей' },
         { sym: '♓\uFE0E', name: 'Рыбы' },
     ];
+
+    function drawPlutoCanvas(ctx, ax, ay, size, color) {
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = Math.max(1.1, size * 0.09);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const s = size / 16;
+        ctx.beginPath();
+        ctx.arc(ax, ay - 4.2 * s, 2.5 * s, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(ax, ay - 1.8 * s, 5.6 * s, 0.15 * Math.PI, 0.85 * Math.PI, false);
+        ctx.stroke();
+
+        const botY = ay + 3.8 * s;
+        const endY = ay + 8.2 * s;
+        const barY = ay + 6.0 * s;
+        const barW = 3.2 * s;
+
+        ctx.beginPath();
+        ctx.moveTo(ax, botY);
+        ctx.lineTo(ax, endY);
+        ctx.moveTo(ax - barW, barY);
+        ctx.lineTo(ax + barW, barY);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawJupiterCanvas(ctx, ax, ay, size, color) {
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = Math.max(1.1, size * 0.09);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const s = size / 16;
+        const hY = ay + 1.8 * s;
+
+        ctx.beginPath();
+        ctx.moveTo(ax - 6.0 * s, ay - 1.2 * s);
+        ctx.bezierCurveTo(ax - 6.0 * s, ay - 6.5 * s, ax - 1.5 * s, ay - 7.2 * s, ax - 1.5 * s, ay - 3.2 * s);
+        ctx.bezierCurveTo(ax - 1.5 * s, ay - 1.0 * s, ax - 5.5 * s, ay + 0.2 * s, ax - 5.5 * s, hY);
+        ctx.lineTo(ax + 5.5 * s, hY);
+        ctx.stroke();
+
+        const vX = ax + 1.8 * s;
+        ctx.beginPath();
+        ctx.moveTo(vX, ay - 6.2 * s);
+        ctx.lineTo(vX, ay + 7.5 * s);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawPlanetOnCanvas(ctx, pName, sym, x, y, size = 15, color = '#000000') {
+        const nameStr = (pName || '').toLowerCase();
+        const symStr  = (sym || '');
+
+        if (nameStr.includes('плутон') || symStr === '♇') {
+            drawPlutoCanvas(ctx, x, y, size, color);
+        } else if (nameStr.includes('юпитер') || symStr === '♃') {
+            drawJupiterCanvas(ctx, x, y, size, color);
+        } else if (nameStr.includes('земля') || symStr === '⊕') {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = Math.max(1.1, size * 0.09);
+            const r = size * 0.4;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - r, y); ctx.lineTo(x + r, y);
+            ctx.moveTo(x, y - r); ctx.lineTo(x, y + r);
+            ctx.stroke();
+            ctx.restore();
+        } else {
+            ctx.save();
+            ctx.font = `bold ${size}px "DM Sans", "Segoe UI Symbol", sans-serif`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(symStr, x, y);
+            ctx.restore();
+        }
+    }
 
     function signMeta(signName) {
         return ZODIAC_META.find(z => z.name === signName) || { sym: '?', name: signName };
@@ -1649,11 +1739,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
 
             // Symbol
-            ctx.font      = '13px serif';
-            ctx.fillStyle = PLANET_COLORS[p.name] || '#2E2A20';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(meta.sym, px, py);
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 13, PLANET_COLORS[p.name] || '#2E2A20');
 
             // Retrograde indicator
             if (p.is_retrograde) {
@@ -1817,24 +1903,7 @@ document.addEventListener('DOMContentLoaded', () => {
             placed.push({ x: px, y: py });
             ctx.beginPath(); ctx.moveTo(dx, dy); ctx.lineTo(px, py);
             ctx.strokeStyle = 'rgba(197,158,63,0.2)'; ctx.lineWidth = 0.5; ctx.stroke();
-            ctx.font = '12.5px serif'; ctx.fillStyle = PLANET_COLORS[p.name] || '#2E2A20';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if (meta.sym === '⊕') {
-                ctx.strokeStyle = PLANET_COLORS[p.name] || '#2D82B7';
-                ctx.lineWidth = 1.0;
-                ctx.beginPath();
-                ctx.arc(px, py, 4.5, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(px - 4.5, py);
-                ctx.lineTo(px + 4.5, py);
-                ctx.moveTo(px, py - 4.5);
-                ctx.lineTo(px, py + 4.5);
-                ctx.stroke();
-            } else {
-                ctx.fillText(meta.sym, px, py);
-            }
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 12.5, PLANET_COLORS[p.name] || '#2E2A20');
             if (p.is_retrograde) {
                 ctx.font = 'bold 7px DM Sans,sans-serif'; ctx.fillStyle = '#E06D53';
                 ctx.fillText('R', px + 7, py - 5);
@@ -2723,11 +2792,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 0.5;
             ctx.stroke();
             
-            ctx.font = '12px serif';
-            ctx.fillStyle = '#C59E3F';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(meta.sym, px, py);
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 12, '#C59E3F');
         });
         
         // Draw P2 Planets (Dark Slate)
@@ -2763,11 +2828,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 0.5;
             ctx.stroke();
             
-            ctx.font = '12px serif';
-            ctx.fillStyle = '#777166';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(meta.sym, px, py);
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 12, '#777166');
         });
     }
 
@@ -3287,11 +3348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.lineWidth = 1.0;
                 ctx.stroke();
 
-                ctx.font = '15px sans-serif';
-                ctx.fillStyle = glyphColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(pPers.symbol, xCenter, y);
+                drawPlanetOnCanvas(ctx, pName, pPers.symbol, xCenter, y, 15, glyphColor);
 
                 const xText = xCenter - 35.85;
                 ctx.font = 'normal 13px DM Sans, sans-serif';
@@ -3336,11 +3393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.lineWidth = 1.0;
                 ctx.stroke();
 
-                ctx.font = '15px sans-serif';
-                ctx.fillStyle = glyphColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(pDes.symbol, xCenter, y);
+                drawPlanetOnCanvas(ctx, pName, pDes.symbol, xCenter, y, 15, glyphColor);
 
                 const xText = xCenter + 35.85;
                 ctx.font = 'normal 13px DM Sans, sans-serif';
@@ -4303,31 +4356,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Draw planet glyph symbol (enlarged for readability)
-                if (act.symbol === '⊕' || act.name === 'Земля') {
-                    ctx.strokeStyle = planetColor;
-                    ctx.lineWidth = 1.4;
-                    ctx.beginPath();
-                    ctx.arc(ax, ay, 6.5, 0, Math.PI * 2);
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                    ctx.moveTo(ax - 6.5, ay);
-                    ctx.lineTo(ax + 6.5, ay);
-                    ctx.moveTo(ax, ay - 6.5);
-                    ctx.lineTo(ax, ay + 6.5);
-                    ctx.stroke();
-                } else if (act.name === 'Плутон' || act.symbol === '♇' || (typeof act.symbol === 'string' && act.symbol.includes('cy="3.6"'))) {
-                    drawPlutoCanvas(ctx, ax, ay, 15, planetColor);
-                } else if (act.name === 'Юпитер' || act.symbol === '♃' || (typeof act.symbol === 'string' && act.symbol.includes('L 13.5'))) {
-                    drawJupiterCanvas(ctx, ax, ay, 15, planetColor);
-                } else {
-                    ctx.font = isAnyHovered && isHighlighted ? 'bold 18px "DM Sans", sans-serif' : 'bold 16px "DM Sans", sans-serif';
-                    ctx.fillStyle = planetColor;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(act.symbol, ax, ay);
-                }
+                drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
 
                 // Draw line number subscript next to planet symbol
                 const subAngle = midAngle + 0.032;
