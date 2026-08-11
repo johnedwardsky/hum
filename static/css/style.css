@@ -3048,6 +3048,24 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-col-design .bg-gate-cell { color: #fe0000; }
 .bg-col-personality .bg-gate-cell { color: #2E2A20; }
 
+/* Mirror Cell (Second Dial Program) Styling */
+.bg-mirror-cell {
+    opacity: 0.80;
+    padding: 0 4px;
+    border-left: 1px dashed rgba(180, 175, 165, 0.40);
+    border-right: 1px dashed rgba(180, 175, 165, 0.40);
+    margin: 0 2px;
+}
+.bg-mirror-cell .bg-gate-main {
+    font-size: 13.5px;
+    font-weight: 600;
+}
+.bg-mirror-cell .bg-line-sub {
+    font-size: 8.5px;
+}
+.bg-col-design .bg-mirror-cell { color: rgba(254, 0, 0, 0.72); }
+.bg-col-personality .bg-mirror-cell { color: rgba(46, 42, 32, 0.72); }
+
 /* Hexagram icon */
 .bg-hex-icon {
     display: flex;

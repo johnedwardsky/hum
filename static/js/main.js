@@ -5128,7 +5128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro);
 
             const gateCellHtml = `
-                <div class="bg-gate-cell" style="color:${colorCss}">
+                <div class="bg-gate-cell" style="color:${colorCss}" title="1-й цифербат (Основной Рейв): ворота ${gate}.${line}">
                     <span class="bg-gate-main">${gate}</span>
                     <div class="bg-line-stack">
                         ${fixBadge}
@@ -5137,20 +5137,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            // Compute 2nd dial (Зеркало Жизни) program for this planet if houses data exists
+            let mirrorGateCellHtml = '';
+            if (p.longitude != null && data && data.houses && data.houses.length >= 1) {
+                const AS = data.houses[0].longitude;
+                const relLon = (p.longitude - AS + 360) % 360;
+                const mIdx = Math.floor(relLon / 5.625) % 64;
+                const mGate = MIRROR_GATE_ORDER[mIdx];
+                const mLine = Math.floor((relLon % 5.625) / (5.625 / 6)) + 1;
+
+                const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro);
+
+                mirrorGateCellHtml = `
+                    <div class="bg-gate-cell bg-mirror-cell" title="2-й цифербат (Зеркало Жизни): ворота ${mGate}.${mLine}">
+                        <span class="bg-gate-main">${mGate}</span>
+                        <div class="bg-line-stack">
+                            ${mirrorFixBadge}
+                            <span class="bg-line-sub">${mLine}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
             if (isDesign) {
-                // Left column: Planet | Gate.Line.Fixation | Zodiac
+                // Left column: Planet | 1st Dial Gate | 2nd Dial Mirror Gate | Zodiac
                 row.innerHTML = `
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym ${glyphCls}" style="color:${colorCss}">${sym}</span>
                         ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
                     </div>
                     ${gateCellHtml}
+                    ${mirrorGateCellHtml}
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
                 `;
             } else {
-                // Right column: Zodiac | Gate.Line.Fixation | Planet
+                // Right column: Zodiac | 2nd Dial Mirror Gate | 1st Dial Gate | Planet
                 row.innerHTML = `
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
+                    ${mirrorGateCellHtml}
                     ${gateCellHtml}
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym ${glyphCls}" style="color:${colorCss}">${sym}</span>
