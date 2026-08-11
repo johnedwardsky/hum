@@ -3454,11 +3454,11 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    justify-content: flex-start;
+    gap: 12px;
     width: 100%;
-    max-width: 780px;
-    margin: 0 auto 16px auto;
+    max-width: 820px;
+    margin: 0 0 16px 0;
     padding: 10px 16px;
     background: var(--bg-card);
     border: 1px solid var(--border);
