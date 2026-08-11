@@ -2955,14 +2955,20 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     justify-content: center;
     width: 24px;
     height: 24px;
+    border-radius: 50%;
+    background: rgba(245, 243, 238, 0.45);
+    border: 1px solid rgba(220, 215, 205, 0.35);
     flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
 .bg-planet-wrap .bg-planet-sym {
-    font-size: 18px;
+    font-size: 14px;
     text-align: center;
     line-height: 1;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bg-col-design .bg-planet-sym     { color: #fe0000; }

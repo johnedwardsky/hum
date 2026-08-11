@@ -1190,36 +1190,121 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    function getPlanetHtmlSymbol(name) {
+        if (!name) return '';
+        const nameLower = name.toLowerCase();
+        if (nameLower.includes('солнце')) return typeof SVG_SUN !== 'undefined' ? SVG_SUN : '☉';
+        if (nameLower.includes('земля')) return typeof SVG_EARTH !== 'undefined' ? SVG_EARTH : '⊕';
+        if (nameLower.includes('луна')) return typeof SVG_MOON !== 'undefined' ? SVG_MOON : '☽';
+        if (nameLower.includes('северный узел')) return typeof SVG_NODE_NORTH !== 'undefined' ? SVG_NODE_NORTH : '☊';
+        if (nameLower.includes('южный узел')) return typeof SVG_NODE_SOUTH !== 'undefined' ? SVG_NODE_SOUTH : '☋';
+        if (nameLower.includes('меркурий')) return typeof SVG_MERCURY !== 'undefined' ? SVG_MERCURY : '☿';
+        if (nameLower.includes('венера')) return typeof SVG_VENUS !== 'undefined' ? SVG_VENUS : '♀';
+        if (nameLower.includes('марс')) return typeof SVG_MARS !== 'undefined' ? SVG_MARS : '♂';
+        if (nameLower.includes('юпитер')) return typeof SVG_JUPITER !== 'undefined' ? SVG_JUPITER : '♃';
+        if (nameLower.includes('сатурн')) return typeof SVG_SATURN !== 'undefined' ? SVG_SATURN : '♄';
+        if (nameLower.includes('уран')) return typeof SVG_URANUS !== 'undefined' ? SVG_URANUS : '♅';
+        if (nameLower.includes('нептун')) return typeof SVG_NEPTUNE !== 'undefined' ? SVG_NEPTUNE : '♆';
+        if (nameLower.includes('плутон')) return typeof SVG_PLUTO !== 'undefined' ? SVG_PLUTO : '♇';
+
+        const key = name === 'Северный Узел' ? 'Истинный Северный Узел' : (name === 'Южный Узел' ? 'Истинный Южный Узел' : name);
+        const meta = PLANET_META[key] || PLANET_META[name];
+        return meta ? meta.sym : name.substring(0,2);
+    }
+
     function drawPlanetOnCanvas(ctx, pName, sym, x, y, size = 15, color = '#000000') {
         const nameStr = (pName || '').toLowerCase();
         const symStr  = (sym || '');
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = Math.max(1.1, size * 0.09);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        const s = size / 16;
 
-        if (nameStr.includes('плутон') || symStr === '♇') {
-            drawPlutoCanvas(ctx, x, y, size, color);
+        if (nameStr.includes('солнце') || symStr === '☉') {
+            ctx.beginPath(); ctx.arc(x, y, 5.6 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x, y, 1.1 * s, 0, Math.PI * 2); ctx.fill();
+        } else if (nameStr.includes('земля') || symStr === '⊕') {
+            ctx.beginPath(); ctx.arc(x, y, 5.6 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - 5.6 * s, y); ctx.lineTo(x + 5.6 * s, y);
+            ctx.moveTo(x, y - 5.6 * s); ctx.lineTo(x, y + 5.6 * s);
+            ctx.stroke();
+        } else if (nameStr.includes('луна') || symStr === '☽') {
+            ctx.beginPath();
+            ctx.arc(x + 2.5 * s, y, 5.8 * s, 0.65 * Math.PI, 1.35 * Math.PI, false);
+            ctx.arc(x + 2.5 * s, y, 4.6 * s, 1.35 * Math.PI, 0.65 * Math.PI, true);
+            ctx.closePath();
+            ctx.stroke();
+        } else if (nameStr.includes('северный узел') || symStr === '☊') {
+            ctx.beginPath();
+            ctx.arc(x, y - 1.2 * s, 4.6 * s, 1.05 * Math.PI, 1.95 * Math.PI, false);
+            ctx.stroke();
+            ctx.beginPath(); ctx.arc(x - 4.0 * s, y + 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x + 4.0 * s, y + 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
+        } else if (nameStr.includes('южный узел') || symStr === '☋') {
+            ctx.beginPath();
+            ctx.arc(x, y + 1.2 * s, 4.6 * s, 0.05 * Math.PI, 0.95 * Math.PI, false);
+            ctx.stroke();
+            ctx.beginPath(); ctx.arc(x - 4.0 * s, y - 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x + 4.0 * s, y - 3.4 * s, 1.3 * s, 0, Math.PI * 2); ctx.stroke();
+        } else if (nameStr.includes('меркурий') || symStr === '☿') {
+            ctx.beginPath(); ctx.arc(x, y - 5.6 * s, 3.8 * s, 0.15 * Math.PI, 0.85 * Math.PI, false); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x, y - 1.2 * s, 2.8 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y + 1.6 * s); ctx.lineTo(x, y + 6.8 * s);
+            ctx.moveTo(x - 2.8 * s, y + 4.5 * s); ctx.lineTo(x + 2.8 * s, y + 4.5 * s);
+            ctx.stroke();
+        } else if (nameStr.includes('венера') || symStr === '♀') {
+            ctx.beginPath(); ctx.arc(x, y - 2.6 * s, 3.8 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y + 1.2 * s); ctx.lineTo(x, y + 6.8 * s);
+            ctx.moveTo(x - 3.0 * s, y + 4.2 * s); ctx.lineTo(x + 3.0 * s, y + 4.2 * s);
+            ctx.stroke();
+        } else if (nameStr.includes('марс') || symStr === '♂') {
+            ctx.beginPath(); ctx.arc(x - 1.5 * s, y + 1.5 * s, 3.8 * s, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 1.2 * s, y - 1.2 * s); ctx.lineTo(x + 6.0 * s, y - 6.0 * s);
+            ctx.moveTo(x + 2.2 * s, y - 6.0 * s); ctx.lineTo(x + 6.0 * s, y - 6.0 * s); ctx.lineTo(x + 6.0 * s, y - 2.2 * s);
+            ctx.stroke();
         } else if (nameStr.includes('юпитер') || symStr === '♃') {
             drawJupiterCanvas(ctx, x, y, size, color);
-        } else if (nameStr.includes('земля') || symStr === '⊕') {
-            ctx.save();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = Math.max(1.1, size * 0.09);
-            const r = size * 0.4;
+        } else if (nameStr.includes('сатурн') || symStr === '♄') {
             ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.moveTo(x - 2.8 * s, y - 6.0 * s); ctx.lineTo(x - 2.8 * s, y + 6.8 * s);
+            ctx.moveTo(x - 5.4 * s, y - 3.2 * s); ctx.lineTo(x - 0.2 * s, y - 3.2 * s);
+            ctx.moveTo(x - 2.8 * s, y + 0.2 * s);
+            ctx.bezierCurveTo(x + 1.5 * s, y + 0.2 * s, x + 3.8 * s, y + 2.5 * s, x + 1.5 * s, y + 5.8 * s);
+            ctx.bezierCurveTo(x + 0.5 * s, y + 7.2 * s, x - 1.0 * s, y + 6.5 * s, x - 0.5 * s, y + 5.2 * s);
             ctx.stroke();
+        } else if (nameStr.includes('уран') || symStr === '♅') {
+            ctx.beginPath(); ctx.arc(x, y + 4.8 * s, 2.0 * s, 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(x - r, y); ctx.lineTo(x + r, y);
-            ctx.moveTo(x, y - r); ctx.lineTo(x, y + r);
+            ctx.moveTo(x, y - 6.0 * s); ctx.lineTo(x, y + 2.8 * s);
+            ctx.moveTo(x - 4.8 * s, y - 2.8 * s); ctx.lineTo(x + 4.8 * s, y - 2.8 * s);
+            ctx.moveTo(x - 4.8 * s, y - 6.0 * s); ctx.lineTo(x - 4.8 * s, y + 0.4 * s);
+            ctx.moveTo(x + 4.8 * s, y - 6.0 * s); ctx.lineTo(x + 4.8 * s, y + 0.4 * s);
             ctx.stroke();
-            ctx.restore();
+        } else if (nameStr.includes('нептун') || symStr === '♆') {
+            ctx.beginPath();
+            ctx.moveTo(x - 4.8 * s, y - 4.8 * s); ctx.lineTo(x - 4.8 * s, y - 1.2 * s);
+            ctx.bezierCurveTo(x - 4.8 * s, y + 1.2 * s, x + 4.8 * s, y + 1.2 * s, x + 4.8 * s, y - 1.2 * s);
+            ctx.lineTo(x + 4.8 * s, y - 4.8 * s);
+            ctx.moveTo(x, y - 6.0 * s); ctx.lineTo(x, y + 6.8 * s);
+            ctx.moveTo(x - 3.0 * s, y + 4.5 * s); ctx.lineTo(x + 3.0 * s, y + 4.5 * s);
+            ctx.stroke();
+        } else if (nameStr.includes('плутон') || symStr === '♇') {
+            drawPlutoCanvas(ctx, x, y, size, color);
         } else {
-            ctx.save();
             ctx.font = `bold ${size}px "DM Sans", "Segoe UI Symbol", sans-serif`;
             ctx.fillStyle = color;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(symStr, x, y);
-            ctx.restore();
         }
+        ctx.restore();
     }
 
     function signMeta(signName) {

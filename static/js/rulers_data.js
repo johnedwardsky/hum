@@ -5,24 +5,46 @@
 // Includes "(только для нидан)" planets — used on the Nidana wheel
 // ============================================================
 
-const SVG_PLUTO = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="3.6" r="2.5"/><path d="M 2.4 6.0 A 5.6 5.6 0 0 0 13.6 6.0"/><line x1="8" y1="9.4" x2="8" y2="14.8"/><line x1="4.8" y1="12.4" x2="11.2" y2="12.4"/></svg>`;
+const SVG_SUN = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="8" r="5.6"/><circle cx="8" cy="8" r="1.1" fill="currentColor"/></svg>`;
+
+const SVG_EARTH = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="8" r="5.6"/><line x1="2.4" y1="8" x2="13.6" y2="8"/><line x1="8" y1="2.4" x2="8" y2="13.6"/></svg>`;
+
+const SVG_MOON = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 10.5 2.6 A 5.8 5.8 0 0 0 10.5 13.4 A 4.6 4.6 0 0 1 10.5 2.6 Z"/></svg>`;
+
+const SVG_NODE_NORTH = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 3.8 11.2 A 4.6 4.6 0 0 1 12.2 11.2"/><circle cx="3.8" cy="11.8" r="1.3"/><circle cx="12.2" cy="11.8" r="1.3"/></svg>`;
+
+const SVG_NODE_SOUTH = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 3.8 4.8 A 4.6 4.6 0 0 0 12.2 4.8"/><circle cx="3.8" cy="4.2" r="1.3"/><circle cx="12.2" cy="4.2" r="1.3"/></svg>`;
+
+const SVG_MERCURY = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 4.2 2.4 A 3.8 3.8 0 0 0 11.8 2.4"/><circle cx="8" cy="6.8" r="2.8"/><line x1="8" y1="9.6" x2="8" y2="14.8"/><line x1="5.2" y1="12.5" x2="10.8" y2="12.5"/></svg>`;
+
+const SVG_VENUS = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="5.4" r="3.8"/><line x1="8" y1="9.2" x2="8" y2="14.8"/><line x1="5.0" y1="12.2" x2="11.0" y2="12.2"/></svg>`;
+
+const SVG_MARS = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="6.5" cy="9.5" r="3.8"/><line x1="9.2" y1="6.8" x2="14.0" y2="2.0"/><polyline points="10.2,2.0 14.0,2.0 14.0,5.8"/></svg>`;
 
 const SVG_JUPITER = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 2.0 6.5 C 2.0 1.5 6.5 0.8 6.5 4.5 C 6.5 7.0 2.5 8.5 2.5 9.8 L 13.5 9.8"/><line x1="9.8" y1="1.8" x2="9.8" y2="14.8"/></svg>`;
 
+const SVG_SATURN = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><line x1="5.2" y1="2.0" x2="5.2" y2="14.8"/><line x1="2.6" y1="4.8" x2="7.8" y2="4.8"/><path d="M 5.2 8.2 C 9.5 8.2 11.8 10.5 9.5 13.8 C 8.5 15.2 7.0 14.5 7.5 13.2"/></svg>`;
+
+const SVG_URANUS = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="12.8" r="2.0"/><line x1="8" y1="2.0" x2="8" y2="10.8"/><line x1="3.2" y1="5.2" x2="12.8" y2="5.2"/><line x1="3.2" y1="2.0" x2="3.2" y2="8.4"/><line x1="12.8" y1="2.0" x2="12.8" y2="8.4"/></svg>`;
+
+const SVG_NEPTUNE = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 3.2 3.2 L 3.2 6.8 C 3.2 9.2 12.8 9.2 12.8 6.8 L 12.8 3.2"/><line x1="8" y1="2.0" x2="8" y2="14.8"/><line x1="5.0" y1="12.5" x2="11.0" y2="12.5"/><path d="M 2.2 4.0 L 3.2 2.4 L 4.2 4.0"/><path d="M 7.0 2.8 L 8.0 1.5 L 9.0 2.8"/><path d="M 11.8 4.0 L 12.8 2.4 L 13.8 4.0"/></svg>`;
+
+const SVG_PLUTO = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="3.6" r="2.5"/><path d="M 2.4 6.0 A 5.6 5.6 0 0 0 13.6 6.0"/><line x1="8" y1="9.4" x2="8" y2="14.8"/><line x1="4.8" y1="12.4" x2="11.2" y2="12.4"/></svg>`;
+
 const PLANET_SYM = {
-  'Луна': '☽',
-  'Уран': '♅',
-  'Венера': '♀',
-  'Марс': '♂',
-  'Земля': '⊕',
-  'Юпитер': '♃',
-  'Меркурий': '☿',
-  'Сатурн': '♄',
-  'Нептун': '♆',
   'Солнце': '☉',
-  'Плутон': '♇',
+  'Земля': '⊕',
+  'Луна': '☽',
   'Северный узел': '☊',
   'Южный узел': '☋',
+  'Меркурий': '☿',
+  'Венера': '♀',
+  'Марс': '♂',
+  'Юпитер': '♃',
+  'Сатурн': '♄',
+  'Уран': '♅',
+  'Нептун': '♆',
+  'Плутон': '♇',
 };
 
 // Channels list (for future use in descriptions)
