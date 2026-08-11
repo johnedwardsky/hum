@@ -1084,6 +1084,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h/24 + B - 1524.5;
     }
 
+    const MIRROR_GATE_ORDER = [
+        41, 61, 60, 10, 58, 54, 38, 24, 27, 42,  3, 25, 17, 51, 21, 13, 49, 55, 30, 36,
+        22, 37, 63,  2, 23, 20,  8, 12, 45, 16, 35, 33, 31, 62, 56, 15, 52, 53, 39, 44,
+        28, 32, 50, 46, 18, 57, 48,  7,  4, 59, 29,  6, 47, 40, 64,  1, 43, 34, 14, 11,
+        26,  9,  5, 19
+    ];
+
     // ── Planet meta (symbol, glyph-class) ─────────────────────
     const PLANET_META = {
         'Солнце':       { sym: '☉', cls: 'glyph-sun' },
