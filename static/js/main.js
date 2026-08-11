@@ -3445,7 +3445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rZodiacOuter = rDialInner;
         const rZodiacInner = R * 0.720;
         const rHousesOuter = rZodiacInner;   // flush against zodiac inner edge
-        const rHousesInner = R * 0.540;      // spacious band for 12 houses!
+        const rHousesInner = R * 0.630;      // compact, narrow band for 12 houses
         const rInnerBorder = rHousesInner;
 
 
@@ -3782,22 +3782,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
             ctx.stroke();
 
-            // 6 slots per gate: sub-divider ticks only in the dial ring (from rGatesInner/rDialOuter to rDialInner)
-            const tickSpacing = GATE_INTERVAL / 6;
-            for (let t = 1; t <= 5; t++) {
-                const tickLon = startLon + t * tickSpacing;
-                const tickAngle = degToRad(tickLon - 180);
-                let tickColor = 'rgba(180,175,165,0.20)';
-                if (isAnyHovered) {
-                    tickColor = isHighlighted ? 'rgba(120,115,105,0.45)' : 'rgba(120,120,120,0.03)';
-                }
-                ctx.beginPath();
-                ctx.moveTo(cx + rGatesInner * Math.cos(tickAngle), cy + rGatesInner * Math.sin(tickAngle));
-                ctx.lineTo(cx + rDialInner * Math.cos(tickAngle), cy + rDialInner * Math.sin(tickAngle));
-                ctx.strokeStyle = tickColor;
-                ctx.lineWidth = 0.6;
-                ctx.stroke();
-            }
+            // 6 slots per gate: sub-divider ticks removed per reference request
+            // (no grey lines inside dial ring)
 
             // Draw Gate Number
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
@@ -5540,7 +5526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const R = displayW / 2 - 8;
                 
                 const rHousesOuter = R * 0.720;
-                const rHousesInner = R * 0.540;
+                const rHousesInner = R * 0.630;
                 const rInnerBorder = rHousesInner;
 
                 const dx = mx - cx;
