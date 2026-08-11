@@ -3439,12 +3439,100 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 /* Custom size increases to match Earth glyph size */
+/* Custom size increases to match Earth glyph size */
 .bg-planet-sym {
     font-size: 21px !important;
 }
 .planet-glyph {
     font-size: 19px !important;
 }
+
+/* ============================================================
+   MANDALA RINGS TOGGLE TOOLBAR
+   ============================================================ */
+.mandala-toolbar-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto 16px auto;
+    padding: 10px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
+}
+
+.mandala-toolbar-header {
+    display: flex;
+    align-items: center;
+}
+
+.mandala-toolbar-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+}
+
+.mandala-toggle-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.mandala-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-sub);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mandala-chip .chip-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(160, 150, 135, 0.4);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.mandala-chip:hover {
+    border-color: var(--primary);
+    color: var(--text-dark);
+    background: rgba(197, 158, 63, 0.08);
+}
+
+.mandala-chip.active {
+    background: linear-gradient(135deg, rgba(197, 158, 63, 0.12) 0%, rgba(217, 180, 85, 0.22) 100%);
+    border-color: var(--primary);
+    color: var(--text-dark);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(197, 158, 63, 0.12);
+}
+
+.mandala-chip.active .chip-dot {
+    background: var(--primary);
+    transform: scale(1.2);
+}
+
 
 
 

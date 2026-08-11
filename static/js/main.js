@@ -3519,6 +3519,15 @@ document.addEventListener('DOMContentLoaded', () => {
         drawPolygon(ctx, [[cx,cy-h/2],[cx+w/2,cy],[cx,cy+h/2],[cx-w/2,cy]], fill, stroke);
     }
 
+    const mandalaSettings = {
+        bodygraph: true,
+        hexagrams: false,
+        mirror: false,
+        zodiac: false,
+        houses: false,
+        cross: false
+    };
+
     /* ── Mandala renderer (with bodygraph overlay inside) ── */
     function drawMandala(data, canvasEl, hoverState = null) {
         if (!canvasEl) return;
@@ -3684,10 +3693,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
         }
 
-        // Personality axis (black/charcoal)
-        drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.88)', 3.2);
-        // Design axis (red)
-        drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.88)', 3.2);
+        if (mandalaSettings.cross) {
+            // Personality axis (black/charcoal)
+            drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.88)', 3.2);
+            // Design axis (red)
+            drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.88)', 3.2);
+        }
 
 
 
@@ -3916,50 +3927,52 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = fillStyle;
             ctx.fillText(gateNum.toString(), lx, ly);
 
-            // Draw I Ching Hexagram (6 stacked horizontal lines, unrotated, matching reference)
-            const lineStr = HEX_LINES[gateNum] || "000000";
-            const rHexMid = (rHexagramsInner + rHexagramsOuter) / 2;
-            const hx = cx + rHexMid * Math.cos(midAngle);
-            const hy = cy + rHexMid * Math.sin(midAngle);
+            if (mandalaSettings.hexagrams) {
+                // Draw I Ching Hexagram (6 stacked horizontal lines, unrotated, matching reference)
+                const lineStr = HEX_LINES[gateNum] || "000000";
+                const rHexMid = (rHexagramsInner + rHexagramsOuter) / 2;
+                const hx = cx + rHexMid * Math.cos(midAngle);
+                const hy = cy + rHexMid * Math.sin(midAngle);
 
-            const lineLen = 14.0;     // Total width of each line in px
-            const lineSpacing = 2.8;  // Equal vertical distance between all lines
-            const gap = 3.0;          // Center gap in Yin (broken) line in px
-            const halfLen = lineLen / 2;
-            const halfGap = gap / 2;
+                const lineLen = 14.0;     // Total width of each line in px
+                const lineSpacing = 2.8;  // Equal vertical distance between all lines
+                const gap = 3.0;          // Center gap in Yin (broken) line in px
+                const halfLen = lineLen / 2;
+                const halfGap = gap / 2;
 
-            let hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
-            if (isAnyHovered) {
-                if (isHighlighted) {
-                    hexColor = isPersActive ? '#000000' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(80, 80, 80, 0.9)');
-                } else {
-                    hexColor = 'rgba(180, 180, 180, 0.12)';
+                let hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        hexColor = isPersActive ? '#000000' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(80, 80, 80, 0.9)');
+                    } else {
+                        hexColor = 'rgba(180, 180, 180, 0.12)';
+                    }
                 }
-            }
 
-            ctx.lineWidth = 1.2;
-            ctx.lineCap = 'butt';
-            ctx.strokeStyle = hexColor;
+                ctx.lineWidth = 1.2;
+                ctx.lineCap = 'butt';
+                ctx.strokeStyle = hexColor;
 
-            // Stack 6 lines vertically (Line 6 at top, Line 1 at bottom)
-            for (let j = 0; j < 6; j++) {
-                const lineType = lineStr[j]; // '1' = Yang (solid), '0' = Yin (broken)
-                const yOff = (2.5 - j) * lineSpacing; // Line 6 (j=5) at top, Line 1 (j=0) at bottom
-                const yLine = hy + yOff;
+                // Stack 6 lines vertically (Line 6 at top, Line 1 at bottom)
+                for (let j = 0; j < 6; j++) {
+                    const lineType = lineStr[j]; // '1' = Yang (solid), '0' = Yin (broken)
+                    const yOff = (2.5 - j) * lineSpacing; // Line 6 (j=5) at top, Line 1 (j=0) at bottom
+                    const yLine = hy + yOff;
 
-                ctx.beginPath();
-                if (lineType === '1') {
-                    // Solid Yang line
-                    ctx.moveTo(hx - halfLen, yLine);
-                    ctx.lineTo(hx + halfLen, yLine);
-                } else {
-                    // Broken Yin line
-                    ctx.moveTo(hx - halfLen, yLine);
-                    ctx.lineTo(hx - halfGap, yLine);
-                    ctx.moveTo(hx + halfGap, yLine);
-                    ctx.lineTo(hx + halfLen, yLine);
+                    ctx.beginPath();
+                    if (lineType === '1') {
+                        // Solid Yang line
+                        ctx.moveTo(hx - halfLen, yLine);
+                        ctx.lineTo(hx + halfLen, yLine);
+                    } else {
+                        // Broken Yin line
+                        ctx.moveTo(hx - halfLen, yLine);
+                        ctx.lineTo(hx - halfGap, yLine);
+                        ctx.moveTo(hx + halfGap, yLine);
+                        ctx.lineTo(hx + halfLen, yLine);
+                    }
+                    ctx.stroke();
                 }
-                ctx.stroke();
             }
         }
 
@@ -3974,7 +3987,7 @@ document.addEventListener('DOMContentLoaded', () => {
             26,  9,  5, 19
         ];
 
-        if (data.houses && data.houses.length >= 1) {
+        if (mandalaSettings.mirror && data.houses && data.houses.length >= 1) {
             const AS = data.houses[0].longitude;
             const MIRROR_INTERVAL = GATE_INTERVAL; // same 5.625°
 
@@ -4064,83 +4077,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 4. Zodiac Ring and Ticks
 
-        const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
-            ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
-            : -1;
+        if (mandalaSettings.zodiac) {
+            const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
+                ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
+                : -1;
 
-        const hoveredSignIdxs = new Set();
-        if (hoverType === 'house' && data.houses && data.houses.length === 12) {
-            const asc = data.houses[0].longitude;
-            const houseIdx = hoverTarget - 1;
-            let s = (asc + houseIdx * 30) % 360;
-            let e = (asc + (houseIdx + 1) * 30) % 360;
-            for (let j = 0; j < 12; j++) {
-                const signMid = (j * 30 + 15) % 360;
-                let inHouse = false;
-                if (e < s) {
-                    inHouse = (signMid >= s || signMid < e);
-                } else {
-                    inHouse = (signMid >= s && signMid < e);
+            const hoveredSignIdxs = new Set();
+            if (hoverType === 'house' && data.houses && data.houses.length === 12) {
+                const asc = data.houses[0].longitude;
+                const houseIdx = hoverTarget - 1;
+                let s = (asc + houseIdx * 30) % 360;
+                let e = (asc + (houseIdx + 1) * 30) % 360;
+                for (let j = 0; j < 12; j++) {
+                    const signMid = (j * 30 + 15) % 360;
+                    let inHouse = false;
+                    if (e < s) {
+                        inHouse = (signMid >= s || signMid < e);
+                    } else {
+                        inHouse = (signMid >= s && signMid < e);
+                    }
+                    if (inHouse) hoveredSignIdxs.add(j);
                 }
-                if (inHouse) hoveredSignIdxs.add(j);
             }
-        }
 
-        const MANDALA_ZODIAC_COLORS = [
-            '#C88C28', // Aries
-            '#8C7355', // Taurus
-            '#5E7A8C', // Gemini
-            '#3A5C80', // Cancer
-            '#D95238', // Leo
-            '#7A7865', // Virgo
-            '#A69C7C', // Libra
-            '#5B3D5C', // Scorpio
-            '#C86428', // Sagittarius
-            '#605E59', // Capricorn
-            '#7E8A9C', // Aquarius
-            '#3B7E8C'  // Pisces
-        ];
+            const MANDALA_ZODIAC_COLORS = [
+                '#C88C28', // Aries
+                '#8C7355', // Taurus
+                '#5E7A8C', // Gemini
+                '#3A5C80', // Cancer
+                '#D95238', // Leo
+                '#7A7865', // Virgo
+                '#A69C7C', // Libra
+                '#5B3D5C', // Scorpio
+                '#C86428', // Sagittarius
+                '#605E59', // Capricorn
+                '#7E8A9C', // Aquarius
+                '#3B7E8C'  // Pisces
+            ];
 
-        for (let i = 0; i < 12; i++) {
-            const startAngle = degToRad(i * 30 - 180);
-            const endAngle = degToRad((i + 1) * 30 - 180);
-            const isAnyHovered = (hoverType !== null);
-            const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx)
-                                    : (hoverType === 'house') ? hoveredSignIdxs.has(i)
-                                    : true;
+            for (let i = 0; i < 12; i++) {
+                const startAngle = degToRad(i * 30 - 180);
+                const endAngle = degToRad((i + 1) * 30 - 180);
+                const isAnyHovered = (hoverType !== null);
+                const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx)
+                                        : (hoverType === 'house') ? hoveredSignIdxs.has(i)
+                                        : true;
 
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
-            ctx.closePath();
-            
-            let fillOpacity = 0.08;
-            if (isAnyHovered) {
-                fillOpacity = isHighlightedSign ? 0.12 : 0.01;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
+                ctx.closePath();
+                
+                let fillOpacity = 0.08;
+                if (isAnyHovered) {
+                    fillOpacity = isHighlightedSign ? 0.12 : 0.01;
+                }
+                ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], fillOpacity);
+                ctx.fill();
+
+                // Label
+                const midAngle = startAngle + degToRad(15);
+                const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
+                const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
+                ctx.font = 'bold 14.5px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
+                
+                let labelColor = MANDALA_ZODIAC_COLORS[i];
+                if (isAnyHovered && !isHighlightedSign) {
+                    labelColor = 'rgba(150, 150, 150, 0.12)';
+                }
+                ctx.fillStyle = labelColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(ZODIAC_META[i].sym, gx, gy);
             }
-            ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], fillOpacity);
-            ctx.fill();
-
-            // Label
-            const midAngle = startAngle + degToRad(15);
-            const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
-            const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
-            ctx.font = 'bold 14.5px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
-            
-            let labelColor = MANDALA_ZODIAC_COLORS[i];
-            if (isAnyHovered && !isHighlightedSign) {
-                labelColor = 'rgba(150, 150, 150, 0.12)';
-            }
-            ctx.fillStyle = labelColor;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(ZODIAC_META[i].sym, gx, gy);
         }
 
         // 4.5 Nidana (Houses) Ring — Spatial layout matching reference
         // Gold transparent background, house# (inner ring), gate.line (center), stacked ▲/▽ rulers (right)
         // Visually drawn as 12 equal 30-degree sectors starting from the Ascendant
-        if (data.houses && data.houses.length === 12) {
+        if (mandalaSettings.houses && data.houses && data.houses.length === 12) {
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
             const asc = data.houses[0].longitude;
@@ -4299,10 +4314,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 5. Draw concentric circle dividing lines
         const concentricBorders = [
-            rHexagramsOuter, rHexagramsInner, 
-            rMirrorInner, rGatesInner, rDialInner, rZodiacInner, rInnerBorder
+            { r: rInnerBorder, show: true },
+            { r: rDialInner, show: true },
+            { r: rGatesInner, show: true },
+            { r: rZodiacInner, show: mandalaSettings.zodiac || mandalaSettings.houses },
+            { r: rMirrorInner, show: mandalaSettings.mirror },
+            { r: rHexagramsInner, show: mandalaSettings.hexagrams },
+            { r: rHexagramsOuter, show: mandalaSettings.hexagrams }
         ];
-        concentricBorders.forEach((r, idx) => {
+        concentricBorders.forEach(({ r, show }, idx) => {
+            if (!show) return;
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
             ctx.strokeStyle = idx === 0 ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.18)';
@@ -4491,6 +4512,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState) {
         const wrap = document.getElementById('mandala-bodygraph-wrap');
         if (!wrap) return;
+
+        wrap.style.display = mandalaSettings.bodygraph ? 'flex' : 'none';
+        if (!mandalaSettings.bodygraph) return;
 
         // Position the wrapper exactly over the canvas inner circle (adding 20px to compensate for #mandala-container padding)
         wrap.style.left = (bgOffX + 20) + 'px';
@@ -5638,6 +5662,22 @@ document.addEventListener('DOMContentLoaded', () => {
         function initMandalaInteractivity() {
             const canvasEl = document.getElementById('mandala-canvas');
             if (!canvasEl) return;
+
+            // Bind click listeners to Mandala ring toggle chips
+            document.querySelectorAll('.mandala-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const ring = chip.getAttribute('data-ring');
+                    if (ring in mandalaSettings) {
+                        mandalaSettings[ring] = !mandalaSettings[ring];
+                        chip.classList.toggle('active', mandalaSettings[ring]);
+                        
+                        // Re-draw mandala canvas & update SVG bodygraph overlay
+                        if (lastChart) {
+                            drawMandala(lastChart, canvasEl, mandalaHoverState);
+                        }
+                    }
+                });
+            });
             
             let mandalaHoverState = { type: null, target: null, mx: 0, my: 0, cx: 0, cy: 0, gateIdx: -1 };
             

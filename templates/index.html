@@ -1459,6 +1459,40 @@
 
                 <!-- === TAB: MANDALA === -->
                 <div class="tab-content" id="content-mandala">
+                        <div class="mandala-toolbar-container">
+                            <div class="mandala-toolbar-header">
+                                <span class="mandala-toolbar-title">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px; color:var(--primary);"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                    Кольца мандалы:
+                                </span>
+                            </div>
+                            <div class="mandala-toggle-chips">
+                                <button class="mandala-chip active" data-ring="bodygraph">
+                                    <span class="chip-dot"></span>
+                                    <span class="chip-label">Бодиграф</span>
+                                </button>
+                                <button class="mandala-chip" data-ring="hexagrams">
+                                    <span class="chip-dot"></span>
+                                    <span class="chip-label">Гексаграммы</span>
+                                </button>
+                                <button class="mandala-chip" data-ring="mirror">
+                                    <span class="chip-dot"></span>
+                                    <span class="chip-label">Зеркало жизни</span>
+                                </button>
+                                <button class="mandala-chip" data-ring="zodiac">
+                                    <span class="chip-dot"></span>
+                                    <span class="chip-label">Зодиак</span>
+                                </button>
+                                <button class="mandala-chip" data-ring="houses">
+                                    <span class="chip-dot"></span>
+                                    <span class="chip-label">12 Домов</span>
+                                </button>
+                                <button class="mandala-chip" data-ring="cross">
+                                    <span class="chip-dot"></span>
+                                    <span class="chip-label">Крест Инкарнации</span>
+                                </button>
+                            </div>
+                        </div>
                         <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-md); backdrop-filter: blur(16px); display:inline-block; margin-bottom: 24px; position: relative;" id="mandala-container">
                             <canvas id="mandala-canvas" width="780" height="780" style="display: block;"></canvas>
                             <div id="mandala-bodygraph-wrap" class="bg-svg-wrap" style="position: absolute; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center; max-width: none;"></div>
