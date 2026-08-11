@@ -21,7 +21,8 @@ const SVG_VENUS = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" 
 
 const SVG_MARS = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="6.5" cy="9.5" r="3.8"/><line x1="9.2" y1="6.8" x2="14.0" y2="2.0"/><polyline points="10.2,2.0 14.0,2.0 14.0,5.8"/></svg>`;
 
-const SVG_JUPITER = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 2.0 6.5 C 2.0 1.5 6.5 0.8 6.5 4.5 C 6.5 7.0 2.5 8.5 2.5 9.8 L 13.5 9.8"/><line x1="9.8" y1="1.8" x2="9.8" y2="14.8"/></svg>`;
+const SVG_JUPITER = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" style="display:inline-block; vertical-align:-0.15em;"><text x="8" y="13" text-anchor="middle" fill="currentColor" font-family="'Times New Roman','Apple Symbols',serif" font-size="16" stroke="none">♃</text></svg>`;
+
 
 const SVG_SATURN = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><line x1="5.2" y1="2.0" x2="5.2" y2="14.8"/><line x1="2.6" y1="4.8" x2="7.8" y2="4.8"/><path d="M 5.2 8.2 C 9.5 8.2 11.8 10.5 9.5 13.8 C 8.5 15.2 7.0 14.5 7.5 13.2"/></svg>`;
 
@@ -29,7 +30,7 @@ const SVG_URANUS = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em"
 
 const SVG_NEPTUNE = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 3.2 3.2 L 3.2 6.8 C 3.2 9.2 12.8 9.2 12.8 6.8 L 12.8 3.2"/><line x1="8" y1="2.0" x2="8" y2="14.8"/><line x1="5.0" y1="12.5" x2="11.0" y2="12.5"/><path d="M 2.2 4.0 L 3.2 2.4 L 4.2 4.0"/><path d="M 7.0 2.8 L 8.0 1.5 L 9.0 2.8"/><path d="M 11.8 4.0 L 12.8 2.4 L 13.8 4.0"/></svg>`;
 
-const SVG_PLUTO = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="3.6" r="2.5"/><path d="M 2.4 6.0 A 5.6 5.6 0 0 0 13.6 6.0"/><line x1="8" y1="9.4" x2="8" y2="14.8"/><line x1="4.8" y1="12.4" x2="11.2" y2="12.4"/></svg>`;
+const SVG_PLUTO = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" style="display:inline-block; vertical-align:-0.15em;"><text x="8" y="13" text-anchor="middle" fill="currentColor" font-family="'Times New Roman','Apple Symbols',serif" font-size="16" stroke="none">♇</text></svg>`;
 
 const PLANET_SYM = {
   'Солнце': '☉',
