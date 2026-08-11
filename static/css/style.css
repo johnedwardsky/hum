@@ -2898,6 +2898,19 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     overflow: hidden;
 }
 
+.planet-svg-icon {
+    display: inline-block;
+    vertical-align: -0.15em;
+    width: 1.1em;
+    height: 1.1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.35;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+}
+
 /* Soft Hover Effects per column */
 .bg-col-design .bg-planet-row:hover {
     background: rgba(254, 0, 0, 0.045);

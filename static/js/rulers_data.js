@@ -5,18 +5,22 @@
 // Includes "(только для нидан)" planets — used on the Nidana wheel
 // ============================================================
 
+const SVG_PLUTO = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="8" cy="3.6" r="2.5"/><path d="M 2.4 6.0 A 5.6 5.6 0 0 0 13.6 6.0"/><line x1="8" y1="9.4" x2="8" y2="14.8"/><line x1="4.8" y1="12.4" x2="11.2" y2="12.4"/></svg>`;
+
+const SVG_JUPITER = `<svg class="planet-svg-icon" viewBox="0 0 16 16" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><path d="M 2.0 6.5 C 2.0 1.5 6.5 0.8 6.5 4.5 C 6.5 7.0 2.5 8.5 2.5 9.8 L 13.5 9.8"/><line x1="9.8" y1="1.8" x2="9.8" y2="14.8"/></svg>`;
+
 const PLANET_SYM = {
   'Луна': '☽',
   'Уран': '♅',
   'Венера': '♀',
   'Марс': '♂',
   'Земля': '⊕',
-  'Юпитер': '♃',
+  'Юпитер': SVG_JUPITER,
   'Меркурий': '☿',
   'Сатурн': '♄',
   'Нептун': '♆',
   'Солнце': '☉',
-  'Плутон': '♇',
+  'Плутон': SVG_PLUTO,
   'Северный узел': '☊',
   'Южный узел': '☋',
 };

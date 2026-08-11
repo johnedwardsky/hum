@@ -1091,11 +1091,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'Меркурий':     { sym: '☿', cls: 'glyph-mercury' },
         'Венера':       { sym: '♀', cls: 'glyph-venus' },
         'Марс':         { sym: '♂', cls: 'glyph-mars' },
-        'Юпитер':       { sym: '♃', cls: 'glyph-jupiter' },
+        'Юпитер':       { sym: typeof SVG_JUPITER !== 'undefined' ? SVG_JUPITER : '♃', cls: 'glyph-jupiter' },
         'Сатурн':       { sym: '♄', cls: 'glyph-saturn' },
         'Уран':         { sym: '♅', cls: 'glyph-uranus' },
         'Нептун':       { sym: '♆', cls: 'glyph-neptune' },
-        'Плутон':       { sym: '♇', cls: 'glyph-pluto' },
+        'Плутон':       { sym: typeof SVG_PLUTO !== 'undefined' ? SVG_PLUTO : '♇', cls: 'glyph-pluto' },
         'Северный Узел':{ sym: '☊', cls: 'glyph-node' },
         'Южный Узел':   { sym: '☋', cls: 'glyph-node' },
         'Истинный Северный Узел':{ sym: '☊', cls: 'glyph-node' },
@@ -4218,9 +4218,70 @@ document.addEventListener('DOMContentLoaded', () => {
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
 
-            // Radial ray lines removed (per user request)
+        function drawPlutoCanvas(ctx, ax, ay, size, color) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 1.35;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
-            // Draw stacked planet symbols inside the inner circle
+            const s = size / 16;
+            // 1. Top circle
+            ctx.beginPath();
+            ctx.arc(ax, ay - 4.2 * s, 2.5 * s, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 2. Crescent cup holding the circle
+            ctx.beginPath();
+            ctx.arc(ax, ay - 1.8 * s, 5.6 * s, 0.15 * Math.PI, 0.85 * Math.PI, false);
+            ctx.stroke();
+
+            // 3. Vertical stem & horizontal cross bar
+            const botY = ay + 3.8 * s;
+            const endY = ay + 8.2 * s;
+            const barY = ay + 6.0 * s;
+            const barW = 3.2 * s;
+
+            ctx.beginPath();
+            ctx.moveTo(ax, botY);
+            ctx.lineTo(ax, endY);
+            ctx.moveTo(ax - barW, barY);
+            ctx.lineTo(ax + barW, barY);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawJupiterCanvas(ctx, ax, ay, size, color) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.35;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const s = size / 16;
+            const hY = ay + 1.8 * s; // Horizontal bar height
+
+            // 1. Left 2-shaped curve into horizontal bar
+            ctx.beginPath();
+            ctx.moveTo(ax - 6.0 * s, ay - 1.2 * s);
+            ctx.bezierCurveTo(ax - 6.0 * s, ay - 6.5 * s, ax - 1.5 * s, ay - 7.2 * s, ax - 1.5 * s, ay - 3.2 * s);
+            ctx.bezierCurveTo(ax - 1.5 * s, ay - 1.0 * s, ax - 5.5 * s, ay + 0.2 * s, ax - 5.5 * s, hY);
+            ctx.lineTo(ax + 5.5 * s, hY);
+            ctx.stroke();
+
+            // 2. Vertical cross stroke
+            const vX = ax + 1.8 * s;
+            ctx.beginPath();
+            ctx.moveTo(vX, ay - 6.2 * s);
+            ctx.lineTo(vX, ay + 7.5 * s);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Draw stacked planet symbols inside the inner circle
             activations.forEach((act, aIdx) => {
                 const rAct = rInnerBorder - 14 - aIdx * 20;
                 const ax = cx + rAct * cos;
@@ -4236,7 +4297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Draw planet glyph symbol (enlarged for readability)
-                if (act.symbol === '⊕') {
+                if (act.symbol === '⊕' || act.name === 'Земля') {
                     ctx.strokeStyle = planetColor;
                     ctx.lineWidth = 1.4;
                     ctx.beginPath();
@@ -4249,6 +4310,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.moveTo(ax, ay - 6.5);
                     ctx.lineTo(ax, ay + 6.5);
                     ctx.stroke();
+                } else if (act.name === 'Плутон' || act.symbol === '♇' || (typeof act.symbol === 'string' && act.symbol.includes('cy="3.6"'))) {
+                    drawPlutoCanvas(ctx, ax, ay, 15, planetColor);
+                } else if (act.name === 'Юпитер' || act.symbol === '♃' || (typeof act.symbol === 'string' && act.symbol.includes('L 13.5'))) {
+                    drawJupiterCanvas(ctx, ax, ay, 15, planetColor);
                 } else {
                     ctx.font = isAnyHovered && isHighlighted ? 'bold 18px "DM Sans", sans-serif' : 'bold 16px "DM Sans", sans-serif';
                     ctx.fillStyle = planetColor;
@@ -5033,6 +5098,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Planet symbols map ─────────────────────────────────────────
         function getPlanetSym(name) {
             const key = name === 'Северный Узел' ? 'Истинный Северный Узел' : (name === 'Южный Узел' ? 'Истинный Южный Узел' : name);
+            if (key === 'Юпитер' || name === 'Юпитер') return SVG_JUPITER;
+            if (key === 'Плутон' || name === 'Плутон') return SVG_PLUTO;
             const meta = PLANET_META[key] || PLANET_META[name];
             return meta ? meta.sym : name.substring(0,2);
         }
