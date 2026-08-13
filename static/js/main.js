@@ -3646,9 +3646,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Type colors
         const typeStyles = {
-            'Генератор':                  { bg: '#E53935', color: '#fff' },
-            'Манифестирующий Генератор':  { bg: '#FF7043', color: '#fff' },
-            'Манифестор':                 { bg: '#8E24AA', color: '#fff' },
+            'Генератор':                  { bg: '#FF8C00', color: '#fff' },
+            'Манифестирующий Генератор':  { bg: '#F5C400', color: '#2E2A20' },
+            'Манифестор':                 { bg: '#E53935', color: '#fff' },
             'Проектор':                   { bg: '#1E88E5', color: '#fff' },
             'Рефлектор':                  { bg: '#546E7A', color: '#fff' },
         };
