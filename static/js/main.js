@@ -4170,8 +4170,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
 
+            // hoveredSignIdx: Rave sign (0=Aries) that a gate belongs to, anchored at WHEEL_START
             const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
-                ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
+                ? Math.floor(((GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2)) / 30) % 12
                 : -1;
 
             const hoveredSignIdxs = new Set();
@@ -4181,12 +4182,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let s = (asc + houseIdx * 30) % 360;
                 let e = (asc + (houseIdx + 1) * 30) % 360;
                 for (let j = 0; j < 12; j++) {
-                    const signMid = (j * 30 + 15) % 360;
+                    // signMid in terms of offset from WHEEL_START
+                    const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
                     let inHouse = false;
                     if (e < s) {
-                        inHouse = (signMid >= s || signMid < e);
+                        inHouse = (signMidLon >= s || signMidLon < e);
                     } else {
-                        inHouse = (signMid >= s && signMid < e);
+                        inHouse = (signMidLon >= s && signMidLon < e);
                     }
                     if (inHouse) hoveredSignIdxs.add(j);
                 }
@@ -4208,8 +4210,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             for (let i = 0; i < 12; i++) {
-                const startAngle = degToRad(i * 30 - 180);
-                const endAngle = degToRad((i + 1) * 30 - 180);
+                // Rave Mandala: Aries (i=0) starts at WHEEL_START (358.25°) on the ecliptic
+                const sLon = (WHEEL_START + i * 30) % 360;
+                const eLon = (WHEEL_START + (i + 1) * 30) % 360;
+                const startAngle = degToRad(sLon - 180);
+                let endAngle = degToRad(eLon - 180);
+                if (endAngle < startAngle) endAngle += 2 * Math.PI;
                 const isAnyHovered = (hoverType !== null);
                 const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx)
                                         : (hoverType === 'house') ? hoveredSignIdxs.has(i)
@@ -4227,8 +4233,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], fillOpacity);
                 ctx.fill();
 
-                // Label
-                const midAngle = startAngle + degToRad(15);
+                // Label at midpoint of this sign's sector
+                const midLon = (WHEEL_START + i * 30 + 15) % 360;
+                const midAngle = degToRad(midLon - 180);
                 const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
                 const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
                 ctx.font = 'bold 14.5px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
@@ -4984,9 +4991,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
-            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
-            
-            const signIdx = Math.floor(startLon / 30) % 12;
+            // signIdx: Rave sign (0=Aries, anchored at WHEEL_START) for this gate
+            const signIdx = Math.floor((i * GATE_INTERVAL + GATE_INTERVAL / 2) / 30) % 12;
             const sm = ZODIAC_META[signIdx];
             const activatorHtml = gateActivators[gateNum] ? gateActivators[gateNum].join('') : '<span style="color:#9E978A;">—</span>';
             const isActive = !!gateActivators[gateNum];
