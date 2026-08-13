@@ -42,8 +42,8 @@ WHEEL_START = 358.0 + 15.0 / 60.0  # 358.25°
 GATE_INTERVAL  = 5.625                    # 360 / 64
 LINE_INTERVAL  = GATE_INTERVAL / 6        # 0.9375°
 COLOR_INTERVAL = LINE_INTERVAL / 6        # 0.15625°
-TONE_INTERVAL  = COLOR_INTERVAL / 6        # 0.02604166...°
-BASE_INTERVAL  = TONE_INTERVAL / 5          # 0.00520833...°
+TONE_INTERVAL  = 0.02606166666667         # Hardcoded in HexagramParserV3 (with minor typo)
+BASE_INTERVAL  = 0.00520833333333         # Hardcoded in HexagramParserV3
 THEOS_INTERVAL = BASE_INTERVAL / 3        # 0.00173611...°
 
 

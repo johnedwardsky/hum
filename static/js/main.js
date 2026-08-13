@@ -3632,7 +3632,7 @@ document.addEventListener('DOMContentLoaded', () => {
             46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
             15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
         ];
-        const WHEEL_START = 358.0 + 15.0 / 60.0;
+        const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
         const GATE_INTERVAL = 5.625;
 
         // Compile active gates and planets
@@ -3862,7 +3862,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
             const startAngle = degToRad(startLon - 180);
             const endAngle = degToRad(startLon + GATE_INTERVAL - 180);
             const midAngle = (startAngle + endAngle) / 2;
@@ -4165,7 +4165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
-                ? Math.floor((((WHEEL_START - GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL - GATE_INTERVAL / 2 + 720) % 360) / 30)) % 12
+                ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
                 : -1;
 
             const hoveredSignIdxs = new Set();
@@ -4442,7 +4442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const midAngle = degToRad((WHEEL_START - i * GATE_INTERVAL - GATE_INTERVAL / 2 + 360 - 180) % 360);
+            const midAngle = degToRad((WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2 - 180) % 360);
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
 
@@ -4550,7 +4550,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
             const startAngle = degToRad(startLon - 180);
             const endAngle = degToRad(startLon + GATE_INTERVAL - 180);
 
@@ -4925,7 +4925,7 @@ document.addEventListener('DOMContentLoaded', () => {
             46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
             15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
         ];
-        const WHEEL_START = 358.0 + 15.0 / 60.0;
+        const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
         const GATE_INTERVAL = 5.625;
 
         const gateActivators = {};
@@ -4957,7 +4957,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
-            const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
             
             const signIdx = Math.floor(startLon / 30) % 12;
             const sm = ZODIAC_META[signIdx];
@@ -5863,7 +5863,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
             ];
             
-            const WHEEL_START = 358.0 + 15.0 / 60.0;
+            const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
             const GATE_INTERVAL = 5.625;
 
             // Tooltip elements
@@ -5933,7 +5933,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!type) {
                         // On the Gates/Zodiac Ring
-                        let offset = (WHEEL_START - deg + 360) % 360;
+                        let offset = (deg - WHEEL_START) % 360;
+                        if (offset < 0) offset += 360;
                         gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
                         const gateNum = GATE_ORDER[gateIdx];
 
