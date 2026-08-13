@@ -1042,6 +1042,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draw Rave Mandala
         drawMandala(data, document.getElementById('mandala-canvas'));
+        updateHdTypeProfile(data);
 
         // Draw print chart (sized to 220px to match CSS)
         const printCanvas = document.getElementById('print-chart-canvas');
@@ -3549,6 +3550,123 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let mandalaAnimFrameId = null;
+
+    // ── HD Type, Profile & Authority ──────────────────────────────────────────
+    function computeHdInfo(data) {
+        // Build active gates from personality + design
+        const activeGates = new Set();
+        (data.planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+        (data.design_planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+
+        // Defined centers via channels
+        const definedCenters = new Set();
+        CHANNELS_DATA.forEach(ch => {
+            if (activeGates.has(ch.gateA) && activeGates.has(ch.gateB)) {
+                definedCenters.add(ch.centerA);
+                definedCenters.add(ch.centerB);
+            }
+        });
+
+        // Motor centers
+        const motors = ['Heart', 'Root', 'SolarPlexus', 'Sacral'];
+        const hasSacral   = definedCenters.has('Sacral');
+        const hasThroat   = definedCenters.has('Throat');
+        const hasHeart    = definedCenters.has('Heart');
+        const hasRoot     = definedCenters.has('Root');
+        const hasSolar    = definedCenters.has('SolarPlexus');
+
+        // Check if any motor is connected to Throat via defined channel
+        function motorConnectedToThroat() {
+            // Direct channel between motor and throat
+            const motorThroatChannels = [
+                [45, 21], // Heart-Throat
+                [35, 36], // Throat-SolarPlexus
+                [12, 22], // Throat-SolarPlexus
+            ];
+            // Also indirect: motor → G → Throat, motor → Sacral → G → Throat etc.
+            // Simplified: check if any defined channel connects a motor center to Throat
+            return CHANNELS_DATA.some(ch => {
+                const active = activeGates.has(ch.gateA) && activeGates.has(ch.gateB);
+                if (!active) return false;
+                const centersInvolved = [ch.centerA, ch.centerB];
+                const hasMotor = centersInvolved.some(c => motors.includes(c) && c !== 'Sacral');
+                const hasThroatC = centersInvolved.includes('Throat');
+                return hasMotor && hasThroatC;
+            });
+        }
+
+        // Determine type
+        let type;
+        if (definedCenters.size === 0) {
+            type = 'Рефлектор';
+        } else if (hasSacral) {
+            // Generator family
+            if (motorConnectedToThroat()) {
+                type = 'Манифестирующий Генератор';
+            } else {
+                type = 'Генератор';
+            }
+        } else {
+            // No sacral
+            if (motorConnectedToThroat()) {
+                type = 'Манифестор';
+            } else {
+                type = 'Проектор';
+            }
+        }
+
+        // Determine profile from Personality Sun line
+        const sunPers = (data.planets || []).find(p => p.name === 'Sun' || p.name === 'Солнце' || p.id === 0);
+        const sunDes  = (data.design_planets || []).find(p => p.name === 'Sun' || p.name === 'Солнце' || p.id === 0);
+        const persLine = sunPers?.hexagram?.line || null;
+        const desLine  = sunDes?.hexagram?.line  || null;
+        const profile  = (persLine && desLine) ? `${persLine}/${desLine}` : null;
+
+        // Determine authority
+        let authority = 'Нет внутреннего авторитета';
+        if (hasSolar)  authority = 'Эмоциональный';
+        else if (hasSacral) authority = 'Сакральный';
+        else if (definedCenters.has('Spleen')) authority = 'Селезёночный';
+        else if (hasHeart && hasThroat) authority = 'Эго-манифестированный';
+        else if (hasHeart) authority = 'Эго-проецированный';
+        else if (definedCenters.has('G-Center') && hasThroat) authority = 'Ментально-проецированный';
+        else if (definedCenters.size === 0) authority = 'Лунный цикл';
+
+        return { type, profile, authority };
+    }
+
+    function updateHdTypeProfile(data) {
+        const block = document.getElementById('hd-type-profile-block');
+        const typeBadge = document.getElementById('hd-type-badge');
+        const profileBadge = document.getElementById('hd-profile-badge');
+        const authorityBadge = document.getElementById('hd-authority-badge');
+        if (!block || !typeBadge) return;
+
+        const info = computeHdInfo(data);
+
+        // Type colors
+        const typeStyles = {
+            'Генератор':                  { bg: '#E53935', color: '#fff' },
+            'Манифестирующий Генератор':  { bg: '#FF7043', color: '#fff' },
+            'Манифестор':                 { bg: '#8E24AA', color: '#fff' },
+            'Проектор':                   { bg: '#1E88E5', color: '#fff' },
+            'Рефлектор':                  { bg: '#546E7A', color: '#fff' },
+        };
+        const st = typeStyles[info.type] || { bg: '#C59E3F', color: '#fff' };
+        typeBadge.textContent = info.type;
+        typeBadge.style.background = st.bg;
+        typeBadge.style.color = st.color;
+        typeBadge.style.boxShadow = `0 2px 12px ${st.bg}44`;
+
+        profileBadge.innerHTML = info.profile
+            ? `<span style="opacity:0.6;font-weight:500;">Профиль</span> <strong>${info.profile}</strong>`
+            : '';
+
+        authorityBadge.innerHTML = `<span style="opacity:0.6;font-weight:500;">Авторитет</span> <strong>${info.authority}</strong>`;
+
+        block.style.display = 'block';
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     function animateMandala() {
         if (mandalaAnimFrameId) cancelAnimationFrame(mandalaAnimFrameId);
