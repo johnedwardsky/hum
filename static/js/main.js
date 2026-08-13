@@ -4151,6 +4151,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         }
 
+        // Draw light white inner circle background (before zodiac/houses so they render on top)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
+
         // 4. Zodiac Ring and Ticks
 
         const pZod = mandalaAnimState.zodiac.progress;
@@ -4562,12 +4568,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Light white inner circle background (drawn before rays for clean layering)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-        ctx.fill();
-
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
             const activations = activationsByGate[gateNum];
@@ -4592,11 +4592,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let fillStyle;
             if (isP && isD) {
-                fillStyle = centerHue + (0.30 * opacity) + ')';
+                fillStyle = centerHue + (0.13 * opacity) + ')';
             } else if (isD) {
-                fillStyle = centerHue + (0.22 * opacity) + ')';
+                fillStyle = centerHue + (0.09 * opacity) + ')';
             } else if (isP) {
-                fillStyle = centerHue + (0.20 * opacity) + ')';
+                fillStyle = centerHue + (0.08 * opacity) + ')';
             } else {
                 fillStyle = 'rgba(0,0,0,0)';
             }
@@ -4621,7 +4621,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Soft white overlay over rays before bodygraph SVG renders on top
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
