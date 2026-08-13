@@ -3802,8 +3802,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.houses && data.houses.length === 12) {
                     const asc = data.houses[0].longitude;
                     const houseIdx = hoverTarget - 1;
-                    let s = (asc + houseIdx * 30) % 360;
-                    let e = (asc + (houseIdx + 1) * 30) % 360;
+                    let s = (asc - (houseIdx + 1) * 30 + 720) % 360;
+                    let e = (asc - houseIdx * 30 + 720) % 360;
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -4179,8 +4179,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hoverType === 'house' && data.houses && data.houses.length === 12) {
                 const asc = data.houses[0].longitude;
                 const houseIdx = hoverTarget - 1;
-                let s = (asc + houseIdx * 30) % 360;
-                let e = (asc + (houseIdx + 1) * 30) % 360;
+                let s = (asc - (houseIdx + 1) * 30 + 720) % 360;
+                let e = (asc - houseIdx * 30 + 720) % 360;
                 for (let j = 0; j < 12; j++) {
                     // signMid in terms of offset from WHEEL_START
                     const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
@@ -4272,8 +4272,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             for (let i = 0; i < 12; i++) {
                 const h     = data.houses[i];
-                let startAngle = degToRad((asc + i * 30 - 180) % 360);
-                let endAngle   = degToRad((asc + (i + 1) * 30 - 180) % 360);
+                let startAngle = degToRad((asc - (i + 1) * 30 - 180 + 720) % 360);
+                let endAngle   = degToRad((asc - i * 30 - 180 + 720) % 360);
                 if (endAngle < startAngle) endAngle += 2 * Math.PI;
 
                 const houseNum = i + 1;
@@ -4317,8 +4317,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gate = h.hexagram ? h.hexagram.gate : '?';
                 const line = h.hexagram ? h.hexagram.line : '?';
 
-                // --- House Number: horizontal (unrotated), near start cusp, inside gold band ---
-                const houseAngleOffset = (endAngle - startAngle) * 0.15;
+                // --- House Number: near the other border (end of sector), inside gold band ---
+                const houseAngleOffset = (endAngle - startAngle) * 0.85;
                 const angleHouseNum = startAngle + houseAngleOffset;
                 const xHN = cx + rMid * Math.cos(angleHouseNum);
                 const yHN = cy + rMid * Math.sin(angleHouseNum);
@@ -4337,12 +4337,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`${gate}.${line}`, xGL, yGL);
 
-                // --- Rulers: near end cusp, inside gold band ---
+                // --- Rulers: near start border (opposite to house number), inside gold band ---
                 const rulers = (typeof getNidanaRulers === 'function')
                     ? getNidanaRulers(gate, line) : null;
 
                 if (rulers) {
-                    const rulerAngleOffset = (endAngle - startAngle) * 0.82;
+                    const rulerAngleOffset = (endAngle - startAngle) * 0.18;
                     const angleRulerPos = startAngle + rulerAngleOffset;
                     const xRP = cx + rMid * Math.cos(angleRulerPos);
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
@@ -5957,7 +5957,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Check if hovering the Houses Ring (rHousesInner <= dist <= rHousesOuter)
                     if (dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses) {
                         const asc = lastChart.houses[0].longitude;
-                        let houseIdx = Math.floor(((deg - asc) % 360 + 360) % 360 / 30);
+                        let offsetCCW = ((asc - deg) % 360 + 360) % 360;
+                        let houseIdx = Math.floor(offsetCCW / 30);
                         if (houseIdx >= 0 && houseIdx < 12) {
                             type = 'house';
                             target = houseIdx + 1;
