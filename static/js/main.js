@@ -4542,6 +4542,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 7.5 Draw radial activation wedges (rays) from the center to the gates
+        // -- Center color lookup for each gate --
+        const GATE_CENTER_COLORS = {};
+        const CENTER_HUES = {
+            'Head':        'rgba(180,160,220,', // soft violet
+            'Ajna':        'rgba(130,170,220,', // cool blue
+            'Throat':      'rgba(120,190,155,', // green-teal
+            'G-Center':    'rgba(255,210,100,', // warm gold
+            'Heart':       'rgba(255,140,100,', // warm orange
+            'Sacral':      'rgba(220,100,90,',  // red-orange
+            'Root':        'rgba(150,115,80,',  // warm brown
+            'Spleen':      'rgba(100,185,160,', // teal-green
+            'SolarPlexus': 'rgba(200,130,190,'  // soft purple-rose
+        };
+        Object.entries(BG_CENTERS).forEach(([cName, c]) => {
+            const hue = CENTER_HUES[cName] || 'rgba(150,150,150,';
+            Object.keys(c.gates).forEach(gStr => {
+                GATE_CENTER_COLORS[parseInt(gStr)] = hue;
+            });
+        });
+
+        // Light white inner circle background (drawn before rays for clean layering)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
+
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
             const activations = activationsByGate[gateNum];
@@ -4557,19 +4583,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const isP = activations.some(a => a.type === 'personality');
             const isD = activations.some(a => a.type === 'design');
 
-            let fillStyle = 'rgba(0,0,0,0)';
+            const centerHue = GATE_CENTER_COLORS[gateNum] || 'rgba(150,150,150,';
+
             let opacity = 1.0;
-            
             if (isAnyHovered) {
-                opacity = isHighlighted ? 1.0 : 0.08;
+                opacity = isHighlighted ? 1.0 : 0.06;
             }
 
+            let fillStyle;
             if (isP && isD) {
-                fillStyle = `rgba(46,42,32, ${0.08 * opacity})`;
+                fillStyle = centerHue + (0.30 * opacity) + ')';
             } else if (isD) {
-                fillStyle = `rgba(255,96,96, ${0.08 * opacity})`;
+                fillStyle = centerHue + (0.22 * opacity) + ')';
             } else if (isP) {
-                fillStyle = `rgba(46,42,32, ${0.07 * opacity})`;
+                fillStyle = centerHue + (0.20 * opacity) + ')';
             } else {
                 fillStyle = 'rgba(0,0,0,0)';
             }
@@ -4593,8 +4620,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Draw bodygraph with transparent white background overlay for premium UX depth on canvas
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        // Soft white overlay over rays before bodygraph SVG renders on top
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
