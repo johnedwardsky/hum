@@ -4213,20 +4213,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const MANDALA_ZODIAC_COLORS = [
-                '#C88C28', // Aries
-                '#8C7355', // Taurus
-                '#5E7A8C', // Gemini
-                '#3A5C80', // Cancer
-                '#D95238', // Leo
-                '#7A7865', // Virgo
-                '#A69C7C', // Libra
-                '#5B3D5C', // Scorpio
-                '#C86428', // Sagittarius
-                '#605E59', // Capricorn
-                '#7E8A9C', // Aquarius
-                '#3B7E8C'  // Pisces
+            // Element colors: Fire=orange, Earth=green, Water=blue, Air=light-blue
+            const ELEMENT_COLORS = {
+                fire:  '#E07820', // orange
+                earth: '#4A9A52', // green
+                water: '#2A6EBB', // blue
+                air:   '#4AB0D4'  // light blue
+            };
+            // Order: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces
+            const SIGN_ELEMENTS = [
+                'fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'
             ];
+            const MANDALA_ZODIAC_COLORS = SIGN_ELEMENTS.map(e => ELEMENT_COLORS[e]);
 
             for (let i = 0; i < 12; i++) {
                 // Rave Mandala: Aries (i=0) starts at WHEEL_START (358.25°) on the ecliptic
@@ -4240,17 +4238,26 @@ document.addEventListener('DOMContentLoaded', () => {
                                         : (hoverType === 'house') ? hoveredSignIdxs.has(i)
                                         : true;
 
+                // Annular sector fill (ring segment, not pie from center)
                 ctx.beginPath();
-                ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
+                ctx.arc(cx, cy, rZodiacInner, endAngle, startAngle, true);
                 ctx.closePath();
                 
-                let fillOpacity = 0.08;
+                let fillOpacity = 0.22;
                 if (isAnyHovered) {
-                    fillOpacity = isHighlightedSign ? 0.12 : 0.01;
+                    fillOpacity = isHighlightedSign ? 0.38 : 0.04;
                 }
                 ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], fillOpacity);
                 ctx.fill();
+
+                // Sector divider line at start of each sign
+                ctx.beginPath();
+                ctx.moveTo(cx + rZodiacInner * Math.cos(startAngle), cy + rZodiacInner * Math.sin(startAngle));
+                ctx.lineTo(cx + rZodiacOuter * Math.cos(startAngle), cy + rZodiacOuter * Math.sin(startAngle));
+                ctx.strokeStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], isAnyHovered ? (isHighlightedSign ? 0.7 : 0.08) : 0.45);
+                ctx.lineWidth = 1.0;
+                ctx.stroke();
 
                 // Label at midpoint of this sign's sector
                 const midLon = (WHEEL_START + i * 30 + 15) % 360;
