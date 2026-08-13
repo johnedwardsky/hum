@@ -1663,7 +1663,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
 
             // Zodiac glyph
-            const midAngle = degToRad((180 - (i * 30 + 15) + 360) % 360);
+            const midAngle = degToRad(i * 30 + 15 - 90);
             const gx = cx + (R * 0.91) * Math.cos(midAngle);
             const gy = cy + (R * 0.91) * Math.sin(midAngle);
             ctx.font      = `bold 12px serif`;
@@ -1820,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Convert ecliptic longitude to canvas angle (0° = right, CCW = increasing lon)
     // ASC is placed at left (180°), so canvas angle = 180 - (lon - asc)
     function lonToAngle(lon, asc) {
-        return (180 - lon + 360) % 360;
+        return (180 - (lon - asc) % 360 + 360) % 360;
     }
 
     function angularMid(a, b) {
@@ -2724,7 +2724,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth   = 1;
             ctx.stroke();
 
-            const midAngle = degToRad((180 - (i * 30 + 15) + 360) % 360);
+            const midAngle = degToRad(i * 30 + 15 - 90);
             const gx = cx + (R * 0.91) * Math.cos(midAngle);
             const gy = cy + (R * 0.91) * Math.sin(midAngle);
             ctx.font      = `bold 12px serif`;
@@ -3863,8 +3863,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isAnyHovered = (hoverType !== null);
 
             const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
-            const startAngle = degToRad((180 - startLon + 360) % 360);
-            const endAngle = degToRad((180 - (startLon - GATE_INTERVAL) + 360) % 360);
+            const startAngle = degToRad(startLon - 180);
+            const endAngle = degToRad(startLon - GATE_INTERVAL - 180);
             const midAngle = (startAngle + endAngle) / 2;
 
             const activations = activationsByGate[gateNum] || [];
@@ -3914,9 +3914,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 acts.forEach((act, idx) => {
                     // Divide cell angularly if there are multiple activations in this line
                     const subStartLon = (slotStartLon - idx * (slotSize / N) + 360) % 360;
-                    const subEndLon = (subStartLon - (slotSize / N) + 360) % 360;
-                    const aStart = degToRad((180 - subStartLon + 360) % 360);
-                    const aEnd = degToRad((180 - subEndLon + 360) % 360);
+                    const subEndLon = (slotStartLon - (idx + 1) * (slotSize / N) + 360) % 360;
+                    const aStart = degToRad(subStartLon - 180);
+                    const aEnd = degToRad(subEndLon - 180);
 
                     ctx.beginPath();
                     ctx.moveTo(cx + rDialInner * Math.cos(aStart), cy + rDialInner * Math.sin(aStart));
@@ -4101,7 +4101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isD      = mirrorHasDes.has(i);
 
                 const startLon   = (AS + i * MIRROR_INTERVAL) % 360;
-                const startAngle = degToRad((180 - startLon + 360) % 360);
+                const startAngle = degToRad(startLon - 180);
                 const endAngle   = degToRad(startLon + MIRROR_INTERVAL - 180);
                 const midAngle   = (startAngle + endAngle) / 2;
 
@@ -4165,7 +4165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
-                ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
+                ? Math.floor((((WHEEL_START - GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL - GATE_INTERVAL / 2 + 360) % 360) / 30)) % 12
                 : -1;
 
             const hoveredSignIdxs = new Set();
@@ -4202,8 +4202,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             for (let i = 0; i < 12; i++) {
-                const startAngle = degToRad((180 - i * 30 + 360) % 360);
-                const endAngle = degToRad((180 - (i + 1) * 30 + 360) % 360);
+                const startAngle = degToRad(i * 30 - 180);
+                const endAngle = degToRad((i + 1) * 30 - 180);
                 const isAnyHovered = (hoverType !== null);
                 const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx)
                                         : (hoverType === 'house') ? hoveredSignIdxs.has(i)
@@ -4442,7 +4442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const midAngle = degToRad((180 - (WHEEL_START - i * GATE_INTERVAL - GATE_INTERVAL / 2) + 360) % 360);
+            const midAngle = degToRad((WHEEL_START - i * GATE_INTERVAL - GATE_INTERVAL / 2 - 180 + 720) % 360);
             const cos = Math.cos(midAngle);
             const sin = Math.sin(midAngle);
 
@@ -4551,8 +4551,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isAnyHovered = (hoverType !== null);
 
             const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
-            const startAngle = degToRad((180 - startLon + 360) % 360);
-            const endAngle = degToRad((180 - (startLon - GATE_INTERVAL) + 360) % 360);
+            const startAngle = degToRad(startLon - 180);
+            const endAngle = degToRad(startLon - GATE_INTERVAL - 180);
 
             const isP = activations.some(a => a.type === 'personality');
             const isD = activations.some(a => a.type === 'design');
@@ -5933,8 +5933,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!type) {
                         // On the Gates/Zodiac Ring
-                        let eclipticLon = (180 - deg + 360) % 360; let offset = (WHEEL_START - eclipticLon + 360) % 360;
-                        if (offset < 0) offset += 360;
+                        let offset = (WHEEL_START - deg + 360) % 360;
                         gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
                         const gateNum = GATE_ORDER[gateIdx];
 
