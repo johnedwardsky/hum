@@ -3134,15 +3134,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // ── Center shapes ──
-        const uFill = '#FFFFFF';
-        const uStroke = 'rgba(197,158,63,0.35)';
-        const dFill = '#C59E3F';
-        const dStroke = '#A8832E';
+        // Per-center colors matching Human Design standard reference
+        const CENTER_COLORS = {
+            'Head':        { def: '#FFE600', stroke: '#D4C000', hover: '#FFF176' },
+            'Ajna':        { def: '#4CAF50', stroke: '#388E3C', hover: '#81C784' },
+            'Throat':      { def: '#29B6F6', stroke: '#0288D1', hover: '#81D4FA' },
+            'G-Center':    { def: '#FFD700', stroke: '#C9A800', hover: '#FFF176' },
+            'Heart':       { def: '#C62828', stroke: '#8B0000', hover: '#E57373' },
+            'Sacral':      { def: '#E53935', stroke: '#B71C1C', hover: '#EF9A9A' },
+            'Root':        { def: '#FF8C00', stroke: '#E65100', hover: '#FFCC80' },
+            'Spleen':      { def: '#FF8C00', stroke: '#E65100', hover: '#FFCC80' },
+            'SolarPlexus': { def: '#FF8C00', stroke: '#E65100', hover: '#FFCC80' },
+        };
+        const uFill   = 'rgba(220, 215, 205, 0.45)';
+        const uStroke = 'rgba(160, 150, 130, 0.5)';
 
         Object.entries(BG_CENTERS).forEach(([name, c]) => {
             const isDef = definedCenters.has(name);
-            let fill = isDef ? dFill : uFill;
-            let stroke = isDef ? dStroke : uStroke;
+            const cc = CENTER_COLORS[name] || { def: '#C59E3F', stroke: '#A8832E', hover: '#DFB135' };
+            let fill   = isDef ? cc.def    : uFill;
+            let stroke = isDef ? cc.stroke : uStroke;
 
             let op = getBodygraphOpacity(name, null);
 
@@ -3150,8 +3161,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.globalAlpha = op;
 
             if (hoverType === 'center' && name === hoverTarget) {
-                fill = isDef ? '#DFB135' : 'rgba(197,158,63,0.18)';
-                stroke = '#C59E3F';
+                fill   = isDef ? cc.hover : 'rgba(197,158,63,0.22)';
+                stroke = isDef ? cc.def   : '#C59E3F';
             }
 
             if (c.poly) {
@@ -3213,7 +3224,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let op = getBodygraphOpacity(name, null);
             ctx.save();
             ctx.globalAlpha = op;
-            ctx.fillStyle = definedCenters.has(name) ? 'rgba(255,255,255,0.9)' : 'rgba(197,158,63,0.5)';
+            // White text on defined colored centers, dark on open centers
+            ctx.fillStyle = definedCenters.has(name) ? 'rgba(255,255,255,0.92)' : 'rgba(100,90,70,0.55)';
             const off = labelOffsets[name] || [0,0];
             const pt = S([c.cx + off[0], c.cy + off[1]]);
             ctx.fillText(c.label, pt[0], pt[1]);
@@ -4558,15 +4570,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // -- Center color lookup for each gate --
         const GATE_CENTER_COLORS = {};
         const CENTER_HUES = {
-            'Head':        'rgba(180,160,220,', // soft violet
-            'Ajna':        'rgba(130,170,220,', // cool blue
-            'Throat':      'rgba(120,190,155,', // green-teal
-            'G-Center':    'rgba(255,210,100,', // warm gold
-            'Heart':       'rgba(255,140,100,', // warm orange
-            'Sacral':      'rgba(220,100,90,',  // red-orange
-            'Root':        'rgba(150,115,80,',  // warm brown
-            'Spleen':      'rgba(100,185,160,', // teal-green
-            'SolarPlexus': 'rgba(200,130,190,'  // soft purple-rose
+            'Head':        'rgba(255,230,0,',   // yellow
+            'Ajna':        'rgba(76,175,80,',    // green
+            'Throat':      'rgba(41,182,246,',   // blue
+            'G-Center':    'rgba(255,215,0,',    // gold-yellow
+            'Heart':       'rgba(198,40,40,',    // dark red
+            'Sacral':      'rgba(229,57,53,',    // red
+            'Root':        'rgba(255,140,0,',    // orange
+            'Spleen':      'rgba(255,140,0,',    // orange
+            'SolarPlexus': 'rgba(255,140,0,'     // orange
         };
         Object.entries(BG_CENTERS).forEach(([cName, c]) => {
             const hue = CENTER_HUES[cName] || 'rgba(150,150,150,';
