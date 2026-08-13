@@ -3637,6 +3637,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
+        // Blue background for the outermost hexagram ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
+        ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
+        ctx.fillStyle = 'rgba(41, 98, 160, 0.82)';
+        ctx.fill();
+
 
         const GATE_ORDER = [
             25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
@@ -4016,12 +4023,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const halfLen = lineLen / 2;
                 const halfGap = gap / 2;
 
-                let hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
+                let hexColor = isPersActive ? '#FFFFFF' : (isDesActive ? 'rgba(255,180,160,1.0)' : 'rgba(255,255,255,0.28)');
                 if (isAnyHovered) {
                     if (isHighlighted) {
-                        hexColor = isPersActive ? '#000000' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(80, 80, 80, 0.9)');
+                        hexColor = isPersActive ? '#FFFFFF' : (isDesActive ? 'rgba(255,200,180,1.0)' : 'rgba(255,255,255,0.85)');
                     } else {
-                        hexColor = 'rgba(180, 180, 180, 0.12)';
+                        hexColor = 'rgba(255,255,255,0.08)';
                     }
                 }
 
