@@ -3641,7 +3641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.beginPath();
         ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
         ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
-        ctx.fillStyle = 'rgba(41, 98, 160, 0.18)';
+        ctx.fillStyle = 'rgba(41, 98, 160, 0.09)';
         ctx.fill();
 
 
