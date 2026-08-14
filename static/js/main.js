@@ -4268,14 +4268,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             data.planets.forEach(p => {
                 if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                    const mIdx = Math.floor(((p.longitude - AS + 360) % 360) / MIRROR_INTERVAL) % 64;
+                    // Clockwise from AS: mirror offset = (AS - lon + 360) % 360
+                    const mIdx = Math.floor(((AS - p.longitude + 360) % 360) / MIRROR_INTERVAL) % 64;
                     mirrorActivated.add(mIdx);
                     mirrorHasPers.add(mIdx);
                 }
             });
             (data.design_planets || []).forEach(p => {
                 if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                    const mIdx = Math.floor(((p.longitude - AS + 360) % 360) / MIRROR_INTERVAL) % 64;
+                    const mIdx = Math.floor(((AS - p.longitude + 360) % 360) / MIRROR_INTERVAL) % 64;
                     mirrorActivated.add(mIdx);
                     mirrorHasDes.add(mIdx);
                 }
@@ -4295,9 +4296,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isP      = mirrorHasPers.has(i);
                 const isD      = mirrorHasDes.has(i);
 
-                const startLon   = (AS + i * MIRROR_INTERVAL) % 360;
-                const startAngle = degToRad(startLon - 180);
-                const endAngle   = degToRad(startLon + MIRROR_INTERVAL - 180);
+                // Sectors go CLOCKWISE from AS, matching the houses ring direction.
+                // Sector i covers [AS - (i+1)*INTERVAL, AS - i*INTERVAL] in longitude.
+                const startLon   = (AS - (i + 1) * MIRROR_INTERVAL + 720) % 360;
+                const endLon     = (AS - i * MIRROR_INTERVAL + 720) % 360;
+                let   startAngle = degToRad(startLon - 180);
+                let   endAngle   = degToRad(endLon   - 180);
+                if (endAngle < startAngle) endAngle += 2 * Math.PI;
                 const midAngle   = (startAngle + endAngle) / 2;
 
                 // Sector background
@@ -5651,7 +5656,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let mirrorGateCellHtml = '';
             if (p.longitude != null && data && data.houses && data.houses.length >= 1) {
                 const AS = data.houses[0].longitude;
-                const relLon = (p.longitude - AS + 360) % 360;
+                // Clockwise from AS: mirror offset = (AS - lon + 360) % 360
+                const relLon = (AS - p.longitude + 360) % 360;
                 const mIdx = Math.floor(relLon / 5.625) % 64;
                 const mGate = MIRROR_GATE_ORDER[mIdx];
                 const mLine = Math.floor((relLon % 5.625) / (5.625 / 6)) + 1;
