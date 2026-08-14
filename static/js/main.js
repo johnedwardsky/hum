@@ -4781,7 +4781,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // Position and update the HTML SVG overlay
-        const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
+        const bgScale = (rInnerBorder * 2 * 0.748) / BG_H;
         const bgOffX = cx - (BG_W * bgScale) / 2 + (10 * bgScale);
         const bgOffY = cy - (BG_H * bgScale) / 2;
 
