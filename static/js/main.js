@@ -3722,57 +3722,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // ── Dynamic ring radii — redistribute space when rings are toggled ──────
-        // Base widths (fraction of R) for each ring when fully visible
-        const RING_BASE_WIDTHS = {
-            hexagrams: 0.080,  // outermost ring
-            mirror:    0.052,  // mirror of life
-            gates:     0.078,  // gate numbers + dial lines
-            zodiac:    0.070,  // zodiac signs
-            houses:    0.090,  // house numbers
-        };
+        // ── Dynamic ring radii — rings keep fixed width, shift outward when others turn off ──
+        // Fixed ring widths (absolute, based on R). Rings stack from outside in.
+        // When a ring is off (progress→0), it collapses to 0 width and inner rings shift outward.
+        const W_HEX   = R * 0.080;
+        const W_MIRROR = R * 0.052;
+        const W_GATES  = R * 0.078;
+        const W_ZODIAC = R * 0.070;
+        const W_HOUSES = R * 0.090;
 
-        // Progress for each ring (0=hidden, 1=fully visible)
-        // 'gates' ring uses hexagrams progress since they share the same toggle
-        const ringProgress = {
-            hexagrams: mandalaAnimState.hexagrams.progress,
-            mirror:    mandalaAnimState.mirror.progress,
-            gates:     mandalaAnimState.hexagrams.progress, // gates toggle with hexagrams
-            zodiac:    mandalaAnimState.zodiac.progress,
-            houses:    mandalaAnimState.houses.progress,
-        };
+        const pH = mandalaAnimState.hexagrams.progress;
+        const pM = mandalaAnimState.mirror.progress;
+        const pZ = mandalaAnimState.zodiac.progress;
+        const pH2 = mandalaAnimState.houses.progress;
 
-        // Total base width and total weighted width
-        const totalBase = Object.values(RING_BASE_WIDTHS).reduce((s, v) => s + v, 0);
-        const totalWeighted = Object.entries(RING_BASE_WIDTHS)
-            .reduce((s, [k, v]) => s + v * ringProgress[k], 0);
-
-        // Fixed inner border (bodygraph area stays constant)
-        const INNER_FRAC = 0.630;
-        const rInnerBorderFixed = R * INNER_FRAC;
-        const availableSpace = R - rInnerBorderFixed; // total space for all rings
-
-        // Compute actual ring widths by scaling proportionally
-        function ringWidth(key) {
-            if (totalWeighted < 0.001) return 0;
-            return (RING_BASE_WIDTHS[key] * ringProgress[key] / totalWeighted) * availableSpace;
-        }
-
-        // Build radii from outside in
+        // Stack from outside in: each ring starts where the previous ended
         const rHexagramsOuter = R;
-        const rHexagramsInner = rHexagramsOuter - ringWidth('hexagrams');
+        const rHexagramsInner = R - W_HEX * pH;
+
         const rMirrorOuter    = rHexagramsInner;
-        const rMirrorInner    = rMirrorOuter - ringWidth('mirror');
+        const rMirrorInner    = rMirrorOuter - W_MIRROR * pM;
+
         const rGatesOuter     = rMirrorInner;
-        const rGatesInner     = rGatesOuter - ringWidth('gates');
+        const rGatesInner     = rGatesOuter - W_GATES * pH; // gates toggle with hexagrams
+
         const rDialOuter      = rGatesInner;
-        const rDialInner      = rDialOuter; // dial is same as gates inner (no separate dial section)
+        const rDialInner      = rGatesInner;
+
         const rZodiacOuter    = rGatesInner;
-        const rZodiacInner    = rZodiacOuter - ringWidth('zodiac');
+        const rZodiacInner    = rZodiacOuter - W_ZODIAC * pZ;
+
         const rHousesOuter    = rZodiacInner;
-        const rHousesInner    = rHousesOuter - ringWidth('houses');
+        const rHousesInner    = rHousesOuter - W_HOUSES * pH2;
+
+        // Inner border grows as rings are turned off — bodygraph expands to fill freed space
         const rInnerBorder    = rHousesInner;
         // ─────────────────────────────────────────────────────────────────────
+
+
 
 
 
