@@ -4415,7 +4415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const midAngle = degToRad(midLon - 180);
                 const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
                 const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
-                ctx.font = 'bold 14.5px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
+                ctx.font = '400 14px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
                 
                 let labelColor = MANDALA_ZODIAC_COLORS[i];
                 if (isAnyHovered && !isHighlightedSign) {
