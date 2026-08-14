@@ -3722,20 +3722,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // Restored original proportions for hexagrams, dial lines and zodiac rings
+        // ── Dynamic ring radii — redistribute space when rings are toggled ──────
+        // Base widths (fraction of R) for each ring when fully visible
+        const RING_BASE_WIDTHS = {
+            hexagrams: 0.080,  // outermost ring
+            mirror:    0.052,  // mirror of life
+            gates:     0.078,  // gate numbers + dial lines
+            zodiac:    0.070,  // zodiac signs
+            houses:    0.090,  // house numbers
+        };
+
+        // Progress for each ring (0=hidden, 1=fully visible)
+        // 'gates' ring uses hexagrams progress since they share the same toggle
+        const ringProgress = {
+            hexagrams: mandalaAnimState.hexagrams.progress,
+            mirror:    mandalaAnimState.mirror.progress,
+            gates:     mandalaAnimState.hexagrams.progress, // gates toggle with hexagrams
+            zodiac:    mandalaAnimState.zodiac.progress,
+            houses:    mandalaAnimState.houses.progress,
+        };
+
+        // Total base width and total weighted width
+        const totalBase = Object.values(RING_BASE_WIDTHS).reduce((s, v) => s + v, 0);
+        const totalWeighted = Object.entries(RING_BASE_WIDTHS)
+            .reduce((s, [k, v]) => s + v * ringProgress[k], 0);
+
+        // Fixed inner border (bodygraph area stays constant)
+        const INNER_FRAC = 0.630;
+        const rInnerBorderFixed = R * INNER_FRAC;
+        const availableSpace = R - rInnerBorderFixed; // total space for all rings
+
+        // Compute actual ring widths by scaling proportionally
+        function ringWidth(key) {
+            if (totalWeighted < 0.001) return 0;
+            return (RING_BASE_WIDTHS[key] * ringProgress[key] / totalWeighted) * availableSpace;
+        }
+
+        // Build radii from outside in
         const rHexagramsOuter = R;
-        const rHexagramsInner = R * 0.92;
-        const rMirrorOuter = rHexagramsInner;
-        const rMirrorInner = R * 0.868;
-        const rGatesOuter = rMirrorInner;
-        const rGatesInner = rGatesOuter - 22;
-        const rDialOuter = rGatesInner;
-        const rDialInner = R * 0.790;
-        const rZodiacOuter = rDialInner;
-        const rZodiacInner = R * 0.720;
-        const rHousesOuter = rZodiacInner;   // flush against zodiac inner edge
-        const rHousesInner = R * 0.630;      // compact, narrow band for 12 houses
-        const rInnerBorder = rHousesInner;
+        const rHexagramsInner = rHexagramsOuter - ringWidth('hexagrams');
+        const rMirrorOuter    = rHexagramsInner;
+        const rMirrorInner    = rMirrorOuter - ringWidth('mirror');
+        const rGatesOuter     = rMirrorInner;
+        const rGatesInner     = rGatesOuter - ringWidth('gates');
+        const rDialOuter      = rGatesInner;
+        const rDialInner      = rDialOuter; // dial is same as gates inner (no separate dial section)
+        const rZodiacOuter    = rGatesInner;
+        const rZodiacInner    = rZodiacOuter - ringWidth('zodiac');
+        const rHousesOuter    = rZodiacInner;
+        const rHousesInner    = rHousesOuter - ringWidth('houses');
+        const rInnerBorder    = rHousesInner;
+        // ─────────────────────────────────────────────────────────────────────
+
+
 
 
         ctx.clearRect(0, 0, size, size);
