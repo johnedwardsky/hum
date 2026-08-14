@@ -3879,48 +3879,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const hoverTarget = hoverState ? hoverState.target : null;
 
         // ── Draw Incarnation Cross — two axes through mandala center ──────────
-        // Uses exact ecliptic longitudes mapped with the same formula as gates:
-        //   angle = degToRad(longitude - 180)
-        // Personality Sun → Earth: BLACK axis
-        // Design Sun → Earth:      RED axis
-        // Both pass exactly through center (cx, cy) since Sun & Earth are 180° apart.
-        function drawCrossAxis(sunLon, earthLon, col, colHover, lineW) {
-            if (sunLon === null || earthLon === null) return;
+        // Gate position on the mandala wheel is determined by its index in GATE_ORDER,
+        // using the SAME formula as gate sector drawing:
+        //   angle = degToRad((WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL/2) - 180)
+        // This ensures lines pass exactly through gate symbols on the ring.
+        function gateAngle(gateNum) {
+            const idx = GATE_ORDER.indexOf(gateNum);
+            if (idx < 0) return null;
+            const lon = (WHEEL_START + idx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
+            return degToRad(lon - 180);
+        }
+
+        function drawCrossAxis(gateA, gateB, col, colHover, lineW) {
+            const aA = gateAngle(gateA);
+            const aB = gateAngle(gateB);
+            if (aA === null || aB === null) return;
 
             const isHov = hoverType === 'gate' && (
                 hoverTarget === pSunGate || hoverTarget === pEarthGate ||
                 hoverTarget === dSunGate || hoverTarget === dEarthGate
             );
             const color = isHov ? colHover : col;
-
-            // Map longitudes to mandala angles (same formula as gate positions)
-            const aSun   = degToRad(sunLon   - 180);
-            const aEarth = degToRad(earthLon - 180);
-
             const rLine = R + 18;
 
-            // Full diameter line through center
+            // Full line from gate A through center to gate B
             ctx.beginPath();
-            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
-            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
+            ctx.moveTo(cx + rLine * Math.cos(aA), cy + rLine * Math.sin(aA));
+            ctx.lineTo(cx + rLine * Math.cos(aB), cy + rLine * Math.sin(aB));
             ctx.strokeStyle = color;
             ctx.lineWidth   = lineW;
             ctx.lineCap     = 'round';
             ctx.setLineDash([]);
             ctx.stroke();
 
-            // Dot markers at Sun (filled circle) and Earth (open circle) positions
+            // Dot markers at both gate positions on the rim
             const dotR = lineW * 1.8;
-            // Sun dot
-            ctx.beginPath();
-            ctx.arc(cx + rLine * Math.cos(aSun), cy + rLine * Math.sin(aSun), dotR, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-            // Earth dot
-            ctx.beginPath();
-            ctx.arc(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth), dotR, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
+            [aA, aB].forEach(a => {
+                ctx.beginPath();
+                ctx.arc(cx + rLine * Math.cos(a), cy + rLine * Math.sin(a), dotR, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+            });
         }
 
         const pCross = mandalaAnimState.cross.progress;
@@ -3933,12 +3932,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.rotate(rotCross);
                 ctx.translate(-cx, -cy);
             }
-            // Design axis — RED (Дизайн: красное Солнце → красная Земля)
-            drawCrossAxis(dSunLon, dEarthLon, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
-            // Personality axis — BLACK (Личность: чёрное Солнце → чёрная Земля)
-            drawCrossAxis(pSunLon, pEarthLon, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
+            // Design axis — RED (красное Солнце Дизайна → красная Земля Дизайна)
+            drawCrossAxis(dSunGate, dEarthGate, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
+            // Personality axis — BLACK (чёрное Солнце → чёрная Земля)
+            drawCrossAxis(pSunGate, pEarthGate, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
             ctx.restore();
         }
+
 
 
 
