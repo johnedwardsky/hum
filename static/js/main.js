@@ -3878,33 +3878,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const hoverType = hoverState ? hoverState.type : null;
         const hoverTarget = hoverState ? hoverState.target : null;
 
-        // ── Draw Incarnation Cross — exact axes through center ──────────────────────
-        // Drawn at exact planet longitudes.
-        // Default: moderately visible. Hovering on any of the 4 cross gates highlights them.
-        // Thickness remains constant (does not increase), shadow blur is removed.
-        function drawCrossAxisExact(sunLon, earthLon, strokeColorDefault, strokeColorHover, lineW) {
+        // ── Draw Incarnation Cross — two axes through center ──────────────────
+        // Personality: black line from Sun to Earth (through center)
+        // Design:      red line from Sun to Earth (through center)
+        function drawCrossAxis(sunLon, earthLon, colorDefault, colorHover, lineW) {
             if (sunLon === null || earthLon === null) return;
 
             const isHovered = (hoverType === 'gate' && (
-                hoverTarget === pSunGate || 
-                hoverTarget === pEarthGate || 
-                hoverTarget === dSunGate || 
+                hoverTarget === pSunGate ||
+                hoverTarget === pEarthGate ||
+                hoverTarget === dSunGate ||
                 hoverTarget === dEarthGate
             ));
 
             const aSun   = degToRad(sunLon - 180);
             const aEarth = degToRad(earthLon - 180);
+            const rLine  = R + 20; // slightly beyond outer rim
 
-            const rLine = R + 28; // slightly beyond outer rim
-            
+            const col = isHovered ? colorHover : colorDefault;
+
             ctx.beginPath();
+            // Line from Sun point through center to Earth point (full diameter)
             ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
             ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
-            ctx.strokeStyle = isHovered ? strokeColorHover : strokeColorDefault;
+            ctx.strokeStyle = col;
             ctx.lineWidth   = lineW;
             ctx.lineCap     = 'round';
             ctx.setLineDash([]);
             ctx.stroke();
+
+            // Small circle markers at Sun and Earth endpoints
+            const markerR = lineW * 1.6;
+            [[aSun, '☉'], [aEarth, '⊕']].forEach(([ang]) => {
+                ctx.beginPath();
+                ctx.arc(cx + rLine * Math.cos(ang), cy + rLine * Math.sin(ang), markerR, 0, Math.PI * 2);
+                ctx.fillStyle = col;
+                ctx.fill();
+            });
         }
 
         const pCross = mandalaAnimState.cross.progress;
@@ -3917,12 +3927,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.rotate(rotCross);
                 ctx.translate(-cx, -cy);
             }
-            // Personality axis (black/charcoal)
-            drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.88)', 3.2);
-            // Design axis (red)
-            drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.88)', 3.2);
+            // Personality axis — black/charcoal (Солнце-Земля чёрные)
+            drawCrossAxis(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.28)', 'rgba(40, 35, 20, 0.92)', 2.5);
+            // Design axis — red (Солнце-Земля красные)
+            drawCrossAxis(dSunLon, dEarthLon, 'rgba(210, 55, 55, 0.28)', 'rgba(210, 55, 55, 0.92)', 2.5);
             ctx.restore();
         }
+
 
 
 
