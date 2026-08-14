@@ -3849,28 +3849,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Incarnation Cross gates & exact longitudes (Sun and Earth)
         // Planet names come from backend in Russian: 'Солнце', 'Земля'
-        let pSunGate = null, pEarthGate = null;
-        let dSunGate = null, dEarthGate = null;
+        let pSunGate = null, pEarthGate = null, pSunLine = null, pEarthLine = null;
+        let dSunGate = null, dEarthGate = null, dSunLine = null, dEarthLine = null;
         let pSunLon = null, pEarthLon = null;
         let dSunLon = null, dEarthLon = null;
         data.planets.forEach(p => {
             if (p.name === 'Солнце') {
                 pSunGate = p.hexagram?.gate;
-                pSunLon = p.longitude;
+                pSunLine = p.hexagram?.line ?? null;
+                pSunLon  = p.longitude;
             }
             if (p.name === 'Земля') {
                 pEarthGate = p.hexagram?.gate;
-                pEarthLon = p.longitude;
+                pEarthLine = p.hexagram?.line ?? null;
+                pEarthLon  = p.longitude;
             }
         });
         designPlanetsList.forEach(p => {
             if (p.name === 'Солнце') {
                 dSunGate = p.hexagram?.gate;
-                dSunLon = p.longitude;
+                dSunLine = p.hexagram?.line ?? null;
+                dSunLon  = p.longitude;
             }
             if (p.name === 'Земля') {
                 dEarthGate = p.hexagram?.gate;
-                dEarthLon = p.longitude;
+                dEarthLine = p.hexagram?.line ?? null;
+                dEarthLon  = p.longitude;
             }
         });
 
@@ -3879,20 +3883,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const hoverTarget = hoverState ? hoverState.target : null;
 
         // ── Draw Incarnation Cross — two axes through mandala center ──────────
-        // Gate position on the mandala wheel is determined by its index in GATE_ORDER,
-        // using the SAME formula as gate sector drawing:
-        //   angle = degToRad((WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL/2) - 180)
-        // This ensures lines pass exactly through gate symbols on the ring.
-        function gateAngle(gateNum) {
+        // Gate+line position on the mandala wheel:
+        //   gate sector starts at WHEEL_START + gateIdx * GATE_INTERVAL
+        //   each of 6 lines = GATE_INTERVAL/6 wide
+        //   line N midpoint = gateStart + (N - 0.5) * lineWidth
+        function gateLineAngle(gateNum, lineNum) {
             const idx = GATE_ORDER.indexOf(gateNum);
             if (idx < 0) return null;
-            const lon = (WHEEL_START + idx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
+            const lineWidth = GATE_INTERVAL / 6;
+            const gateStart = WHEEL_START + idx * GATE_INTERVAL;
+            const line = (lineNum >= 1 && lineNum <= 6) ? lineNum : 3.5; // fallback = midpoint
+            const lon = (gateStart + (line - 0.5) * lineWidth) % 360;
             return degToRad(lon - 180);
         }
 
-        function drawCrossAxis(gateA, gateB, col, colHover, lineW) {
-            const aA = gateAngle(gateA);
-            const aB = gateAngle(gateB);
+        function drawCrossAxis(gateA, lineA, gateB, lineB, col, colHover, lineW) {
+            const aA = gateLineAngle(gateA, lineA);
+            const aB = gateLineAngle(gateB, lineB);
             if (aA === null || aB === null) return;
 
             const isHov = hoverType === 'gate' && (
@@ -3933,9 +3940,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
             // Design axis — RED (красное Солнце Дизайна → красная Земля Дизайна)
-            drawCrossAxis(dSunGate, dEarthGate, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
+            drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
             // Personality axis — BLACK (чёрное Солнце → чёрная Земля)
-            drawCrossAxis(pSunGate, pEarthGate, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
+            drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
             ctx.restore();
         }
 
