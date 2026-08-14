@@ -3742,18 +3742,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const rDialOuter      = rGatesInner;
         const rDialInner      = rGatesInner;
 
-        // Inner rings — fixed positions; when off, bodygraph expands
-        const rZodiacOuter    = R * 0.790;
-        const rZodiacInner    = R * 0.720;
+        // Inner rings — stack from gates inner INWARD with fixed widths
+        // When zodiac is off: houses shifts outward to sit adjacent to gates dial
+        const W_ZODIAC = R * 0.070;   // zodiac ring width (fixed)
+        const W_HOUSES = R * 0.090;   // houses ring width (fixed)
 
-        const rHousesOuter    = R * 0.720;
-        const rHousesInner    = R * 0.630;
+        const rZodiacOuter    = R * 0.790;                        // always flush with gates inner
+        const rZodiacInner    = rZodiacOuter - W_ZODIAC * pZ;    // shrinks to 0 when zodiac off
 
-        // rInnerBorder: expands as inner rings are toggled off
-        // When zodiac off: border rises to rZodiacOuter; when houses off: to rHousesOuter
-        const rInnerBorder = rGatesInner
-            - (rGatesInner  - rZodiacInner)  * pZ
-            - (rZodiacInner - rHousesInner)  * pH2;
+        const rHousesOuter    = rZodiacInner;                     // always adjacent to zodiac
+        const rHousesInner    = rHousesOuter - W_HOUSES * pH2;   // shrinks to 0 when houses off
+
+        // rInnerBorder: bodygraph expands as inner rings collapse
+        const rInnerBorder    = rHousesInner;
+
         // ─────────────────────────────────────────────────────────────────────
 
 
