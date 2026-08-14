@@ -3722,42 +3722,41 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // ── Dynamic ring radii — rings keep fixed width, shift outward when others turn off ──
-        // Fixed ring widths (absolute, based on R). Rings stack from outside in.
-        // When a ring is off (progress→0), it collapses to 0 width and inner rings shift outward.
-        const W_HEX   = R * 0.080;
-        const W_MIRROR = R * 0.052;
-        const W_GATES  = R * 0.078;
-        const W_ZODIAC = R * 0.070;
-        const W_HOUSES = R * 0.090;
-
-        const pH = mandalaAnimState.hexagrams.progress;
-        const pM = mandalaAnimState.mirror.progress;
-        const pZ = mandalaAnimState.zodiac.progress;
+        // ── Ring radii — gates dial is FIXED, outer rings appear/disappear at fixed positions,
+        //    inner rings disappear and bodygraph expands into freed space ──────────────────
+        const pH  = mandalaAnimState.hexagrams.progress; // also controls gates ring visibility
+        const pM  = mandalaAnimState.mirror.progress;
+        const pZ  = mandalaAnimState.zodiac.progress;
         const pH2 = mandalaAnimState.houses.progress;
 
-        // Stack from outside in: each ring starts where the previous ended
+        // All ring positions are FIXED — only visibility (progress/opacity) changes
         const rHexagramsOuter = R;
-        const rHexagramsInner = R - W_HEX * pH;
+        const rHexagramsInner = R * 0.920;
 
-        const rMirrorOuter    = rHexagramsInner;
-        const rMirrorInner    = rMirrorOuter - W_MIRROR * pM;
+        const rMirrorOuter    = R * 0.920;
+        const rMirrorInner    = R * 0.868;
 
-        const rGatesOuter     = rMirrorInner;
-        const rGatesInner     = rGatesOuter - W_GATES * pH; // gates toggle with hexagrams
-
+        // Gates dial — NEVER moves
+        const rGatesOuter     = R * 0.868;
+        const rGatesInner     = R * 0.790;
         const rDialOuter      = rGatesInner;
         const rDialInner      = rGatesInner;
 
-        const rZodiacOuter    = rGatesInner;
-        const rZodiacInner    = rZodiacOuter - W_ZODIAC * pZ;
+        // Inner rings — fixed positions; when off, bodygraph expands
+        const rZodiacOuter    = R * 0.790;
+        const rZodiacInner    = R * 0.720;
 
-        const rHousesOuter    = rZodiacInner;
-        const rHousesInner    = rHousesOuter - W_HOUSES * pH2;
+        const rHousesOuter    = R * 0.720;
+        const rHousesInner    = R * 0.630;
 
-        // Inner border grows as rings are turned off — bodygraph expands to fill freed space
-        const rInnerBorder    = rHousesInner;
+        // rInnerBorder: expands as inner rings are toggled off
+        // When zodiac off: border rises to rZodiacOuter; when houses off: to rHousesOuter
+        const rInnerBorder = rGatesInner
+            - (rGatesInner  - rZodiacInner)  * pZ
+            - (rZodiacInner - rHousesInner)  * pH2;
         // ─────────────────────────────────────────────────────────────────────
+
+
 
 
 
