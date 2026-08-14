@@ -4808,7 +4808,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // Position and update the HTML SVG overlay
-        const bgScale = (rInnerBorder * 2 * 0.748) / BG_H;
+        const bgScale = (R * 0.630 * 2 * 0.748) / BG_H; // fixed size — does not change when rings toggle
         const bgOffX = cx - (BG_W * bgScale) / 2 + (10 * bgScale);
         const bgOffY = cy - (BG_H * bgScale) / 2;
 
