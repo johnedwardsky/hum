@@ -1,528 +1,94 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#FAF8F5">
-    <title>Humantica — Натальная карта и бодиграф</title>
-    <meta name="description" content="Точный расчёт натальной карты и бодиграфа по швейцарским эфемеридам">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=1.2.68">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ===== SVG SPRITE FOR GOLDEN LOGO ===== -->
-    <svg style="display: none;">
-        <defs>
-            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#FFEFA6" />
-                <stop offset="30%" stop-color="#E5C453" />
-                <stop offset="55%" stop-color="#D4AF37" />
-                <stop offset="80%" stop-color="#AA7C11" />
-                <stop offset="100%" stop-color="#D4AF37" />
-            </linearGradient>
-        </defs>
-        <symbol id="logo-symbol" viewBox="0 0 100 100">
-            <!-- Left side (R=16 to R=32, shifted left to center and create gap) -->
-            <g transform="translate(-10, 0)">
-                <path d="M 50 18 A 32 32 0 0 0 50 82 L 50 66 A 16 16 0 0 1 50 34 Z" fill="#C59E3F" />
-            </g>
-            <!-- Right side (R=16 and R=32 to R=48, shifted right to center and create gap) -->
-            <g transform="translate(-6, 0)">
-                <path d="M 50 34 A 16 16 0 0 1 50 66 Z" fill="#C59E3F" />
-                <path d="M 50 2 A 48 48 0 0 1 50 98 L 50 82 A 32 32 0 0 0 50 18 Z" fill="#C59E3F" />
-            </g>
-        </symbol>
-    </svg>
-
-    <!-- ===== TOP NAV ===== -->
-    <header class="topnav">
-        <div class="topnav-left">
-            <div class="logo">
-                <svg width="32" height="32" class="logo-svg">
-                    <use href="#logo-symbol"/>
-                </svg>
-                <span class="logo-text">Humantica</span>
-            </div>
-            <span class="topnav-divider"></span>
-            <span class="topnav-subtitle">Натальная карта и бодиграф по эфемеридам</span>
-        </div>
-        
-        <div class="topnav-center">
-            <div class="nav-segmented">
-                <button class="nav-segment-btn active" id="nav-mode-natal">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
-                        <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-                    </svg>
-                    <span>Натальная карта</span>
-                </button>
-                <button class="nav-segment-btn" id="nav-mode-compat">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 14.5S2 9.5 2 5.5a3.5 3.5 0 0 1 6-2.5 3.5 3.5 0 0 1 6 2.5c0 4-6 9-6 9z"/>
-                    </svg>
-                    <span>Совместимость</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="topnav-right">
-            <button class="btn-ghost" id="btn-about">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M8 7v5M8 5.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-                <span>О проекте</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- ===== MAIN LAYOUT ===== -->
-    <div class="app-layout">
-
-        <!-- ===== LEFT SIDEBAR ===== -->
-        <aside class="sidebar">
-            <!-- Mobile toggle (shown only on small screens via CSS) -->
-            <button class="sidebar-toggle-btn" id="sidebar-toggle" style="display:none">
-                <span>Данные рождения</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 6l5 5 5-5" stroke="#A29DB0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-            <div class="sidebar-collapsible" id="sidebar-collapsible">
-            <div class="sidebar-inner">
-                <!-- Section title -->
-                <div class="sidebar-title">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <circle cx="9" cy="6" r="3.5" stroke="var(--primary)" stroke-width="1.3"/>
-                        <path d="M2 16c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="var(--primary)" stroke-width="1.3" stroke-linecap="round"/>
-                    </svg>
-                    <span>Данные рождения</span>
-                </div>
-
-                <form id="calc-form" novalidate>
-                    <!-- Date -->
-                    <div class="field-group">
-                        <label class="field-label" for="birth_date">Дата рождения</label>
-                        <div class="field-wrap">
-                            <input type="date" id="birth_date" class="field-input" required>
-                            <svg class="field-icon" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                                <rect x="1.5" y="2.5" width="14" height="13" rx="2" stroke="#7A7585" stroke-width="1.2"/>
-                                <path d="M5 1v3M12 1v3M1.5 7h14" stroke="#7A7585" stroke-width="1.2" stroke-linecap="round"/>
-                            </svg>
+    <div class="menu_1">
+        <img src="https://img.icons8.com/android/24/000000/menu.png"/>
+    </div>
+    <div class="body">
+        <div class="btns_block_1"></div>
+        <div class="container">
+            <div class="wrapper">
+                <div class="unconscious">
+                    <h1>Бессознательные активации</h1>
+                    <div class="icons_group">
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.05 15.04"><path class="cls_1" d="M7.53,4.15A3.37,3.37,0,1,1,4.16,7.52,3.37,3.37,0,0,1,7.53,4.15Z"/><path class="cls_1" d="M7.53,0A7.52,7.52,0,1,1,0,7.52,7.52,7.52,0,0,1,7.53,0Zm0,1.24a6.28,6.28,0,1,0,6.28,6.28A6.29,6.29,0,0,0,7.53,1.24Z"/></svg>
+                            <h4>13.<span>4</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
-                    </div>
-
-                    <!-- Time -->
-                    <div class="field-group">
-                        <label class="field-label" for="birth_time">Время рождения</label>
-                        <div class="field-wrap">
-                            <input type="time" id="birth_time" step="1" value="12:00:00" class="field-input" required>
-                            <svg class="field-icon" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                                <circle cx="8.5" cy="8.5" r="6.5" stroke="#7A7585" stroke-width="1.2"/>
-                                <path d="M8.5 5v3.5l2.5 2" stroke="#7A7585" stroke-width="1.2" stroke-linecap="round"/>
-                            </svg>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.05 15.04"><path class="cls_1" d="M7.53,0A7.52,7.52,0,1,1,0,7.52,7.52,7.52,0,0,1,7.53,0Zm0,1.24a6.28,6.28,0,1,0,6.28,6.28A6.29,6.29,0,0,0,7.53,1.24Z"/><rect class="cls_2" x="0.09" y="6.72" width="13.87" height="0.98"/><rect class="cls_2" x="6.92" y="1.24" width="1.21" height="13.53"/></svg>
+                            <h4>7.<span>4</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.94 9.35"><rect class="cls_1" width="5" height="1.04"/><rect class="cls_1" x="8.82" width="5.12" height="1.04"/><rect class="cls_1" y="1.62" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="1.62" width="5.12" height="1.04"/><rect class="cls_1" y="3.3" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="3.3" width="5.12" height="1.04"/><rect class="cls_1" y="4.89" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="4.89" width="5.12" height="1.04"/><rect class="cls_1" y="6.56" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="6.56" width="5.12" height="1.04"/><rect class="cls_1" y="8.31" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="8.31" width="5.12" height="1.04"/></svg>
                         </div>
-                    </div>
-
-                    <!-- City -->
-                    <div class="field-group">
-                        <label class="field-label" for="city">Город рождения</label>
-                        <div class="field-wrap city-wrap">
-                            <svg class="field-icon-left" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="#7A7585" stroke-width="1.2"/>
-                                <circle cx="8" cy="6" r="1.8" stroke="#7A7585" stroke-width="1.2"/>
-                            </svg>
-                            <input type="text" id="city" class="field-input city-input" placeholder="Начните вводить город..." autocomplete="off">
-                            <button type="button" class="city-clear hidden" id="city-clear">
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                    <path d="M2 2l10 10M12 2L2 12" stroke="#7A7585" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </button>
-                            <div class="search-spinner hidden" id="search-spinner"></div>
-                            <input type="hidden" id="lat">
-                            <input type="hidden" id="lon">
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 15.13"><path class="cls_1" d="M7,0a5.47,5.47,0,0,1,5.66,5.24A5.46,5.46,0,0,1,7,10.48,5.46,5.46,0,0,1,1.36,5.24,5.46,5.46,0,0,1,7,0ZM7,1.15A4.26,4.26,0,0,0,2.6,5.24,4.26,4.26,0,0,0,7,9.33a4.26,4.26,0,0,0,4.41-4.09A4.26,4.26,0,0,0,7,1.15Z"/><path class="cls_1" d="M6.22,9.57c-.13,1,0,3.26-.89,3.92-1.1.82-3.35-.37-4-.91-1.34-.74-1.73.51-.68,1.21C2.29,14.93,3.78,15.4,5.31,15s1.59-1.86,1.8-3.14L7.47,9.7Z"/><path class="cls_1" d="M8.23,9.55c.13,1,0,3.26.9,3.92,1.09.82,3.35-.36,4-.91,1.34-.74,1.73.52.69,1.22-1.69,1.13-3.19,1.6-4.71,1.17s-1.59-1.86-1.81-3.14L7,9.68Z"/></svg>
+                            <h4>3.<span>3</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" width="5.15" height="1.04"/><rect class="cls_1" y="1.62" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" y="1.62" width="5.15" height="1.04"/><rect class="cls_1" y="3.3" width="5.03" height="1.04"/><rect class="cls_1" x="8.78" y="3.3" width="5.15" height="1.04"/><rect class="cls_1" y="4.89" width="13.96" height="1.04"/><rect class="cls_1" y="6.56" width="13.96" height="1.04"/><rect class="cls_1" y="8.31" width="13.96" height="1.04"/></svg>
+                        </div>  
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 15.13"><path class="cls_1" d="M7,15.13a5.47,5.47,0,0,0,5.66-5.25A5.47,5.47,0,0,0,7,4.64,5.46,5.46,0,0,0,1.36,9.88,5.46,5.46,0,0,0,7,15.13ZM7,14A4.26,4.26,0,0,1,2.6,9.88,4.26,4.26,0,0,1,7,5.79a4.26,4.26,0,0,1,4.41,4.09A4.26,4.26,0,0,1,7,14Z"/><path class="cls_1" d="M6.22,5.56c-.13-1,0-3.26-.89-3.92C4.23.82,2,2,1.28,2.54-.06,3.29-.45,2,.6,1.33,2.29.2,3.78-.27,5.31.16S6.9,2,7.11,3.3l.36,2.13Z"/><path class="cls_1" d="M8.23,5.57c.13-1,0-3.25.9-3.92,1.09-.82,3.35.37,4,.91,1.34.74,1.73-.51.69-1.21C12.17.21,10.67-.26,9.15.17S7.56,2,7.34,3.31L7,5.44Z"/></svg>
+                            <h4>50.<span>3</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" y="8.31" width="5.06" height="1.04"/><rect class="cls_1" x="8.79" y="8.31" width="5.15" height="1.04"/><rect class="cls_1" y="6.69" width="5.07" height="1.04"/><rect class="cls_1" x="8.79" y="6.69" width="5.15" height="1.04"/><rect class="cls_1" y="5.02" width="5.06" height="1.04"/><rect class="cls_1" x="8.78" y="5.02" width="5.15" height="1.04"/><rect class="cls_1" y="3.42" width="13.96" height="1.04"/><rect class="cls_1" y="1.75" width="13.96" height="1.04"/><rect class="cls_1" width="13.96" height="1.04"/></svg>
                         </div>
-                        <!-- Autocomplete dropdown -->
-                        <ul class="suggestions" id="suggestions"></ul>
-                    </div>
-
-                    <!-- Time type -->
-                    <div class="field-group">
-                        <label class="field-label">Время</label>
-                        <label class="radio-row" id="radio-local">
-                            <div class="radio-dot active" id="radio-local-dot"></div>
-                            <span>Местное время (по часовому поясу)</span>
-                        </label>
-                        <label class="radio-row" id="radio-gmt">
-                            <div class="radio-dot" id="radio-gmt-dot"></div>
-                            <span>Время по Гринвичу (GMT / UTC)</span>
-                        </label>
-                        <input type="hidden" id="is_gmt" value="0">
-                    </div>
-
-                    <!-- House System Selection -->
-                    <div class="field-group">
-                        <label class="field-label" for="house_system">Система домов</label>
-                        <div class="field-wrap">
-                            <select id="house_system" class="field-input select-input">
-                                <option value="P" selected>Плацидус (Placidus)</option>
-                                <option value="D">Равнодомная от МС (Equal MC)</option>
-                            </select>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.65 14.22"><path class="cls___1" d="M6.85,1a5.77,5.77,0,0,1,4.62,2.36v0a3.91,3.91,0,0,0-2-.56,4.09,4.09,0,0,0-4,4.18,4.09,4.09,0,0,0,4,4.17,3.8,3.8,0,0,0,2.19-.69v.19a5.79,5.79,0,0,1-4.82,2.63A6,6,0,0,1,1,7.11,6,6,0,0,1,6.85,1Z" transform="translate(-0.01 0)"/><path class="cls___2" d="M6.85,1a5.77,5.77,0,0,1,4.62,2.36v0a3.91,3.91,0,0,0-2-.56,4.09,4.09,0,0,0-4,4.18,4.09,4.09,0,0,0,4,4.17,3.8,3.8,0,0,0,2.19-.69v.19a5.79,5.79,0,0,1-4.82,2.63A6,6,0,0,1,1,7.11,6,6,0,0,1,6.85,1Z" transform="translate(-0.01 0)"/></svg>
+                            <h4>27.<span>4</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
-                    </div>
-
-                    <!-- House Cusp Offset (shown only when Equal MC is selected) -->
-                    <div class="field-group hidden" id="cusp-offset-group">
-                        <label class="field-label" for="cusp_offset">Сдвиг куспидов (в градусах)</label>
-                        <div class="field-wrap">
-                            <input type="number" id="cusp_offset" class="field-input" value="0" step="1" placeholder="Например: -5 или 5">
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.46 16.12"><path class="cls_1" d="M5.73.75A5.68,5.68,0,1,1,0,6.43,5.71,5.71,0,0,1,5.73.75Zm0,1a4.65,4.65,0,1,0,4.69,4.65A4.67,4.67,0,0,0,5.73,1.78Z"/><rect class="cls_2" x="5.47" y="11.39" width="1.04" height="4.73"/><rect class="cls_2" x="2.94" y="13.46" width="5.99" height="0.81"/><rect class="cls_2" x="1.73" y="0.07" width="0.92" height="2.29" transform="translate(-0.31 1.38) rotate(-32.91)"/><rect class="cls_2" x="8.83" y="0.85" width="2.29" height="0.92" transform="translate(3.46 8.97) rotate(-57.09)"/></svg>
+                            <h4>19.<span>3</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.94 9.35"><rect class="cls_1" width="5" height="1.04"/><rect class="cls_1" x="8.82" width="5.12" height="1.04"/><rect class="cls_1" y="1.62" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="1.62" width="5.12" height="1.04"/><rect class="cls_1" y="3.3" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="3.3" width="5.12" height="1.04"/><rect class="cls_1" y="4.89" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="4.89" width="5.12" height="1.04"/><rect class="cls_1" y="6.56" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="6.56" width="5.12" height="1.04"/><rect class="cls_1" y="8.31" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="8.31" width="5.12" height="1.04"/></svg>
                         </div>
-                    </div>
-
-                    <!-- Polar equal house system options (shown only when Placidus is selected) -->
-                    <div id="placidus-polar-options">
-                        <div class="field-group">
-                            <label class="checkbox-row" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 10px;">
-                                <input type="checkbox" id="use_polar_equal" style="accent-color: var(--primary); cursor: pointer; transform: scale(1.15);">
-                                <span style="font-size: 13px; color: var(--text-dark);">Равнодомная для заполярных широт</span>
-                            </label>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.02 17.46"><path class="cls_1" d="M6.51,0A6.46,6.46,0,1,1,0,6.45,6.48,6.48,0,0,1,6.51,0Zm0,1.17a5.29,5.29,0,1,0,5.33,5.28A5.31,5.31,0,0,0,6.51,1.17Z"/><rect class="cls_2" x="6.22" y="12.09" width="1.18" height="5.37"/><rect class="cls_2" x="3.34" y="14.45" width="6.81" height="0.92"/></svg>
+                            <h4>60.<span>3</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" width="5.15" height="1.04"/><rect class="cls_1" y="1.62" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" y="1.62" width="5.15" height="1.04"/><rect class="cls_1" y="3.3" width="5.03" height="1.04"/><rect class="cls_1" x="8.78" y="3.3" width="5.15" height="1.04"/><rect class="cls_1" y="4.89" width="13.96" height="1.04"/><rect class="cls_1" y="6.56" width="13.96" height="1.04"/><rect class="cls_1" y="8.31" width="13.96" height="1.04"/></svg>
                         </div>
-                        <div class="field-group hidden" id="polar-boundary-group">
-                            <label class="field-label" for="polar_boundary">Граница заполярья (широта, °)</label>
-                            <div class="field-wrap">
-                                <input type="number" id="polar_boundary" class="field-input" value="62" min="0" max="90" step="1">
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.66 14.42"><path class="cls_1" d="M6.51,1.51A6.46,6.46,0,1,1,0,8,6.48,6.48,0,0,1,6.51,1.51Zm0,1.16A5.29,5.29,0,1,0,11.84,8,5.31,5.31,0,0,0,6.51,2.67Z"/><polygon class="cls_1" points="10.21 0.52 14.66 0 14.4 4.13 12.76 2.82 10.99 4.26 9.95 3.31 11.68 1.83 10.21 0.52"/></svg>
+                            <h4>30.<span>1</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" y="8.31" width="5.06" height="1.04"/><rect class="cls_1" x="8.79" y="8.31" width="5.15" height="1.04"/><rect class="cls_1" y="6.69" width="5.07" height="1.04"/><rect class="cls_1" x="8.79" y="6.69" width="5.15" height="1.04"/><rect class="cls_1" y="5.02" width="5.06" height="1.04"/><rect class="cls_1" x="8.78" y="5.02" width="5.15" height="1.04"/><rect class="cls_1" y="3.42" width="13.96" height="1.04"/><rect class="cls_1" y="1.75" width="13.96" height="1.04"/><rect class="cls_1" width="13.96" height="1.04"/></svg>
                         </div>
-                    </div>
-
-
-                    <!-- Timezone note -->
-                    <div class="tz-note">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <circle cx="8" cy="8" r="6.5" stroke="var(--primary)" stroke-width="1.2"/>
-                            <path d="M8 10V8M8 6h.01" stroke="var(--primary)" stroke-width="1.3" stroke-linecap="round"/>
-                        </svg>
-                        <span>Часовой пояс будет определён автоматически на основе координат и даты рождения.</span>
-                    </div>
-
-                    <!-- Submit -->
-                    <button type="submit" class="btn-calculate" id="btn-submit">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                            <path d="M9 1l1.8 5.4H17l-4.8 3.5 1.8 5.4L9 12.4l-5 3.5 1.8-5.4L1 7.4h6.2z" fill="currentColor"/>
-                        </svg>
-                        <span id="btn-label">Рассчитать карту</span>
-                        <span class="btn-spin hidden" id="btn-spinner"></span>
-                    </button>
-                </form>
-                <div class="sidebar-footer">© 2026 Humantica</div>
-            </div>
-            </div><!-- /sidebar-collapsible -->
-        </aside>
-
-        <!-- ===== MAIN CONTENT ===== -->
-        <main class="main-panel">
-
-            <!-- Placeholder state -->
-            <div class="placeholder-state" id="placeholder-state">
-                <div class="placeholder-icon">
-                    <svg width="72" height="72" class="logo-placeholder-svg">
-                        <use href="#logo-symbol"/>
-                    </svg>
-                </div>
-                <h2>Введите данные для расчёта</h2>
-                <p>Укажите дату, время и город рождения в форме слева, затем нажмите «Рассчитать карту»</p>
-            </div>
-
-            <!-- Results panel (hidden initially) -->
-            <div class="results-panel hidden" id="results-panel">
-
-                <!-- Tabs + Export -->
-                <div class="tabs-row">
-                    <div class="tabs">
-                        <button class="tab active" id="tab-planets" data-tab="planets">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <circle cx="7.5" cy="7.5" r="3.5" stroke="currentColor" stroke-width="1.2"/>
-                                <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                            </svg>
-                            Натальная карта
-                        </button>
-                        <button class="tab" id="tab-houses" data-tab="houses">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <path d="M7.5 1.5L1.5 6v7h4v-4h4v4h4V6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
-                            </svg>
-                            Куспиды домов
-                        </button>
-                        <button class="tab" id="tab-info" data-tab="info">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                                <path d="M7.5 7v4M7.5 5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                            </svg>
-                            Информация о расчёте
-                        </button>
-                        <button class="tab" id="tab-hexagrams" data-tab="hexagrams">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <line x1="3" y1="2" x2="12" y2="2" stroke="currentColor" stroke-width="1.4"/>
-                                <line x1="3" y1="4.5" x2="7" y2="4.5" stroke="currentColor" stroke-width="1.4"/>
-                                <line x1="8" y1="4.5" x2="12" y2="4.5" stroke="currentColor" stroke-width="1.4"/>
-                                <line x1="3" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="1.4"/>
-                                <line x1="3" y1="9.5" x2="7" y2="9.5" stroke="currentColor" stroke-width="1.4"/>
-                                <line x1="8" y1="9.5" x2="12" y2="9.5" stroke="currentColor" stroke-width="1.4"/>
-                                <line x1="3" y1="12" x2="12" y2="12" stroke="currentColor" stroke-width="1.4"/>
-                            </svg>
-                            Программы
-                        </button>
-                        <button class="tab" id="tab-bodygraph" data-tab="bodygraph">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <path d="M7.5 1a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM2 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                            </svg>
-                            Бодиграф
-                        </button>
-                        <button class="tab" id="tab-mandala" data-tab="mandala">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                                <circle cx="7.5" cy="7.5" r="3.5" stroke="currentColor" stroke-width="1.2"/>
-                                <path d="M7.5 1v3M7.5 11v3M1 7.5h3M11 7.5h3" stroke="currentColor" stroke-width="1.2"/>
-                            </svg>
-                            Мандала
-                        </button>
-                        <button class="tab" id="tab-interpretations" data-tab="interpretations">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <rect x="2.5" y="2.5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
-                                <path d="M5.5 5.5h4M5.5 8.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                            </svg>
-                            Расшифровка карты
-                        </button>
-                    </div>
-                    <div class="export-wrapper">
-                        <button class="btn-export" id="btn-export" aria-haspopup="true" aria-expanded="false">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <path d="M2.5 10.5v2h10v-2M7.5 1v8M4.5 6l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Экспорт</span>
-                            <svg class="chevron-icon" width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                <path d="M1 3.5l4 4 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <div class="export-dropdown" id="export-dropdown">
-                            <button class="export-item" id="export-png">
-                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                    <rect x="1.5" y="1.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.3"/>
-                                    <circle cx="5.5" cy="5.5" r="1.5" fill="currentColor"/>
-                                    <path d="M2 12.5l3.5-3.5 3 3 5-5 1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                Сохранить карту (PNG)
-                            </button>
-                            <button class="export-item" id="export-pdf">
-                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                    <rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                                    <path d="M5 5.5h6M5 8h6M5 10.5h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                                </svg>
-                                Скачать PDF (отчёт)
-                            </button>
-                            <button class="export-item" id="export-print">
-                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                    <path d="M4 5V1.5h8V5M2 5h12v7H2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
-                                    <path d="M4 9h8v5.5H4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
-                                    <circle cx="12" cy="7" r="1" fill="currentColor"/>
-                                </svg>
-                                Распечатать / PDF
-                            </button>
-                            <button class="export-item" id="export-copy">
-                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                    <rect x="4.5" y="4.5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                                    <path d="M2.5 11.5V3.5A1.5 1.5 0 0 1 4 2h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                                </svg>
-                                Скопировать отчёт
-                            </button>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.14 15.05"><rect class="cls_1" x="9.28" y="0.44" width="1.51" height="14.61"/><rect class="cls_1" x="1.3" y="11.38" width="11.84" height="1.51"/><path class="cls_1" d="M2.05,12c-.48-.13.71-.79,1.13-1.21a21.49,21.49,0,0,0,3-3.59A5,5,0,0,0,7,4.66a3.17,3.17,0,0,0-.71-2.09A2.35,2.35,0,0,0,4.4,1.72a2.34,2.34,0,0,0-1.94.91,3.89,3.89,0,0,0-.74,2.49L0,4.9A5.91,5.91,0,0,1,1.33,1.25,4,4,0,0,1,4.44,0,3.87,3.87,0,0,1,7.55,1.35,5,5,0,0,1,8.69,4.71a6.3,6.3,0,0,1-.33,2A8.29,8.29,0,0,1,7.24,8.77a29.87,29.87,0,0,1-2.58,3c-.25.26-.4.8-.69.72Z"/></svg>
+                            <h4>54.<span>4</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
+                        </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.21 17.21"><rect class="cls_1" x="1.74" y="1.03" width="1.31" height="16.18"/><rect class="cls_1" x="0.11" y="0.11" width="4.65" height="1.05" style="stroke:#1e1e1c;stroke-miterlimit:22.93;stroke-width:0.22px;"/><path class="cls_1" d="M2.86,4C7.12,3.54,9.17,4,10,6.16a3.24,3.24,0,0,1-.8,3.57,25.73,25.73,0,0,0-2.59,2.82c-.72,1.29-.27,2,1.58,2.87l-.53,1c-3.56-1.38-2.95-3.76.46-7,3-4-1.8-5.33-5.29-4.32Z" transform="translate(0 0.01)" style="fill-rule: evenodd;"/></svg>
+                            <h4>59.<span>5</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.94 9.35"><rect class="cls_1" width="5" height="1.04"/><rect class="cls_1" x="8.82" width="5.12" height="1.04"/><rect class="cls_1" y="1.62" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="1.62" width="5.12" height="1.04"/><rect class="cls_1" y="3.3" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="3.3" width="5.12" height="1.04"/><rect class="cls_1" y="4.89" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="4.89" width="5.12" height="1.04"/><rect class="cls_1" y="6.56" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="6.56" width="5.12" height="1.04"/><rect class="cls_1" y="8.31" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="8.31" width="5.12" height="1.04"/></svg>
+                        </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.39 18.26"><path class="cls_1" d="M6.7,5.37a6.57,6.57,0,0,1,6.69,6.44A6.57,6.57,0,0,1,6.7,18.26,6.58,6.58,0,0,1,0,11.81,6.58,6.58,0,0,1,6.7,5.37Zm0,1.22a5.34,5.34,0,0,0-5.44,5.22A5.34,5.34,0,0,0,6.7,17a5.33,5.33,0,0,0,5.43-5.23A5.33,5.33,0,0,0,6.7,6.59Z"/><rect class="cls_2" x="6.26" width="1.07" height="6.19"/><rect class="cls_2" x="3.92" y="3.35" width="5.5" height="0.95"/><rect class="cls_2" x="5.37" y="2.09" width="2.97" height="1.33"/><path class="cls_1" d="M6.67,6.76A2.21,2.21,0,1,1,4.42,9,2.23,2.23,0,0,1,6.67,6.76Z"/></svg>
+                            <h4>12.<span>5</span></h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" width="5.15" height="1.04"/><rect class="cls_1" y="1.62" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" y="1.62" width="5.15" height="1.04"/><rect class="cls_1" y="3.3" width="5.03" height="1.04"/><rect class="cls_1" x="8.78" y="3.3" width="5.15" height="1.04"/><rect class="cls_1" y="4.89" width="13.96" height="1.04"/><rect class="cls_1" y="6.56" width="13.96" height="1.04"/><rect class="cls_1" y="8.31" width="13.96" height="1.04"/></svg>
+                        </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17.41 16.38"><rect class="cls_1" x="7.98" width="1.11" height="16.38"/><rect class="cls_1" x="3.73" y="11.86" width="9.36" height="1.64"/><rect class="cls_1" y="2.69" width="5.3" height="0.98"/><rect class="cls_1" x="12.11" y="2.82" width="5.3" height="0.98"/><rect class="cls_1" x="6.87" y="1.31" width="3.53" height="1.31"/><path class="cls_2" d="M15.46.33A7,7,0,1,1,1.79,2.68,7,7,0,0,1,2.19.33H3.3a5.91,5.91,0,0,0-.47,2.35,6,6,0,1,0,12,0A5.91,5.91,0,0,0,14.35.33Z" transform="translate(-0.02)"/></svg>
+                            <h4>48.<span>6</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" y="8.31" width="5.06" height="1.04"/><rect class="cls_1" x="8.79" y="8.31" width="5.15" height="1.04"/><rect class="cls_1" y="6.69" width="5.07" height="1.04"/><rect class="cls_1" x="8.79" y="6.69" width="5.15" height="1.04"/><rect class="cls_1" y="5.02" width="5.06" height="1.04"/><rect class="cls_1" x="8.78" y="5.02" width="5.15" height="1.04"/><rect class="cls_1" y="3.42" width="13.96" height="1.04"/><rect class="cls_1" y="1.75" width="13.96" height="1.04"/><rect class="cls_1" width="13.96" height="1.04"/></svg>
+                        </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.11 15.08"><path class="cls_1" d="M10.11,4.65A3.9,3.9,0,0,0,8.3,1.21,8.68,8.68,0,0,0,3.39,0C2.81,0,1.68,0,0,.07.1,2.45.16,5.08.16,8,.16,10.66.1,13,0,15.08H9.26L9.2,13.37c-2.66.09-5.12.13-7.4.13,0-1.2.05-2.77.05-4.71.67,0,1.29.05,1.86.05a10.71,10.71,0,0,0,4.21-.65,3.55,3.55,0,0,0,2.19-3.54Zm-1.88-.2c0,1.89-1.6,2.84-4.82,2.84a14.4,14.4,0,0,1-1.56-.07c0-2,0-3.89.12-5.5a7.1,7.1,0,0,1,1.48-.1,7.22,7.22,0,0,1,3.73.69A2.35,2.35,0,0,1,8.23,4.45Z"/></svg>
+                            <h4>7.<span>3</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
                     </div>
                 </div>
-
-                <!-- Info cards strip -->
-                <div class="info-strip" id="info-strip">
-                    <div class="info-card">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="var(--primary)" stroke-width="1.3"/>
-                            <circle cx="8" cy="6" r="1.8" stroke="var(--primary)" stroke-width="1.3"/>
-                        </svg>
-                        <div class="info-card-body">
-                            <div class="info-card-title" id="ic-city">—</div>
-                            <div class="info-card-sub" id="ic-coords">—</div>
-                        </div>
-                    </div>
-                    <div class="info-card-divider"></div>
-                    <div class="info-card">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <circle cx="8" cy="8" r="6.5" stroke="var(--primary)" stroke-width="1.3"/>
-                            <path d="M8 4v4l2.5 2" stroke="var(--primary)" stroke-width="1.3" stroke-linecap="round"/>
-                        </svg>
-                        <div class="info-card-body">
-                            <div class="info-card-title">Часовой пояс</div>
-                            <div class="info-card-sub" id="ic-tz">—</div>
-                        </div>
-                    </div>
-                    <div class="info-card-divider"></div>
-                    <div class="info-card">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke="var(--primary)" stroke-width="1.3"/>
-                            <path d="M5 1.5v2M11 1.5v2M1.5 6.5h13" stroke="var(--primary)" stroke-width="1.3" stroke-linecap="round"/>
-                        </svg>
-                        <div class="info-card-body">
-                            <div class="info-card-title">Местное время</div>
-                            <div class="info-card-sub" id="ic-local">—</div>
-                            <div class="info-card-sub" id="ic-gmt">—</div>
-                        </div>
-                    </div>
-                    <div class="info-card-divider"></div>
-                    <div class="info-card">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke="var(--primary)" stroke-width="1.3"/>
-                            <path d="M5 1.5v2M11 1.5v2M1.5 6.5h13" stroke="var(--primary)" stroke-width="1.3" stroke-linecap="round"/>
-                        </svg>
-                        <div class="info-card-body">
-                            <div class="info-card-title">Юлианский день (UT)</div>
-                            <div class="info-card-sub" id="ic-jd">—</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- === TAB: PLANETS === -->
-                <div class="tab-content active" id="content-planets">
-                    <div class="natal-chart-layout layout-maximized">
-                        <!-- Chart wheel -->
-                        <div class="chart-section">
-                            <div class="chart-header">
-                                <h3 class="section-title">Карта рождения</h3>
-                                <div class="chart-header-actions" style="display: flex; gap: 8px; align-items: center;">
-                                    <button class="chart-action-btn" id="chart-layout-toggle" title="Свернуть / Развернуть карту">
-                                        <!-- Minimize icon: inward arrows -->
-                                        <svg class="icon-minimize" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                                            <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
-                                        </svg>
-                                        <!-- Maximize icon: outward arrows -->
-                                        <svg class="icon-maximize" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-                                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-                                        </svg>
-                                    </button>
-                                    <button class="chart-info-btn" title="О карте">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="8" r="6.5" stroke="#7A7585" stroke-width="1.2"/>
-                                            <path d="M8 7v4M8 5.5v.5" stroke="#7A7585" stroke-width="1.3" stroke-linecap="round"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chart-canvas" width="500" height="500" style="max-width:100%;height:auto;"></canvas>
-                            </div>
-                            <!-- Legend -->
-                            <div class="chart-legend">
-                                <div class="legend-item"><span class="legend-line conj"></span> Соединение (0°)</div>
-                                <div class="legend-item"><span class="legend-line trig"></span> Тригон (120°)</div>
-                                <div class="legend-item"><span class="legend-item-sep"></span></div>
-                                <div class="legend-item"><span class="legend-line squa"></span> Квадрат (90°)</div>
-                                <div class="legend-item"><span class="legend-line oppo"></span> Оппозиция (180°)</div>
-                            </div>
-                        </div>
-
-                        <!-- Planets table -->
-                        <div class="table-section">
-                            <h3 class="section-title">Планеты и Лунные Узлы</h3>
-                            <div class="table-wrap">
-                                <table class="data-table" id="planets-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 40px; text-align: center;"></th>
-                                            <th>Объект</th>
-                                            <th>Долгота</th>
-                                            <th>Знак</th>
-                                            <th>Градусы</th>
-                                            <th>Ретроградность</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="planets-tbody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- === TAB: HOUSES === -->
-                <div class="tab-content" id="content-houses">
-                    <div class="table-section" style="max-width:640px">
-                        <h3 class="section-title">Куспиды домов (Система Плацидус)</h3>
-                        <div class="table-wrap">
-                            <table class="data-table" id="houses-table">
-                                <thead>
-                                    <tr>
-                                        <th>Дом</th>
-                                        <th>Долгота</th>
-                                        <th>Знак</th>
-                                        <th>Градусы</th>
-                                        <th>Программа (Гексаграмма)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="houses-tbody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- === TAB: HEXAGRAMS (Programs) === -->
-                <div class="tab-content" id="content-hexagrams">
-                    <div class="table-section">
-                        <h3 class="section-title">Программы (Гексаграммы)</h3>
-                        <p class="hexagram-subtitle">Расчёт программ по градусам эклиптики. Каждая планета попадает в одну из 64 программ (гексаграмм), которая далее делится на Линию, Цвет, Тон, Базу и Теос.</p>
-                        <div class="table-wrap">
-                            <table class="data-table" id="hexagrams-table">
-                                <thead>
-                                    <tr>
-                                        <th>Объект</th>
-                                        <th>Прогр.</th>
-                                        <th>Линия</th>
-                                        <th>Цвет</th>
-                                        <th>Тон</th>
-                                        <th>База</th>
-                                        <th>Теос</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="hexagrams-tbody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                                <!-- === TAB: BODYGRAPH === -->
-                <div class="tab-content" id="content-bodygraph">
-                    <div class="bg-layout">
-                        <!-- LEFT: Red/Design column -->
-                        <div class="bg-col bg-col-design" id="bg-col-design">
-                            <div class="bg-col-title bg-col-title-design">
-                                <span class="bg-header-crystal">◆</span> ДИЗАЙН
-                                <span class="bg-header-sub">Бессознательное</span>
-                            </div>
-                            <div class="bg-planet-list" id="bg-design-list">
-                                <!-- Populated by JS -->
-                            </div>
-                        </div>
-
-                        <!-- CENTER: SVG Bodygraph -->
-                        <div class="bg-center-wrap">
-<div class="bg-svg-wrap" id="bodygraph-svg-wrap">
+                <div class="center_block">
                     <svg id="Слой_1" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 330.55 476.35">
                         <defs>
-                                <pattern id="grad-both" width="10" height="10" patternUnits="userSpaceOnUse">
-                                    <rect width="10" height="10" fill="#fe0000" />
-                                    <path d="M-5,5 L5,-5 M0,10 L10,0 M5,15 L15,5" stroke="#000000" stroke-width="3.5" />
-                                </pattern>
-                                <linearGradient id="half_black_red" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="50%" stop-color="#000000" />
-                                    <stop offset="50%" stop-color="#fe0000" />
-                                </linearGradient>
                                 <radialGradient id="GradientFill_1" cx="175.6" cy="321.3" r="322.82" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="0.23" stop-color="#f8f8f8"/><stop offset="0.4" stop-color="#efeeee"/><stop offset="0.55" stop-color="#e5e5e5"/><stop offset="0.7" stop-color="#e0e0e0"/><stop offset="1" stop-color="#dadada"/></radialGradient>
                                 <radialGradient id="GradientFill_2" cx="162.93" cy="171.09" r="37.12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f4a641"/><stop offset="1" stop-color="#ef7d00"/></radialGradient>
                                 <clipPath id="clip-path" transform="translate(0.37 -2.51)">
@@ -563,21 +129,21 @@
                             <path class="cls-19 cls__ cls__26" d="M57.3,7.29A224.58,224.58,0,0,1,80.2,3.21l0,5.61c-7.18,1.12-14.85,2.44-22,4.13Z" 
                             transform="translate(66.8 285.4)"/>
                             <g class="cls-19 cls__ cls_26">
-                                <rect class="cls-19 cls__ cls__26" width="2.03" height="5.5" x="198" y="285.8" />
-                                <rect class="cls-19 cls__ cls__26" width="1.99" height="5.4" x="191.5" y="285.94" />
-                                <rect class="cls-19 cls__ cls__26" width="1.99" height="5.4" x="184" y="286.8" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.5" x="198" y="285.8" />
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.4" x="191.5" y="285.94" />
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.4" x="184" y="286.8" 
                                     transform="rotate(-0.2)"/>
-                                <rect class="cls-19 cls__ cls__26" width="1.99" height="5.4" x="175.9" y="287.4" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.4" x="175.9" y="287.4" 
                                     transform="rotate(-0.3)"/>
-                                <rect class="cls-19 cls__ cls__26" width="1.88" height="5.1" x="165.5" y="288.7" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.1" x="165.5" y="288.7" 
                                     transform="rotate(-0.5)"/>
-                                <rect class="cls-19 cls__ cls__26" width="1.88" height="5.1" x="145" y="294" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.1" x="145" y="294" 
                                     transform="rotate(-2.1)"/> 
-                                <rect class="cls-19 cls__ cls__26" width="1.88" height="5.1" x="110" y="303.2" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.1" x="110" y="303.2" 
                                     transform="rotate(-6)"/> 
-                                <rect class="cls-19 cls__ cls__26" width="1.88" height="5.1" x="91" y="307.1" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.1" x="91" y="307.1" 
                                     transform="rotate(-8)"/>
-                                <rect class="cls-19 cls__ cls__26" width="1.88" height="5.1" x="76" y="309.5" 
+                                <rect class="cls-19 cls__ cls__26" width="2.36" height="5.1" x="76" y="309.5" 
                                     transform="rotate(-9.3)"/> 
                             </g>
                             <rect class="cls-9" x="159.7" y="51.13" width="6.32" height="381.05"/>
@@ -629,11 +195,11 @@
                             <path class="cls-19 cls__ cls__32" d="M29.89,38l4.86-6.3c-10.31-7-21.44-18.39-28-31.84A11.45,11.45,0,0,1,.37,4.13C8.84,19.8,16.22,27.73,29.89,38Z" 
                             transform="translate(68.7 355.5) rotate(0)"/>
                             <g class="cls-19 cls__ cls_32">
-                                <rect class="cls-19 cls__ cls__32" x="-131.99" y="347" width="7.4" height="2.73" transform="rotate(-32)" />
-                                <rect class="cls-19 cls__ cls__32" x="-138" y="352.5" width="7.3" height="2.69" transform="rotate(-33)" />
-                                <rect class="cls-19 cls__ cls__32" x="-155.9" y="352.8" width="7.3" height="2.69" transform="rotate(-36)" />
-                                <rect class="cls-19 cls__ cls__32" x="-183.2" y="348.3" width="7.1" height="2.62" transform="rotate(-40.6)" />
-                                <rect class="cls-19 cls__ cls__32" x="-208.8" y="341.7" width="7.0" height="2.58" transform="rotate(-45)" />
+                                <rect class="cls-19 cls__ cls__32" x="-131.99" y="347" width="7.4" height="3.76" transform="rotate(-32)" />
+                                <rect class="cls-19 cls__ cls__32" x="-138" y="352.5" width="7.3" height="3.76" transform="rotate(-33)" />
+                                <rect class="cls-19 cls__ cls__32" x="-155.9" y="352.8" width="7.3" height="3.76" transform="rotate(-36)" />
+                                <rect class="cls-19 cls__ cls__32" x="-183.2" y="348.3" width="7.1" height="3.76" transform="rotate(-40.6)" />
+                                <rect class="cls-19 cls__ cls__32" x="-208.8" y="341.7" width="7.0" height="3.76" transform="rotate(-45)" />
                             </g>
                             <path class="cls-8" d="M40.69,321.35C44.46,262,85.28,188,138.87,162.88l50.08,0c60.76,20.55,94.12,113.64,97.65,157.92l-5.91,1.86c-7-66.6-42-131.82-91.94-153.66L138.34,170c-48.69,22.18-83.87,99.12-92,151.58-.2,1.28,0,4.34-.95,3.63Z" transform="translate(0.37 -2.51)" />
                             <path class="cls-17 cls__ cls__34" d="M9.33,5a22.09,22.09,0,0,1,.42-2.5,16.81,16.81,0,0,1-2.1-.72A15.46,15.46,0,0,0,4.15.65,2.23,2.23,0,0,1,3.54.43C2.29,4.61,1.17,8.81.21,13a6.22,6.22,0,0,1,.48,1.09v0A20,20,0,0,1,2.43,17c1,1.82,1.74,3.78,2.86,5.52a2.17,2.17,0,0,1,.19.41,2.4,2.4,0,0,1,.37.53l.09.09v0A117.34,117.34,0,0,0,16.52,35c1.5-1.47,3-3,4.72-4.46C14.31,23.66,10.13,17.21,9.33,5Z" 
@@ -641,27 +207,27 @@
                             <path class="cls-17 cls__ cls__34" d="M21.49,39.65c14.61,12,33.38,19,57.17,20.14l-.13-7A92.78,92.78,0,0,1,26.8,35.09,25.21,25.21,0,0,0,21.49,39.65Z" 
                             transform="translate(58.4 281)"/>
                             <g class="cls-19 cls__ cls_34">
-                                <rect class="cls-19 cls__ cls__34" x="-97.4" y="-282.7" width="7.7" height="2.84" transform="rotate(186)" />
-                                <rect class="cls-19 cls__ cls__34" x="-100.8" y="-290.7" width="7" height="2.58" transform="rotate(186)" />
-                                <rect class="cls-19 cls__ cls__34" x="148.8" y="-273" width="7" height="2.58" transform="rotate(138)" />
-                                <rect class="cls-19 cls__ cls__34" x="173.4" y="-267.5" width="6.5" height="2.4" transform="rotate(133)" />
-                                <rect class="cls-19 cls__ cls__34" x="210.2" y="-258" width="6.8" height="2.51" transform="rotate(125)" />
-                                <rect class="cls-19 cls__ cls__34" x="231.9" y="-247" width="6.8" height="2.51" transform="rotate(120)" />
-                                <rect class="cls-19 cls__ cls__34" x="252.5" y="-233" width="6.8" height="2.51" transform="rotate(115)" />
-                                <rect class="cls-19 cls__ cls__34" x="271.6" y="-218" width="7" height="2.58" transform="rotate(110)" />
-                                <rect class="cls-19 cls__ cls__34" x="289.6" y="-201" width="6.8" height="2.51" transform="rotate(105)" />
-                                <rect class="cls-19 cls__ cls__34" x="306.1" y="-182.5" width="6.6" height="2.43" transform="rotate(100)" />
-                                <rect class="cls-19 cls__ cls__34" x="320.8" y="-162.5" width="6.8" height="2.51" transform="rotate(95)" />
+                                <rect class="cls-19 cls__ cls__34" x="-97.4" y="-282.7" width="7.7" height="2.36" transform="rotate(186)" />
+                                <rect class="cls-19 cls__ cls__34" x="-100.8" y="-290.7" width="7" height="2.36" transform="rotate(186)" />
+                                <rect class="cls-19 cls__ cls__34" x="148.8" y="-273" width="7" height="2.36" transform="rotate(138)" />
+                                <rect class="cls-19 cls__ cls__34" x="173.4" y="-267.5" width="6.5" height="2.36" transform="rotate(133)" />
+                                <rect class="cls-19 cls__ cls__34" x="210.2" y="-258" width="6.8" height="2.36" transform="rotate(125)" />
+                                <rect class="cls-19 cls__ cls__34" x="231.9" y="-247" width="6.8" height="2.36" transform="rotate(120)" />
+                                <rect class="cls-19 cls__ cls__34" x="252.5" y="-233" width="6.8" height="2.36" transform="rotate(115)" />
+                                <rect class="cls-19 cls__ cls__34" x="271.6" y="-218" width="7" height="2.36" transform="rotate(110)" />
+                                <rect class="cls-19 cls__ cls__34" x="289.6" y="-201" width="6.8" height="2.36" transform="rotate(105)" />
+                                <rect class="cls-19 cls__ cls__34" x="306.1" y="-182.5" width="6.6" height="2.36" transform="rotate(100)" />
+                                <rect class="cls-19 cls__ cls__34" x="320.8" y="-162.5" width="6.8" height="2.36" transform="rotate(95)" />
                             </g>
                             <path class="cls-12" d="M224.35,265.93,205.05,287c-4,4.58-3.71,9.77,2.15,11L243,304c6,.27,8.53-2.72,5.58-9.86l-11.86-26.66C234.51,262.61,230.11,258.65,224.35,265.93Z" transform="translate(0.37 -2.51)"/>
                             <path class="cls-8 block__5" d="M224.35,265.93,205.05,287c-4,4.58-3.71,9.77,2.15,11L243,304c6,.27,8.53-2.72,5.58-9.86l-11.86-26.66C234.51,262.61,230.11,258.65,224.35,265.93Z" transform="translate(0.37 -2.51)"/>
                             <path class="cls-19 cls__ cls__21" d="M228.26,261a6.23,6.23,0,0,1,6.23,1.07c.75-11.44-4.38-25.82-11.83-37.68L217.12,228C224.31,240.61,228.15,251.88,228.26,261Z" transform="translate(0.37 -2.51)"/>
                             <g class="cls__ cls_21">
-                                <rect class="cls-19 cls__ cls__21" width="2.36" height="6.4" x="296.5" y="-124.3" transform="rotate(68)" />
-                                <rect class="cls-19 cls__ cls__21" width="2.36" height="6.4" x="296.5" y="-124.3" transform="rotate(68)" />
-                                <rect class="cls-19 cls__ cls__21" width="2.36" height="6.4" x="300.5" y="-135.5" transform="rotate(70)" />
-                                <rect class="cls-19 cls__ cls__21" width="2.36" height="6.4" x="296" y="-161.5" transform="rotate(75)" />
-                                <rect class="cls-19 cls__ cls__21" width="2.36" height="6.4" x="279" y="-202" transform="rotate(83)" />
+                                <rect class="cls-19 cls__ cls__21" width="3" height="6.4" x="296.5" y="-124.3" transform="rotate(68)" />
+                                <rect class="cls-19 cls__ cls__21" width="3" height="6.4" x="296.5" y="-124.3" transform="rotate(68)" />
+                                <rect class="cls-19 cls__ cls__21" width="3" height="6.4" x="300.5" y="-135.5" transform="rotate(70)" />
+                                <rect class="cls-19 cls__ cls__21" width="3" height="6.4" x="296" y="-161.5" transform="rotate(75)" />
+                                <rect class="cls-19 cls__ cls__21" width="3" height="6.4" x="279" y="-202" transform="rotate(83)" />
                             </g>
                             <path class="cls-30 cls__ cls__21 cls______21" d="M71.45,361A5.17,5.17,0,1,1,73,353.75,5.25,5.25,0,0,1,71.45,361Z" 
                             transform="translate(161 -90)"/>
@@ -671,8 +237,8 @@
                             <path class="cls-17 cls__ cls__51" d="M14.88,11.1C14.76,9.2,10,4.5,4.3.15a22.72,22.72,0,0,1-1.52,2c-.19.24-.38.47-.58.7l-.27.34-.11.14-.09.12-.11.13-.11.15-.27.38-.46.71a.92.92,0,0,1-.26.29C6.22,10,10.89,15.38,10.11,16.2Z" 
                             transform="translate(204.3 257)"/>
                             <g class="cls__ cls_51">
-                                <rect class="cls-19 cls__ cls__51" width="2.36" height="6.4" x="342" y="-7.7" transform="rotate(52)" />
-                                <rect class="cls-19 cls__ cls__51" width="2.29" height="6.2" x="332.5" y="34" transform="rotate(45)" />
+                                <rect class="cls-19 cls__ cls__51" width="3" height="6.4" x="342" y="-7.7" transform="rotate(52)" />
+                                <rect class="cls-19 cls__ cls__51" width="3" height="6.2" x="332.5" y="34" transform="rotate(45)" />
                             </g>
                             <path class="red_border cls__ cls__51 cls______51" d="M71.45,361A5.17,5.17,0,1,1,73,353.75,5.25,5.25,0,0,1,71.45,361Z" 
                             transform="translate(151 -79)"/>
@@ -686,10 +252,10 @@
                             <path class="cls-17 cls__ cls__54" d="M.27,6.42,5.13.12A89.38,89.38,0,0,0,41.7,14.77c-1.8.47-2.66,4.91-1.72,6.75C26.69,19.44,13.81,14.5.27,6.42Z" 
                             transform="translate(98 387)"/>
                             <g class="cls-19 cls__ cls_54">
-                                <rect class="cls-19 cls__ cls__54" x="-363.1" y="224" width="6.9" height="2.54" transform="rotate(-76)" />
-                                <rect class="cls-19 cls__ cls__54" x="-342.5" y="246" width="6.9" height="2.54" transform="rotate(-71)" />
-                                <rect class="cls-19 cls__ cls__54" x="-324.9" y="260" width="6.9" height="2.54" transform="rotate(-67)" />
-                                <rect class="cls-19 cls__ cls__54" x="-296.3" y="283" width="6.9" height="2.54" transform="rotate(-61)" />
+                                <rect class="cls-19 cls__ cls__54" x="-363.1" y="224" width="6.9" height="3.76" transform="rotate(-76)" />
+                                <rect class="cls-19 cls__ cls__54" x="-342.5" y="246" width="6.9" height="3.76" transform="rotate(-71)" />
+                                <rect class="cls-19 cls__ cls__54" x="-324.9" y="260" width="6.9" height="3.76" transform="rotate(-67)" />
+                                <rect class="cls-19 cls__ cls__54" x="-296.3" y="283" width="6.9" height="3.76" transform="rotate(-61)" />
                             </g>
                             <path class="cls-11 a51" d="M215.48,281.38l1-.1a.84.84,0,0,0,.24.51.67.67,0,0,0,1-.05,1.19,1.19,0,0,0,.2-.74,1,1,0,0,0-.2-.69.68.68,0,0,0-.54-.23,1,1,0,0,0-.74.36l-.78-.11.49-2.61h2.54v.9h-1.81l-.15.85a1.52,1.52,0,0,1,.65-.16,1.46,1.46,0,0,1,1.09.47,1.69,1.69,0,0,1,.44,1.2,1.82,1.82,0,0,1-.36,1.11,1.57,1.57,0,0,1-1.35.66,1.65,1.65,0,0,1-1.13-.37,1.52,1.52,0,0,1-.53-1Zm6.34,1.28h-1V279a3.24,3.24,0,0,1-1.24.73v-.87a2.84,2.84,0,0,0,.81-.46,1.75,1.75,0,0,0,.61-.81h.78Z" transform="translate(0.37 -2.51)"/>
                             <path class="cls-30 cls__ cls__26 cls______26" d="M71.45,361A5.17,5.17,0,1,1,73,353.75,5.25,5.25,0,0,1,71.45,361Z" 
@@ -700,9 +266,9 @@
                             <path class="cls-19 cls__ cls__40" d="M10.41,16.72l0,0c.28-.09.56-.14.83-.23s.24-.09.36-.13a2,2,0,0,1,.35-.09l0,0,0,0a.93.93,0,0,1,.39-.12C10.77,10,7.18,4.59,1.49-.16,1.42,3.36.44,4.3-.42,5.29A25.61,25.61,0,0,1,7.29,17.55s.08,0,.11,0h.1l.13,0,.1,0h0l0,0h.1l.05,0c.34-.12.7-.14,1-.23L9.47,17l.2,0a1.15,1.15,0,0,1,.33-.09A2,2,0,0,1,10.41,16.72Z"
                             transform="translate(250 296.3)"/>
                             <g class="cls__ cls_40">
-                                <rect class="cls-19 cls__ cls__40" width="1.84" height="5" x="391" y="-2.9" transform="rotate(50)" />
-                                <rect class="cls-19 cls__ cls__40" width="1.84" height="5" x="393" y="-58.3" transform="rotate(58)" />
-                                <rect class="cls-19 cls__ cls__40" width="1.84" height="5" x="391.5" y="-99.3" transform="rotate(64)" />
+                                <rect class="cls-19 cls__ cls__40" width="3" height="5" x="391" y="-2.9" transform="rotate(50)" />
+                                <rect class="cls-19 cls__ cls__40" width="3" height="5" x="393" y="-58.3" transform="rotate(58)" />
+                                <rect class="cls-19 cls__ cls__40" width="3" height="5" x="391.5" y="-99.3" transform="rotate(64)" />
                             </g>
                             <path class="cls-30 cls__ cls__40 cls______40" d="M71.45,361A5.17,5.17,0,1,1,73,353.75,5.25,5.25,0,0,1,71.45,361Z" 
                             transform="translate(172.5 -62)"/>
@@ -844,34 +410,34 @@
                                 <rect x="56.62" y="331.16" width="66.18" height="85.53" transform="translate(-294.3 382.43) rotate(-78.15)"/>
                             </g>
                             <g class="cls-22 cls__ cls_12">
-                                <rect class="cls-19 cls__ cls__12" x="197.36" y="185.64" width="13.5" height="4.98" transform="translate(-61.66 260.01) rotate(-58.35)"/>
-                                <rect class="cls-19 cls__ cls__12" x="226.36" y="217.11" width="13.5" height="4.98" transform="translate(-85.87 214.85) rotate(-42.95)"/>
-                                <rect class="cls-19 cls__ cls__12" x="190.67" y="182.39" width="13.5" height="4.98" transform="translate(-62.07 252.78) rotate(-58.35)"/>
-                                <rect class="cls-19 cls__ cls__12" x="221.62" y="211.22" width="13.5" height="4.98" transform="translate(-83.13 210.05) rotate(-42.95)"/>
-                                <rect class="cls-19 cls__ cls__12" x="184.88" y="178.93" width="13.5" height="4.98" transform="translate(-61.88 246.2) rotate(-58.35)"/>
-                                <rect class="cls-19 cls__ cls__12" x="217.72" y="205.56" width="13.5" height="4.98" transform="translate(-80.32 205.88) rotate(-42.95)"/>
-                                <rect class="cls-19 cls__ cls__12" x="202.33" y="190.39" width="13.5" height="4.98" transform="matrix(0.52, -0.85, 0.85, 0.52, -63.34, 266.5)"/>
-                                <rect class="cls-19 cls__ cls__12" x="230.18" y="223.5" width="13.5" height="4.98" transform="translate(-89.2 219.18) rotate(-42.95)"/>
-                                <rect class="cls-19 cls__ cls__12" x="240.62" y="242.21" width="13.5" height="4.98" transform="translate(-91.97 170.01) rotate(-32.75)"/>
-                                <rect class="cls-19 cls__ cls__12" x="207.74" y="194.62" width="13.5" height="4.98" transform="translate(-64.36 273.11) rotate(-58.35)"/>
-                                <rect class="cls-19 cls__ cls__12" x="233.7" y="229.92" width="13.5" height="4.98" transform="translate(-92.64 223.29) rotate(-42.95)"/>
-                                <rect class="cls-19 cls__ cls__12" x="244.19" y="246.98" width="13.5" height="4.98" transform="translate(-93.99 172.7) rotate(-32.75)"/>
-                                <rect class="cls-19 cls__ cls__12" x="213.22" y="200.09" width="13.5" height="4.98" transform="translate(-76.87 222.4) rotate(-47.01)"/>
-                                <rect class="cls-19 cls__ cls__12" x="236.88" y="235.66" width="13.5" height="4.98" transform="translate(-93.47 194.87) rotate(-37.52)"/>
-                                <rect class="cls-19 cls__ cls__12" x="247.25" y="252.97" width="13.5" height="4.98" transform="translate(-87.94 142.41) rotate(-27.32)"/>
+                                <rect class="cls-19 cls__ cls__12" x="197.36" y="185.64" width="13.5" height="2.36" transform="translate(-61.66 260.01) rotate(-58.35)"/>
+                                <rect class="cls-19 cls__ cls__12" x="226.36" y="217.11" width="13.5" height="2.36" transform="translate(-85.87 214.85) rotate(-42.95)"/>
+                                <rect class="cls-19 cls__ cls__12" x="190.67" y="182.39" width="13.5" height="2.36" transform="translate(-62.07 252.78) rotate(-58.35)"/>
+                                <rect class="cls-19 cls__ cls__12" x="221.62" y="211.22" width="13.5" height="2.36" transform="translate(-83.13 210.05) rotate(-42.95)"/>
+                                <rect class="cls-19 cls__ cls__12" x="184.88" y="178.93" width="13.5" height="2.36" transform="translate(-61.88 246.2) rotate(-58.35)"/>
+                                <rect class="cls-19 cls__ cls__12" x="217.72" y="205.56" width="13.5" height="2.36" transform="translate(-80.32 205.88) rotate(-42.95)"/>
+                                <rect class="cls-19 cls__ cls__12" x="202.33" y="190.39" width="13.5" height="2.36" transform="matrix(0.52, -0.85, 0.85, 0.52, -63.34, 266.5)"/>
+                                <rect class="cls-19 cls__ cls__12" x="230.18" y="223.5" width="13.5" height="2.36" transform="translate(-89.2 219.18) rotate(-42.95)"/>
+                                <rect class="cls-19 cls__ cls__12" x="240.62" y="242.21" width="13.5" height="2.36" transform="translate(-91.97 170.01) rotate(-32.75)"/>
+                                <rect class="cls-19 cls__ cls__12" x="207.74" y="194.62" width="13.5" height="2.36" transform="translate(-64.36 273.11) rotate(-58.35)"/>
+                                <rect class="cls-19 cls__ cls__12" x="233.7" y="229.92" width="13.5" height="2.36" transform="translate(-92.64 223.29) rotate(-42.95)"/>
+                                <rect class="cls-19 cls__ cls__12" x="244.19" y="246.98" width="13.5" height="2.36" transform="translate(-93.99 172.7) rotate(-32.75)"/>
+                                <rect class="cls-19 cls__ cls__12" x="213.22" y="200.09" width="13.5" height="2.36" transform="translate(-76.87 222.4) rotate(-47.01)"/>
+                                <rect class="cls-19 cls__ cls__12" x="236.88" y="235.66" width="13.5" height="2.36" transform="translate(-93.47 194.87) rotate(-37.52)"/>
+                                <rect class="cls-19 cls__ cls__12" x="247.25" y="252.97" width="13.5" height="2.36" transform="translate(-87.94 142.41) rotate(-27.32)"/>
                             </g>
                             <path class="cls-11 a31" d="M146.25,191.59l.93-.11a.9.9,0,0,0,.24.54.67.67,0,0,0,.47.19.66.66,0,0,0,.5-.23.9.9,0,0,0,.2-.61.8.8,0,0,0-.19-.57.63.63,0,0,0-.48-.21,1.59,1.59,0,0,0-.44.07l.11-.78a.85.85,0,0,0,.59-.17.6.6,0,0,0,.21-.48.54.54,0,0,0-.15-.4.55.55,0,0,0-.4-.15.54.54,0,0,0-.42.17.8.8,0,0,0-.22.5l-.88-.15a1.83,1.83,0,0,1,.28-.73,1.31,1.31,0,0,1,.52-.43,1.78,1.78,0,0,1,.74-.15,1.5,1.5,0,0,1,1.14.45,1.14,1.14,0,0,1-.37,1.88,1.18,1.18,0,0,1,.69.42,1.19,1.19,0,0,1,.26.77,1.49,1.49,0,0,1-.49,1.13,1.8,1.8,0,0,1-2.32.07,1.53,1.53,0,0,1-.52-1Zm6.38,1.33h-1V189.3a3.29,3.29,0,0,1-1.24.73v-.88a2.77,2.77,0,0,0,.82-.46,1.82,1.82,0,0,0,.6-.8h.78Z" transform="translate(0.37 -2.51)"/>
                             <path class="cls-17 cls__ cls__10" d="M74.09.37C55,.48,34.44,3.19,15.75,12.74v0l-.25.09a2,2,0,0,1-.71.33l-1.29.53c-.47.19-1.15.57-1.75.77l-.25.12-.16.07h0l-.06,0-.22.09,0,0,.12,0a.53.53,0,0,0-.16,0l0,0h.15a.85.85,0,0,0-.29.09.84.84,0,0,1-.23.12l-.15.08-.27.11a1.72,1.72,0,0,1-.38.16,2.68,2.68,0,0,1-.33.18l-.25.15a2.62,2.62,0,0,1-.33.17l-.08.05c-.15.1-.3.2-.45.28L8,16.39l-.1.06,0,0-.27.13-.25.14c-.13.09-.27.19-.41.27A207,207,0,0,0-.11,37.53c2.24.18,4.47.43,6.69.79,3.67-21.29,31-28.78,65.58-30C71.66,6.76,72,3.79,74.09.37Z" 
                             transform="translate(61.5 245.6)"/>
                             <g class="cls-19 cls__ cls_10">
-                                <rect class="cls-19 cls__ cls__10" x="263" y="67" width="7.4" height="2.73" transform="rotate(60)" />
-                                <rect class="cls-19 cls__ cls__10" x="267.2" y="34" width="7.6" height="2.8" transform="rotate(65)" />
-                                <rect class="cls-19 cls__ cls__10" x="269" y="1" width="7.35" height="2.71" transform="rotate(70)" />
-                                <rect class="cls-19 cls__ cls__10" x="268" y="-32" width="7.2" height="2.65" transform="rotate(75)" />
-                                <rect class="cls-19 cls__ cls__10" x="264.1" y="-65" width="7.2" height="2.65" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__10" x="257.05" y="-98" width="7.4" height="2.73" transform="rotate(85)" />
-                                <rect class="cls-19 cls__ cls__10" x="246.7" y="-130" width="7.4" height="2.73" transform="rotate(90)" />
-                                <rect class="cls-19 cls__ cls__10" x="154" y="233" width="7" height="2.58" transform="rotate(20)" />
+                                <rect class="cls-19 cls__ cls__10" x="263" y="67" width="7.4" height="2.36" transform="rotate(60)" />
+                                <rect class="cls-19 cls__ cls__10" x="267.2" y="34" width="7.6" height="2.36" transform="rotate(65)" />
+                                <rect class="cls-19 cls__ cls__10" x="269" y="1" width="7.35" height="2.36" transform="rotate(70)" />
+                                <rect class="cls-19 cls__ cls__10" x="268" y="-32" width="7.2" height="2.36" transform="rotate(75)" />
+                                <rect class="cls-19 cls__ cls__10" x="264.1" y="-65" width="7.2" height="2.36" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__10" x="257.05" y="-98" width="7.4" height="2.36" transform="rotate(85)" />
+                                <rect class="cls-19 cls__ cls__10" x="246.7" y="-130" width="7.4" height="2.36" transform="rotate(90)" />
+                                <rect class="cls-19 cls__ cls__10" x="154" y="233" width="7" height="2.36" transform="rotate(20)" />
                             </g>
                             <path class="cls-17 cls__ cls__20" d="M60.39,288.16l6.5.07c9-36.79,46.47-93,74.31-106.67L138,176C103.68,192.32,69.13,249.9,60.39,288.16Z" transform="translate(0.37 -2.51)"/>
                             <path class="cls-21 cls__ cls__20 cls______20" d="M140,178.66a5.16,5.16,0,1,0,1.78-7.21A5.25,5.25,0,0,0,140,178.66Z" transform="translate(0.37 -2.51)"/>
@@ -900,8 +466,8 @@
                             <path class="cls-17 cls__ cls__25" d="M14.72,13.23a2.19,2.19,0,0,0,.21-.23l-.06.08a1.2,1.2,0,0,1,.23-.22,7.92,7.92,0,0,1,1.28-1.31C17,11,17.57,10.4,18.2,9.85,12,5.05,4.47.48.25.31c1.26,2,.81,4.76.67,6.08,3.57.83,8.42,4.15,12.68,7.79a1.3,1.3,0,0,1,.17-.08l0,0c.28-.24.55-.5.81-.76C14.63,13.27,14.68,13.26,14.72,13.23Z" 
                             transform="translate(191 248) rotate(-1)"/>
                             <g class="cls__ cls_25">
-                                <rect class="cls-19 cls__ cls__25" width="2.03" height="5.5" x="294" y="118.2" transform="rotate(30)" />
-                                <rect class="cls-19 cls__ cls__25" width="2.03" height="5.5" x="312" y="91.3" transform="rotate(35)" />
+                                <rect class="cls-19 cls__ cls__25" width="3" height="5.5" x="294" y="118.2" transform="rotate(30)" />
+                                <rect class="cls-19 cls__ cls__25" width="3" height="5.5" x="312" y="91.3" transform="rotate(35)" />
                             </g>
                             <path class="cls-21 cls__ cls__25 cls______25" d="M150,236.15a5.17,5.17,0,1,1-5.34,5.16A5.25,5.25,0,0,1,150,236.15Z" 
                             transform="translate(34 11)"/>
@@ -950,40 +516,40 @@
                             <path class="cls-19 cls__ cls__18" d="M43.19,37.11C27,27.59,14,14.93,5.76-.48l-6,3.67c8.86,17.36,22.39,30.88,39.47,41A72.24,72.24,0,0,0,43.19,37.11Z" 
                             transform="translate(46 374)"/>
                             <g class="cls-19 cls__ cls_18">
-                                <rect class="cls-19 cls__ cls__18" x="-161.6" y="347" width="7.4" height="2.73" transform="rotate(-32)" />
-                                <rect class="cls-19 cls__ cls__18" x="-167.2" y="352.5" width="7.3" height="2.69" transform="rotate(-33)" />
-                                <rect class="cls-19 cls__ cls__18" x="-185.1" y="352.8" width="7.3" height="2.69" transform="rotate(-36)" />
-                                <rect class="cls-19 cls__ cls__18" x="-212.3" y="347.3" width="7.1" height="2.62" transform="rotate(-40.6)" />
-                                <rect class="cls-19 cls__ cls__18" x="-237.7" y="340.7" width="7.0" height="2.58" transform="rotate(-45)" />
-                                <rect class="cls-19 cls__ cls__18" x="-277" y="319.7" width="7.0" height="2.58" transform="rotate(-52)" />
+                                <rect class="cls-19 cls__ cls__18" x="-161.6" y="347" width="7.4" height="3.76" transform="rotate(-32)" />
+                                <rect class="cls-19 cls__ cls__18" x="-167.2" y="352.5" width="7.3" height="3.76" transform="rotate(-33)" />
+                                <rect class="cls-19 cls__ cls__18" x="-185.1" y="352.8" width="7.3" height="3.76" transform="rotate(-36)" />
+                                <rect class="cls-19 cls__ cls__18" x="-212.3" y="347.3" width="7.1" height="3.76" transform="rotate(-40.6)" />
+                                <rect class="cls-19 cls__ cls__18" x="-237.7" y="340.7" width="7.0" height="3.76" transform="rotate(-45)" />
+                                <rect class="cls-19 cls__ cls__18" x="-277" y="319.7" width="7.0" height="3.76" transform="rotate(-52)" />
                             </g>
                             <path class="cls-17 cls__ cls__28" d="M37.86,41.93c.46-.8.93-1.58,1.46-2.33s1.29-1.73,2-2.58A83.06,83.06,0,0,1,6.4,0L-.06,4.19C8.18,21.8,20.87,34.62,37,43.59,37.23,43,37.55,42.47,37.86,41.93Z" 
                             transform="translate(56.5 361.5) rotate(1.9)"/>
                             <g class="cls-19 cls__ cls_28">
-                                <rect class="cls-19 cls__ cls__28" x="-146.6" y="347" width="7.4" height="2.73" transform="rotate(-32)" />
-                                <rect class="cls-19 cls__ cls__28" x="-152.8" y="352.5" width="7.3" height="2.69" transform="rotate(-33)" />
-                                <rect class="cls-19 cls__ cls__28" x="-171.1" y="352" width="7.3" height="2.69" transform="rotate(-36)" />
-                                <rect class="cls-19 cls__ cls__28" x="-198.4" y="346" width="7.1" height="2.62" transform="rotate(-40.6)" />
-                                <rect class="cls-19 cls__ cls__28" x="-223.9" y="339" width="7.0" height="2.58" transform="rotate(-45)" />
-                                <rect class="cls-19 cls__ cls__28" x="-246.2" y="331.7" width="7.0" height="2.58" transform="rotate(-49)" />
+                                <rect class="cls-19 cls__ cls__28" x="-146.6" y="347" width="7.4" height="3.76" transform="rotate(-32)" />
+                                <rect class="cls-19 cls__ cls__28" x="-152.8" y="352.5" width="7.3" height="3.76" transform="rotate(-33)" />
+                                <rect class="cls-19 cls__ cls__28" x="-171.1" y="352" width="7.3" height="3.76" transform="rotate(-36)" />
+                                <rect class="cls-19 cls__ cls__28" x="-198.4" y="346" width="7.1" height="3.76" transform="rotate(-40.6)" />
+                                <rect class="cls-19 cls__ cls__28" x="-223.9" y="339" width="7.0" height="3.76" transform="rotate(-45)" />
+                                <rect class="cls-19 cls__ cls__28" x="-246.2" y="331.7" width="7.0" height="3.76" transform="rotate(-49)" />
                             </g>
                             <path class="cls-19 cls__ cls__58" d="M5.13.48C3.51,2.64,2,4.88.53,7.17c15.33,9.4,33.61,16,54,20a52.73,52.73,0,0,1-.34-8.6C36.09,15.15,19.35,9,5.13.48Z" 
                             transform="translate(83.3 410.3) rotate(-0.1)"/>
                             <g class="cls-19 cls__ cls_58">
-                                <rect class="cls-19 cls__ cls__58" x="-391.4" y="229" width="8.43" height="3.11" transform="rotate(-76)" />
-                                <rect class="cls-19 cls__ cls__58" x="-370.5" y="252" width="8.3" height="3.06" transform="rotate(-71)" />
-                                <rect class="cls-19 cls__ cls__58" x="-352.8" y="267" width="8.3" height="3.06" transform="rotate(-67)" />
-                                <rect class="cls-19 cls__ cls__58" x="-334.1" y="280.5" width="8.2" height="3.02" transform="rotate(-63)" />
-                                <rect class="cls-19 cls__ cls__58" x="-324.5" y="281.5" width="8.1" height="2.99" transform="rotate(-61)" />
+                                <rect class="cls-19 cls__ cls__58" x="-391.4" y="229" width="8.43" height="3.76" transform="rotate(-76)" />
+                                <rect class="cls-19 cls__ cls__58" x="-370.5" y="252" width="8.3" height="3.76" transform="rotate(-71)" />
+                                <rect class="cls-19 cls__ cls__58" x="-352.8" y="267" width="8.3" height="3.76" transform="rotate(-67)" />
+                                <rect class="cls-19 cls__ cls__58" x="-334.1" y="280.5" width="8.2" height="3.76" transform="rotate(-63)" />
+                                <rect class="cls-19 cls__ cls__58" x="-324.5" y="281.5" width="8.1" height="3.76" transform="rotate(-61)" />
                             </g>
                             <path class="cls-17 cls__ cls__38" d="M3.6.3A67.23,67.23,0,0,1-.33,6.11C12.81,14.39,28.47,19.82,46,22.94l0-7.81C30.65,12.29,16.36,7.42,4.06-.43,3.92-.18,3.74.07,3.6.3Z" 
                             transform="translate(92 400)"/>
                             <g class="cls-19 cls__ cls_38">
-                                <rect class="cls-19 cls__ cls__38" x="-377.4" y="229" width="7.6" height="2.8" transform="rotate(-76)" />
-                                <rect class="cls-19 cls__ cls__38" x="-356.8" y="252" width="7.6" height="2.8" transform="rotate(-71)" />
-                                <rect class="cls-19 cls__ cls__38" x="-339.2" y="267" width="7.6" height="2.8" transform="rotate(-67)" />
-                                <rect class="cls-19 cls__ cls__38" x="-320.4" y="280.5" width="7.5" height="2.77" transform="rotate(-63)" />
-                                <rect class="cls-19 cls__ cls__38" x="-310.9" y="281.5" width="7.5" height="2.77" transform="rotate(-61)" />
+                                <rect class="cls-19 cls__ cls__38" x="-377.4" y="229" width="7.6" height="3.76" transform="rotate(-76)" />
+                                <rect class="cls-19 cls__ cls__38" x="-356.8" y="252" width="7.6" height="3.76" transform="rotate(-71)" />
+                                <rect class="cls-19 cls__ cls__38" x="-339.2" y="267" width="7.6" height="3.76" transform="rotate(-67)" />
+                                <rect class="cls-19 cls__ cls__38" x="-320.4" y="280.5" width="7.5" height="3.76" transform="rotate(-63)" />
+                                <rect class="cls-19 cls__ cls__38" x="-310.9" y="281.5" width="7.5" height="3.76" transform="rotate(-61)" />
                             </g>
                             <rect class="cls-17 cls__ cls__24" x="159.56" y="59.13" width="6.56" height="6.62"/>
                             <g class="cls__ cls_24">
@@ -995,32 +561,32 @@
                             </g>
                             <path class="cls-17 cls__ cls__22" d="M269,325.25c-2.51-22.83-9.67-47.26-20.56-72.09L254,249.9c10.78,22.55,17.31,46.65,20.62,71.91Z" transform="translate(0.37 -2.51)"/>
                             <g class="cls__ cls_22">
-                                <rect class="cls-19 cls__ cls__22" width="2.18" height="5.9" x="318" y="-165.5" transform="rotate(72)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.18" height="5.9" x="321" y="-177.5" transform="rotate(74)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.18" height="5.9" x="319.5" y="-195.3" transform="rotate(77)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.14" height="5.8" x="322.5" y="-204.6" transform="rotate(78.5)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.14" height="5.8" x="329.5" y="-208.4" transform="rotate(79)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.14" height="5.8" x="334" y="-214.8" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.14" height="5.8" x="341.5" y="-215.2" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.14" height="5.8" x="349" y="-215.5" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__22" width="2.03" height="5.5" x="356" y="-215.4" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.9" x="318" y="-165.5" transform="rotate(72)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.9" x="321" y="-177.5" transform="rotate(74)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.9" x="319.5" y="-195.3" transform="rotate(77)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.8" x="322.5" y="-204.6" transform="rotate(78.5)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.8" x="329.5" y="-208.4" transform="rotate(79)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.8" x="334" y="-214.8" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.8" x="341.5" y="-215.2" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.8" x="349" y="-215.5" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__22" width="2.36" height="5.5" x="356" y="-215.4" transform="rotate(80)" />
                             </g>
                             <path class="cls-17 cls__ cls__45" d="M186.66,193.55a10.11,10.11,0,0,0,1.42-6.19c11.51,2.79,31.21,29.75,34.77,37l-5.54,3.88C210.14,215,194.79,196.86,186.66,193.55Z" transform="translate(0.37 -2.51)"/>
                             <g class="cls__ cls_45">
-                                <rect class="cls-19 cls__ cls__45" width="2.36" height="6.4" x="273" y="-19.5" transform="rotate(48)" />
-                                <rect class="cls-19 cls__ cls__45" width="2.36" height="6.4" x="281" y="-20" transform="rotate(48)" />
-                                <rect class="cls-19 cls__ cls__45" width="2.36" height="6.4" x="289" y="-30.3" transform="rotate(50)" />
-                                <rect class="cls-19 cls__ cls__45" width="2.36" height="6.4" x="296" y="-40.5" transform="rotate(52)" />
-                                <rect class="cls-19 cls__ cls__45" width="2.36" height="6.4" x="303" y="-55.5" transform="rotate(55)" />
+                                <rect class="cls-19 cls__ cls__45" width="3" height="6.4" x="273" y="-19.5" transform="rotate(48)" />
+                                <rect class="cls-19 cls__ cls__45" width="3" height="6.4" x="281" y="-20" transform="rotate(48)" />
+                                <rect class="cls-19 cls__ cls__45" width="3" height="6.4" x="289" y="-30.3" transform="rotate(50)" />
+                                <rect class="cls-19 cls__ cls__45" width="3" height="6.4" x="296" y="-40.5" transform="rotate(52)" />
+                                <rect class="cls-19 cls__ cls__45" width="3" height="6.4" x="303" y="-55.5" transform="rotate(55)" />
                             </g>
                             <path class="cls-17 cls__ cls__57" d="M10.52,31.61a2,2,0,0,1,0-.35,80.56,80.56,0,0,1,2.41-12.68,16.94,16.94,0,0,1,.81-4.5,1.73,1.73,0,0,1,.07-.67c.14-.43.22-.88.32-1.32a5.31,5.31,0,0,1,.19-.65c0-.13.1-.26.15-.39a25.16,25.16,0,0,1,2.76-8.41A33.33,33.33,0,0,1,13.06.8C12.36.42,11.66.05,11-.29A188.12,188.12,0,0,0,1.23,45.85l6.93,4.58a85.46,85.46,0,0,1,2.24-18A3.13,3.13,0,0,1,10.52,31.61Z" 
                             transform="translate(51.2 282) rotate(-2)"/>
                             <g class="cls-19 cls__ cls_57">
-                                <rect class="cls-19 cls__ cls__57" x="93.2" y="308" width="7" height="2.58" transform="rotate(7)" />
-                                <rect class="cls-19 cls__ cls__57" x="98.3" y="299" width="7" height="2.58" transform="rotate(8)" />
-                                <rect class="cls-19 cls__ cls__57" x="103.5" y="290" width="7.2" height="2.65" transform="rotate(9)" />
-                                <rect class="cls-19 cls__ cls__57" x="108.9" y="281" width="7" height="2.58" transform="rotate(10)" />
-                                <rect class="cls-19 cls__ cls__57" x="114" y="271" width="6.8" height="2.51" transform="rotate(11)" />
+                                <rect class="cls-19 cls__ cls__57" x="93.2" y="308" width="7" height="2.36" transform="rotate(7)" />
+                                <rect class="cls-19 cls__ cls__57" x="98.3" y="299" width="7" height="2.36" transform="rotate(8)" />
+                                <rect class="cls-19 cls__ cls__57" x="103.5" y="290" width="7.2" height="2.36" transform="rotate(9)" />
+                                <rect class="cls-19 cls__ cls__57" x="108.9" y="281" width="7" height="2.36" transform="rotate(10)" />
+                                <rect class="cls-19 cls__ cls__57" x="114" y="271" width="6.8" height="2.36" transform="rotate(11)" />
                             </g>
                             <rect class="cls-19 cls__ cls__11" x="172.41" y="97.54" width="6.44" height="24.7" />
                             <g class="cls__ cls_11">
@@ -1032,26 +598,26 @@
                             <path class="cls-19 cls__ cls__44" d="M0,42.53C9.81,20.9,35.44,11.8,56.23,7.51l1.07-.22L58.21,13l-.92.21C36.22,18,12.19,28,6.09,46.52Z" 
                             transform="translate(67 285.3)"/>
                             <g class="cls-19 cls__ cls_44">
-                                <rect class="cls-19 cls__ cls__44" x="222.1" y="246" width="6.5" height="2.4" transform="rotate(30)" />
-                                <rect class="cls-19 cls__ cls__44" x="246.5" y="213" width="6.3" height="2.32" transform="rotate(36)" />
+                                <rect class="cls-19 cls__ cls__44" x="222.1" y="246" width="6.5" height="2.36" transform="rotate(30)" />
+                                <rect class="cls-19 cls__ cls__44" x="246.5" y="213" width="6.3" height="2.36" transform="rotate(36)" />
                                 <rect class="cls-19 cls__ cls__44" x="279.5" y="158.7" width="6.4" height="2.36" transform="rotate(46)" />
-                                <rect class="cls-19 cls__ cls__44" x="297" y="115" width="6.2" height="2.29" transform="rotate(53)" />
-                                <rect class="cls-19 cls__ cls__44" x="309" y="69" width="6" height="2.21" transform="rotate(60)" />
-                                <rect class="cls-19 cls__ cls__44" x="314.8" y="27" width="5.9" height="2.18" transform="rotate(66)" />
-                                <rect class="cls-19 cls__ cls__44" x="316" y="-15" width="5.6" height="2.06" transform="rotate(72)" />
-                                <rect class="cls-19 cls__ cls__44" x="314.9" y="-40" width="5.6" height="2.06" transform="rotate(75)" />
+                                <rect class="cls-19 cls__ cls__44" x="297" y="115" width="6.2" height="2.36" transform="rotate(53)" />
+                                <rect class="cls-19 cls__ cls__44" x="309" y="69" width="6" height="2.36" transform="rotate(60)" />
+                                <rect class="cls-19 cls__ cls__44" x="314.8" y="27" width="5.9" height="2.36" transform="rotate(66)" />
+                                <rect class="cls-19 cls__ cls__44" x="316" y="-15" width="5.6" height="2.36" transform="rotate(72)" />
+                                <rect class="cls-19 cls__ cls__44" x="314.9" y="-40" width="5.6" height="2.36" transform="rotate(75)" />
                             </g>
                             <path class="cls-17 cls__ cls__30" d="M0,42.2l3.73,7.38,2.61-1.47c5.51-3.5,9.91-6.16,14.87-10.62C31.81,28,45.31,12.1,47,3.22L41.18,0C39.46,7.79,27,22.41,16.57,31.14A116.84,116.84,0,0,1,0,42.2Z"
                             transform="translate(238 372)"/>
                             <path class="cls-17 cls__ cls__41" d="M.85,16.06c-.09,3.05.25,7.08-.85,8.65A147.84,147.84,0,0,0,54,7.32L50.12,0C34.49,8.12,17.73,14.37.85,16.06Z"
                             transform="translate(188.5 414)"/>
                             <g class="cls-19 cls__ cls_41">
-                                <rect class="cls-19 cls__ cls__41" x="456.6" y="-117" width="8.3" height="3.06" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__41" x="465.6" y="-86.5" width="8.3" height="3.06" transform="rotate(75)" />
-                                <rect class="cls-19 cls__ cls__41" x="472.2" y="-55" width="8.2" height="3.02" transform="rotate(70)" />
-                                <rect class="cls-19 cls__ cls__41" x="476" y="-23" width="8.2" height="3.02" transform="rotate(65)" />
-                                <rect class="cls-19 cls__ cls__41" x="477.1" y="9" width="8.2" height="3.02" transform="rotate(60)" />
-                                <rect class="cls-19 cls__ cls__41" x="475.9" y="42" width="8.2" height="3.02" transform="rotate(55)" />
+                                <rect class="cls-19 cls__ cls__41" x="456.6" y="-117" width="8.3" height="3.36" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__41" x="465.6" y="-86.5" width="8.3" height="3.36" transform="rotate(75)" />
+                                <rect class="cls-19 cls__ cls__41" x="472.2" y="-55" width="8.2" height="3.36" transform="rotate(70)" />
+                                <rect class="cls-19 cls__ cls__41" x="476" y="-23" width="8.2" height="3.36" transform="rotate(65)" />
+                                <rect class="cls-19 cls__ cls__41" x="477.1" y="9" width="8.2" height="3.36" transform="rotate(60)" />
+                                <rect class="cls-19 cls__ cls__41" x="475.9" y="42" width="8.2" height="3.36" transform="rotate(55)" />
                             </g>
                             <rect class="cls-19 cls__ cls__4" x="172.31" y="58.8" width="6.56" height="6.9"/>
                             <g class="cls__ cls_4">
@@ -1060,17 +626,17 @@
                             <path class="cls-19 cls__ cls__36" d="M11.84,14.3h0l-.19-.4,0-.11h0Q8.26,6.55,4.64-.49A11,11,0,0,1,2.46.89L.81,1.64a2.12,2.12,0,0,1-1,.64c2.56,4.7,4.89,9.47,7,14.27h0a227.83,227.83,0,0,1,19.91,71A12.68,12.68,0,0,1,33,86.45C30.5,61.43,21.49,37,11.84,14.3Z" 
                             transform="translate(254.25 228.9)"/>
                             <g class="cls__ cls_36">
-                                <rect class="cls-19 cls__ cls__36" width="1.92" height="5.2" x="305" y="-171" transform="rotate(71)" />
-                                <rect class="cls-19 cls__ cls__36" width="1.92" height="5.2" x="310" y="-177.2" transform="rotate(72)" />
-                                <rect class="cls-19 cls__ cls__36" width="1.92" height="5.2" x="318" y="-178" transform="rotate(72)" />
-                                <rect class="cls-19 cls__ cls__36" width="1.92" height="5.2" x="321" y="-190.2" transform="rotate(74)" />
-                                <rect class="cls-19 cls__ cls__36" width="1.92" height="5.2" x="319.5" y="-207.8" transform="rotate(77)" />
-                                <rect class="cls-19 cls__ cls__36" width="1.92" height="5.2" x="322.5" y="-217.2" transform="rotate(78.5)" />
-                                <rect class="cls-19 cls__ cls__36" width="1.99" height="5.4" x="329.5" y="-220.9" transform="rotate(79)" />
-                                <rect class="cls-19 cls__ cls__36" width="2.06" height="5.6" x="334" y="-227.5" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__36" width="2.14" height="5.8" x="341.5" y="-227.9" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__36" width="2.14" height="5.8" x="349" y="-227.9" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__36" width="2.14" height="5.8" x="356" y="-227.6" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.2" x="305" y="-171" transform="rotate(71)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.2" x="310" y="-177.2" transform="rotate(72)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.2" x="318" y="-178" transform="rotate(72)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.2" x="321" y="-190.2" transform="rotate(74)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.2" x="319.5" y="-207.8" transform="rotate(77)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.2" x="322.5" y="-217.2" transform="rotate(78.5)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.4" x="329.5" y="-220.9" transform="rotate(79)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.6" x="334" y="-227.5" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.8" x="341.5" y="-227.9" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.8" x="349" y="-227.9" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__36" width="2.36" height="5.8" x="356" y="-227.6" transform="rotate(80)" />
                             </g>
                             <rect class="cls-17 cls__ cls__17" x="146.93" y="101.03" width="6.44" height="21.29"/>
                             <g class="cls__ cls_17">
@@ -1088,11 +654,11 @@
                             <path class="cls-17 cls__ cls__39" d="M.28,13.91v7.77c16.33-3,31.5-7.38,44.7-14.44l1.16-.62L42.57,0l-2,1.15C28.83,7.72,14.23,11.68.28,13.91Z" 
                             transform="translate(189.1 401.4)"/>
                             <g class="cls-19 cls__ cls_39">
-                                <rect class="cls-19 cls__ cls__39" x="442" y="-119.5" width="7.7" height="2.84" transform="rotate(80)" />
-                                <rect class="cls-19 cls__ cls__39" x="451" y="-89" width="7.7" height="2.84" transform="rotate(75)" />
-                                <rect class="cls-19 cls__ cls__39" x="457.7" y="-59" width="7.7" height="2.84" transform="rotate(70)" />
-                                <rect class="cls-19 cls__ cls__39" x="461.6" y="-28" width="7.7" height="2.84" transform="rotate(65)" />
-                                <rect class="cls-19 cls__ cls__39" x="463.1" y="4" width="7.7" height="2.84" transform="rotate(60)" />
+                                <rect class="cls-19 cls__ cls__39" x="442" y="-119.5" width="7.7" height="3.76" transform="rotate(80)" />
+                                <rect class="cls-19 cls__ cls__39" x="451" y="-89" width="7.7" height="3.76" transform="rotate(75)" />
+                                <rect class="cls-19 cls__ cls__39" x="457.7" y="-59" width="7.7" height="3.76" transform="rotate(70)" />
+                                <rect class="cls-19 cls__ cls__39" x="461.6" y="-28" width="7.7" height="3.76" transform="rotate(65)" />
+                                <rect class="cls-19 cls__ cls__39" x="463.1" y="4" width="7.7" height="3.76" transform="rotate(60)" />
                             </g>
                             <rect class="cls-17 cls__ cls__29" x="172.34" y="299.8" width="6.44" height="35.76" />
                             <rect class="cls-17 cls__ cls__5" x="146.88" y="299.8" width="6.44" height="35.76" />
@@ -1148,23 +714,23 @@
                             <path class="a43" d="M5.85,10.13V9H3.51V8L6,4.38h.92V8h.71V9H6.92v1.15ZM5.85,8V6.06L4.54,8Zm2.26.6,1.06-.13a1,1,0,0,0,.28.62.73.73,0,0,0,.54.22.75.75,0,0,0,.57-.26,1,1,0,0,0,.23-.69.92.92,0,0,0-.22-.66A.71.71,0,0,0,10,7.47a1.77,1.77,0,0,0-.51.08l.12-.89a1,1,0,0,0,.68-.2.68.68,0,0,0,.24-.54.66.66,0,0,0-.17-.47.69.69,0,0,0-.94,0,.88.88,0,0,0-.24.57l-1-.17a2.4,2.4,0,0,1,.32-.83,1.4,1.4,0,0,1,.6-.49A2,2,0,0,1,10,4.38a1.7,1.7,0,0,1,1.3.52,1.32,1.32,0,0,1,.4.95,1.34,1.34,0,0,1-.82,1.2,1.3,1.3,0,0,1,.78.48,1.34,1.34,0,0,1,.3.88,1.77,1.77,0,0,1-.55,1.29,1.93,1.93,0,0,1-1.37.53,1.88,1.88,0,0,1-1.29-.45A1.8,1.8,0,0,1,8.11,8.61Z" 
                             transform="translate(154.3 100)"/>
                             <g class="cls-27 cls__ cls_20">
-                                <rect class="cls-19 cls__ cls__20" x="131.93" y="175.08" width="4.98" height="13.5" transform="translate(-76.54 97.65) rotate(-32.55)"/>
-                                <rect class="cls-19 cls__ cls__20" x="94.97" y="212.19" width="4.98" height="13.5" transform="translate(-128.46 135.41) rotate(-46.49)"/>
+                                <rect class="cls-19 cls__ cls__20" x="131.93" y="175.08" width="2.36" height="13.5" transform="translate(-76.54 97.65) rotate(-32.55)"/>
+                                <rect class="cls-19 cls__ cls__20" x="94.97" y="212.19" width="2.36" height="13.5" transform="translate(-128.46 135.41) rotate(-46.49)"/>
                                 <polygon class="cls-19 cls__ cls__20" points="73.7 240.44 86.54 245.05 85.82 247.54 72.97 242.93 73.7 240.44"/>
                                 <polygon class="cls-19 cls__ cls__20" points="58.61 273.13 73.84 275.2 73.53 278.29 58.3 276.22 58.61 273.13"/>
-                                <rect class="cls-19 cls__ cls__20" x="63.43" y="278.06" width="5.65" height="15.33" transform="translate(-221.88 341.99) rotate(-88.8)"/>
+                                <rect class="cls-19 cls__ cls__20" x="63.43" y="278.06" width="2.68" height="15.33" transform="translate(-221.88 341.99) rotate(-88.8)"/>
                                 <polygon class="cls-19 cls__ cls__20" points="62.58 265.29 77.14 267.58 76.79 270.47 62.22 268.17 62.58 265.29"/>
                                 <polygon class="cls-19 cls__ cls__20" points="65.58 257.05 78.84 259.86 78.4 262.45 65.14 259.63 65.58 257.05"/>
                                 <polygon class="cls-19 cls__ cls__20" points="69.43 248.68 82.55 252.25 81.98 254.81 68.87 251.23 69.43 248.68"/>
-                                <rect class="cls-19 cls__ cls__20" x="155.85" y="190.01" width="4.98" height="13.5" transform="translate(-84.77 125.5) rotate(-35.56)"/>
+                                <rect class="cls-19 cls__ cls__20" x="155.85" y="190.01" width="2.36" height="13.5" transform="translate(-84.77 125.5) rotate(-35.56)"/>
                                 <polygon class="cls-19 cls__ cls__20" points="104.11 196.59 113.9 206.18 112.28 207.94 102.49 198.35 104.11 196.59"/>
                                 <polygon class="cls-19 cls__ cls__20" points="78.03 231.8 90.09 238.81 89.03 241.23 76.97 234.23 78.03 231.8"/>
-                                <rect class="cls-19 cls__ cls__20" x="152.42" y="173.18" width="4.98" height="13.5" transform="translate(-75.62 120.37) rotate(-35.56)"/>
+                                <rect class="cls-19 cls__ cls__20" x="152.42" y="173.18" width="2.36" height="13.5" transform="translate(-75.62 120.37) rotate(-35.56)"/>
                                 <polygon class="cls-19 cls__ cls__20" points="98.01 203.5 107.8 213.38 106.18 215.2 96.39 205.32 98.01 203.5"/>
                                 <polygon class="cls-19 cls__ cls__20" points="82.49 224.36 93.54 232.67 92.19 234.74 81.14 226.43 82.49 224.36"/>
-                                <rect class="cls-19 cls__ cls__20" x="117.91" y="185.77" width="4.98" height="13.5" transform="translate(-89.38 102.65) rotate(-35.56)"/>
-                                <rect class="cls-19 cls__ cls__20" x="124.75" y="180.41" width="4.98" height="13.5" transform="translate(-82.05 98.19) rotate(-33.53)"/>
-                                <rect class="cls-19 cls__ cls__20" x="112.43" y="191.67" width="4.98" height="13.5" transform="translate(-99.92 115.15) rotate(-39.52)"/>
+                                <rect class="cls-19 cls__ cls__20" x="117.91" y="185.77" width="2.36" height="13.5" transform="translate(-89.38 102.65) rotate(-35.56)"/>
+                                <rect class="cls-19 cls__ cls__20" x="124.75" y="180.41" width="2.36" height="13.5" transform="translate(-82.05 98.19) rotate(-33.53)"/>
+                                <rect class="cls-19 cls__ cls__20" x="112.43" y="191.67" width="2.36" height="13.5" transform="translate(-99.92 115.15) rotate(-39.52)"/>
                                 <polygon class="cls-19 cls__ cls__20" points="87.36 217.72 97.69 226.69 96.18 228.55 85.84 219.58 87.36 217.72"/>
                             </g>
                                 <path class="cls-21 cls__ cls__45 cls______45" d="M189.18,190.4a5.17,5.17,0,1,0-6.78,3A5.27,5.27,0,0,0,189.18,190.4Z" 
@@ -1183,16 +749,16 @@
                                 <path class="cls-19 cls__ cls__6" d="M240.8,345.7a7.5,7.5,0,0,0,.24,6.14,181.9,181.9,0,0,1-25.51,5l-.6-6.35C223.6,349.33,232.22,347.64,240.8,345.7Z" 
                                 transform="translate(0.2 -2.51)" />
                                 <g class="cls__ cls_6">
-                                    <rect class="cls-19 cls__ cls__6" width="2.32" height="6.3" x="198" y="367" transform="rotate(-6)" />
-                                    <rect class="cls-19 cls__ cls__6" width="2.32" height="6.3" x="183" y="371" transform="rotate(-7)" />
-                                    <rect class="cls-19 cls__ cls__6" width="2.32" height="6.3" x="181" y="368.5" transform="rotate(-6)" />
+                                    <rect class="cls-19 cls__ cls__6" width="3" height="6.3" x="198" y="367" transform="rotate(-6)" />
+                                    <rect class="cls-19 cls__ cls__6" width="3" height="6.3" x="183" y="371" transform="rotate(-7)" />
+                                    <rect class="cls-19 cls__ cls__6" width="3" height="6.3" x="181" y="368.5" transform="rotate(-6)" />
                                 </g>
                                 <path class="cls-17 cls__ cls__59" d="M.73,3.27V9.83Q14.91,9,28.78,6.76L28.18.43Q14.73,2.26.73,3.27Z" 
                                 transform="translate(187.2 347.5)"/>
                                 <g class="cls__ cls_59">
-                                    <rect class="cls-19 cls__ cls__59" width="2.32" height="6.3" x="178" y="357.2" transform="rotate(-2)" />
-                                    <rect class="cls-19 cls__ cls__59" width="2.32" height="6.3" x="177" y="361.6" transform="rotate(-3.5)" />
-                                    <rect class="cls-19 cls__ cls__59" width="2.32" height="6.3" x="176" y="365.9" transform="rotate(-5)" />
+                                    <rect class="cls-19 cls__ cls__59" width="3" height="6.3" x="178" y="357.2" transform="rotate(-2)" />
+                                    <rect class="cls-19 cls__ cls__59" width="3" height="6.3" x="177" y="361.6" transform="rotate(-3.5)" />
+                                    <rect class="cls-19 cls__ cls__59" width="3" height="6.3" x="176" y="365.9" transform="rotate(-5)" />
                                 </g>
                                 <path class="cls-17 cls__ cls__50" d="M25.59,11.2l0-.07c.06-.2.11-.41.16-.62A7,7,0,0,1,26.34,9l.09-.16a3.4,3.4,0,0,1,.07-.34A9.91,9.91,0,0,1,27,6.83C18.08,5.5,9.2,3.87.45,1.84L-.21,8.09C8,10,16.46,11.53,25,12.84A7.75,7.75,0,0,1,25.59,11.2Z" 
                                 transform="translate(87 341)"/>
@@ -1208,12 +774,12 @@
                                     <rect class="cls-19 cls__ cls__50" x="106.85" y="351.96" width="10.43" height="3.76" transform="translate(-253.99 410.4) rotate(-81.58)"/>
                                 </g>
                                 <g class="cls__ cls_30">
-                                    <rect class="cls-19 cls__ cls__30" x="277" y="380.6" width="2.29" height="6.2" transform="translate(-193.95 409.97) rotate(-57.69)"/>
-                                    <rect class="cls-19 cls__ cls__30" x="272.5" y="388.5" width="2.47" height="6.7" transform="translate(-203.41 386.45) rotate(-54.92)"/>
-                                    <rect class="cls-19 cls__ cls__30" x="267" y="395.6" width="2.58" height="7" transform="translate(-211.57 372.36) rotate(-53.38)"/>
-                                    <rect class="cls-19 cls__ cls__30" x="261" y="402.3" width="2.58" height="7" transform="translate(-207.56 288.05) rotate(-43.51)"/>
-                                    <rect class="cls-19 cls__ cls__30" x="223" y="425.4" width="2.69" height="7.3" transform="translate(-175.11 185.37) rotate(-35)"/>
-                                    <rect class="cls-19 cls__ cls__30" x="476.4" y="33" width="1.24" height="3.36" transform="rotate(55)" />
+                                    <rect class="cls-19 cls__ cls__30" x="277" y="380.6" width="3.36" height="6.2" transform="translate(-193.95 409.97) rotate(-57.69)"/>
+                                    <rect class="cls-19 cls__ cls__30" x="272.5" y="388.5" width="3.36" height="6.7" transform="translate(-203.41 386.45) rotate(-54.92)"/>
+                                    <rect class="cls-19 cls__ cls__30" x="267" y="395.6" width="3.36" height="7" transform="translate(-211.57 372.36) rotate(-53.38)"/>
+                                    <rect class="cls-19 cls__ cls__30" x="261" y="402.3" width="3.36" height="7" transform="translate(-207.56 288.05) rotate(-43.51)"/>
+                                    <rect class="cls-19 cls__ cls__30" x="223" y="425.4" width="3.36" height="7.3" transform="translate(-175.11 185.37) rotate(-35)"/>
+                                    <rect class="cls-19 cls__ cls__30" x="476.4" y="33" width="7.75" height="3.36" transform="rotate(55)" />
                                 </g>
                                 <path class="block__6" d="M80.89,339.91,48.64,318.82c-7-4.3-13.82-2.81-14.22,5.27L34.29,373c1,8.08,5.49,10.76,14.35,5.27l32.9-21.61C87.53,352.71,91.84,346,80.89,339.91Z" transform="translate(0.37 -2.51)"/>
                                 <path class="cls-21 cls__ cls__48 cls______48" d="M44.07,322.19A5.16,5.16,0,1,1,38.4,327,5.26,5.26,0,0,1,44.07,322.19Z" transform="translate(0.37 -2.51)" />
@@ -1248,11 +814,11 @@
                                 <path class="cls-17 cls__ cls__55" d="M0,34.48A95.38,95.38,0,0,0,34.45,0l6.34,4.11C31.86,19.8,20,32.65,3.57,41.1Z"
                                 transform="translate(231 367.3) rotate(0)"/>
                                 <g class="cls-19 cls__ cls_55">
-                                    <rect class="cls-19 cls__ cls__55" x="454" y="90" width="7.7" height="2.84" transform="rotate(48)" />
-                                    <rect class="cls-19 cls__ cls__55" x="446.5" y="120" width="7.7" height="2.84" transform="rotate(43)" />
-                                    <rect class="cls-19 cls__ cls__55" x="436" y="149" width="7.7" height="2.84" transform="rotate(38)" />
-                                    <rect class="cls-19 cls__ cls__55" x="423" y="176" width="7.7" height="2.84" transform="rotate(33)" />
-                                    <rect class="cls-19 cls__ cls__55" x="423" y="167" width="7.7" height="2.84" transform="rotate(33)" />
+                                    <rect class="cls-19 cls__ cls__55" x="454" y="90" width="7.7" height="3.76" transform="rotate(48)" />
+                                    <rect class="cls-19 cls__ cls__55" x="446.5" y="120" width="7.7" height="3.76" transform="rotate(43)" />
+                                    <rect class="cls-19 cls__ cls__55" x="436" y="149" width="7.7" height="3.76" transform="rotate(38)" />
+                                    <rect class="cls-19 cls__ cls__55" x="423" y="176" width="7.7" height="3.76" transform="rotate(33)" />
+                                    <rect class="cls-19 cls__ cls__55" x="423" y="167" width="7.7" height="3.76" transform="rotate(33)" />
                                 </g>
                                 <path class="cls-32" d="M248,340.7l30.36-19.86c6.57-4,13-2.64,13.39,5l.13,46.05c-.91,7.61-5.17,10.13-13.52,5l-31-20.35C241.78,352.76,237.72,346.43,248,340.7Z" transform="translate(0.37 -2.51)" />
                                 <path class="block__8" d="M248,340.7l30.36-19.86c6.57-4,13-2.64,13.39,5l.13,46.05c-.91,7.61-5.17,10.13-13.52,5l-31-20.35C241.78,352.76,237.72,346.43,248,340.7Z" transform="translate(0.37 -2.51)"/>
@@ -1264,11 +830,11 @@
                                 <path class="cls-19 cls__ cls__49" d="M3.52,36-.16,30.69c10.8-7,25.39-20.31,28.75-30.36l6.23,4.06C25.92,19.63,17.42,27.82,3.52,36Z" 
                                 transform="translate(224.5 359)"/>
                                 <g class="cls-19 cls__ cls_49">
-                                    <rect class="cls-19 cls__ cls__49" x="443" y="75" width="6.3" height="2.32" transform="rotate(50)" />
-                                    <rect class="cls-19 cls__ cls__49" x="434.3" y="112" width="6.4" height="2.36" transform="rotate(44)" />
-                                    <rect class="cls-19 cls__ cls__49" x="424.3" y="141" width="6.5" height="2.4" transform="rotate(39)" />
-                                    <rect class="cls-19 cls__ cls__49" x="411.2" y="169" width="7" height="2.58" transform="rotate(34)" />
-                                    <rect class="cls-19 cls__ cls__49" x="408.5" y="167" width="7" height="2.58" transform="rotate(33)" />
+                                    <rect class="cls-19 cls__ cls__49" x="443" y="75" width="6.3" height="3.76" transform="rotate(50)" />
+                                    <rect class="cls-19 cls__ cls__49" x="434.3" y="112" width="6.4" height="3.76" transform="rotate(44)" />
+                                    <rect class="cls-19 cls__ cls__49" x="424.3" y="141" width="6.5" height="3.76" transform="rotate(39)" />
+                                    <rect class="cls-19 cls__ cls__49" x="411.2" y="169" width="7" height="3.76" transform="rotate(34)" />
+                                    <rect class="cls-19 cls__ cls__49" x="408.5" y="167" width="7" height="3.76" transform="rotate(33)" />
                                 </g>
                                 <path class="cls-30 cls__ cls__49 cls______49" d="M281.51,375.82a5.17,5.17,0,1,0-2.36-7A5.25,5.25,0,0,0,281.51,375.82Z" 
                                 transform="translate(-24 -17)"/>
@@ -1288,8 +854,8 @@
                                 <path class="cls-19 cls__ cls__37" d="M5.58.53a1.5,1.5,0,0,1-.3,0A9.69,9.69,0,0,0,4.2.87l-.64.22a2.84,2.84,0,0,1-.49.1c-.87.33-1.76.58-2.65.86A38,38,0,0,1,.64,18.49l5.45-3.55A34.89,34.89,0,0,0,5.58.53Z" 
                                 transform="translate(256.9 311.9)"/>
                                 <g class="cls__ cls_37">
-                                    <rect class="cls-19 cls__ cls__37" width="1.84" height="5" x="314" y="-274.5" transform="rotate(92)" />
-                                    <rect class="cls-19 cls__ cls__37" width="1.84" height="5" x="330" y="-246.3" transform="rotate(87)" />
+                                    <rect class="cls-19 cls__ cls__37" width="3" height="5" x="314" y="-274.5" transform="rotate(92)" />
+                                    <rect class="cls-19 cls__ cls__37" width="3" height="5" x="330" y="-246.3" transform="rotate(87)" />
                                 </g>
                                 <path class="cls-30 cls__ cls__37 cls______37" d="M281.51,375.82a5.17,5.17,0,1,0-2.36-7A5.25,5.25,0,0,0,281.51,375.82Z" 
                                 transform="translate(-24.5 -34)"/>
@@ -1320,7 +886,7 @@
                                 transform="translate(-20.1 -28)"/>
                                 <rect class="cls-19 cls__ cls__9" x="172.43" y="370.72" width="6.36" height="10" />
                                 <g class="cls__ cls_9">
-                                    <rect class="cls-19 cls__ cls__9" x="172.43" y="372.54" width="6.4" height="2.36"/>
+                                    <rect class="cls-19 cls__ cls__9" x="172.43" y="372.54" width="6.4" height="2.31"/>
                                 </g>
                                 <path class="cls-30 cls__ cls__9 cls______9" d="M175.2,321.46a5.17,5.17,0,1,1-5.34,5.16A5.26,5.26,0,0,1,175.2,321.46Z" 
                                 transform="translate(0.9 37.8)" />
@@ -1340,7 +906,7 @@
                                 transform="translate(0.37 -2.1)"/>
                                 <rect class="cls-17 cls__ cls__3" x="159.64" y="368.74" width="6.44" height="11.6"/>
                                 <g class="cls__ cls_3">
-                                    <rect class="cls-19 cls__ cls__3" x="159.67" y="372.54" width="6.4" height="2.36"/>
+                                    <rect class="cls-19 cls__ cls__3" x="159.67" y="372.54" width="6.4" height="2.31"/>
                                 </g>
                                 <path class="cls-35 cls__ cls__3 cls______3" d="M175.2,321.46a5.17,5.17,0,1,1-5.34,5.16A5.26,5.26,0,0,1,175.2,321.46Z" 
                                 transform="translate(-12 37.6)" />
@@ -1358,13 +924,13 @@
                                 <path class="cls-8 cls__ cls__60" d="M162.6,393.68a5.16,5.16,0,1,1-5.34,5.16A5.25,5.25,0,0,1,162.6,393.68Z" 
                                 transform="translate(0.37 -1.81)"/>
                                 <g class="cls__ cls_60">
-                                    <rect class="cls-19 cls__ cls__60" x="159.67" y="385.54" width="6.4" height="2.36"/>
-                                    <rect class="cls-19 cls__ cls__60" x="159.67" y="379.74" width="6.4" height="2.36"/>
+                                    <rect class="cls-19 cls__ cls__60" x="159.67" y="385.54" width="6.4" height="2.19"/>
+                                    <rect class="cls-19 cls__ cls__60" x="159.67" y="379.74" width="6.4" height="2.19"/>
                                 </g>
                                 <rect class="cls-17 cls__ cls__53" x="147.09" y="380" width="6.36" height="11" />
                                 <g class="cls__ cls_53">
-                                    <rect class="cls-19 cls__ cls__53" x="147.09" y="385.54" width="6.4" height="2.36"/>
-                                    <rect class="cls-19 cls__ cls__53" x="147.09" y="379.74" width="6.4" height="2.36"/>
+                                    <rect class="cls-19 cls__ cls__53" x="147.09" y="385.54" width="6.4" height="2.19"/>
+                                    <rect class="cls-19 cls__ cls__53" x="147.09" y="379.74" width="6.4" height="2.19"/>
                                 </g>
                                 <path class="cls-21 cls__ cls__53 cls______53" d="M162.6,393.68a5.16,5.16,0,1,1-5.34,5.16A5.25,5.25,0,0,1,162.6,393.68Z" 
                                 transform="translate(-12 -2.51)"/>
@@ -1396,8 +962,8 @@
                                 <path class="cls-11 a58" d="M140.6,438l1-.1a.77.77,0,0,0,.24.51.66.66,0,0,0,.47.19.62.62,0,0,0,.5-.24,1.11,1.11,0,0,0,.21-.74,1,1,0,0,0-.2-.69.71.71,0,0,0-.54-.23,1,1,0,0,0-.74.37l-.78-.12.49-2.6h2.54v.89h-1.81l-.15.86a1.39,1.39,0,0,1,.65-.16,1.45,1.45,0,0,1,1.09.46,1.7,1.7,0,0,1,.44,1.21,1.79,1.79,0,0,1-.36,1.1,1.58,1.58,0,0,1-1.35.66,1.7,1.7,0,0,1-1.14-.37,1.55,1.55,0,0,1-.52-1Zm4.7-1.41a1.2,1.2,0,0,1-.54-.44,1.13,1.13,0,0,1-.17-.6,1.24,1.24,0,0,1,.39-.93,1.91,1.91,0,0,1,2.23,0,1.24,1.24,0,0,1,.39.93,1.1,1.1,0,0,1-.18.62,1.18,1.18,0,0,1-.51.42,1.3,1.3,0,0,1,.63.48,1.26,1.26,0,0,1,.22.74,1.52,1.52,0,0,1-.44,1.13,1.62,1.62,0,0,1-1.18.44,1.81,1.81,0,0,1-1.14-.36,1.41,1.41,0,0,1-.53-1.16,1.38,1.38,0,0,1,.2-.75,1.22,1.22,0,0,1,.63-.52Zm.2-1a.62.62,0,0,0,1,.44.68.68,0,0,0,0-.88.57.57,0,0,0-.43-.16.58.58,0,0,0-.44.16.6.6,0,0,0-.17.44Zm-.09,2.14a.86.86,0,0,0,.21.62.63.63,0,0,0,.5.22.66.66,0,0,0,.5-.21.89.89,0,0,0,.19-.62.76.76,0,0,0-.2-.56.67.67,0,0,0-.5-.22.6.6,0,0,0-.52.25A.84.84,0,0,0,145.41,437.79Z" transform="translate(0.37 -2.51)"/>
                                 <rect class="cls-19 cls__ cls__52" x="172.43" y="380" width="6.36" height="11" />
                                 <g class="cls__ cls_52">
-                                    <rect class="cls-19 cls__ cls__52" x="172.43" y="385.54" width="6.4" height="2.36"/>
-                                    <rect class="cls-19 cls__ cls__52" x="172.43" y="379.74" width="6.4" height="2.36"/>
+                                    <rect class="cls-19 cls__ cls__52" x="172.43" y="385.54" width="6.4" height="2.19"/>
+                                    <rect class="cls-19 cls__ cls__52" x="172.43" y="379.74" width="6.4" height="2.19"/>
                                 </g>
                                 <path class="cls-30 cls__ cls__52 cls______52" d="M162.6,393.68a5.16,5.16,0,1,1-5.34,5.16A5.25,5.25,0,0,1,162.6,393.68Z" 
                                 transform="translate(13.5 -2.1)"/>
@@ -1410,10 +976,10 @@
                                 <path class="cls-17 cls__ cls__19" d="M.09,13.14A113.44,113.44,0,0,0,35.81,0l3.58,5.33C26.63,13.25,13.51,18.58,0,20Z" 
                                 transform="translate(189 389.4)"/>
                                 <g class="cls-19 cls__ cls_19">
-                                    <rect class="cls-19 cls__ cls__19" x="429.1" y="-121.5" width="6" height="2.21" transform="rotate(80)" />
-                                    <rect class="cls-19 cls__ cls__19" x="438.3" y="-92" width="6" height="2.21" transform="rotate(75)" />
-                                    <rect class="cls-19 cls__ cls__19" x="444.8" y="-62" width="6" height="2.21" transform="rotate(70)" />
-                                    <rect class="cls-19 cls__ cls__19" x="448.5" y="-32" width="6" height="2.21" transform="rotate(65)" />
+                                    <rect class="cls-19 cls__ cls__19" x="429.1" y="-121.5" width="6" height="3.76" transform="rotate(80)" />
+                                    <rect class="cls-19 cls__ cls__19" x="438.3" y="-92" width="6" height="3.76" transform="rotate(75)" />
+                                    <rect class="cls-19 cls__ cls__19" x="444.8" y="-62" width="6" height="3.76" transform="rotate(70)" />
+                                    <rect class="cls-19 cls__ cls__19" x="448.5" y="-32" width="6" height="3.76" transform="rotate(65)" />
                                 </g>
                                 <path class="cls-21 cls__ cls__19 cls______19" d="M162.6,393.68a5.16,5.16,0,1,1-5.34,5.16A5.25,5.25,0,0,1,162.6,393.68Z" 
                                 transform="translate(19 9)"/>
@@ -1427,9 +993,9 @@
                                 <path class="cls-8 cls__ cls__29" d="M175.2,321.46a5.17,5.17,0,1,1-5.34,5.16A5.26,5.26,0,0,1,175.2,321.46Z" transform="translate(0.37 -2.51)"/>
                                 <path class="cls-11 a29" d="M174.87,328v.89H171.5a2.5,2.5,0,0,1,.33-1,7.11,7.11,0,0,1,1.08-1.2,5.9,5.9,0,0,0,.8-.82,1.07,1.07,0,0,0,.2-.59.66.66,0,0,0-.18-.49.73.73,0,0,0-.95,0,.93.93,0,0,0-.21.6l-.95-.1a1.54,1.54,0,0,1,.53-1.13,1.83,1.83,0,0,1,1.13-.35,1.66,1.66,0,0,1,1.17.4,1.33,1.33,0,0,1,.42,1,1.73,1.73,0,0,1-.12.64,2.75,2.75,0,0,1-.38.64,7,7,0,0,1-.63.64c-.31.28-.5.46-.58.55a2.07,2.07,0,0,0-.2.27Zm.67-.27.93-.1a.63.63,0,0,0,.18.42.54.54,0,0,0,.38.14.61.61,0,0,0,.5-.27,2.36,2.36,0,0,0,.27-1.14,1.14,1.14,0,0,1-.9.42,1.35,1.35,0,0,1-1-.46,1.65,1.65,0,0,1-.42-1.18,1.69,1.69,0,0,1,.45-1.23,1.63,1.63,0,0,1,2.4.12,3,3,0,0,1,.49,1.94,3.05,3.05,0,0,1-.51,2A1.63,1.63,0,0,1,177,329a1.38,1.38,0,0,1-1-.31,1.53,1.53,0,0,1-.47-.94Zm2.18-2.09a1.13,1.13,0,0,0-.22-.73.62.62,0,0,0-.49-.25.54.54,0,0,0-.44.21,1.06,1.06,0,0,0-.18.69,1.08,1.08,0,0,0,.19.71.62.62,0,0,0,.48.23.63.63,0,0,0,.47-.22A1,1,0,0,0,177.72,325.62Z" transform="translate(0.37 -2.51)"/>
                                 <g class="cls__ cls_29">
-                                    <rect class="cls-19 cls__ cls__29" x="172.14" y="312.79" width="6.67" height="2.46"/>
-                                    <rect class="cls-19 cls__ cls__29" x="172.14" y="307.94" width="6.6" height="2.43"/>
-                                    <rect class="cls-19 cls__ cls__29" x="172.11" y="302.46" width="6.77" height="2.5"/>
+                                    <rect class="cls-19 cls__ cls__29" x="172.14" y="312.79" width="6.67" height="2.31"/>
+                                    <rect class="cls-19 cls__ cls__29" x="172.14" y="307.94" width="6.6" height="2.36"/>
+                                    <rect class="cls-19 cls__ cls__29" x="172.11" y="302.46" width="6.77" height="2.36"/>
                                 </g>
                                 <path class="cls-35 cls__ cls__5 cls______5" d="M175.2,321.46a5.17,5.17,0,1,1-5.34,5.16A5.26,5.26,0,0,1,175.2,321.46Z" 
                                 transform="translate(-24.98 -2.51)" />
@@ -1441,834 +1007,86 @@
                                 <path class="cls-11 a54" d="M140.35,410.6l1-.1a.82.82,0,0,0,.24.51.64.64,0,0,0,.47.19.62.62,0,0,0,.5-.24,1.13,1.13,0,0,0,.21-.74,1,1,0,0,0-.2-.69.68.68,0,0,0-.54-.23,1,1,0,0,0-.74.36l-.78-.11.49-2.61h2.54v.9h-1.81l-.15.85a1.39,1.39,0,0,1,.65-.16,1.46,1.46,0,0,1,1.09.47,1.69,1.69,0,0,1,.44,1.2,1.84,1.84,0,0,1-.36,1.11A1.58,1.58,0,0,1,142,412a1.7,1.7,0,0,1-1.14-.37,1.55,1.55,0,0,1-.52-1Zm5.76,1.28v-1h-2.05V410l2.18-3.19h.8V410h.63v.85H147v1Zm0-1.85v-1.71L145,410Z" transform="translate(0.37 -2.51)"/>
                                 <path class="cls-11 a27" d="M144.93,356.68v.9h-3.37a2.25,2.25,0,0,1,.33-1,6.31,6.31,0,0,1,1.08-1.2,6.92,6.92,0,0,0,.79-.82,1.1,1.1,0,0,0,.2-.59.7.7,0,0,0-.17-.5.69.69,0,0,0-.48-.17.65.65,0,0,0-.48.18,1,1,0,0,0-.2.61l-1-.1a1.59,1.59,0,0,1,.54-1.14,1.79,1.79,0,0,1,1.13-.34,1.6,1.6,0,0,1,1.16.4,1.3,1.3,0,0,1,.43,1,1.7,1.7,0,0,1-.13.64,2.8,2.8,0,0,1-.38.65,7.24,7.24,0,0,1-.63.63l-.58.56a1.88,1.88,0,0,0-.19.26Zm.64-3.15v-.89h3.29v.69a5.27,5.27,0,0,0-.83,1.15,6.87,6.87,0,0,0-.64,1.59,5.92,5.92,0,0,0-.22,1.51h-.92a6.26,6.26,0,0,1,.43-2.12,7,7,0,0,1,1.08-1.93Z" transform="translate(0.37 -2.51)"/>
                         </svg>
-                    </div>
                 </div>
-
-                <!-- RIGHT: Black/Personality column -->
-                <div class="bg-col bg-col-personality" id="bg-col-personality">
-                    <div class="bg-col-title bg-col-title-personality">
-                        <span class="bg-header-crystal">●</span> ЛИЧНОСТЬ
-                        <span class="bg-header-sub">Сознательное</span>
-                    </div>
-                    <div class="bg-planet-list" id="bg-personality-list">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-                <!-- === TAB: MANDALA === -->
-                <div class="tab-content" id="content-mandala">
-                        <div class="mandala-toolbar-container">
-                            <div class="mandala-toolbar-header">
-                                <span class="mandala-toolbar-title">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px; color:var(--primary);"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                                    Кольца мандалы:
-                                </span>
-                            </div>
-                            <div class="mandala-toggle-chips">
-                                <button class="mandala-chip active" data-ring="bodygraph">
-                                    <span class="chip-dot"></span>
-                                    <span class="chip-label">Бодиграф</span>
-                                </button>
-                                <button class="mandala-chip active" data-ring="hexagrams">
-                                    <span class="chip-dot"></span>
-                                    <span class="chip-label">Гексаграммы</span>
-                                </button>
-                                <button class="mandala-chip active" data-ring="mirror">
-                                    <span class="chip-dot"></span>
-                                    <span class="chip-label">Зеркало жизни</span>
-                                </button>
-                                <button class="mandala-chip active" data-ring="zodiac">
-                                    <span class="chip-dot"></span>
-                                    <span class="chip-label">Зодиак</span>
-                                </button>
-                                <button class="mandala-chip active" data-ring="houses">
-                                    <span class="chip-dot"></span>
-                                    <span class="chip-label">12 Домов</span>
-                                </button>
-                                <button class="mandala-chip active" data-ring="cross">
-                                    <span class="chip-dot"></span>
-                                    <span class="chip-label">Крест Инкарнации</span>
-                                </button>
-                                <button class="mandala-chip-all" id="mandala-toggle-all">
-                                    ↺ Сбросить
-                                </button>
-                            </div>
+                <div class="conscious">
+                    <h1>Сознательные активации</h1>
+                    <div class="icons_group">
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.05 15.04"><path class="cls_1" d="M7.53,4.15A3.37,3.37,0,1,1,4.16,7.52,3.37,3.37,0,0,1,7.53,4.15Z"/><path class="cls_1" d="M7.53,0A7.52,7.52,0,1,1,0,7.52,7.52,7.52,0,0,1,7.53,0Zm0,1.24a6.28,6.28,0,1,0,6.28,6.28A6.29,6.29,0,0,0,7.53,1.24Z"/></svg>
+                            <h4>2.<span>2</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
-                        <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-md); backdrop-filter: blur(16px); display:inline-block; margin-bottom: 24px; position: relative;" id="mandala-container">
-                            <canvas id="mandala-canvas" width="780" height="780" style="display: block;"></canvas>
-                            <div id="mandala-bodygraph-wrap" class="bg-svg-wrap" style="position: absolute; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center; max-width: none;"></div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.05 15.04"><path class="cls_1" d="M7.53,0A7.52,7.52,0,1,1,0,7.52,7.52,7.52,0,0,1,7.53,0Zm0,1.24a6.28,6.28,0,1,0,6.28,6.28A6.29,6.29,0,0,0,7.53,1.24Z"/><rect class="cls_2" x="0.09" y="6.72" width="13.87" height="0.98"/><rect class="cls_2" x="6.92" y="1.24" width="1.21" height="13.53"/></svg>
+                            <h4>1.<span>2</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.94 9.35"><rect class="cls_1" width="5" height="1.04"/><rect class="cls_1" x="8.82" width="5.12" height="1.04"/><rect class="cls_1" y="1.62" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="1.62" width="5.12" height="1.04"/><rect class="cls_1" y="3.3" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="3.3" width="5.12" height="1.04"/><rect class="cls_1" y="4.89" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="4.89" width="5.12" height="1.04"/><rect class="cls_1" y="6.56" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="6.56" width="5.12" height="1.04"/><rect class="cls_1" y="8.31" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="8.31" width="5.12" height="1.04"/></svg>
                         </div>
-                        <!-- HD Type & Profile block -->
-                        <div id="hd-type-profile-block" style="display:none; text-align:center; margin-bottom: 18px; width:100%; max-width:780px;">
-                            <div id="hd-type-badge" style="display:inline-block; font-size:18px; font-weight:700; letter-spacing:0.02em; padding: 8px 28px; border-radius: 40px; margin-bottom: 10px;"></div>
-                            <div style="display:flex; align-items:center; justify-content:center; gap: 12px; flex-wrap:wrap;">
-                                <div id="hd-profile-badge" style="display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:600; color: var(--text-muted, #888); background: var(--bg-card, #f5f5f5); border: 1px solid var(--border, #ddd); border-radius: 20px; padding: 5px 18px;"></div>
-                                <div id="hd-authority-badge" style="display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:500; color: var(--text-muted, #888); background: var(--bg-card, #f5f5f5); border: 1px solid var(--border, #ddd); border-radius: 20px; padding: 5px 18px;"></div>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 15.13"><path class="cls_1" d="M7,0a5.47,5.47,0,0,1,5.66,5.24A5.46,5.46,0,0,1,7,10.48,5.46,5.46,0,0,1,1.36,5.24,5.46,5.46,0,0,1,7,0ZM7,1.15A4.26,4.26,0,0,0,2.6,5.24,4.26,4.26,0,0,0,7,9.33a4.26,4.26,0,0,0,4.41-4.09A4.26,4.26,0,0,0,7,1.15Z"/><path class="cls_1" d="M6.22,9.57c-.13,1,0,3.26-.89,3.92-1.1.82-3.35-.37-4-.91-1.34-.74-1.73.51-.68,1.21C2.29,14.93,3.78,15.4,5.31,15s1.59-1.86,1.8-3.14L7.47,9.7Z"/><path class="cls_1" d="M8.23,9.55c.13,1,0,3.26.9,3.92,1.09.82,3.35-.36,4-.91,1.34-.74,1.73.52.69,1.22-1.69,1.13-3.19,1.6-4.71,1.17s-1.59-1.86-1.81-3.14L7,9.68Z"/></svg>
+                            <h4>42.<span>6</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" width="5.15" height="1.04"/><rect class="cls_1" y="1.62" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" y="1.62" width="5.15" height="1.04"/><rect class="cls_1" y="3.3" width="5.03" height="1.04"/><rect class="cls_1" x="8.78" y="3.3" width="5.15" height="1.04"/><rect class="cls_1" y="4.89" width="13.96" height="1.04"/><rect class="cls_1" y="6.56" width="13.96" height="1.04"/><rect class="cls_1" y="8.31" width="13.96" height="1.04"/></svg>
+                        </div>  
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 15.13"><path class="cls_1" d="M7,15.13a5.47,5.47,0,0,0,5.66-5.25A5.47,5.47,0,0,0,7,4.64,5.46,5.46,0,0,0,1.36,9.88,5.46,5.46,0,0,0,7,15.13ZM7,14A4.26,4.26,0,0,1,2.6,9.88,4.26,4.26,0,0,1,7,5.79a4.26,4.26,0,0,1,4.41,4.09A4.26,4.26,0,0,1,7,14Z"/><path class="cls_1" d="M6.22,5.56c-.13-1,0-3.26-.89-3.92C4.23.82,2,2,1.28,2.54-.06,3.29-.45,2,.6,1.33,2.29.2,3.78-.27,5.31.16S6.9,2,7.11,3.3l.36,2.13Z"/><path class="cls_1" d="M8.23,5.57c.13-1,0-3.25.9-3.92,1.09-.82,3.35.37,4,.91,1.34.74,1.73-.51.69-1.21C12.17.21,10.67-.26,9.15.17S7.56,2,7.34,3.31L7,5.44Z"/></svg>
+                            <h4>32.<span>6</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" y="8.31" width="5.06" height="1.04"/><rect class="cls_1" x="8.79" y="8.31" width="5.15" height="1.04"/><rect class="cls_1" y="6.69" width="5.07" height="1.04"/><rect class="cls_1" x="8.79" y="6.69" width="5.15" height="1.04"/><rect class="cls_1" y="5.02" width="5.06" height="1.04"/><rect class="cls_1" x="8.78" y="5.02" width="5.15" height="1.04"/><rect class="cls_1" y="3.42" width="13.96" height="1.04"/><rect class="cls_1" y="1.75" width="13.96" height="1.04"/><rect class="cls_1" width="13.96" height="1.04"/></svg>
                         </div>
-                        <div class="table-section" style="width:100%; max-width:700px;">
-                            <h3 class="section-title">Порядок ворот на колесе</h3>
-                            <p class="hexagram-subtitle">Все 64 ворот в последовательности Рейв-Мандалы.</p>
-                            <div class="table-wrap" style="max-height: 520px; overflow-y: auto;">
-                                <table class="data-table" id="mandala-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 50px;">№</th>
-                                            <th>Ворота</th>
-                                            <th>Зодиак</th>
-                                            <th>Активатор</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="mandala-tbody"></tbody>
-                                </table>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.65 14.22"><path class="cls___1" d="M6.85,1a5.77,5.77,0,0,1,4.62,2.36v0a3.91,3.91,0,0,0-2-.56,4.09,4.09,0,0,0-4,4.18,4.09,4.09,0,0,0,4,4.17,3.8,3.8,0,0,0,2.19-.69v.19a5.79,5.79,0,0,1-4.82,2.63A6,6,0,0,1,1,7.11,6,6,0,0,1,6.85,1Z" transform="translate(-0.01 0)"/><path class="cls___2" d="M6.85,1a5.77,5.77,0,0,1,4.62,2.36v0a3.91,3.91,0,0,0-2-.56,4.09,4.09,0,0,0-4,4.18,4.09,4.09,0,0,0,4,4.17,3.8,3.8,0,0,0,2.19-.69v.19a5.79,5.79,0,0,1-4.82,2.63A6,6,0,0,1,1,7.11,6,6,0,0,1,6.85,1Z" transform="translate(-0.01 0)"/></svg>
+                            <h4>31.<span>2</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
-                    </div>
-                </div>
-
-                <!-- === TAB: INFO === -->
-                <div class="tab-content" id="content-info">
-                    <div class="info-detail-grid" id="info-detail-grid"></div>
-                </div>
-
-                <!-- === TAB: INTERPRETATIONS === -->
-                <div class="tab-content" id="content-interpretations">
-                    <div class="interpretation-header">
-                        <h3>Астрологическая расшифровка</h3>
-                        <p>Индивидуальное толкование положений планет и куспидов домов на основе ваших расчетных данных.</p>
-                    </div>
-                    <div class="interpretation-sections">
-                        <div class="interpretation-group">
-                            <h4 class="interpretation-group-title">Положения планет</h4>
-                            <div class="interpretation-grid" id="interpretations-planets-grid">
-                                <!-- Generated via JS -->
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.46 16.12"><path class="cls_1" d="M5.73.75A5.68,5.68,0,1,1,0,6.43,5.71,5.71,0,0,1,5.73.75Zm0,1a4.65,4.65,0,1,0,4.69,4.65A4.67,4.67,0,0,0,5.73,1.78Z"/><rect class="cls_2" x="5.47" y="11.39" width="1.04" height="4.73"/><rect class="cls_2" x="2.94" y="13.46" width="5.99" height="0.81"/><rect class="cls_2" x="1.73" y="0.07" width="0.92" height="2.29" transform="translate(-0.31 1.38) rotate(-32.91)"/><rect class="cls_2" x="8.83" y="0.85" width="2.29" height="0.92" transform="translate(3.46 8.97) rotate(-57.09)"/></svg>
+                            <h4>20.<span>5</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.94 9.35"><rect class="cls_1" width="5" height="1.04"/><rect class="cls_1" x="8.82" width="5.12" height="1.04"/><rect class="cls_1" y="1.62" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="1.62" width="5.12" height="1.04"/><rect class="cls_1" y="3.3" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="3.3" width="5.12" height="1.04"/><rect class="cls_1" y="4.89" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="4.89" width="5.12" height="1.04"/><rect class="cls_1" y="6.56" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="6.56" width="5.12" height="1.04"/><rect class="cls_1" y="8.31" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="8.31" width="5.12" height="1.04"/></svg>
                         </div>
-                        <div class="interpretation-group" style="margin-top: 24px;">
-                            <h4 class="interpretation-group-title">Куспиды домов (Сферы жизни)</h4>
-                            <div class="interpretation-grid" id="interpretations-houses-grid">
-                                <!-- Generated via JS -->
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.02 17.46"><path class="cls_1" d="M6.51,0A6.46,6.46,0,1,1,0,6.45,6.48,6.48,0,0,1,6.51,0Zm0,1.17a5.29,5.29,0,1,0,5.33,5.28A5.31,5.31,0,0,0,6.51,1.17Z"/><rect class="cls_2" x="6.22" y="12.09" width="1.18" height="5.37"/><rect class="cls_2" x="3.34" y="14.45" width="6.81" height="0.92"/></svg>
+                            <h4>23.<span>1</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" width="5.15" height="1.04"/><rect class="cls_1" y="1.62" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" y="1.62" width="5.15" height="1.04"/><rect class="cls_1" y="3.3" width="5.03" height="1.04"/><rect class="cls_1" x="8.78" y="3.3" width="5.15" height="1.04"/><rect class="cls_1" y="4.89" width="13.96" height="1.04"/><rect class="cls_1" y="6.56" width="13.96" height="1.04"/><rect class="cls_1" y="8.31" width="13.96" height="1.04"/></svg>
                         </div>
-                    </div>
-                </div>
-
-            </div><!-- /results-panel -->
-        </main>
-
-        <!-- ===== COMPATIBILITY LAYOUT (Hidden by default) ===== -->
-        <div class="compat-layout hidden" id="compat-layout">
-            <div class="compat-container">
-                <!-- Mode switch: Zodiac vs Date -->
-                <div class="compat-type-row">
-                    <div class="compat-type-segmented">
-                        <button class="compat-type-btn active" id="type-zodiac-btn">По знакам зодиака</button>
-                        <button class="compat-type-btn" id="type-synastry-btn">По датам рождения</button>
-                    </div>
-                </div>
-
-                <!-- INPUT VIEW -->
-                <div class="compat-view" id="compat-input-view">
-                    <!-- ZODIAC INPUTS -->
-                    <div class="compat-card" id="zodiac-input-card">
-                        <h3 class="compat-card-title">Совместимость по знакам зодиака</h3>
-                        <p class="compat-card-subtitle">Выберите зодиакальные знаки обоих партнеров для мгновенного расчета</p>
-                        
-                        <div class="zodiac-selectors-grid">
-                            <div class="field-group">
-                                <label class="field-label" for="zodiac-p1">Партнёр 1</label>
-                                <div class="field-wrap">
-                                    <select id="zodiac-p1" class="field-input select-input">
-                                        <option value="Овен">♈&#xFE0E; Овен</option>
-                                        <option value="Телец">♉&#xFE0E; Телец</option>
-                                        <option value="Близнецы">♊&#xFE0E; Близнецы</option>
-                                        <option value="Рак">♋&#xFE0E; Рак</option>
-                                        <option value="Лев">♌&#xFE0E; Лев</option>
-                                        <option value="Дева">♍&#xFE0E; Дева</option>
-                                        <option value="Весы">♎&#xFE0E; Весы</option>
-                                        <option value="Скорпион">♏&#xFE0E; Скорпион</option>
-                                        <option value="Стрелец">♐&#xFE0E; Стрелец</option>
-                                        <option value="Козерог">♑&#xFE0E; Козерог</option>
-                                        <option value="Водолей">♒&#xFE0E; Водолей</option>
-                                        <option value="Рыбы">♓&#xFE0E; Рыбы</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="zodiac-selector-heart">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--primary)" opacity="0.8"/>
-                                </svg>
-                            </div>
-
-                            <div class="field-group">
-                                <label class="field-label" for="zodiac-p2">Партнёр 2</label>
-                                <div class="field-wrap">
-                                    <select id="zodiac-p2" class="field-input select-input">
-                                        <option value="Овен">♈&#xFE0E; Овен</option>
-                                        <option value="Телец">♉&#xFE0E; Телец</option>
-                                        <option value="Близнецы">♊&#xFE0E; Близнецы</option>
-                                        <option value="Рак">♋&#xFE0E; Рак</option>
-                                        <option value="Лев">♌&#xFE0E; Лев</option>
-                                        <option value="Дева">♍&#xFE0E; Дева</option>
-                                        <option value="Весы">♎&#xFE0E; Весы</option>
-                                        <option value="Скорпион" selected>♏&#xFE0E; Скорпион</option>
-                                        <option value="Стрелец">♐&#xFE0E; Стрелец</option>
-                                        <option value="Козерог">♑&#xFE0E; Козерог</option>
-                                        <option value="Водолей">♒&#xFE0E; Водолей</option>
-                                        <option value="Рыбы">♓&#xFE0E; Рыбы</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.66 14.42"><path class="cls_1" d="M6.51,1.51A6.46,6.46,0,1,1,0,8,6.48,6.48,0,0,1,6.51,1.51Zm0,1.16A5.29,5.29,0,1,0,11.84,8,5.31,5.31,0,0,0,6.51,2.67Z"/><polygon class="cls_1" points="10.21 0.52 14.66 0 14.4 4.13 12.76 2.82 10.99 4.26 9.95 3.31 11.68 1.83 10.21 0.52"/></svg>
+                            <h4>27.<span>2</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" y="8.31" width="5.06" height="1.04"/><rect class="cls_1" x="8.79" y="8.31" width="5.15" height="1.04"/><rect class="cls_1" y="6.69" width="5.07" height="1.04"/><rect class="cls_1" x="8.79" y="6.69" width="5.15" height="1.04"/><rect class="cls_1" y="5.02" width="5.06" height="1.04"/><rect class="cls_1" x="8.78" y="5.02" width="5.15" height="1.04"/><rect class="cls_1" y="3.42" width="13.96" height="1.04"/><rect class="cls_1" y="1.75" width="13.96" height="1.04"/><rect class="cls_1" width="13.96" height="1.04"/></svg>
                         </div>
-
-                        <button class="btn-calculate" id="btn-calculate-zodiac">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
-                            </svg>
-                            Рассчитать совместимость
-                        </button>
-                    </div>
-
-                    <!-- SYNASTRY INPUTS (hidden by default) -->
-                    <div class="compat-card hidden" id="synastry-input-card">
-                        <h3 class="compat-card-title">Точная синастрия по датам рождения</h3>
-                        <p class="compat-card-subtitle">Внесите точные данные обоих партнеров для расчета межкарточных аспектов</p>
-
-                        <form id="synastry-form" novalidate>
-                            <div class="synastry-forms-grid">
-                                <!-- Partner 1 Form -->
-                                <div class="partner-form-col">
-                                    <div class="partner-col-title">Партнёр 1</div>
-                                    
-                                    <div class="field-group">
-                                        <label class="field-label" for="p1_birth_date">Дата рождения</label>
-                                        <div class="field-wrap">
-                                            <input type="date" id="p1_birth_date" class="field-input" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label class="field-label" for="p1_birth_time">Время рождения</label>
-                                        <div class="field-wrap">
-                                            <input type="time" id="p1_birth_time" step="1" value="12:00:00" class="field-input" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label class="field-label" for="p1_city">Город рождения</label>
-                                        <div class="field-wrap city-wrap">
-                                            <input type="text" id="p1_city" class="field-input city-input" placeholder="Введите город..." autocomplete="off">
-                                            <button type="button" class="city-clear hidden" id="p1-city-clear">
-                                                <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="#7A7585" stroke-width="1.5" stroke-linecap="round"/></svg>
-                                            </button>
-                                            <div class="search-spinner hidden" id="p1-search-spinner"></div>
-                                            <input type="hidden" id="p1_lat">
-                                            <input type="hidden" id="p1_lon">
-                                        </div>
-                                        <ul class="suggestions" id="p1_suggestions"></ul>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label class="field-label">Время</label>
-                                        <label class="radio-row" id="p1-radio-local">
-                                            <div class="radio-dot active" id="p1-radio-local-dot"></div>
-                                            <span>Местное</span>
-                                        </label>
-                                        <label class="radio-row" id="p1-radio-gmt">
-                                            <div class="radio-dot" id="p1-radio-gmt-dot"></div>
-                                            <span>GMT / UTC</span>
-                                        </label>
-                                        <input type="hidden" id="p1_is_gmt" value="0">
-                                    </div>
-                                </div>
-
-                                <!-- Divider line -->
-                                <div class="synastry-forms-divider"></div>
-
-                                <!-- Partner 2 Form -->
-                                <div class="partner-form-col">
-                                    <div class="partner-col-title">Партнёр 2</div>
-
-                                    <div class="field-group">
-                                        <label class="field-label" for="p2_birth_date">Дата рождения</label>
-                                        <div class="field-wrap">
-                                            <input type="date" id="p2_birth_date" class="field-input" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label class="field-label" for="p2_birth_time">Время рождения</label>
-                                        <div class="field-wrap">
-                                            <input type="time" id="p2_birth_time" step="1" value="12:00:00" class="field-input" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label class="field-label" for="p2_city">Город рождения</label>
-                                        <div class="field-wrap city-wrap">
-                                            <input type="text" id="p2_city" class="field-input city-input" placeholder="Введите город..." autocomplete="off">
-                                            <button type="button" class="city-clear hidden" id="p2-city-clear">
-                                                <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="#7A7585" stroke-width="1.5" stroke-linecap="round"/></svg>
-                                            </button>
-                                            <div class="search-spinner hidden" id="p2-search-spinner"></div>
-                                            <input type="hidden" id="p2_lat">
-                                            <input type="hidden" id="p2_lon">
-                                        </div>
-                                        <ul class="suggestions" id="p2_suggestions"></ul>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label class="field-label">Время</label>
-                                        <label class="radio-row" id="p2-radio-local">
-                                            <div class="radio-dot active" id="p2-radio-local-dot"></div>
-                                            <span>Местное</span>
-                                        </label>
-                                        <label class="radio-row" id="p2-radio-gmt">
-                                            <div class="radio-dot" id="p2-radio-gmt-dot"></div>
-                                            <span>GMT / UTC</span>
-                                        </label>
-                                        <input type="hidden" id="p2_is_gmt" value="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn-calculate" id="btn-submit-synastry" style="margin-top: 24px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
-                                </svg>
-                                <span>Рассчитать точную совместимость</span>
-                                <span class="btn-spin hidden" id="btn-spinner-synastry"></span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- RESULT VIEW (Hidden initially) -->
-                <div class="compat-view hidden" id="compat-result-view">
-                    <!-- Circular progress meters strip -->
-                    <div class="compat-results-header">
-                        <!-- Main Score -->
-                        <div class="main-score-card">
-                            <div class="circle-progress-wrap">
-                                <svg class="circle-progress" width="130" height="130" viewBox="0 0 130 130">
-                                    <circle class="circle-bg" cx="65" cy="65" r="56" stroke-width="8"></circle>
-                                    <circle class="circle-bar" id="score-circle-bar" cx="65" cy="65" r="56" stroke-width="8" stroke-dasharray="351.8" stroke-dashoffset="351.8"></circle>
-                                </svg>
-                                <div class="circle-text">
-                                    <span class="circle-num" id="score-overall">0%</span>
-                                    <span class="circle-lbl">Совместимость</span>
-                                </div>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.14 15.05"><rect class="cls_1" x="9.28" y="0.44" width="1.51" height="14.61"/><rect class="cls_1" x="1.3" y="11.38" width="11.84" height="1.51"/><path class="cls_1" d="M2.05,12c-.48-.13.71-.79,1.13-1.21a21.49,21.49,0,0,0,3-3.59A5,5,0,0,0,7,4.66a3.17,3.17,0,0,0-.71-2.09A2.35,2.35,0,0,0,4.4,1.72a2.34,2.34,0,0,0-1.94.91,3.89,3.89,0,0,0-.74,2.49L0,4.9A5.91,5.91,0,0,1,1.33,1.25,4,4,0,0,1,4.44,0,3.87,3.87,0,0,1,7.55,1.35,5,5,0,0,1,8.69,4.71a6.3,6.3,0,0,1-.33,2A8.29,8.29,0,0,1,7.24,8.77a29.87,29.87,0,0,1-2.58,3c-.25.26-.4.8-.69.72Z"/></svg>
+                            <h4>60.<span>6</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
-
-                        <!-- Category Scores -->
-                        <div class="category-scores-wrap">
-                            <div class="cat-score-card">
-                                <div class="cat-score-header">
-                                    <span class="cat-icon">❤️</span>
-                                    <span class="cat-title">Любовь / Романтика</span>
-                                    <span class="cat-percent" id="score-love">0%</span>
-                                </div>
-                                <div class="cat-progress-bg">
-                                    <div class="cat-progress-bar" id="bar-love" style="width: 0%"></div>
-                                </div>
-                            </div>
-
-                            <div class="cat-score-card">
-                                <div class="cat-score-header">
-                                    <span class="cat-icon">🤝</span>
-                                    <span class="cat-title">Дружба / Понимание</span>
-                                    <span class="cat-percent" id="score-friendship">0%</span>
-                                </div>
-                                <div class="cat-progress-bg">
-                                    <div class="cat-progress-bar" id="bar-friendship" style="width: 0%"></div>
-                                </div>
-                            </div>
-
-                            <div class="cat-score-card">
-                                <div class="cat-score-header">
-                                    <span class="cat-icon">💼</span>
-                                    <span class="cat-title">Бизнес / Работа</span>
-                                    <span class="cat-percent" id="score-work">0%</span>
-                                </div>
-                                <div class="cat-progress-bg">
-                                    <div class="cat-progress-bar" id="bar-work" style="width: 0%"></div>
-                                </div>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.21 17.21"><rect class="cls_1" x="1.74" y="1.03" width="1.31" height="16.18"/><rect class="cls_1" x="0.11" y="0.11" width="4.65" height="1.05" style="stroke:#1e1e1c;stroke-miterlimit:22.93;stroke-width:0.22px;"/><path class="cls_1" d="M2.86,4C7.12,3.54,9.17,4,10,6.16a3.24,3.24,0,0,1-.8,3.57,25.73,25.73,0,0,0-2.59,2.82c-.72,1.29-.27,2,1.58,2.87l-.53,1c-3.56-1.38-2.95-3.76.46-7,3-4-1.8-5.33-5.29-4.32Z" transform="translate(0 0.01)" style="fill-rule: evenodd;"/></svg>
+                            <h4>29.<span>6</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.94 9.35"><rect class="cls_1" width="5" height="1.04"/><rect class="cls_1" x="8.82" width="5.12" height="1.04"/><rect class="cls_1" y="1.62" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="1.62" width="5.12" height="1.04"/><rect class="cls_1" y="3.3" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="3.3" width="5.12" height="1.04"/><rect class="cls_1" y="4.89" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="4.89" width="5.12" height="1.04"/><rect class="cls_1" y="6.56" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="6.56" width="5.12" height="1.04"/><rect class="cls_1" y="8.31" width="5" height="1.04"/><rect class="cls_1" x="8.82" y="8.31" width="5.12" height="1.04"/></svg>
                         </div>
-                    </div>
-
-                    <!-- Grid Details -->
-                    <div class="compat-grid">
-                        <!-- Left: Graphic / Synastry canvas -->
-                        <div class="compat-visual-section">
-                            <div class="compat-card">
-                                <h4 class="compat-section-title" id="compat-visual-title">Звёздная карта союза</h4>
-                                <div class="synastry-canvas-container" id="synastry-canvas-container">
-                                    <canvas id="synastry-canvas" width="380" height="380" style="max-width:100%;height:auto;"></canvas>
-                                </div>
-                                <!-- Legend for synastry -->
-                                <div class="chart-legend" id="synastry-legend">
-                                    <div class="legend-item"><span class="legend-line conj"></span> Соединение</div>
-                                    <div class="legend-item"><span class="legend-line trig"></span> Тригон</div>
-                                    <div class="legend-item"><span class="legend-line squa"></span> Квадрат</div>
-                                    <div class="legend-item"><span class="legend-line oppo"></span> Оппозиция</div>
-                                </div>
-                                <div class="zodiac-elements-badge-container" id="zodiac-elements-badge-container">
-                                    <div class="element-badge" id="badge-p1">Огонь</div>
-                                    <span style="color:#C59E3F">+</span>
-                                    <div class="element-badge" id="badge-p2">Земля</div>
-                                </div>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.39 18.26"><path class="cls_1" d="M6.7,5.37a6.57,6.57,0,0,1,6.69,6.44A6.57,6.57,0,0,1,6.7,18.26,6.58,6.58,0,0,1,0,11.81,6.58,6.58,0,0,1,6.7,5.37Zm0,1.22a5.34,5.34,0,0,0-5.44,5.22A5.34,5.34,0,0,0,6.7,17a5.33,5.33,0,0,0,5.43-5.23A5.33,5.33,0,0,0,6.7,6.59Z"/><rect class="cls_2" x="6.26" width="1.07" height="6.19"/><rect class="cls_2" x="3.92" y="3.35" width="5.5" height="0.95"/><rect class="cls_2" x="5.37" y="2.09" width="2.97" height="1.33"/><path class="cls_1" d="M6.67,6.76A2.21,2.21,0,1,1,4.42,9,2.23,2.23,0,0,1,6.67,6.76Z"/></svg>
+                            <h4>12.<span>6</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" width="5.15" height="1.04"/><rect class="cls_1" y="1.62" width="5.03" height="1.04"/><rect class="cls_1" x="8.79" y="1.62" width="5.15" height="1.04"/><rect class="cls_1" y="3.3" width="5.03" height="1.04"/><rect class="cls_1" x="8.78" y="3.3" width="5.15" height="1.04"/><rect class="cls_1" y="4.89" width="13.96" height="1.04"/><rect class="cls_1" y="6.56" width="13.96" height="1.04"/><rect class="cls_1" y="8.31" width="13.96" height="1.04"/></svg>
                         </div>
-
-                        <!-- Right: Text Description / Aspects -->
-                        <div class="compat-text-section">
-                            <div class="compat-card">
-                                <h4 class="compat-section-title">Астрологический анализ союза</h4>
-                                
-                                <div class="compat-text-block">
-                                    <h5 class="compat-block-title">Взаимодействие стихий</h5>
-                                    <p id="text-elements">—</p>
-                                </div>
-
-                                <div class="compat-text-block">
-                                    <h5 class="compat-block-title">Характер взаимоотношений</h5>
-                                    <p id="text-description">—</p>
-                                </div>
-
-                                <div class="compat-text-block">
-                                    <h5 class="compat-block-title">Рекомендации и советы</h5>
-                                    <p id="text-advice">—</p>
-                                </div>
-                            </div>
-
-                            <!-- Aspects Interpretations (Shown only for Synastry) -->
-                            <div class="compat-card hidden" id="synastry-aspects-card">
-                                <h4 class="compat-section-title">Ключевые планетарные аспекты</h4>
-                                <div class="synastry-aspects-list" id="synastry-aspects-list">
-                                    <!-- Populated dynamically -->
-                                </div>
-                            </div>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17.41 16.38"><rect class="cls_1" x="7.98" width="1.11" height="16.38"/><rect class="cls_1" x="3.73" y="11.86" width="9.36" height="1.64"/><rect class="cls_1" y="2.69" width="5.3" height="0.98"/><rect class="cls_1" x="12.11" y="2.82" width="5.3" height="0.98"/><rect class="cls_1" x="6.87" y="1.31" width="3.53" height="1.31"/><path class="cls_2" d="M15.46.33A7,7,0,1,1,1.79,2.68,7,7,0,0,1,2.19.33H3.3a5.91,5.91,0,0,0-.47,2.35,6,6,0,1,0,12,0A5.91,5.91,0,0,0,14.35.33Z" transform="translate(-0.02)"/></svg>
+                            <h4>48.<span>4</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.96 9.35"><rect class="cls_1" y="8.31" width="5.06" height="1.04"/><rect class="cls_1" x="8.79" y="8.31" width="5.15" height="1.04"/><rect class="cls_1" y="6.69" width="5.07" height="1.04"/><rect class="cls_1" x="8.79" y="6.69" width="5.15" height="1.04"/><rect class="cls_1" y="5.02" width="5.06" height="1.04"/><rect class="cls_1" x="8.78" y="5.02" width="5.15" height="1.04"/><rect class="cls_1" y="3.42" width="13.96" height="1.04"/><rect class="cls_1" y="1.75" width="13.96" height="1.04"/><rect class="cls_1" width="13.96" height="1.04"/></svg>
                         </div>
-                    </div>
-
-                    <!-- Export & Actions -->
-                    <div class="compat-actions-row">
-                        <button class="btn-ghost" id="btn-compat-back">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                <path d="M10.5 12.5L5.5 7.5l5-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Другой расчет
-                        </button>
-                        
-                        <div class="export-wrapper">
-                            <button class="btn-export" id="btn-compat-export" aria-haspopup="true">
-                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                                    <path d="M2.5 10.5v2h10v-2M7.5 1v8M4.5 6l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span>Экспорт отчета</span>
-                            </button>
+                        <div class="icon_group_block">
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.11 15.08"><path class="cls_1" d="M10.11,4.65A3.9,3.9,0,0,0,8.3,1.21,8.68,8.68,0,0,0,3.39,0C2.81,0,1.68,0,0,.07.1,2.45.16,5.08.16,8,.16,10.66.1,13,0,15.08H9.26L9.2,13.37c-2.66.09-5.12.13-7.4.13,0-1.2.05-2.77.05-4.71.67,0,1.29.05,1.86.05a10.71,10.71,0,0,0,4.21-.65,3.55,3.55,0,0,0,2.19-3.54Zm-1.88-.2c0,1.89-1.6,2.84-4.82,2.84a14.4,14.4,0,0,1-1.56-.07c0-2,0-3.89.12-5.5a7.1,7.1,0,0,1,1.48-.1,7.22,7.22,0,0,1,3.73.69A2.35,2.35,0,0,1,8.23,4.45Z"/></svg>
+                            <h4>7.<span>1</span> </h4>
+                            <svg id="Слой_1" class="border" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13.92 9.35"><rect class="cls_1" width="13.92" height="1.04"/><rect class="cls_1" x="0.01" y="1.62" width="13.92" height="1.04"/><rect class="cls_1" y="3.3" width="13.92" height="1.04"/><rect class="cls_1" y="4.89" width="13.92" height="1.04"/><rect class="cls_1" y="6.56" width="13.92" height="1.04"/><rect class="cls_1" y="8.31" width="13.92" height="1.04"/></svg>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="btns_block_2"></div>
     </div>
-
-    <!-- Footer bar -->
-    <div class="bottom-bar">
-        <span>Точность расчётов: Swiss Ephemeris (pyswisseph)</span>
-        <span>Версия 1.0.0</span>
+    <div class="menu_2">
+        <img src="https://img.icons8.com/android/24/000000/menu.png"/>
     </div>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/script.js"></script>
 
-    <!-- ============================================================
-         PRINT & PDF REPORT TEMPLATE (Hidden on screen, shown on print)
-         ============================================================ -->
-    <div class="print-report" id="print-report">
-        <!-- Header -->
-        <div class="print-header">
-            <div class="print-header-left">
-                <svg class="print-logo" width="34" height="34">
-                    <use href="#logo-symbol"/>
-                </svg>
-                <span class="print-brand-title">Humantica</span>
-                <span class="print-brand-divider">|</span>
-                <span class="print-brand-subtitle">Натальная карта и бодиграф по эфемеридам</span>
-            </div>
-            <div class="print-header-right" id="print-date-timestamp">
-                Отчёт сформирован: —
-            </div>
-        </div>
-
-        <div class="print-divider"></div>
-
-        <!-- Section: Natal Chart -->
-        <div class="print-section-title">НАТАЛЬНАЯ КАРТА</div>
-        
-        <!-- Meta Row -->
-        <div class="print-meta-row">
-            <div class="print-meta-card">
-                <div class="print-meta-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                        <path d="M8 1a5 5 0 0 0-5 5c0 3.5 5 9 5 9s5-5.5 5-9a5 5 0 0 0-5-5z" stroke="currentColor" stroke-width="1.3"/>
-                        <circle cx="8" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/>
-                    </svg>
-                </div>
-                <div class="print-meta-content">
-                    <span class="print-meta-label">Место рождения</span>
-                    <span class="print-meta-val" id="pm-city">—</span>
-                    <span class="print-meta-sub" id="pm-coords">—</span>
-                </div>
-            </div>
-            
-            <div class="print-meta-card">
-                <div class="print-meta-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
-                        <path d="M8 4v4l2.5 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="print-meta-content">
-                    <span class="print-meta-label">Местное время</span>
-                    <span class="print-meta-val" id="pm-time">—</span>
-                    <span class="print-meta-sub" id="pm-gmt">—</span>
-                </div>
-            </div>
-
-            <div class="print-meta-card">
-                <div class="print-meta-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
-                        <path d="M2.5 8h11M8 2.5a10 10 0 0 0 0 11M8 2.5a10 10 0 0 1 0 11" stroke="currentColor" stroke-width="1.3"/>
-                    </svg>
-                </div>
-                <div class="print-meta-content">
-                    <span class="print-meta-label">Часовой пояс</span>
-                    <span class="print-meta-val" id="pm-timezone">—</span>
-                    <span class="print-meta-sub" id="pm-offset">—</span>
-                </div>
-            </div>
-
-            <div class="print-meta-card">
-                <div class="print-meta-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                        <rect x="2.5" y="2.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                        <path d="M2.5 6.5h11M6.5 2.5v11" stroke="currentColor" stroke-width="1.3"/>
-                    </svg>
-                </div>
-                <div class="print-meta-content">
-                    <span class="print-meta-label">Юлианский день (UT)</span>
-                    <span class="print-meta-val" id="pm-jd">—</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Columns Grid -->
-        <div class="print-main-grid">
-            <div class="print-grid-left">
-                <div class="print-column-title">ПЛАНЕТЫ И ЛУННЫЕ УЗЛЫ</div>
-                <table class="print-planets-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 25%">Объект</th>
-                            <th style="width: 25%">Долгота</th>
-                            <th style="width: 15%">Знак</th>
-                            <th style="width: 20%">Градусы</th>
-                            <th style="width: 15%">Ретро</th>
-                        </tr>
-                    </thead>
-                    <tbody id="print-planets-tbody">
-                        <!-- Populated via JS -->
-                    </tbody>
-                </table>
-                <div class="print-retro-legend"><span class="retro-r">R</span> — Ретроградное движение</div>
-            </div>
-
-            <div class="print-grid-right">
-                <div class="print-column-title">КАРТА РОЖДЕНИЯ</div>
-                <div class="print-canvas-wrapper">
-                    <canvas id="print-chart-canvas"></canvas>
-                </div>
-                <div class="print-aspect-legend">
-                    <div class="print-aspect-item"><span class="aspect-line aspect-conj"></span>Соединение (0°)</div>
-                    <div class="print-aspect-item"><span class="aspect-line aspect-trine"></span>Тригон (120°)</div>
-                    <div class="print-aspect-item"><span class="aspect-line aspect-square"></span>Квадрат (90°)</div>
-                    <div class="print-aspect-item"><span class="aspect-line aspect-opp"></span>Оппозиция (180°)</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Houses -->
-        <div class="print-column-title" style="margin-top: 15px;">ДОМА (КУСПИДЫ)</div>
-        <div class="print-houses-row" id="print-houses-row">
-            <!-- 12 houses generated via JS -->
-        </div>
-
-        <!-- Bottom Row -->
-        <div class="print-bottom-row">
-            <div class="print-bottom-card" style="flex: 4.5;">
-                <div class="print-column-title" style="margin-top: 0; font-size: 11px;">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</div>
-                <div class="print-extra-info-list">
-                    <div class="print-extra-item">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                            <path d="M2.5 8h11M8 2.5c2 1.5 2 9.5 0 11" stroke="currentColor" stroke-width="1.2"/>
-                        </svg>
-                        <span>Система домов: <strong id="print-house-system-label">Placidus</strong></span>
-                    </div>
-                    <div class="print-extra-item">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                            <path d="M8 4v4l2.5 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                        </svg>
-                        <span>Аянамса: <strong>Не используется (Тропический Зодиак)</strong></span>
-                    </div>
-                    <div class="print-extra-item">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                            <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2"/>
-                        </svg>
-                        <span>Эфемериды: <strong>Swiss Ephemeris (pyswisseph)</strong></span>
-                    </div>
-                    <div class="print-extra-item">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                            <rect x="2.5" y="2.5" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/>
-                            <path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                        </svg>
-                        <span>Точность расчётов: <strong>~ 1 угл. секунда</strong></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="print-bottom-card" style="flex: 5.5; position: relative;">
-                <div class="print-column-title" style="margin-top: 0; font-size: 11px;">ПРИМЕЧАНИЕ</div>
-                <p class="print-note-text">
-                    Данный отчёт содержит положения планет и куспиды домов, рассчитанные на основе введённых данных с использованием эфемерид Swiss Ephemeris. Погрешность расчётов не превышает нескольких секунд дуги.
-                </p>
-                <svg class="print-star-decor" width="48" height="48" viewBox="0 0 48 48" fill="none">
-                    <path d="M24 4c0 10 6 16 16 16-10 0-16 6-16 16 0-10-6-16-16-16 10 0 16-6 16-16z" fill="rgba(197, 158, 63, 0.1)"/>
-                    <path d="M24 10c0 7 4 11 11 11-7 0-11 4-11 11 0-7-4-11-11-11 7 0 11-4 11-11z" fill="var(--primary)"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="print-footer">
-            <span>© 2026 Humantica</span>
-            <span>Точность расчётов: Swiss Ephemeris (pyswisseph)</span>
-            <span>Страница 1 из 2</span>
-        </div>
-    </div>
-
-    <!-- ============================================================
-         PRINT REPORT — PAGE 2: INTERPRETATIONS
-         ============================================================ -->
-    <div class="print-interpretations-section" id="print-interpretations-section">
-        <!-- Page header (repeated branding) -->
-        <div class="print-interp-page-header">
-            <svg class="print-logo" width="26" height="26">
-                <use href="#logo-symbol"/>
-            </svg>
-            <span class="print-brand-title">Humantica</span>
-            <span class="print-brand-divider">|</span>
-            <span class="print-brand-subtitle">Астрологическая расшифровка натальной карты</span>
-            <span style="flex:1"></span>
-            <span class="print-header-right" id="print-date-timestamp-p2" style="font-size:7.5pt;color:#9E978A;"></span>
-        </div>
-
-        <!-- Planets section -->
-        <div class="print-interp-section-title">Положения планет — Расшифровка</div>
-        <div class="print-interp-grid" id="print-interp-planets-grid">
-            <!-- Populated via JS -->
-        </div>
-
-        <!-- Houses section -->
-        <div class="print-interp-section-title" style="margin-top: 8px;">Куспиды домов — Сферы жизни</div>
-        <div class="print-interp-grid" id="print-interp-houses-grid">
-            <!-- Populated via JS -->
-        </div>
-
-        <!-- Footer page 2 -->
-        <div class="print-footer" style="margin-top: 16px;">
-            <span>© 2026 Humantica</span>
-            <span>Точность расчётов: Swiss Ephemeris (pyswisseph)</span>
-            <span>Страница 2 из 2</span>
-        </div>
-    </div>
-
-    <!-- ============================================================
-         PRINT COMPATIBILITY REPORT TEMPLATE (Hidden on screen)
-         ============================================================ -->
-    <div class="print-report" id="print-compat-report">
-        <div class="print-header">
-            <div class="print-header-left">
-                <svg class="print-logo" width="34" height="34">
-                    <use href="#logo-symbol"/>
-                </svg>
-                <span class="print-brand-title">Humantica</span>
-                <span class="print-brand-divider">|</span>
-                <span class="print-brand-subtitle">Отчёт о совместимости партнёров</span>
-            </div>
-            <div class="print-header-right" id="print-compat-date-timestamp">
-                Отчёт сформирован: —
-            </div>
-        </div>
-
-        <div class="print-divider"></div>
-
-        <div class="print-compat-grid">
-            <div class="print-compat-score-col">
-                <div class="print-section-title">ОБЩАЯ СОВМЕСТИМОСТЬ</div>
-                <div class="print-big-score" id="print-compat-score-val">0%</div>
-                
-                <div class="print-score-row">
-                    <span class="print-score-label">Любовь / Брак:</span>
-                    <span class="print-score-num" id="print-compat-love">0%</span>
-                </div>
-                <div class="print-score-row">
-                    <span class="print-score-label">Дружба / Общение:</span>
-                    <span class="print-score-num" id="print-compat-friendship">0%</span>
-                </div>
-                <div class="print-score-row">
-                    <span class="print-score-label">Бизнес / Работа:</span>
-                    <span class="print-score-num" id="print-compat-work">0%</span>
-                </div>
-            </div>
-
-            <div class="print-compat-info-col">
-                <div class="print-section-title">ИНФОРМАЦИЯ О ПАРЕ</div>
-                <div class="print-couple-details" id="print-couple-details">
-                    <!-- Zodiac Sign or birth dates details -->
-                </div>
-            </div>
-        </div>
-
-        <div class="print-divider" style="margin-top: 16px;"></div>
-
-        <div class="print-section-title">АНАЛИЗ СОВМЕСТИМОСТИ</div>
-        
-        <div class="print-text-block">
-            <div class="print-block-subtitle">Взаимодействие стихий</div>
-            <p id="print-text-elements">—</p>
-        </div>
-
-        <div class="print-text-block">
-            <div class="print-block-subtitle">Характер взаимоотношений</div>
-            <p id="print-text-description">—</p>
-        </div>
-
-        <div class="print-text-block">
-            <div class="print-block-subtitle">Рекомендации и советы</div>
-            <p id="print-text-advice">—</p>
-        </div>
-
-        <!-- Populated only if Synastry -->
-        <div id="print-synastry-aspects-section" class="hidden">
-            <div class="print-divider" style="margin-top: 16px; page-break-before: always;"></div>
-            <div class="print-header">
-                <svg class="print-logo" width="26" height="26">
-                    <use href="#logo-symbol"/>
-                </svg>
-                <span class="print-brand-title">Humantica</span>
-                <span class="print-brand-divider">|</span>
-                <span class="print-brand-subtitle">Планетарные аспекты синастрии</span>
-            </div>
-            <div class="print-section-title" style="margin-top: 16px;">КЛЮЧЕВЫЕ АСПЕКТЫ СОВМЕСТИМОСТИ</div>
-            <div id="print-synastry-aspects-list">
-                <!-- Aspect interpretations -->
-            </div>
-        </div>
-
-        <div class="print-footer" style="margin-top: 24px;">
-            <span>© 2026 Humantica</span>
-            <span>Точность расчётов: Swiss Ephemeris</span>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast-notification" id="toast-notification" role="alert" aria-live="polite">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="7" stroke="var(--primary)" stroke-width="1.3"/>
-            <path d="M5 8.5l2 2 4-4.5" stroke="var(--primary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span id="toast-message">Отчёт успешно скопирован в буфер обмена</span>
-    </div>
-
-    <!-- Custom Date Picker Modal (Mobile Only) -->
-    <div class="custom-picker-modal hidden" id="date-picker-modal">
-        <div class="custom-picker-overlay" id="date-picker-overlay"></div>
-        <div class="custom-picker-content">
-            <div class="custom-picker-header">Установите дату рождения</div>
-            <div class="custom-picker-labels">
-                <div class="custom-picker-column-label">День</div>
-                <div class="custom-picker-column-label">Месяц</div>
-                <div class="custom-picker-column-label">Год</div>
-            </div>
-            <div class="custom-picker-body">
-                <div class="custom-picker-column" id="picker-day">
-                    <div class="custom-picker-spacer"></div>
-                    <!-- Days 1 to 31 populated via JS -->
-                    <div class="custom-picker-spacer"></div>
-                </div>
-                <div class="custom-picker-column" id="picker-month">
-                    <div class="custom-picker-spacer"></div>
-                    <!-- Months Jan to Dec populated via JS -->
-                    <div class="custom-picker-spacer"></div>
-                </div>
-                <div class="custom-picker-column" id="picker-year">
-                    <div class="custom-picker-spacer"></div>
-                    <!-- Years 1900 to current year populated via JS -->
-                    <div class="custom-picker-spacer"></div>
-                </div>
-                <div class="custom-picker-highlight"></div>
-            </div>
-            <div class="custom-picker-footer">
-                <button class="custom-picker-btn cancel" id="date-picker-cancel">Отмена</button>
-                <button class="custom-picker-btn confirm" id="date-picker-confirm">Установить</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Time Picker Modal (Mobile Only) -->
-    <div class="custom-picker-modal hidden" id="time-picker-modal">
-        <div class="custom-picker-overlay" id="time-picker-overlay"></div>
-        <div class="custom-picker-content">
-            <div class="custom-picker-header">Установите время рождения</div>
-            <div class="custom-picker-labels">
-                <div class="custom-picker-column-label">Часы</div>
-                <div class="custom-picker-column-label">Минуты</div>
-                <div class="custom-picker-column-label">Секунды</div>
-            </div>
-            <div class="custom-picker-body">
-                <div class="custom-picker-column" id="picker-hour">
-                    <div class="custom-picker-spacer"></div>
-                    <!-- Hours 00 to 23 populated via JS -->
-                    <div class="custom-picker-spacer"></div>
-                </div>
-                <div class="custom-picker-column" id="picker-minute">
-                    <div class="custom-picker-spacer"></div>
-                    <!-- Minutes 00 to 59 populated via JS -->
-                    <div class="custom-picker-spacer"></div>
-                </div>
-                <div class="custom-picker-column" id="picker-second">
-                    <div class="custom-picker-spacer"></div>
-                    <!-- Seconds 00 to 59 populated via JS -->
-                    <div class="custom-picker-spacer"></div>
-                </div>
-                <div class="custom-picker-highlight"></div>
-            </div>
-            <div class="custom-picker-footer">
-                <button class="custom-picker-btn cancel" id="time-picker-cancel">Отмена</button>
-                <button class="custom-picker-btn confirm" id="time-picker-confirm">Установить</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="/static/js/rulers_data.js?v=1.0.0"></script>
-    <script src="/static/js/main.js?v=1.2.98"></script>
 </body>
 </html>
