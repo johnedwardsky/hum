@@ -4009,8 +4009,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                     };
                     
-                    const s = getProgramBoundary(h);
-                    const e = getProgramBoundary(hNext);
+                    const s = getProgramBoundary(hNext);
+                    const e = getProgramBoundary(h);
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -4416,8 +4416,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                 };
 
-                const s = getProgramBoundary(h);
-                const e = getProgramBoundary(hNext);
+                const s = getProgramBoundary(hNext);
+                const e = getProgramBoundary(h);
                 
                 for (let j = 0; j < 12; j++) {
                     const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
@@ -4527,9 +4527,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const startLon = getProgramBoundary(h);
                 const endLon = getProgramBoundary(hNext);
 
-                let startAngle = degToRad(startLon - 180);
-                let endAngle   = degToRad(endLon - 180);
-                if (endAngle < startAngle) endAngle += 2 * Math.PI;
+                // On canvas, sectors move counter-clockwise from startLon down to endLon.
+                // aStart is the counter-clockwise edge (endLon), aEnd is the clockwise edge (startLon).
+                let aStart = degToRad(endLon - 180);
+                let aEnd   = degToRad(startLon - 180);
+                if (aEnd < aStart) aEnd += 2 * Math.PI;
 
                 const houseNum = i + 1;
                 const isThisHouseHovered = (hoverType === 'house' && hoverTarget === houseNum);
@@ -4541,18 +4543,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     fillOpacity = isThisHouseHovered ? 0.28 : 0.02;
                 }
                 ctx.beginPath();
-                ctx.moveTo(cx + rHousesInner * Math.cos(startAngle), cy + rHousesInner * Math.sin(startAngle));
-                ctx.arc(cx, cy, rHousesOuter, startAngle, endAngle);
-                ctx.lineTo(cx + rHousesInner * Math.cos(endAngle), cy + rHousesInner * Math.sin(endAngle));
-                ctx.arc(cx, cy, rHousesInner, endAngle, startAngle, true);
+                ctx.moveTo(cx + rHousesInner * Math.cos(aStart), cy + rHousesInner * Math.sin(aStart));
+                ctx.arc(cx, cy, rHousesOuter, aStart, aEnd);
+                ctx.lineTo(cx + rHousesInner * Math.cos(aEnd), cy + rHousesInner * Math.sin(aEnd));
+                ctx.arc(cx, cy, rHousesInner, aEnd, aStart, true);
                 ctx.closePath();
                 ctx.fillStyle = `rgba(225, 190, 110, ${fillOpacity})`;
                 ctx.fill();
 
-                // 2. Cusp divider line
+                // 2. Cusp divider line (at startLon = aEnd)
                 ctx.beginPath();
-                ctx.moveTo(cx + rHousesInner * Math.cos(startAngle), cy + rHousesInner * Math.sin(startAngle));
-                ctx.lineTo(cx + rHousesOuter * Math.cos(startAngle), cy + rHousesOuter * Math.sin(startAngle));
+                ctx.moveTo(cx + rHousesInner * Math.cos(aEnd), cy + rHousesInner * Math.sin(aEnd));
+                ctx.lineTo(cx + rHousesOuter * Math.cos(aEnd), cy + rHousesOuter * Math.sin(aEnd));
                 
                 let cuspColor = 'rgba(197, 158, 63, 0.35)';
                 if (isAnyHouseHovered) {
@@ -4568,13 +4570,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     textAlpha = 0.12;
                 }
 
-                const midAngle = (startAngle + endAngle) / 2;
+                const midAngle = (aStart + aEnd) / 2;
                 const gate = h.hexagram ? h.hexagram.gate : '?';
                 const line = h.hexagram ? h.hexagram.line : '?';
 
-                // --- House Number: near the other border (end of sector), inside gold band ---
-                const houseAngleOffset = (endAngle - startAngle) * 0.85;
-                const angleHouseNum = startAngle + houseAngleOffset;
+                // --- House Number: near the cusp border (aEnd), inside gold band ---
+                const houseAngleOffset = (aEnd - aStart) * 0.85;
+                const angleHouseNum = aStart + houseAngleOffset;
                 const xHN = cx + rMid * Math.cos(angleHouseNum);
                 const yHN = cy + rMid * Math.sin(angleHouseNum);
                 ctx.font = 'bold 12.5px "DM Sans", sans-serif';
@@ -4592,13 +4594,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`${gate}.${line}`, xGL, yGL);
 
-                // --- Rulers: near start border (opposite to house number), inside gold band ---
+                // --- Rulers: near opposite border (aStart), inside gold band ---
                 const rulers = (typeof getNidanaRulers === 'function')
                     ? getNidanaRulers(gate, line) : null;
 
                 if (rulers) {
-                    const rulerAngleOffset = (endAngle - startAngle) * 0.18;
-                    const angleRulerPos = startAngle + rulerAngleOffset;
+                    const rulerAngleOffset = (aEnd - aStart) * 0.18;
+                    const angleRulerPos = aStart + rulerAngleOffset;
                     const xRP = cx + rMid * Math.cos(angleRulerPos);
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
 
@@ -6227,8 +6229,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                             };
                             
-                            const s = getProgramBoundary(h);
-                            const e = getProgramBoundary(hNext);
+                            const s = getProgramBoundary(hNext);
+                            const e = getProgramBoundary(h);
                             
                             let inHouse;
                             if (e < s) { // wrap around 360°
