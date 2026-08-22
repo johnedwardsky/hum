@@ -3997,10 +3997,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (hoverType === 'house') {
                 if (data.houses && data.houses.length === 12) {
-                    const asc = data.houses[0].longitude;
                     const houseIdx = hoverTarget - 1;
-                    let s = (asc - (houseIdx + 1) * 30 + 720) % 360;
-                    let e = (asc - houseIdx * 30 + 720) % 360;
+                    const s = data.houses[houseIdx].longitude;
+                    const e = data.houses[(houseIdx + 1) % 12].longitude;
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -4393,10 +4392,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const hoveredSignIdxs = new Set();
             if (hoverType === 'house' && data.houses && data.houses.length === 12) {
-                const asc = data.houses[0].longitude;
                 const houseIdx = hoverTarget - 1;
-                let s = (asc - (houseIdx + 1) * 30 + 720) % 360;
-                let e = (asc - houseIdx * 30 + 720) % 360;
+                const s = data.houses[houseIdx].longitude;
+                const e = data.houses[(houseIdx + 1) % 12].longitude;
                 for (let j = 0; j < 12; j++) {
                     // signMid in terms of offset from WHEEL_START
                     const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
@@ -4491,12 +4489,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
-            const asc = data.houses[0].longitude;
-
             for (let i = 0; i < 12; i++) {
-                const h     = data.houses[i];
-                let startAngle = degToRad((asc - (i + 1) * 30 - 180 + 720) % 360);
-                let endAngle   = degToRad((asc - i * 30 - 180 + 720) % 360);
+                const h        = data.houses[i];
+                const startLon = h.longitude;
+                const endLon   = data.houses[(i + 1) % 12].longitude;
+                let startAngle = degToRad(startLon - 180);
+                let endAngle   = degToRad(endLon - 180);
                 if (endAngle < startAngle) endAngle += 2 * Math.PI;
 
                 const houseNum = i + 1;
@@ -6180,10 +6178,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Check if hovering the Houses Ring (rHousesInner <= dist <= rHousesOuter)
                     if (dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses) {
-                        const asc = lastChart.houses[0].longitude;
-                        let offsetCCW = ((asc - deg) % 360 + 360) % 360;
-                        let houseIdx = Math.floor(offsetCCW / 30);
-                        if (houseIdx >= 0 && houseIdx < 12) {
+                        // deg (= atan2(dy,dx)*180/π + 180) is already the ecliptic longitude
+                        const cursorLon = deg;
+                        let houseIdx = -1;
+                        for (let h = 0; h < 12; h++) {
+                            const s = lastChart.houses[h].longitude;
+                            const e = lastChart.houses[(h + 1) % 12].longitude;
+                            let inHouse;
+                            if (e < s) { // wrap around 360°
+                                inHouse = cursorLon >= s || cursorLon < e;
+                            } else {
+                                inHouse = cursorLon >= s && cursorLon < e;
+                            }
+                            if (inHouse) { houseIdx = h; break; }
+                        }
+                        if (houseIdx >= 0) {
                             type = 'house';
                             target = houseIdx + 1;
                         }
