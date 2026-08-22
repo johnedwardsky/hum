@@ -3998,8 +3998,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hoverType === 'house') {
                 if (data.houses && data.houses.length === 12) {
                     const houseIdx = hoverTarget - 1;
-                    const s = data.houses[houseIdx].longitude;
-                    const e = data.houses[(houseIdx + 1) % 12].longitude;
+                    const hIdx = (12 - houseIdx) % 12;
+                    const nextHIdx = (11 - houseIdx) % 12;
+                    
+                    const getProgramBoundary = (houseData) => {
+                        if (!houseData.hexagram) return houseData.longitude;
+                        const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                        if (gIdx === -1) return houseData.longitude;
+                        const lineIdx = houseData.hexagram.line - 1;
+                        return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                    };
+                    
+                    const s = getProgramBoundary(data.houses[nextHIdx]);
+                    const e = getProgramBoundary(data.houses[hIdx]);
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -4392,11 +4403,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const hoveredSignIdxs = new Set();
             if (hoverType === 'house' && data.houses && data.houses.length === 12) {
-                const houseIdx = hoverTarget - 1;
-                const s = data.houses[houseIdx].longitude;
-                const e = data.houses[(houseIdx + 1) % 12].longitude;
+                const houseIdx = hoverTarget - 1; // 0 for Sector 1
+                const hIdx = (12 - houseIdx) % 12;
+                const nextHIdx = (11 - houseIdx) % 12;
+                
+                const getProgramBoundary = (houseData) => {
+                    if (!houseData.hexagram) return houseData.longitude;
+                    const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                    if (gateIdx === -1) return houseData.longitude;
+                    const lineIdx = houseData.hexagram.line - 1;
+                    return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                };
+
+                const s = getProgramBoundary(data.houses[nextHIdx]);
+                const e = getProgramBoundary(data.houses[hIdx]);
+                
                 for (let j = 0; j < 12; j++) {
-                    // signMid in terms of offset from WHEEL_START
                     const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
                     let inHouse = false;
                     if (e < s) {
@@ -4407,7 +4429,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (inHouse) hoveredSignIdxs.add(j);
                 }
             }
-
             // Element colors: Fire=orange, Earth=green, Water=blue, Air=light-blue
             const ELEMENT_COLORS = {
                 fire:  '#E07820', // orange
@@ -4490,9 +4511,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
             for (let i = 0; i < 12; i++) {
-                const h        = data.houses[i];
-                const startLon = h.longitude;
-                const endLon   = data.houses[(i + 1) % 12].longitude;
+                // Numbering counter-clockwise: Sector 1 (i=0) uses House 1 (0) and House 12 (11)
+                const hIdx = (12 - i) % 12;
+                const nextHIdx = (11 - i) % 12;
+                
+                const h = data.houses[hIdx];
+                const hNext = data.houses[nextHIdx];
+
+                // Snap exact boundary to the indicated program on the 1st dial (gate + line)
+                const getProgramBoundary = (houseData) => {
+                    if (!houseData.hexagram) return houseData.longitude;
+                    const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                    if (gateIdx === -1) return houseData.longitude;
+                    const lineIdx = houseData.hexagram.line - 1;
+                    return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                };
+
+                const startLon = getProgramBoundary(hNext);
+                const endLon = getProgramBoundary(h);
+
                 let startAngle = degToRad(startLon - 180);
                 let endAngle   = degToRad(endLon - 180);
                 if (endAngle < startAngle) endAngle += 2 * Math.PI;
@@ -6181,16 +6218,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         // deg (= atan2(dy,dx)*180/π + 180) is already the ecliptic longitude
                         const cursorLon = deg;
                         let houseIdx = -1;
-                        for (let h = 0; h < 12; h++) {
-                            const s = lastChart.houses[h].longitude;
-                            const e = lastChart.houses[(h + 1) % 12].longitude;
+                        for (let i = 0; i < 12; i++) {
+                            const hIdx = (12 - i) % 12;
+                            const nextHIdx = (11 - i) % 12;
+                            const h = lastChart.houses[hIdx];
+                            const hNext = lastChart.houses[nextHIdx];
+                            
+                            const getProgramBoundary = (houseData) => {
+                                if (!houseData.hexagram) return houseData.longitude;
+                                const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                                if (gateIdx === -1) return houseData.longitude;
+                                const lineIdx = houseData.hexagram.line - 1;
+                                return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                            };
+                            
+                            const s = getProgramBoundary(hNext);
+                            const e = getProgramBoundary(h);
+                            
                             let inHouse;
                             if (e < s) { // wrap around 360°
                                 inHouse = cursorLon >= s || cursorLon < e;
                             } else {
                                 inHouse = cursorLon >= s && cursorLon < e;
                             }
-                            if (inHouse) { houseIdx = h; break; }
+                            if (inHouse) { houseIdx = i; break; }
                         }
                         if (houseIdx >= 0) {
                             type = 'house';
