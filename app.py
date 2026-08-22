@@ -158,7 +158,7 @@ def calculate_person_chart(data):
     calc_lat = lat if lat is not None else 0.0
     calc_lon = lon if lon is not None else 0.0
     
-    house_system = data.get('house_system', 'P')
+    house_system = data.get('house_system', 'E')
     try:
         cusp_offset = float(data.get('cusp_offset', 0.0))
     except (ValueError, TypeError):

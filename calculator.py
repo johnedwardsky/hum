@@ -212,7 +212,7 @@ def _calculate_planets_only(jd_ut):
         
     return planets
 
-def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='P', cusp_offset=0.0, use_polar_equal=False, polar_boundary=62.0):
+def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='E', cusp_offset=0.0, use_polar_equal=False, polar_boundary=62.0):
     """
     Calculates planetary positions and house cusps.
     hour_gmt should be a decimal hour in GMT (e.g. 14.5 for 14:30 GMT).
