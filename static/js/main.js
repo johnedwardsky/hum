@@ -1085,6 +1085,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h/24 + B - 1524.5;
     }
 
+    const GATE_ORDER = [
+        25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
+        10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
+        46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
+        15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
+    ];
+    const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+    const GATE_INTERVAL = 5.625;
+
     const MIRROR_GATE_ORDER = [
         41, 61, 60, 10, 58, 54, 38, 24, 27, 42,  3, 25, 17, 51, 21, 13, 49, 55, 30, 36,
         22, 37, 63,  2, 23, 20,  8, 12, 45, 16, 35, 33, 31, 62, 56, 15, 52, 53, 39, 44,
@@ -3730,20 +3739,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const pZ  = mandalaAnimState.zodiac.progress;
         const pH2 = mandalaAnimState.houses.progress;
 
-        const W_HEX     = R * 0.080;
-        const W_MIRROR  = R * 0.052;
-        const W_GATENUM = R * 0.054;  // gate numbers band width
-        const W_DIAL    = R * 0.024;  // 6-line dial band width with ticks and activations
-        const W_GATES   = W_GATENUM + W_DIAL;  // gates dial — always visible, but position can shift
-        const W_ZODIAC  = R * 0.070;
-        const W_HOUSES  = R * 0.090;
+        const W_HEX           = R * 0.080;
+        const W_MIRROR_GATENUM= R * 0.054;  // 2nd dial gate numbers band width
+        const W_MIRROR_DIAL   = R * 0.024;  // 2nd dial 6-line dial band width with ticks and activations
+        const W_MIRROR        = W_MIRROR_GATENUM + W_MIRROR_DIAL;
+        const W_GATENUM       = R * 0.054;  // gate numbers band width
+        const W_DIAL          = R * 0.024;  // 6-line dial band width with ticks and activations
+        const W_GATES         = W_GATENUM + W_DIAL;  // gates dial — always visible, but position can shift
+        const W_ZODIAC        = R * 0.070;
+        const W_HOUSES        = R * 0.090;
 
         // Outer rings: stack from R inward
         const rHexagramsOuter = R;
         const rHexagramsInner = R - W_HEX * pH;
 
-        const rMirrorOuter    = rHexagramsInner;
-        const rMirrorInner    = rMirrorOuter - W_MIRROR * pM;
+        const rMirrorOuter     = rHexagramsInner;
+        const rMirrorGateInner = rMirrorOuter - W_MIRROR_GATENUM * pM;
+        const rMirrorInner     = rMirrorOuter - W_MIRROR * pM;
 
         // Gates dial: always drawn, but shifts outward when outer rings turn off
         const rGatesOuter     = rMirrorInner;
@@ -3806,6 +3818,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
         const GATE_INTERVAL = 5.625;
+
+        const getProgramBoundary = (houseData) => {
+            if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+            const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+            if (gateIdx === -1) return houseData.longitude;
+            const lineIdx = (houseData.hexagram.line || 1) - 1;
+            return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+        };
 
         // Compile active gates and planets
         const activeGatesPersonality = new Set();
@@ -3998,8 +4018,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hoverType === 'house') {
                 if (data.houses && data.houses.length === 12) {
                     const houseIdx = hoverTarget - 1;
-                    const h = data.houses[houseIdx];
-                    const hNext = data.houses[(houseIdx + 1) % 12];
                     const getProgramBoundary = (houseData) => {
                         if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
                         const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
@@ -4007,8 +4025,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const lineIdx = (houseData.hexagram.line || 1) - 1;
                         return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                     };
-                    const s = getProgramBoundary(hNext);
-                    const e = getProgramBoundary(h);
+                    const asc = getProgramBoundary(data.houses[0]);
+                    const s = (asc - (houseIdx + 1) * 30.0 + 720.0) % 360.0;
+                    const e = (asc - houseIdx * 30.0 + 720.0) % 360.0;
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -4261,10 +4280,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3.5 Mirror Ring — Зеркало Жизни
-        // Placed between hexagram lines (outer) and gate numbers ring.
-        // Gate sequence starts at the Ascendant (AS = 0°), step 5.625°.
-        // Shows ONLY activated gate numbers — inactive ones are completely hidden.
+        // 3.5 Mirror Ring — 2-й циферблат (Зеркало Жизни)
+        // Placed between hexagram lines (outer) and 1st dial gate numbers ring.
+        // Gate sequence starts at the Ascendant (AS), step 5.625° clockwise.
+        // Includes gate numbers band and 6-line scale band with ticks and activations.
         const MIRROR_GATE_ORDER = [
             41, 61, 60, 10, 58, 54, 38, 24, 27, 42,  3, 25, 17, 51, 21, 13, 49, 55, 30, 36,
             22, 37, 63,  2, 23, 20,  8, 12, 45, 16, 35, 33, 31, 62, 56, 15, 52, 53, 39, 44,
@@ -4283,46 +4302,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
 
-            const AS = data.houses[0].longitude;
-            const MIRROR_INTERVAL = GATE_INTERVAL; // same 5.625°
+            const AS = getProgramBoundary(data.houses[0]);
+            const MIRROR_INTERVAL = GATE_INTERVAL; // 5.625°
 
-            // Determine which mirror sectors are activated (have a planet landing in them)
-            const mirrorActivated = new Set(); // indices 0-63
-            const mirrorHasPers  = new Set();
-            const mirrorHasDes   = new Set();
+            // Collect activations for 2nd dial
+            const mirrorActivationsBySector = {};
+            for (let i = 0; i < 64; i++) {
+                mirrorActivationsBySector[i] = [];
+            }
+            const mirrorActivePers = new Set();
+            const mirrorActiveDes  = new Set();
 
             data.planets.forEach(p => {
                 if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                    // Clockwise from AS: mirror offset = (AS - lon + 360) % 360
-                    const mIdx = Math.floor(((AS - p.longitude + 360) % 360) / MIRROR_INTERVAL) % 64;
-                    mirrorActivated.add(mIdx);
-                    mirrorHasPers.add(mIdx);
+                    const relLon = (AS - p.longitude + 360) % 360;
+                    const mIdx = Math.floor(relLon / MIRROR_INTERVAL) % 64;
+                    const mLine = Math.min(6, Math.max(1, Math.floor((relLon % MIRROR_INTERVAL) / (MIRROR_INTERVAL / 6)) + 1));
+                    const mGate = MIRROR_GATE_ORDER[mIdx];
+                    mirrorActivePers.add(mIdx);
+                    mirrorActivationsBySector[mIdx].push({
+                        type: 'personality',
+                        symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
+                        color: '#2E2A20',
+                        line: mLine,
+                        gate: mGate,
+                        name: p.name
+                    });
                 }
             });
-            (data.design_planets || []).forEach(p => {
+            designPlanetsList.forEach(p => {
                 if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                    const mIdx = Math.floor(((AS - p.longitude + 360) % 360) / MIRROR_INTERVAL) % 64;
-                    mirrorActivated.add(mIdx);
-                    mirrorHasDes.add(mIdx);
+                    const relLon = (AS - p.longitude + 360) % 360;
+                    const mIdx = Math.floor(relLon / MIRROR_INTERVAL) % 64;
+                    const mLine = Math.min(6, Math.max(1, Math.floor((relLon % MIRROR_INTERVAL) / (MIRROR_INTERVAL / 6)) + 1));
+                    const mGate = MIRROR_GATE_ORDER[mIdx];
+                    mirrorActiveDes.add(mIdx);
+                    mirrorActivationsBySector[mIdx].push({
+                        type: 'design',
+                        symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
+                        color: 'rgb(255,96,96)',
+                        line: mLine,
+                        gate: mGate,
+                        name: p.name
+                    });
                 }
             });
-
-            const rMirrorMid = (rMirrorOuter + rMirrorInner) / 2;
-            const mirrorBand = rMirrorOuter - rMirrorInner;
-            const fontSize   = Math.round(mirrorBand * 0.65);
 
             for (let i = 0; i < 64; i++) {
-                const gateNum  = MIRROR_GATE_ORDER[i];
-                const hasAct   = mirrorActivated.has(i);
+                const gateNum = MIRROR_GATE_ORDER[i];
+                const isPersActive = mirrorActivePers.has(i);
+                const isDesActive  = mirrorActiveDes.has(i);
+                const isCombinedActive = isPersActive || isDesActive;
 
-                // Completely hide inactive (dimmed) mirror programs
-                if (!hasAct) continue;
+                const isHighlighted = isGateHighlighted(gateNum, i);
+                const isAnyHovered  = (hoverType !== null);
 
-                const isP      = mirrorHasPers.has(i);
-                const isD      = mirrorHasDes.has(i);
-
-                // Sectors go CLOCKWISE from AS, matching the houses ring direction.
-                // Sector i covers [AS - (i+1)*INTERVAL, AS - i*INTERVAL] in longitude.
+                // Sector boundaries:
+                // startLon is at relLon = (i + 1) * 5.625 (lower lon, counter-clockwise start)
+                // endLon is at relLon = i * 5.625 (higher lon, counter-clockwise end)
                 const startLon   = (AS - (i + 1) * MIRROR_INTERVAL + 720) % 360;
                 const endLon     = (AS - i * MIRROR_INTERVAL + 720) % 360;
                 let   startAngle = degToRad(startLon - 180);
@@ -4330,48 +4367,129 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (endAngle < startAngle) endAngle += 2 * Math.PI;
                 const midAngle   = (startAngle + endAngle) / 2;
 
-                // Sector background
-                let bgFill;
-                if (isP && isD)       bgFill = 'rgba(46,42,32,0.11)';
-                else if (isP)         bgFill = 'rgba(46,42,32,0.09)';
-                else if (isD)         bgFill = 'rgba(255,96,96,0.10)';
-                else                  bgFill = 'rgba(0,0,0,0)';
-                ctx.beginPath();
-                ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
-                ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle);
-                ctx.lineTo(cx + rMirrorInner * Math.cos(endAngle), cy + rMirrorInner * Math.sin(endAngle));
-                ctx.arc(cx, cy, rMirrorInner, endAngle, startAngle, true);
-                ctx.closePath();
-                ctx.fillStyle = bgFill;
-                ctx.fill();
+                const activations = mirrorActivationsBySector[i] || [];
+                const byLine = {};
+                activations.forEach(act => {
+                    const ln = act.line || 1;
+                    if (!byLine[ln]) byLine[ln] = [];
+                    byLine[ln].push(act);
+                });
 
-                // Divider line at sector start
-                ctx.beginPath();
-                ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
-                ctx.lineTo(cx + rMirrorOuter * Math.cos(startAngle), cy + rMirrorOuter * Math.sin(startAngle));
-                ctx.strokeStyle = 'rgba(160,155,145,0.22)';
-                ctx.lineWidth = 0.5;
-                ctx.stroke();
+                // Highlight active gate cell background (numbers band: rMirrorGateInner to rMirrorOuter)
+                if (isCombinedActive) {
+                    ctx.beginPath();
+                    ctx.moveTo(cx + rMirrorGateInner * Math.cos(startAngle), cy + rMirrorGateInner * Math.sin(startAngle));
+                    ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle);
+                    ctx.lineTo(cx + rMirrorGateInner * Math.cos(endAngle), cy + rMirrorGateInner * Math.sin(endAngle));
+                    ctx.arc(cx, cy, rMirrorGateInner, endAngle, startAngle, true);
+                    ctx.closePath();
 
-                // Gate number — centered in sector
-                const gnx = cx + rMirrorMid * Math.cos(midAngle);
-                const gny = cy + rMirrorMid * Math.sin(midAngle);
+                    let opacityScale = 1.0;
+                    if (isAnyHovered && !isHighlighted) opacityScale = 0.15;
 
-                let numColor, numFont;
-                if (hasAct) {
-                    const mBoth = isP && isD;
-                    numColor = (mBoth || isP) ? '#2E2A20' : 'rgb(220,80,80)';
-                    numFont  = 'bold 10.5px "DM Sans", sans-serif';
-                } else {
-                    numColor = 'rgba(150,145,130,0.28)';
-                    numFont  = '500 9px "DM Sans", sans-serif';
+                    let bgFill;
+                    if (isPersActive && isDesActive) bgFill = `rgba(46,42,32,${0.12 * opacityScale})`;
+                    else if (isDesActive)           bgFill = `rgba(255,96,96,${0.12 * opacityScale})`;
+                    else if (isPersActive)          bgFill = `rgba(46,42,32,${0.10 * opacityScale})`;
+                    else                            bgFill = 'rgba(0,0,0,0)';
+                    ctx.fillStyle = bgFill;
+                    ctx.fill();
                 }
 
-                ctx.font = numFont;
+                // Draw colored activation blocks inside the 6 dial cells (scale band: rMirrorInner to rMirrorGateInner)
+                const slotSize = MIRROR_INTERVAL / 6;
+                Object.entries(byLine).forEach(([lineStr, acts]) => {
+                    const lineNum = parseInt(lineStr); // 1-6
+                    const slotStartRelLon = i * MIRROR_INTERVAL + (lineNum - 1) * slotSize;
+                    const N = acts.length;
+
+                    acts.forEach((act, idx) => {
+                        const subStartRelLon = slotStartRelLon + idx * (slotSize / N);
+                        const subEndRelLon   = slotStartRelLon + (idx + 1) * (slotSize / N);
+
+                        const lonStart = (AS - subEndRelLon + 720) % 360;
+                        const lonEnd   = (AS - subStartRelLon + 720) % 360;
+                        let aStart = degToRad(lonStart - 180);
+                        let aEnd   = degToRad(lonEnd   - 180);
+                        if (aEnd < aStart) aEnd += 2 * Math.PI;
+
+                        ctx.beginPath();
+                        ctx.moveTo(cx + rMirrorInner * Math.cos(aStart), cy + rMirrorInner * Math.sin(aStart));
+                        ctx.arc(cx, cy, rMirrorGateInner, aStart, aEnd);
+                        ctx.lineTo(cx + rMirrorInner * Math.cos(aEnd), cy + rMirrorInner * Math.sin(aEnd));
+                        ctx.arc(cx, cy, rMirrorInner, aEnd, aStart, true);
+                        ctx.closePath();
+
+                        let fillColor = act.color;
+                        if (isAnyHovered) {
+                            fillColor = isHighlighted ? act.color : 'rgba(150, 150, 150, 0.08)';
+                        }
+                        ctx.fillStyle = fillColor;
+                        ctx.fill();
+                    });
+                });
+
+                // Radial divider lines for gates (extended through dial ring from rMirrorInner to rMirrorOuter)
+                ctx.beginPath();
+                ctx.moveTo(cx + rMirrorInner * Math.cos(endAngle), cy + rMirrorInner * Math.sin(endAngle));
+                ctx.lineTo(cx + rMirrorOuter * Math.cos(endAngle), cy + rMirrorOuter * Math.sin(endAngle));
+
+                let strokeColor;
+                if (isAnyHovered) {
+                    strokeColor = isHighlighted
+                        ? (isDesActive ? 'rgba(255,96,96,0.7)' : 'rgba(46,42,32,0.7)')
+                        : 'rgba(120,120,120,0.04)';
+                } else {
+                    strokeColor = isCombinedActive
+                        ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
+                        : 'rgba(180,175,165,0.18)';
+                }
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
+                ctx.stroke();
+
+                // 6 slots per gate: sub-divider ticks in the dial ring (from rMirrorGateInner to rMirrorInner)
+                const tickSpacing = MIRROR_INTERVAL / 6;
+                for (let t = 1; t <= 5; t++) {
+                    const tickRelLon = i * MIRROR_INTERVAL + t * tickSpacing;
+                    const tickLon = (AS - tickRelLon + 720) % 360;
+                    const tickAngle = degToRad(tickLon - 180);
+                    let tickColor = 'rgba(180,175,165,0.22)';
+                    if (isAnyHovered) {
+                        tickColor = isHighlighted ? 'rgba(120,115,105,0.45)' : 'rgba(120,120,120,0.03)';
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(cx + rMirrorGateInner * Math.cos(tickAngle), cy + rMirrorGateInner * Math.sin(tickAngle));
+                    ctx.lineTo(cx + rMirrorInner * Math.cos(tickAngle), cy + rMirrorInner * Math.sin(tickAngle));
+                    ctx.strokeStyle = tickColor;
+                    ctx.lineWidth = 0.6;
+                    ctx.stroke();
+                }
+
+                // Draw Gate Number in numbers band
+                const rMirrorGateMid = (rMirrorOuter + rMirrorGateInner) / 2;
+                const lx = cx + rMirrorGateMid * Math.cos(midAngle);
+                const ly = cy + rMirrorGateMid * Math.sin(midAngle);
+
+                let font = isCombinedActive ? 'bold 11px DM Sans, sans-serif' : '600 9.5px DM Sans, sans-serif';
+                const mBoth = isPersActive && isDesActive;
+                let fillStyle = (mBoth || isPersActive) ? '#2E2A20'
+                              : isDesActive             ? 'rgb(220,60,60)'
+                              : 'rgba(165, 158, 145, 0.48)';
+
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        font = 'bold 13px DM Sans, sans-serif';
+                    } else {
+                        fillStyle = 'rgba(180, 180, 180, 0.12)';
+                    }
+                }
+
+                ctx.font = font;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = numColor;
-                ctx.fillText(gateNum.toString(), gnx, gny);
+                ctx.fillStyle = fillStyle;
+                ctx.fillText(gateNum.toString(), lx, ly);
             }
             ctx.restore();
         }
@@ -4395,25 +4513,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
 
-            // hoveredSignIdx: Rave sign (0=Aries) that a gate belongs to, anchored at WHEEL_START
-            const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
+            // hoveredSignIdx: Zodiac sign index (0=Aries..11=Pisces) that the hovered gate belongs to
+            const hoveredGateSec = (hoverType === 'gate' && hoverTarget)
                 ? Math.floor(((GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2)) / 30) % 12
                 : -1;
+            const hoveredSignIdx = hoveredGateSec !== -1 ? (11 - hoveredGateSec + 12) % 12 : -1;
 
             const hoveredSignIdxs = new Set();
             if (hoverType === 'house' && data.houses && data.houses.length === 12) {
                 const houseIdx = hoverTarget - 1; // 0 for Sector 1
-                const h = data.houses[houseIdx];
-                const hNext = data.houses[(houseIdx + 1) % 12];
-                const getProgramBoundary = (houseData) => {
-                    if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
-                    const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
-                    if (gateIdx === -1) return houseData.longitude;
-                    const lineIdx = (houseData.hexagram.line || 1) - 1;
-                    return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
-                };
-                const s = getProgramBoundary(hNext);
-                const e = getProgramBoundary(h);
+                const asc = getProgramBoundary(data.houses[0]);
+                const s = (asc - (houseIdx + 1) * 30.0 + 720.0) % 360.0;
+                const e = (asc - houseIdx * 30.0 + 720.0) % 360.0;
                 
                 for (let j = 0; j < 12; j++) {
                     const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
@@ -4423,7 +4534,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         inHouse = (signMidLon >= s && signMidLon < e);
                     }
-                    if (inHouse) hoveredSignIdxs.add(j);
+                    if (inHouse) {
+                        const sIdx = (11 - j + 12) % 12;
+                        hoveredSignIdxs.add(sIdx);
+                    }
                 }
             }
             // Element colors: Fire=orange, Earth=green, Water=blue, Air=light-blue
@@ -4433,22 +4547,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 water: '#2A6EBB', // blue
                 air:   '#4AB0D4'  // light blue
             };
-            // Order: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces
+            // Order: Aries(0:fire), Taurus(1:earth), Gemini(2:air), Cancer(3:water), Leo(4:fire), Virgo(5:earth), Libra(6:air), Scorpio(7:water), Sagittarius(8:fire), Capricorn(9:earth), Aquarius(10:air), Pisces(11:water)
             const SIGN_ELEMENTS = [
                 'fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'
             ];
             const MANDALA_ZODIAC_COLORS = SIGN_ELEMENTS.map(e => ELEMENT_COLORS[e]);
 
             for (let i = 0; i < 12; i++) {
-                // Rave Mandala: Aries (i=0) starts at WHEEL_START (358.25°) on the ecliptic
+                // Rave Mandala progresses through signs in reverse ecliptic order from WHEEL_START:
+                // i=0: Pisces (11), i=1: Aquarius (10), ..., i=11: Aries (0)
+                const signIdx = (11 - i + 12) % 12;
                 const sLon = (WHEEL_START + i * 30) % 360;
                 const eLon = (WHEEL_START + (i + 1) * 30) % 360;
                 const startAngle = degToRad(sLon - 180);
                 let endAngle = degToRad(eLon - 180);
                 if (endAngle < startAngle) endAngle += 2 * Math.PI;
                 const isAnyHovered = (hoverType !== null);
-                const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx)
-                                        : (hoverType === 'house') ? hoveredSignIdxs.has(i)
+                const isHighlightedSign = (hoverType === 'gate') ? (signIdx === hoveredSignIdx)
+                                        : (hoverType === 'house') ? hoveredSignIdxs.has(signIdx)
                                         : true;
 
                 // Annular sector fill (ring segment, not pie from center)
@@ -4461,14 +4577,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isAnyHovered) {
                     fillOpacity = isHighlightedSign ? 0.38 : 0.04;
                 }
-                ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], fillOpacity);
+                ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[signIdx], fillOpacity);
                 ctx.fill();
 
                 // Sector divider line at start of each sign
                 ctx.beginPath();
                 ctx.moveTo(cx + rZodiacInner * Math.cos(startAngle), cy + rZodiacInner * Math.sin(startAngle));
                 ctx.lineTo(cx + rZodiacOuter * Math.cos(startAngle), cy + rZodiacOuter * Math.sin(startAngle));
-                ctx.strokeStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], isAnyHovered ? (isHighlightedSign ? 0.7 : 0.08) : 0.45);
+                ctx.strokeStyle = hexToRgba(MANDALA_ZODIAC_COLORS[signIdx], isAnyHovered ? (isHighlightedSign ? 0.7 : 0.08) : 0.45);
                 ctx.lineWidth = 1.0;
                 ctx.stroke();
 
@@ -4479,21 +4595,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
                 ctx.font = '400 14px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
                 
-                let labelColor = MANDALA_ZODIAC_COLORS[i];
+                let labelColor = MANDALA_ZODIAC_COLORS[signIdx];
                 if (isAnyHovered && !isHighlightedSign) {
                     labelColor = 'rgba(150, 150, 150, 0.12)';
                 }
                 ctx.fillStyle = labelColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(ZODIAC_META[i].sym, gx, gy);
+                ctx.fillText(ZODIAC_META[signIdx].sym, gx, gy);
             }
             ctx.restore();
         }
 
         // 4.5 Nidana (Houses) Ring — Spatial layout matching reference
         // Gold transparent background, house# (inner ring), gate.line (center), stacked ▲/▽ rulers (right)
-        // Each sector begins with its own calculated program on the 1st dial
+        // Equal 30-degree sectors starting from the Ascendant program
         const pHou = mandalaAnimState.houses.progress;
         if (pHou > 0.001 && data.houses && data.houses.length === 12) {
             ctx.save();
@@ -4508,7 +4624,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
             
-            // Snap exact boundary to the indicated program on the 1st dial (gate + line)
+            // Snap Ascendant to exact boundary of its calculated program on 1st dial
             const getProgramBoundary = (houseData) => {
                 if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
                 const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
@@ -4516,14 +4632,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lineIdx = (houseData.hexagram.line || 1) - 1;
                 return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
             };
+            const asc = getProgramBoundary(data.houses[0]);
 
             for (let i = 0; i < 12; i++) {
                 const h = data.houses[i];
-                const hNext = data.houses[(i + 1) % 12];
 
-                // Each sector starts with its own calculated program on the 1st dial
-                const startLon = getProgramBoundary(h);
-                const endLon = getProgramBoundary(hNext);
+                // Equal 30-degree sectors from Ascendant, progressing counter-clockwise
+                const startLon = (asc - i * 30.0 + 720.0) % 360.0;
+                const endLon = (asc - (i + 1) * 30.0 + 720.0) % 360.0;
 
                 let aStart = degToRad(((endLon - 180.0 + 720.0) % 360.0));
                 let aEnd   = degToRad(((startLon - 180.0 + 720.0) % 360.0));
@@ -4683,6 +4799,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { r: rGatesInner, alpha: 1.0 },
             { r: rZodiacInner, alpha: Math.max(mandalaAnimState.zodiac.progress, mandalaAnimState.houses.progress) },
             { r: rMirrorInner, alpha: mandalaAnimState.mirror.progress },
+            { r: rMirrorGateInner, alpha: mandalaAnimState.mirror.progress },
             { r: rHexagramsInner, alpha: mandalaAnimState.hexagrams.progress },
             { r: rHexagramsOuter, alpha: mandalaAnimState.hexagrams.progress }
         ];
@@ -5701,12 +5818,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Compute 2nd dial (Зеркало Жизни) program for this planet if houses data exists
             let mirrorGateCellHtml = '';
             if (p.longitude != null && data && data.houses && data.houses.length >= 1) {
-                const AS = data.houses[0].longitude;
+                const getProgramBoundary = (houseData) => {
+                    if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                    const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                    if (gateIdx === -1) return houseData.longitude;
+                    const lineIdx = (houseData.hexagram.line || 1) - 1;
+                    return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                };
+                const AS = getProgramBoundary(data.houses[0]);
                 // Clockwise from AS: mirror offset = (AS - lon + 360) % 360
                 const relLon = (AS - p.longitude + 360) % 360;
                 const mIdx = Math.floor(relLon / 5.625) % 64;
                 const mGate = MIRROR_GATE_ORDER[mIdx];
-                const mLine = Math.floor((relLon % 5.625) / (5.625 / 6)) + 1;
+                const mLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
 
                 const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro);
 
@@ -6170,9 +6294,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cy = displayW / 2;
                 const R = displayW / 2 - 8;
                 
-                const rHousesOuter = R * 0.720;
-                const rHousesInner = R * 0.630;
-                const rInnerBorder = rHousesInner;
+                const pH  = mandalaAnimState.hexagrams.progress;
+                const pM  = mandalaAnimState.mirror.progress;
+                const pZ  = mandalaAnimState.zodiac.progress;
+                const pH2 = mandalaAnimState.houses.progress;
+
+                const W_HEX           = R * 0.080;
+                const W_MIRROR_GATENUM= R * 0.054;
+                const W_MIRROR_DIAL   = R * 0.024;
+                const W_MIRROR        = W_MIRROR_GATENUM + W_MIRROR_DIAL;
+                const W_GATENUM       = R * 0.054;
+                const W_DIAL          = R * 0.024;
+                const W_GATES         = W_GATENUM + W_DIAL;
+                const W_ZODIAC        = R * 0.070;
+                const W_HOUSES        = R * 0.090;
+
+                const rHexagramsOuter = R;
+                const rHexagramsInner = R - W_HEX * pH;
+                const rMirrorOuter    = rHexagramsInner;
+                const rMirrorInner    = rMirrorOuter - W_MIRROR * pM;
+                const rGatesOuter     = rMirrorInner;
+                const rDialInner      = rGatesOuter - W_GATES;
+                const rZodiacInner    = rDialInner - W_ZODIAC * pZ;
+                const rHousesOuter    = rZodiacInner;
+                const rHousesInner    = rHousesOuter - W_HOUSES * pH2;
+                const rInnerBorder    = rHousesInner;
 
                 const dx = mx - cx;
                 const dy = my - cy;
@@ -6209,29 +6355,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (deg < 0) deg += 360;
 
                     // Check if hovering the Houses Ring (rHousesInner <= dist <= rHousesOuter)
-                    if (dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses) {
-                        const cursorLon = deg;
-                        let houseIdx = -1;
-                        for (let i = 0; i < 12; i++) {
-                            const h = lastChart.houses[i];
-                            const hNext = lastChart.houses[(i + 1) % 12];
-                            const getProgramBoundary = (houseData) => {
-                                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
-                                const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
-                                if (gateIdx === -1) return houseData.longitude;
-                                const lineIdx = (houseData.hexagram.line || 1) - 1;
-                                return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
-                            };
-                            const s = getProgramBoundary(hNext);
-                            const e = getProgramBoundary(h);
-                            let inHouse;
-                            if (e < s) {
-                                inHouse = (cursorLon >= s || cursorLon < e);
-                            } else {
-                                inHouse = (cursorLon >= s && cursorLon < e);
-                            }
-                            if (inHouse) { houseIdx = i; break; }
-                        }
+                    if (pH2 > 0.5 && dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses && lastChart.houses.length === 12) {
+                        const getProgramBoundary = (houseData) => {
+                            if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                            const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                            if (gIdx === -1) return houseData.longitude;
+                            const lineIdx = (houseData.hexagram.line || 1) - 1;
+                            return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                        };
+                        const asc = getProgramBoundary(lastChart.houses[0]);
+                        const relDeg = ((asc - deg) % 360 + 360) % 360;
+                        const houseIdx = Math.floor(relDeg / 30) % 12;
                         if (houseIdx >= 0 && houseIdx < 12) {
                             type = 'house';
                             target = houseIdx + 1;
@@ -6239,14 +6373,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (!type) {
-                        // On the Gates/Zodiac Ring
-                        let offset = (deg - WHEEL_START) % 360;
-                        if (offset < 0) offset += 360;
-                        gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
-                        const gateNum = GATE_ORDER[gateIdx];
+                        // Check if hovering 2nd dial (Mirror Ring)
+                        if (pM > 0.5 && dist >= rMirrorInner && dist <= rMirrorOuter && lastChart && lastChart.houses && lastChart.houses.length >= 1) {
+                            const getProgramBoundary = (houseData) => {
+                                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                                const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                                if (gIdx === -1) return houseData.longitude;
+                                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                                return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                            };
+                            const AS = getProgramBoundary(lastChart.houses[0]);
+                            const relLon = (AS - deg + 720) % 360;
+                            const mIdx = Math.floor(relLon / GATE_INTERVAL) % 64;
+                            const mGate = MIRROR_GATE_ORDER[mIdx];
+                            type = 'gate';
+                            target = mGate;
+                            gateIdx = GATE_ORDER.indexOf(mGate);
+                        } else {
+                            // On the 1st dial / Gates Ring
+                            let offset = (deg - WHEEL_START) % 360;
+                            if (offset < 0) offset += 360;
+                            gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
+                            const gateNum = GATE_ORDER[gateIdx];
 
-                        type = 'gate';
-                        target = gateNum;
+                            type = 'gate';
+                            target = gateNum;
+                        }
                     }
                 }
 
