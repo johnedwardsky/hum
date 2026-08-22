@@ -3998,19 +3998,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hoverType === 'house') {
                 if (data.houses && data.houses.length === 12) {
                     const houseIdx = hoverTarget - 1;
-                    const hIdx = (12 - houseIdx) % 12;
-                    const nextHIdx = (11 - houseIdx) % 12;
+                    const h = data.houses[houseIdx];
+                    const hNext = data.houses[(houseIdx + 1) % 12];
                     
                     const getProgramBoundary = (houseData) => {
-                        if (!houseData.hexagram) return houseData.longitude;
+                        if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
                         const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
                         if (gIdx === -1) return houseData.longitude;
-                        const lineIdx = houseData.hexagram.line - 1;
+                        const lineIdx = (houseData.hexagram.line || 1) - 1;
                         return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                     };
                     
-                    const s = getProgramBoundary(data.houses[nextHIdx]);
-                    const e = getProgramBoundary(data.houses[hIdx]);
+                    const s = getProgramBoundary(h);
+                    const e = getProgramBoundary(hNext);
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -4019,6 +4019,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         return (midLon >= s && midLon < e);
                     }
                 }
+                return false;
             }
             return true;
         }
@@ -4404,19 +4405,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const hoveredSignIdxs = new Set();
             if (hoverType === 'house' && data.houses && data.houses.length === 12) {
                 const houseIdx = hoverTarget - 1; // 0 for Sector 1
-                const hIdx = (12 - houseIdx) % 12;
-                const nextHIdx = (11 - houseIdx) % 12;
+                const h = data.houses[houseIdx];
+                const hNext = data.houses[(houseIdx + 1) % 12];
                 
                 const getProgramBoundary = (houseData) => {
-                    if (!houseData.hexagram) return houseData.longitude;
+                    if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
                     const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
                     if (gateIdx === -1) return houseData.longitude;
-                    const lineIdx = houseData.hexagram.line - 1;
+                    const lineIdx = (houseData.hexagram.line || 1) - 1;
                     return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                 };
 
-                const s = getProgramBoundary(data.houses[nextHIdx]);
-                const e = getProgramBoundary(data.houses[hIdx]);
+                const s = getProgramBoundary(h);
+                const e = getProgramBoundary(hNext);
                 
                 for (let j = 0; j < 12; j++) {
                     const signMidLon = (WHEEL_START + j * 30 + 15) % 360;
@@ -4511,24 +4512,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
             for (let i = 0; i < 12; i++) {
-                // Numbering counter-clockwise: Sector 1 (i=0) uses House 1 (0) and House 12 (11)
-                const hIdx = (12 - i) % 12;
-                const nextHIdx = (11 - i) % 12;
-                
-                const h = data.houses[hIdx];
-                const hNext = data.houses[nextHIdx];
+                const h = data.houses[i];
+                const hNext = data.houses[(i + 1) % 12];
 
                 // Snap exact boundary to the indicated program on the 1st dial (gate + line)
                 const getProgramBoundary = (houseData) => {
-                    if (!houseData.hexagram) return houseData.longitude;
+                    if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
                     const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
                     if (gateIdx === -1) return houseData.longitude;
-                    const lineIdx = houseData.hexagram.line - 1;
+                    const lineIdx = (houseData.hexagram.line || 1) - 1;
                     return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                 };
 
-                const startLon = getProgramBoundary(hNext);
-                const endLon = getProgramBoundary(h);
+                const startLon = getProgramBoundary(h);
+                const endLon = getProgramBoundary(hNext);
 
                 let startAngle = degToRad(startLon - 180);
                 let endAngle   = degToRad(endLon - 180);
@@ -6219,27 +6216,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         const cursorLon = deg;
                         let houseIdx = -1;
                         for (let i = 0; i < 12; i++) {
-                            const hIdx = (12 - i) % 12;
-                            const nextHIdx = (11 - i) % 12;
-                            const h = lastChart.houses[hIdx];
-                            const hNext = lastChart.houses[nextHIdx];
+                            const h = lastChart.houses[i];
+                            const hNext = lastChart.houses[(i + 1) % 12];
                             
                             const getProgramBoundary = (houseData) => {
-                                if (!houseData.hexagram) return houseData.longitude;
+                                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
                                 const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
                                 if (gateIdx === -1) return houseData.longitude;
-                                const lineIdx = houseData.hexagram.line - 1;
+                                const lineIdx = (houseData.hexagram.line || 1) - 1;
                                 return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
                             };
                             
-                            const s = getProgramBoundary(hNext);
-                            const e = getProgramBoundary(h);
+                            const s = getProgramBoundary(h);
+                            const e = getProgramBoundary(hNext);
                             
                             let inHouse;
                             if (e < s) { // wrap around 360°
-                                inHouse = cursorLon >= s || cursorLon < e;
+                                inHouse = (cursorLon >= s || cursorLon < e);
                             } else {
-                                inHouse = cursorLon >= s && cursorLon < e;
+                                inHouse = (cursorLon >= s && cursorLon < e);
                             }
                             if (inHouse) { houseIdx = i; break; }
                         }
