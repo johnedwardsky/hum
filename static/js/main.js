@@ -1462,9 +1462,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="sign-name">${sm.name}</span>
                     </div>
                 </td>
-                <td>${fmtPos(p.formatted)}</td>
+                <td class="pos-cell">${fmtPos(p.formatted)}</td>
                 <td class="lon-cell col-grad2">${mirrorLonHtml}</td>
-                <td>${p.is_retrograde
+                <td style="text-align: center;">${p.is_retrograde
                     ? '<span class="retro-badge">R</span>'
                     : '<span class="direct-dash">—</span>'}</td>`;
             planetsTbody.appendChild(tr);
