@@ -4927,51 +4927,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 1.0;
             ctx.stroke();
             ctx.restore();
-        });
-
-        // 7. Planet activation lines and symbols inside the wheel (CCW)
-        const pRaysPlanets = (mandalaAnimState.raysPlanets ? mandalaAnimState.raysPlanets.progress : 1);
-
-        if (pRaysPlanets > 0.005) {
-            for (let i = 0; i < 64; i++) {
-                const gateNum = GATE_ORDER[i];
-                const activations = activationsByGate[gateNum];
-                if (!activations || activations.length === 0) continue;
-
-                const isHighlighted = isGateHighlighted(gateNum, i);
-                const isAnyHovered = (hoverType !== null);
-
-                const midLon = (WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
-                const midAngle = degToRad(180 - midLon);
-                const cos = Math.cos(midAngle);
-                const sin = Math.sin(midAngle);
-
-                // Draw stacked planet symbols inside the inner circle
-                activations.forEach((act, aIdx) => {
-                    const rAct = rInnerBorder - 14 - aIdx * 20;
-                    const ax = cx + rAct * cos;
-                    const ay = cy + rAct * sin;
-
-                    let baseHex = act.type === 'design' ? '#DC3C3C' : '#2E2A20';
-                    let planetAlpha = (isAnyHovered && !isHighlighted ? 0.1 : 1.0) * pRaysPlanets;
-                    let planetColor = hexToRgba(baseHex, planetAlpha);
-
-                    drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
-
-                    // Draw line number subscript next to planet symbol
-                    const subAngle = midAngle - 0.032;
-                    const sx = cx + (rAct + 1) * Math.cos(subAngle);
-                    const sy = cy + (rAct + 1) * Math.sin(subAngle);
-                    ctx.font = 'bold 9px DM Sans, sans-serif';
-                    
-                    let lineAlpha = (isAnyHovered && !isHighlighted ? 0.1 : 0.95) * pRaysPlanets;
-                    ctx.fillStyle = hexToRgba(baseHex, lineAlpha);
-                    ctx.fillText(act.line.toString(), sx, sy);
-                });
-            }
-        }
-
-        // 7.5 Draw radial activation wedges (rays) from the center to the gates (CCW)
+        // 7. Draw radial activation wedges (rays) from the center to the gates (CCW)
         const GATE_CENTER_COLORS = {};
         const CENTER_HUES = {
             'Head':        'rgba(255,230,0,',   // yellow
@@ -5033,6 +4989,53 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fill();
         }
 
+        // 7.5 Soft white overlay over rays before bodygraph and planet symbols render on top
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 7.8 Planet activation lines and symbols inside the wheel (CCW, rendered crisp on top of background)
+        const pRaysPlanets = (mandalaAnimState.raysPlanets ? mandalaAnimState.raysPlanets.progress : 1);
+
+        if (pRaysPlanets > 0.005) {
+            for (let i = 0; i < 64; i++) {
+                const gateNum = GATE_ORDER[i];
+                const activations = activationsByGate[gateNum];
+                if (!activations || activations.length === 0) continue;
+
+                const isHighlighted = isGateHighlighted(gateNum, i);
+                const isAnyHovered = (hoverType !== null);
+
+                const midLon = (WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
+                const midAngle = degToRad(180 - midLon);
+                const cos = Math.cos(midAngle);
+                const sin = Math.sin(midAngle);
+
+                // Draw stacked planet symbols inside the inner circle (crisp, solid, high-contrast)
+                activations.forEach((act, aIdx) => {
+                    const rAct = rInnerBorder - 14 - aIdx * 20;
+                    const ax = cx + rAct * cos;
+                    const ay = cy + rAct * sin;
+
+                    let baseHex = act.type === 'design' ? '#DC2626' : '#1A1610';
+                    let planetAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
+                    let planetColor = hexToRgba(baseHex, planetAlpha);
+
+                    drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
+
+                    // Draw line number subscript next to planet symbol
+                    const subAngle = midAngle - 0.032;
+                    const sx = cx + (rAct + 1) * Math.cos(subAngle);
+                    const sy = cy + (rAct + 1) * Math.sin(subAngle);
+                    ctx.font = 'bold 9.5px DM Sans, sans-serif';
+                    
+                    let lineAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
+                    ctx.fillStyle = hexToRgba(baseHex, lineAlpha);
+                    ctx.fillText(act.line.toString(), sx, sy);
+                });
+            }
+        }
 
         // 8. Bodygraph overlay inside inner circle
         const activeGatesCombinedForBG = new Set([...activeGatesPersonality, ...activeGatesDesign]);
@@ -5043,12 +5046,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 definedCenters.add(ch.centerB);
             }
         });
-
-        // Soft white overlay over rays before bodygraph SVG renders on top
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-        ctx.fill();
 
         // 8.5 Incarnation Cross bars already drawn early (step after gate setup above)
 
