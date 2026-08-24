@@ -1450,7 +1450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </td>
                 <td>${fmtPos(p.formatted)}</td>
-                <td class="lon-cell">${mirrorLonHtml}</td>
+                <td class="lon-cell col-grad2">${mirrorLonHtml}</td>
                 <td>${p.is_retrograde
                     ? '<span class="retro-badge">R</span>'
                     : '<span class="direct-dash">—</span>'}</td>`;
