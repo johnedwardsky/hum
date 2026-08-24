@@ -2608,6 +2608,114 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 
 /* ═══════════════════════════════════════════════════════
+   BODYGRAPH DIAL SWITCHER (1st vs 2nd DIAL)
+═══════════════════════════════════════════════════════ */
+.bg-dial-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px 0 16px 0;
+    width: 100%;
+}
+
+.bg-dial-segmented {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(197, 158, 63, 0.28);
+    border-radius: 30px;
+    padding: 3px;
+    gap: 4px;
+    box-shadow: 0 4px 16px rgba(46, 42, 32, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.bg-dial-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 18px;
+    border-radius: 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-muted);
+}
+
+.bg-dial-btn:hover {
+    color: var(--text-dark);
+    background: rgba(197, 158, 63, 0.06);
+}
+
+.bg-dial-btn.active {
+    background: var(--primary);
+    color: #FFFFFF;
+    box-shadow: 0 2px 10px rgba(197, 158, 63, 0.35);
+}
+
+.bg-dial-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.06);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.bg-dial-btn.active .bg-dial-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFF;
+}
+
+.bg-dial-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bg-dial-desc {
+    font-size: 11px;
+    opacity: 0.75;
+}
+
+.hd-dial-mode-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    background: rgba(197, 158, 63, 0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(197, 158, 63, 0.2);
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+/* Mode-dependent gate column contrast */
+.bg-layout.mode-dial-2 .bg-col-design .bg-mirror-cell {
+    opacity: 1;
+    color: #fe0000;
+    font-weight: 700;
+}
+.bg-layout.mode-dial-2 .bg-col-personality .bg-mirror-cell {
+    opacity: 1;
+    color: #2E2A20;
+    font-weight: 700;
+}
+.bg-layout.mode-dial-2 .bg-gate-cell:not(.bg-mirror-cell) {
+    opacity: 0.38;
+}
+
+.bg-layout.mode-dial-1 .bg-gate-cell:not(.bg-mirror-cell) {
+    opacity: 1;
+}
+.bg-layout.mode-dial-1 .bg-mirror-cell {
+    opacity: 0.45;
+}
+
+/* ═══════════════════════════════════════════════════════
    SVG BODYGRAPH LAYOUT
 ═══════════════════════════════════════════════════════ */
 .bg-layout {

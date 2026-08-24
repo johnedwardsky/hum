@@ -476,6 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activePlanets = null;  // Set of active planet names to display on chart
     let activeBgDesign = null; // Set of active planet names for Bodygraph Design (red) column
     let activeBgPers = null;   // Set of active planet names for Bodygraph Personality (black) column
+    let currentBodygraphDial = '1'; // '1' = 1-й циферблат (Основной), '2' = 2-й циферблат (Зеркало)
     const DEFAULT_INACTIVE_PLANETS = [
         'Хирон',
         'Лилит (средняя)',
@@ -484,6 +485,22 @@ document.addEventListener('DOMContentLoaded', () => {
         'Приап (интерп.)'
     ];
     const geoCache   = new Map(); // local geocoding cache
+
+    // ── Bodygraph Dial Switcher ───────────────────────────────
+    document.querySelectorAll('.bg-dial-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dial = btn.getAttribute('data-dial');
+            if (dial === currentBodygraphDial) return;
+            currentBodygraphDial = dial;
+            document.querySelectorAll('.bg-dial-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-dial') === dial);
+            });
+            if (lastChart) {
+                renderSvgBodygraph(lastChart);
+                updateHdTypeProfile(lastChart);
+            }
+        });
+    });
 
     // ── Radio time mode ───────────────────────────────────────
     document.getElementById('radio-local').addEventListener('click', () => setGmt(false));
@@ -3660,11 +3677,49 @@ document.addEventListener('DOMContentLoaded', () => {
     let mandalaAnimFrameId = null;
 
     // ── HD Type, Profile & Authority ──────────────────────────────────────────
-    function computeHdInfo(data) {
+    function computeHdInfo(data, dialMode = (typeof currentBodygraphDial !== 'undefined' ? currentBodygraphDial : '1')) {
         // Build active gates from personality + design
         const activeGates = new Set();
-        (data.planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
-        (data.design_planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+
+        if (dialMode === '2' && data.houses && data.houses.length >= 1) {
+            const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                 8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                 1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                37, 63, 22, 36
+            ];
+            const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+            const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+
+            const getProgramBoundary = (houseData) => {
+                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                if (gateIdx === -1) return houseData.longitude;
+                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+            };
+            const AS = getProgramBoundary(data.houses[0]);
+            (data.planets || []).forEach(p => {
+                if (p.longitude != null) {
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / 5.625) % 64;
+                    activeGates.add(MIRROR_GATE_ORDER[mIdx]);
+                }
+            });
+            (data.design_planets || []).forEach(p => {
+                if (p.longitude != null) {
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / 5.625) % 64;
+                    activeGates.add(MIRROR_GATE_ORDER[mIdx]);
+                }
+            });
+        } else {
+            (data.planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+            (data.design_planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+        }
 
         // Defined centers via channels (both gates must be active)
         const definedCenters = new Set();
@@ -3714,42 +3769,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Motor centers (per HD spec: Heart/Ego, Solar Plexus, Root, Sacral)
         const MOTORS = ['Heart', 'SolarPlexus', 'Root', 'Sacral'];
-        // Non-sacral motors only (for Manifestor check)
-        const NON_SACRAL_MOTORS = ['Heart', 'SolarPlexus', 'Root'];
 
-        // Is any motor connected to Throat through the defined channel graph?
-        // For MG: Sacral counts as a motor (20-34 channel = Sacral→Throat)
-        function sacralConnectedToThroat() {
-            return canReachThroat('Sacral');
+        function anyMotorConnectedToThroat() {
+            return MOTORS.some(m => definedCenters.has(m) && canReachThroat(m));
         }
 
-        // For Manifestor: non-sacral motor connected to Throat, path must NOT go through Sacral
-        function nonSacralMotorConnectedToThroat() {
-            return NON_SACRAL_MOTORS.some(m =>
-                definedCenters.has(m) && canReachThroat(m, new Set(['Sacral']))
-            );
-        }
-
-        // Determine type — official HD priority order:
-        // 1. Reflector: no defined centers
-        // 2. Generator family (defined Sacral):
-        //    - MG: Sacral connected to Throat (directly via 20-34 or indirectly)
-        //    - Generator: Sacral defined but not connected to Throat
-        // 3. Non-sacral:
-        //    - Manifestor: a non-sacral motor (Heart, SP, Root) connected to Throat
-        //      (path may go through G-Center, Spleen etc., but NOT through Sacral)
-        //    - Projector: no motor connected to Throat
         let type;
         if (definedCenters.size === 0) {
             type = 'Рефлектор';
         } else if (hasSacral) {
-            if (sacralConnectedToThroat()) {
+            if (anyMotorConnectedToThroat()) {
                 type = 'Манифестирующий Генератор';
             } else {
                 type = 'Генератор';
             }
         } else {
-            if (nonSacralMotorConnectedToThroat()) {
+            if (anyMotorConnectedToThroat()) {
                 type = 'Манифестор';
             } else {
                 type = 'Проектор';
@@ -3759,8 +3794,40 @@ document.addEventListener('DOMContentLoaded', () => {
         // Profile: Personality Sun line / Design Sun line
         const sunPers = (data.planets || []).find(p => p.name === 'Sun' || p.name === 'Солнце' || p.id === 0);
         const sunDes  = (data.design_planets || []).find(p => p.name === 'Sun' || p.name === 'Солнце' || p.id === 0);
-        const persLine = sunPers?.hexagram?.line || null;
-        const desLine  = sunDes?.hexagram?.line  || null;
+        let persLine = null;
+        let desLine  = null;
+        if (dialMode === '2' && data.houses && data.houses.length >= 1) {
+            const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                 8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                 1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                37, 63, 22, 36
+            ];
+            const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+            const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+            const getProgramBoundary = (houseData) => {
+                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                if (gateIdx === -1) return houseData.longitude;
+                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+            };
+            const AS = getProgramBoundary(data.houses[0]);
+            if (sunPers && sunPers.longitude != null) {
+                const relLon = (sunPers.longitude - AS + 360) % 360;
+                persLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
+            }
+            if (sunDes && sunDes.longitude != null) {
+                const relLon = (sunDes.longitude - AS + 360) % 360;
+                desLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
+            }
+        } else {
+            persLine = sunPers?.hexagram?.line || null;
+            desLine  = sunDes?.hexagram?.line  || null;
+        }
         const profile  = (persLine && desLine) ? `${persLine}/${desLine}` : null;
 
         // Authority — standard priority order
@@ -3773,17 +3840,17 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (definedCenters.has('G-Center') && hasThroat)    authority = 'Ментально-проецированный';
         else if (definedCenters.size === 0)                       authority = 'Лунный цикл';
 
-        return { type, profile, authority };
+        return { type, profile, authority, definedCenters, activeGates };
     }
 
     function updateHdTypeProfile(data) {
-        // ── Old mandala block (keep for backward compat) ──
+        // ── Old mandala block (keep for backward compat - always uses dial 1 for mandala) ──
         const block = document.getElementById('hd-type-profile-block');
         const typeBadge = document.getElementById('hd-type-badge');
         const profileBadge = document.getElementById('hd-profile-badge');
         const authorityBadge = document.getElementById('hd-authority-badge');
 
-        const info = computeHdInfo(data);
+        const mandalaInfo = computeHdInfo(data, '1');
 
         // Type colors
         const typeStyles = {
@@ -3793,30 +3860,37 @@ document.addEventListener('DOMContentLoaded', () => {
             'Проектор':                   { bg: '#2471A3', color: '#fff' },
             'Рефлектор':                  { bg: '#566573', color: '#fff' },
         };
-        const st = typeStyles[info.type] || { bg: '#C59E3F', color: '#fff' };
 
         // Fill old mandala badge if it exists
-        if (typeBadge) {
-            typeBadge.textContent = info.type;
-            typeBadge.style.background = st.bg;
-            typeBadge.style.color = st.color;
-            typeBadge.style.boxShadow = `0 2px 12px ${st.bg}44`;
+        if (typeBadge || profileBadge || authorityBadge) {
+            const mSt = typeStyles[mandalaInfo.type] || { bg: '#C59E3F', color: '#fff' };
+            if (typeBadge) {
+                typeBadge.textContent = mandalaInfo.type;
+                typeBadge.style.background = mSt.bg;
+                typeBadge.style.color = mSt.color;
+                typeBadge.style.boxShadow = `0 2px 12px ${mSt.bg}44`;
+            }
+            if (profileBadge) {
+                profileBadge.innerHTML = mandalaInfo.profile
+                    ? `<span style="opacity:0.6;font-weight:500;">Профиль</span> <strong>${mandalaInfo.profile}</strong>`
+                    : '';
+            }
+            if (authorityBadge) {
+                authorityBadge.innerHTML = `<span style="opacity:0.6;font-weight:500;">Авторитет</span> <strong>${mandalaInfo.authority}</strong>`;
+            }
+            if (block) block.style.display = 'block';
         }
-        if (profileBadge) {
-            profileBadge.innerHTML = info.profile
-                ? `<span style="opacity:0.6;font-weight:500;">Профиль</span> <strong>${info.profile}</strong>`
-                : '';
-        }
-        if (authorityBadge) {
-            authorityBadge.innerHTML = `<span style="opacity:0.6;font-weight:500;">Авторитет</span> <strong>${info.authority}</strong>`;
-        }
-        if (block) block.style.display = 'block';
 
-        // ── New bodygraph page type card ──
+        // ── New bodygraph page type card (updates for selected dial 1 or 2) ──
+        const currentDial = typeof currentBodygraphDial !== 'undefined' ? currentBodygraphDial : '1';
+        const info = computeHdInfo(data, currentDial);
+        const st = typeStyles[info.type] || { bg: '#C59E3F', color: '#fff' };
+
         const card     = document.getElementById('hd-type-info-card');
         const pillEl   = document.getElementById('hd-type-badge-bg');
         const profEl   = document.getElementById('hd-profile-bg');
         const authEl   = document.getElementById('hd-authority-bg');
+        const modeTag  = document.getElementById('hd-dial-mode-tag');
 
         if (card && pillEl) {
             pillEl.textContent = info.type;
@@ -3826,6 +3900,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (profEl)  profEl.textContent  = info.profile  || '—';
             if (authEl)  authEl.textContent  = info.authority || '—';
+            if (modeTag) {
+                modeTag.textContent = currentDial === '2' ? '2-й циферблат: Зеркало' : '1-й циферблат: Основной';
+            }
 
             card.style.display = 'flex';
         }
@@ -5596,28 +5673,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Helper to get gate for the currently selected dial (1st vs 2nd)
+        const getDialGate = (p) => {
+            if (currentBodygraphDial === '2') {
+                if (p.longitude != null && data && data.houses && data.houses.length >= 1) {
+                    const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                        25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                         8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                        62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                        47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                         1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                        38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                        37, 63, 22, 36
+                    ];
+                    const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+                    const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+                    const getProgramBoundary = (houseData) => {
+                        if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                        const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                        if (gateIdx === -1) return houseData.longitude;
+                        const lineIdx = (houseData.hexagram.line || 1) - 1;
+                        return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+                    };
+                    const AS = getProgramBoundary(data.houses[0]);
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / 5.625) % 64;
+                    return MIRROR_GATE_ORDER[mIdx];
+                }
+            }
+            return p.hexagram ? p.hexagram.gate : null;
+        };
+
         // Maps: gate# -> array of planet names
         const persGates   = {};
         const designGates = {};
 
         personalityPlanets.forEach(p => {
-            if (!p.hexagram) return;
             if (activeBgPers && !activeBgPers.has(p.name)) return;
-            const g = p.hexagram.gate;
+            const g = getDialGate(p);
+            if (!g) return;
             if (!persGates[g]) persGates[g] = [];
             persGates[g].push(p.name);
         });
 
         designPlanets.forEach(p => {
-            if (!p.hexagram) return;
             if (activeBgDesign && !activeBgDesign.has(p.name)) return;
-            const g = p.hexagram.gate;
+            const g = getDialGate(p);
+            if (!g) return;
             if (!designGates[g]) designGates[g] = [];
             designGates[g].push(p.name);
         });
 
         // ── Apply gate visibility on SVG ───────────────────────────────
         function applyGatesToSvg() {
+            // Update container mode class on layout for visual styling
+            const bgLayoutEl = document.querySelector('.bg-layout');
+            if (bgLayoutEl) {
+                bgLayoutEl.classList.toggle('mode-dial-1', currentBodygraphDial === '1');
+                bgLayoutEl.classList.toggle('mode-dial-2', currentBodygraphDial === '2');
+            }
+
             // Reset all gate elements to hidden
             svgWrap.querySelectorAll('[class*="cls__"], [class*="cls_"]').forEach(el => {
                 el.classList.remove(
@@ -5633,17 +5748,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const activeDesignGates = {};
 
             personalityPlanets.forEach(p => {
-                if (!p.hexagram) return;
                 if (activeBgPers && !activeBgPers.has(p.name)) return;
-                const g = p.hexagram.gate;
+                const g = getDialGate(p);
+                if (!g) return;
                 if (!activePersGates[g]) activePersGates[g] = [];
                 activePersGates[g].push(p.name);
             });
 
             designPlanets.forEach(p => {
-                if (!p.hexagram) return;
                 if (activeBgDesign && !activeBgDesign.has(p.name)) return;
-                const g = p.hexagram.gate;
+                const g = getDialGate(p);
+                if (!g) return;
                 if (!activeDesignGates[g]) activeDesignGates[g] = [];
                 activeDesignGates[g].push(p.name);
             });
@@ -6038,14 +6153,67 @@ document.addEventListener('DOMContentLoaded', () => {
             // Design Sun & North Node
             const dSun = designPlanets.find(p => p.name === 'Солнце' || p.name === 'Sun' || p.id === 0);
             const dNode = designPlanets.find(p => p.name.includes('Северный Узел'));
-            const dSunHex = dSun?.hexagram || {};
-            const dNodeHex = dNode?.hexagram || {};
 
             // Personality Sun & North Node
             const pSun = personalityPlanets.find(p => p.name === 'Солнце' || p.name === 'Sun' || p.id === 0);
             const pNode = personalityPlanets.find(p => p.name.includes('Северный Узел'));
-            const pSunHex = pSun?.hexagram || {};
-            const pNodeHex = pNode?.hexagram || {};
+
+            // Helper to get substructure (line, color, tone, base) for the current dial
+            function getPlanetSubstructure(p) {
+                if (!p) return { line: 1, color: 1, tone: 1, base: 1, gate: null };
+                if (currentBodygraphDial === '2' && p.longitude != null && data && data.houses && data.houses.length >= 1) {
+                    const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                        25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                         8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                        62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                        47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                         1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                        38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                        37, 63, 22, 36
+                    ];
+                    const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+                    const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+                    const getProgramBoundary = (houseData) => {
+                        if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                        const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                        if (gateIdx === -1) return houseData.longitude;
+                        const lineIdx = (houseData.hexagram.line || 1) - 1;
+                        return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+                    };
+                    const AS = getProgramBoundary(data.houses[0]);
+                    const relLon = (p.longitude - AS + 360.0) % 360.0;
+                    const gateIdx = Math.floor(relLon / 5.625) % 64;
+                    const gate = MIRROR_GATE_ORDER[gateIdx];
+                    const gateOffset = (relLon % 5.625 + 5.625) % 5.625;
+
+                    const lineInterval = 5.625 / 6; // 0.9375
+                    const lineIdx = Math.min(5, Math.max(0, Math.floor(gateOffset / lineInterval)));
+                    const line = lineIdx + 1;
+                    const lineOffset = gateOffset - (lineIdx * lineInterval);
+
+                    const colorInterval = lineInterval / 6; // 0.15625
+                    const colorIdx = Math.min(5, Math.max(0, Math.floor(lineOffset / colorInterval)));
+                    const color = colorIdx + 1;
+                    const colorOffset = lineOffset - (colorIdx * colorInterval);
+
+                    const toneInterval = colorInterval / 6; // 0.026041666666666668
+                    const toneIdx = Math.min(5, Math.max(0, Math.floor(colorOffset / toneInterval)));
+                    const tone = toneIdx + 1;
+                    const toneOffset = colorOffset - (toneIdx * toneInterval);
+
+                    const baseInterval = toneInterval / 5; // 0.005208333333333333
+                    const baseIdx = Math.min(4, Math.max(0, Math.floor(toneOffset / baseInterval)));
+                    const base = baseIdx + 1;
+
+                    return { gate, line, color, tone, base };
+                }
+                return p.hexagram || { line: 1, color: 1, tone: 1, base: 1, gate: null };
+            }
+
+            const dSunHex = getPlanetSubstructure(dSun);
+            const dNodeHex = getPlanetSubstructure(dNode);
+            const pSunHex = getPlanetSubstructure(pSun);
+            const pNodeHex = getPlanetSubstructure(pNode);
 
             function renderBadgeSvg(type, num) {
                 const n = (num !== undefined && num !== null) ? num : '1';

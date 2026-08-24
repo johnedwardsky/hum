@@ -476,6 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activePlanets = null;  // Set of active planet names to display on chart
     let activeBgDesign = null; // Set of active planet names for Bodygraph Design (red) column
     let activeBgPers = null;   // Set of active planet names for Bodygraph Personality (black) column
+    let currentBodygraphDial = '1'; // '1' = 1-й циферблат (Основной), '2' = 2-й циферблат (Зеркало)
     const DEFAULT_INACTIVE_PLANETS = [
         'Хирон',
         'Лилит (средняя)',
@@ -484,6 +485,22 @@ document.addEventListener('DOMContentLoaded', () => {
         'Приап (интерп.)'
     ];
     const geoCache   = new Map(); // local geocoding cache
+
+    // ── Bodygraph Dial Switcher ───────────────────────────────
+    document.querySelectorAll('.bg-dial-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dial = btn.getAttribute('data-dial');
+            if (dial === currentBodygraphDial) return;
+            currentBodygraphDial = dial;
+            document.querySelectorAll('.bg-dial-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-dial') === dial);
+            });
+            if (lastChart) {
+                renderSvgBodygraph(lastChart);
+                updateHdTypeProfile(lastChart);
+            }
+        });
+    });
 
     // ── Radio time mode ───────────────────────────────────────
     document.getElementById('radio-local').addEventListener('click', () => setGmt(false));
@@ -1042,6 +1059,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draw Rave Mandala
         drawMandala(data, document.getElementById('mandala-canvas'));
+        updateHdTypeProfile(data);
 
         // Draw print chart (sized to 220px to match CSS)
         const printCanvas = document.getElementById('print-chart-canvas');
@@ -1083,6 +1101,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const B = 2 - A + Math.floor(A / 4);
         return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h/24 + B - 1524.5;
     }
+
+    const GATE_ORDER = [
+        25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+         8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+        62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+        47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+         1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+        38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+        37, 63, 22, 36
+    ];
+    const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
+    const GATE_INTERVAL = 5.625;
 
     const MIRROR_GATE_ORDER = [
         41, 61, 60, 10, 58, 54, 38, 24, 27, 42,  3, 25, 17, 51, 21, 13, 49, 55, 30, 36,
@@ -3043,10 +3073,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const GATE_ORDER = [
-            25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
-            10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
-            46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
-            15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
         ];
 
         const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
@@ -3223,15 +3256,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // ── Center shapes ──
-        const uFill = '#FFFFFF';
-        const uStroke = 'rgba(197,158,63,0.35)';
-        const dFill = '#C59E3F';
-        const dStroke = '#A8832E';
+        // Per-center colors matching Human Design standard reference
+        const CENTER_COLORS = {
+            'Head':        { def: '#FFE600', stroke: '#D4C000', hover: '#FFF176' },
+            'Ajna':        { def: '#4CAF50', stroke: '#388E3C', hover: '#81C784' },
+            'Throat':      { def: '#29B6F6', stroke: '#0288D1', hover: '#81D4FA' },
+            'G-Center':    { def: '#FFD700', stroke: '#C9A800', hover: '#FFF176' },
+            'Heart':       { def: '#C62828', stroke: '#8B0000', hover: '#E57373' },
+            'Sacral':      { def: '#E53935', stroke: '#B71C1C', hover: '#EF9A9A' },
+            'Root':        { def: '#FF8C00', stroke: '#E65100', hover: '#FFCC80' },
+            'Spleen':      { def: '#FF8C00', stroke: '#E65100', hover: '#FFCC80' },
+            'SolarPlexus': { def: '#FF8C00', stroke: '#E65100', hover: '#FFCC80' },
+        };
+        const uFill   = 'rgba(220, 215, 205, 0.45)';
+        const uStroke = 'rgba(160, 150, 130, 0.5)';
 
         Object.entries(BG_CENTERS).forEach(([name, c]) => {
             const isDef = definedCenters.has(name);
-            let fill = isDef ? dFill : uFill;
-            let stroke = isDef ? dStroke : uStroke;
+            const cc = CENTER_COLORS[name] || { def: '#C59E3F', stroke: '#A8832E', hover: '#DFB135' };
+            let fill   = isDef ? cc.def    : uFill;
+            let stroke = isDef ? cc.stroke : uStroke;
 
             let op = getBodygraphOpacity(name, null);
 
@@ -3239,8 +3283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.globalAlpha = op;
 
             if (hoverType === 'center' && name === hoverTarget) {
-                fill = isDef ? '#DFB135' : 'rgba(197,158,63,0.18)';
-                stroke = '#C59E3F';
+                fill   = isDef ? cc.hover : 'rgba(197,158,63,0.22)';
+                stroke = isDef ? cc.def   : '#C59E3F';
             }
 
             if (c.poly) {
@@ -3302,7 +3346,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let op = getBodygraphOpacity(name, null);
             ctx.save();
             ctx.globalAlpha = op;
-            ctx.fillStyle = definedCenters.has(name) ? 'rgba(255,255,255,0.9)' : 'rgba(197,158,63,0.5)';
+            // White text on defined colored centers, dark on open centers
+            ctx.fillStyle = definedCenters.has(name) ? 'rgba(255,255,255,0.92)' : 'rgba(100,90,70,0.55)';
             const off = labelOffsets[name] || [0,0];
             const pt = S([c.cx + off[0], c.cy + off[1]]);
             ctx.fillText(c.label, pt[0], pt[1]);
@@ -3620,16 +3665,249 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const mandalaAnimState = {
-        hexagrams:   { progress: 1, startAngle: -0.22 },
-        mirror:      { progress: 1, startAngle:  0.22 },
-        zodiac:      { progress: 1, startAngle: -0.18 },
+        hexagrams:   { progress: 1, startAngle:  0.20 },
+        mirror:      { progress: 1, startAngle:  0.20 },
+        zodiac:      { progress: 1, startAngle:  0.18 },
         houses:      { progress: 1, startAngle:  0.18 },
         rulers:      { progress: 1, startAngle:  0.18 },
         raysPlanets: { progress: 1, startAngle:  0.18 },
-        cross:       { progress: 1, startAngle: -0.25 }
+        cross:       { progress: 1, startAngle:  0.20 }
     };
 
     let mandalaAnimFrameId = null;
+
+    // ── HD Type, Profile & Authority ──────────────────────────────────────────
+    function computeHdInfo(data, dialMode = (typeof currentBodygraphDial !== 'undefined' ? currentBodygraphDial : '1')) {
+        // Build active gates from personality + design
+        const activeGates = new Set();
+
+        if (dialMode === '2' && data.houses && data.houses.length >= 1) {
+            const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                 8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                 1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                37, 63, 22, 36
+            ];
+            const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+            const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+
+            const getProgramBoundary = (houseData) => {
+                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                if (gateIdx === -1) return houseData.longitude;
+                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+            };
+            const AS = getProgramBoundary(data.houses[0]);
+            (data.planets || []).forEach(p => {
+                if (p.longitude != null) {
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / 5.625) % 64;
+                    activeGates.add(MIRROR_GATE_ORDER[mIdx]);
+                }
+            });
+            (data.design_planets || []).forEach(p => {
+                if (p.longitude != null) {
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / 5.625) % 64;
+                    activeGates.add(MIRROR_GATE_ORDER[mIdx]);
+                }
+            });
+        } else {
+            (data.planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+            (data.design_planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+        }
+
+        // Defined centers via channels (both gates must be active)
+        const definedCenters = new Set();
+        CHANNELS_DATA.forEach(ch => {
+            if (activeGates.has(ch.gateA) && activeGates.has(ch.gateB)) {
+                definedCenters.add(ch.centerA);
+                definedCenters.add(ch.centerB);
+            }
+        });
+
+        const hasSacral     = definedCenters.has('Sacral');
+        const hasThroat     = definedCenters.has('Throat');
+        const hasHeart      = definedCenters.has('Heart');
+        const hasRoot       = definedCenters.has('Root');
+        const hasSolar      = definedCenters.has('SolarPlexus');
+
+        // Build adjacency graph of ACTIVE channels only (for path traversal)
+        const activeAdj = {};
+        CHANNELS_DATA.forEach(ch => {
+            if (activeGates.has(ch.gateA) && activeGates.has(ch.gateB)) {
+                if (!activeAdj[ch.centerA]) activeAdj[ch.centerA] = new Set();
+                if (!activeAdj[ch.centerB]) activeAdj[ch.centerB] = new Set();
+                activeAdj[ch.centerA].add(ch.centerB);
+                activeAdj[ch.centerB].add(ch.centerA);
+            }
+        });
+
+        // BFS: can we reach 'Throat' from 'startCenter' without passing through any center in 'blocked'?
+        function canReachThroat(startCenter, blocked = new Set()) {
+            if (!hasThroat) return false;
+            if (startCenter === 'Throat') return true;
+            const visited = new Set([startCenter]);
+            const queue = [startCenter];
+            while (queue.length) {
+                const cur = queue.shift();
+                const neighbors = activeAdj[cur] || new Set();
+                for (const nb of neighbors) {
+                    if (nb === 'Throat') return true;
+                    if (!visited.has(nb) && !blocked.has(nb)) {
+                        visited.add(nb);
+                        queue.push(nb);
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Motor centers (per HD spec: Heart/Ego, Solar Plexus, Root, Sacral)
+        const MOTORS = ['Heart', 'SolarPlexus', 'Root', 'Sacral'];
+
+        function anyMotorConnectedToThroat() {
+            return MOTORS.some(m => definedCenters.has(m) && canReachThroat(m));
+        }
+
+        let type;
+        if (definedCenters.size === 0) {
+            type = 'Рефлектор';
+        } else if (hasSacral) {
+            if (anyMotorConnectedToThroat()) {
+                type = 'Манифестирующий Генератор';
+            } else {
+                type = 'Генератор';
+            }
+        } else {
+            if (anyMotorConnectedToThroat()) {
+                type = 'Манифестор';
+            } else {
+                type = 'Проектор';
+            }
+        }
+
+        // Profile: Personality Sun line / Design Sun line
+        const sunPers = (data.planets || []).find(p => p.name === 'Sun' || p.name === 'Солнце' || p.id === 0);
+        const sunDes  = (data.design_planets || []).find(p => p.name === 'Sun' || p.name === 'Солнце' || p.id === 0);
+        let persLine = null;
+        let desLine  = null;
+        if (dialMode === '2' && data.houses && data.houses.length >= 1) {
+            const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                 8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                 1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                37, 63, 22, 36
+            ];
+            const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+            const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+            const getProgramBoundary = (houseData) => {
+                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                if (gateIdx === -1) return houseData.longitude;
+                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+            };
+            const AS = getProgramBoundary(data.houses[0]);
+            if (sunPers && sunPers.longitude != null) {
+                const relLon = (sunPers.longitude - AS + 360) % 360;
+                persLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
+            }
+            if (sunDes && sunDes.longitude != null) {
+                const relLon = (sunDes.longitude - AS + 360) % 360;
+                desLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
+            }
+        } else {
+            persLine = sunPers?.hexagram?.line || null;
+            desLine  = sunDes?.hexagram?.line  || null;
+        }
+        const profile  = (persLine && desLine) ? `${persLine}/${desLine}` : null;
+
+        // Authority — standard priority order
+        let authority = 'Нет внутреннего авторитета';
+        if (hasSolar)                                             authority = 'Эмоциональный';
+        else if (hasSacral)                                       authority = 'Сакральный';
+        else if (definedCenters.has('Spleen'))                    authority = 'Селезёночный';
+        else if (hasHeart && hasThroat)                           authority = 'Эго-манифестированный';
+        else if (hasHeart)                                        authority = 'Эго-проецированный';
+        else if (definedCenters.has('G-Center') && hasThroat)    authority = 'Ментально-проецированный';
+        else if (definedCenters.size === 0)                       authority = 'Лунный цикл';
+
+        return { type, profile, authority, definedCenters, activeGates };
+    }
+
+    function updateHdTypeProfile(data) {
+        // ── Old mandala block (keep for backward compat - always uses dial 1 for mandala) ──
+        const block = document.getElementById('hd-type-profile-block');
+        const typeBadge = document.getElementById('hd-type-badge');
+        const profileBadge = document.getElementById('hd-profile-badge');
+        const authorityBadge = document.getElementById('hd-authority-badge');
+
+        const mandalaInfo = computeHdInfo(data, '1');
+
+        // Type colors
+        const typeStyles = {
+            'Генератор':                  { bg: '#E8780A', color: '#fff' },
+            'Манифестирующий Генератор':  { bg: '#C59E3F', color: '#fff' },
+            'Манифестор':                 { bg: '#C0392B', color: '#fff' },
+            'Проектор':                   { bg: '#2471A3', color: '#fff' },
+            'Рефлектор':                  { bg: '#566573', color: '#fff' },
+        };
+
+        // Fill old mandala badge if it exists
+        if (typeBadge || profileBadge || authorityBadge) {
+            const mSt = typeStyles[mandalaInfo.type] || { bg: '#C59E3F', color: '#fff' };
+            if (typeBadge) {
+                typeBadge.textContent = mandalaInfo.type;
+                typeBadge.style.background = mSt.bg;
+                typeBadge.style.color = mSt.color;
+                typeBadge.style.boxShadow = `0 2px 12px ${mSt.bg}44`;
+            }
+            if (profileBadge) {
+                profileBadge.innerHTML = mandalaInfo.profile
+                    ? `<span style="opacity:0.6;font-weight:500;">Профиль</span> <strong>${mandalaInfo.profile}</strong>`
+                    : '';
+            }
+            if (authorityBadge) {
+                authorityBadge.innerHTML = `<span style="opacity:0.6;font-weight:500;">Авторитет</span> <strong>${mandalaInfo.authority}</strong>`;
+            }
+            if (block) block.style.display = 'block';
+        }
+
+        // ── New bodygraph page type card (updates for selected dial 1 or 2) ──
+        const currentDial = typeof currentBodygraphDial !== 'undefined' ? currentBodygraphDial : '1';
+        const info = computeHdInfo(data, currentDial);
+        const st = typeStyles[info.type] || { bg: '#C59E3F', color: '#fff' };
+
+        const card     = document.getElementById('hd-type-info-card');
+        const pillEl   = document.getElementById('hd-type-badge-bg');
+        const profEl   = document.getElementById('hd-profile-bg');
+        const authEl   = document.getElementById('hd-authority-bg');
+        const modeTag  = document.getElementById('hd-dial-mode-tag');
+
+        if (card && pillEl) {
+            pillEl.textContent = info.type;
+            pillEl.style.background = st.bg;
+            pillEl.style.color = st.color;
+            pillEl.style.boxShadow = `0 4px 20px ${st.bg}55`;
+
+            if (profEl)  profEl.textContent  = info.profile  || '—';
+            if (authEl)  authEl.textContent  = info.authority || '—';
+            if (modeTag) {
+                modeTag.textContent = currentDial === '2' ? '2-й циферблат: Зеркало' : '1-й циферблат: Основной';
+            }
+
+            card.style.display = 'flex';
+        }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     function animateMandala() {
         if (mandalaAnimFrameId) cancelAnimationFrame(mandalaAnimFrameId);
@@ -3685,20 +3963,58 @@ document.addEventListener('DOMContentLoaded', () => {
         const cy = size / 2;
         const R = size / 2 - 8;
 
-        // Restored original proportions for hexagrams, dial lines and zodiac rings
+        // ── All rings stack from outside in with FIXED widths ──────────────────
+        // When outer rings are off, inner rings (incl. gates) shift outward to fill the gap.
+        // Bodygraph scale is independent and never changes.
+        const pH  = mandalaAnimState.hexagrams.progress;
+        const pM  = mandalaAnimState.mirror.progress;
+        const pZ  = mandalaAnimState.zodiac.progress;
+        const pH2 = mandalaAnimState.houses.progress;
+
+        const W_HEX           = R * 0.080;
+        const W_MIRROR_GATENUM= R * 0.054;  // 2nd dial gate numbers band width
+        const W_MIRROR_DIAL   = R * 0.024;  // 2nd dial 6-line dial band width with ticks and activations
+        const W_MIRROR        = W_MIRROR_GATENUM + W_MIRROR_DIAL;
+        const W_GATENUM       = R * 0.054;  // gate numbers band width
+        const W_DIAL          = R * 0.024;  // 6-line dial band width with ticks and activations
+        const W_GATES         = W_GATENUM + W_DIAL;  // gates dial — always visible, but position can shift
+        const W_ZODIAC        = R * 0.070;
+        const W_HOUSES        = R * 0.090;
+
+        // Outer rings: stack from R inward
         const rHexagramsOuter = R;
-        const rHexagramsInner = R * 0.92;
-        const rMirrorOuter = rHexagramsInner;
-        const rMirrorInner = R * 0.868;
-        const rGatesOuter = rMirrorInner;
-        const rGatesInner = rGatesOuter - 22;
-        const rDialOuter = rGatesInner;
-        const rDialInner = R * 0.790;
-        const rZodiacOuter = rDialInner;
-        const rZodiacInner = R * 0.720;
-        const rHousesOuter = rZodiacInner;   // flush against zodiac inner edge
-        const rHousesInner = R * 0.630;      // compact, narrow band for 12 houses
-        const rInnerBorder = rHousesInner;
+        const rHexagramsInner = R - W_HEX * pH;
+
+        const rMirrorOuter     = rHexagramsInner;
+        const rMirrorGateInner = rMirrorOuter - W_MIRROR_GATENUM * pM;
+        const rMirrorInner     = rMirrorOuter - W_MIRROR * pM;
+
+        // Gates dial: always drawn, but shifts outward when outer rings turn off
+        const rGatesOuter     = rMirrorInner;
+        const rGatesInner     = rGatesOuter - W_GATENUM;  // gate numbers band
+        const rDialOuter      = rGatesInner;
+        const rDialInner      = rGatesOuter - W_GATES;    // 6-line dial band bottom edge
+
+        // Inner rings: stack from gates inward
+        const W_ZODIAC_C = R * 0.070;
+        const W_HOUSES_C = R * 0.090;
+
+        const rZodiacOuter    = rDialInner;
+        const rZodiacInner    = rZodiacOuter - W_ZODIAC_C * pZ;
+
+        const rHousesOuter    = rZodiacInner;
+        const rHousesInner    = rHousesOuter - W_HOUSES_C * pH2;
+
+        const rInnerBorder    = rHousesInner;
+        // ─────────────────────────────────────────────────────────────────────
+
+
+
+
+
+
+
+
 
 
         ctx.clearRect(0, 0, size, size);
@@ -3718,15 +4034,33 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
+        // Subtle semi-transparent blue background for the outermost hexagram ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
+        ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
+        ctx.fillStyle = 'rgba(41, 98, 160, 0.09)';
+        ctx.fill();
+
 
         const GATE_ORDER = [
-            25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
-            10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
-            46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
-            15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
         ];
         const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
         const GATE_INTERVAL = 5.625;
+
+        const getProgramBoundary = (houseData) => {
+            if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+            const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+            if (gateIdx === -1) return houseData.longitude;
+            const lineIdx = (houseData.hexagram.line || 1) - 1;
+            return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+        };
 
         // Compile active gates and planets
         const activeGatesPersonality = new Set();
@@ -3771,29 +4105,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Incarnation Cross gates & exact longitudes (Sun and Earth)
-        // Planet names come from backend in Russian: 'Солнце', 'Земля'
-        let pSunGate = null, pEarthGate = null;
-        let dSunGate = null, dEarthGate = null;
+        let pSunGate = null, pEarthGate = null, pSunLine = null, pEarthLine = null;
+        let dSunGate = null, dEarthGate = null, dSunLine = null, dEarthLine = null;
         let pSunLon = null, pEarthLon = null;
         let dSunLon = null, dEarthLon = null;
         data.planets.forEach(p => {
             if (p.name === 'Солнце') {
                 pSunGate = p.hexagram?.gate;
-                pSunLon = p.longitude;
+                pSunLine = p.hexagram?.line ?? null;
+                pSunLon  = p.longitude;
             }
             if (p.name === 'Земля') {
                 pEarthGate = p.hexagram?.gate;
-                pEarthLon = p.longitude;
+                pEarthLine = p.hexagram?.line ?? null;
+                pEarthLon  = p.longitude;
             }
         });
         designPlanetsList.forEach(p => {
             if (p.name === 'Солнце') {
                 dSunGate = p.hexagram?.gate;
-                dSunLon = p.longitude;
+                dSunLine = p.hexagram?.line ?? null;
+                dSunLon  = p.longitude;
             }
             if (p.name === 'Земля') {
                 dEarthGate = p.hexagram?.gate;
-                dEarthLon = p.longitude;
+                dEarthLine = p.hexagram?.line ?? null;
+                dEarthLon  = p.longitude;
             }
         });
 
@@ -3801,33 +4138,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const hoverType = hoverState ? hoverState.type : null;
         const hoverTarget = hoverState ? hoverState.target : null;
 
-        // ── Draw Incarnation Cross — exact axes through center ──────────────────────
-        // Drawn at exact planet longitudes.
-        // Default: moderately visible. Hovering on any of the 4 cross gates highlights them.
-        // Thickness remains constant (does not increase), shadow blur is removed.
-        function drawCrossAxisExact(sunLon, earthLon, strokeColorDefault, strokeColorHover, lineW) {
-            if (sunLon === null || earthLon === null) return;
+        // ── Draw Incarnation Cross — two axes through mandala center (CCW) ──────
+        function gateLineAngle(gateNum, lineNum) {
+            const idx = GATE_ORDER.indexOf(gateNum);
+            if (idx < 0) return null;
+            const lineWidth = GATE_INTERVAL / 6;
+            const gateStart = WHEEL_START + idx * GATE_INTERVAL;
+            const line = (lineNum >= 1 && lineNum <= 6) ? lineNum : 3.5;
+            const lon = (gateStart + (line - 0.5) * lineWidth) % 360;
+            return degToRad(180 - lon);
+        }
 
-            const isHovered = (hoverType === 'gate' && (
-                hoverTarget === pSunGate || 
-                hoverTarget === pEarthGate || 
-                hoverTarget === dSunGate || 
-                hoverTarget === dEarthGate
-            ));
+        function drawCrossAxis(gateA, lineA, gateB, lineB, col, colHover, lineW) {
+            const aA = gateLineAngle(gateA, lineA);
+            const aB = gateLineAngle(gateB, lineB);
+            if (aA === null || aB === null) return;
 
-            const aSun   = degToRad(180 - (sunLon));
-            const aEarth = degToRad(180 - (earthLon));
+            const isHov = hoverType === 'gate' && (
+                hoverTarget === pSunGate || hoverTarget === pEarthGate ||
+                hoverTarget === dSunGate || hoverTarget === dEarthGate
+            );
+            const color = isHov ? colHover : col;
+            const rLine = R + 18;
 
-            const rLine = R + 28; // slightly beyond outer rim
-            
+            // Full line from gate A through center to gate B
             ctx.beginPath();
-            ctx.moveTo(cx + rLine * Math.cos(aSun),   cy + rLine * Math.sin(aSun));
-            ctx.lineTo(cx + rLine * Math.cos(aEarth), cy + rLine * Math.sin(aEarth));
-            ctx.strokeStyle = isHovered ? strokeColorHover : strokeColorDefault;
+            ctx.moveTo(cx + rLine * Math.cos(aA), cy + rLine * Math.sin(aA));
+            ctx.lineTo(cx + rLine * Math.cos(aB), cy + rLine * Math.sin(aB));
+            ctx.strokeStyle = color;
             ctx.lineWidth   = lineW;
             ctx.lineCap     = 'round';
             ctx.setLineDash([]);
             ctx.stroke();
+
+            // Dot markers at both gate positions on the rim
+            const dotR = lineW * 1.8;
+            [aA, aB].forEach(a => {
+                ctx.beginPath();
+                ctx.arc(cx + rLine * Math.cos(a), cy + rLine * Math.sin(a), dotR, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+            });
         }
 
         const pCross = mandalaAnimState.cross.progress;
@@ -3840,15 +4191,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.rotate(rotCross);
                 ctx.translate(-cx, -cy);
             }
-            // Personality axis (black/charcoal)
-            drawCrossAxisExact(pSunLon, pEarthLon, 'rgba(40, 35, 20, 0.22)', 'rgba(40, 35, 20, 0.88)', 3.2);
-            // Design axis (red)
-            drawCrossAxisExact(dSunLon, dEarthLon, 'rgba(210, 60, 60, 0.22)', 'rgba(210, 60, 60, 0.88)', 3.2);
+            // Design axis — RED (красное Солнце Дизайна → красная Земля Дизайна)
+            drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
+            // Personality axis — BLACK (чёрное Солнце → чёрная Земля)
+            drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
             ctx.restore();
         }
-
-
-
 
         function getQuarterNameForIdx(idx) {
             if (idx >= 56 || idx <= 7) return "Инициация";
@@ -3861,8 +4209,6 @@ document.addEventListener('DOMContentLoaded', () => {
         function isGateHighlighted(gateNum, gateIdx) {
             if (!hoverType) return true;
             if (hoverType === 'gate') {
-                // If hovering over one of the incarnation cross gates,
-                // keep all 4 cross gates highlighted (Personality & Design Sun/Earth)
                 const isCrossHovered = (
                     hoverTarget === pSunGate || 
                     hoverTarget === pEarthGate || 
@@ -3893,10 +4239,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (hoverType === 'house') {
                 if (data.houses && data.houses.length === 12) {
-                    const asc = data.houses[0].longitude;
                     const houseIdx = hoverTarget - 1;
-                    let s = (asc + houseIdx * 30) % 360;
-                    let e = (asc + (houseIdx + 1) * 30) % 360;
+                    const asc = getProgramBoundary(data.houses[0]);
+                    const s = (asc + houseIdx * 30.0) % 360.0;
+                    const e = (asc + (houseIdx + 1) * 30.0) % 360.0;
                     const midLon = (WHEEL_START + gateIdx * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
                     
                     if (e < s) {
@@ -3905,36 +4251,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         return (midLon >= s && midLon < e);
                     }
                 }
+                return false;
             }
             return true;
         }
 
-        // Helper function for rotated labels that corrects for upside-down reading
-        function drawRotatedText(text, r, angle, font, color) {
-            ctx.save();
-            ctx.font = font;
-            ctx.fillStyle = color;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            const x = cx + r * Math.cos(angle);
-            const y = cy + r * Math.sin(angle);
-            ctx.translate(x, y);
-            
-            let rotation = angle + Math.PI / 2;
-            if (angle > 0 && angle < Math.PI) {
-                rotation = angle - Math.PI / 2;
-            }
-            ctx.rotate(rotation);
-            ctx.fillText(text, 0, 0);
-            ctx.restore();
-        }
-
-        // 1. Quarters segment drawing removed as requested
-        // 2. Godheads drawing removed as requested
-
-
-        // 3. Hexagrams and Gates rings rendering
+        // 3. Hexagrams and Gates rings rendering (CCW)
         const HEX_LINES = {
             1: "111111", 2: "000000", 3: "100010", 4: "010001", 5: "111010", 6: "010111", 7: "010000", 8: "000010",
             9: "111011", 10: "110111", 11: "111000", 12: "000111", 13: "101111", 14: "111101", 15: "001000", 16: "000100",
@@ -3955,10 +4277,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
-            const startAngle = degToRad(180 - (startLon));
-            const endAngle = degToRad(180 - (startLon - GATE_INTERVAL));
-            const midAngle = (startAngle + endAngle) / 2;
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
+            const endLon = (WHEEL_START + (i + 1) * GATE_INTERVAL) % 360;
+            const startAngle = degToRad(180 - startLon);
+            const endAngle = degToRad(180 - endLon);
+            const midLon = (WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
+            const midAngle = degToRad(180 - midLon);
 
             const activations = activationsByGate[gateNum] || [];
             const byLine = {};
@@ -3971,9 +4295,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Highlight active gate cell background
             if (isCombinedActive) {
                 ctx.beginPath();
-                ctx.moveTo(cx + rGatesInner * Math.cos(startAngle), cy + rGatesInner * Math.sin(startAngle));
-                ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle);
+                ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle, true);
                 ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
+                ctx.arc(cx, cy, rGatesInner, endAngle, startAngle, false);
                 ctx.closePath();
 
                 let opacityScale = 1.0;
@@ -3997,7 +4321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
             }
 
-            // Draw colored activation blocks inside the 6 dial cells
+            // Draw colored activation blocks inside the 6 dial cells (Lines 1..6 CCW)
             const slotSize = GATE_INTERVAL / 6;
             Object.entries(byLine).forEach(([lineStr, acts]) => {
                 const lineNum = parseInt(lineStr); // 1-6
@@ -4005,17 +4329,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const N = acts.length;
                 
                 acts.forEach((act, idx) => {
-                    // Divide cell angularly if there are multiple activations in this line
                     const subStartLon = slotStartLon + idx * (slotSize / N);
                     const subEndLon = slotStartLon + (idx + 1) * (slotSize / N);
-                    const aStart = degToRad(180 - (subStartLon));
-                    const aEnd = degToRad(180 - (subEndLon));
+                    const aStart = degToRad(180 - subStartLon);
+                    const aEnd = degToRad(180 - subEndLon);
 
                     ctx.beginPath();
-                    ctx.moveTo(cx + rDialInner * Math.cos(aStart), cy + rDialInner * Math.sin(aStart));
-                    ctx.arc(cx, cy, rGatesInner, aStart, aEnd);
+                    ctx.arc(cx, cy, rGatesInner, aStart, aEnd, true);
                     ctx.lineTo(cx + rDialInner * Math.cos(aEnd), cy + rDialInner * Math.sin(aEnd));
-                    ctx.arc(cx, cy, rDialInner, aEnd, aStart, true);
+                    ctx.arc(cx, cy, rDialInner, aEnd, aStart, false);
                     ctx.closePath();
 
                     let fillColor = act.color;
@@ -4046,15 +4368,28 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
             ctx.stroke();
 
-            // 6 slots per gate: sub-divider ticks removed per reference request
-            // (no grey lines inside dial ring)
+            // 6 slots per gate: sub-divider ticks in the dial ring (from rGatesInner to rDialInner, CCW)
+            const tickSpacing = GATE_INTERVAL / 6;
+            for (let t = 1; t <= 5; t++) {
+                const tickLon = startLon + t * tickSpacing;
+                const tickAngle = degToRad(180 - tickLon);
+                let tickColor = 'rgba(180,175,165,0.22)';
+                if (isAnyHovered) {
+                    tickColor = isHighlighted ? 'rgba(120,115,105,0.45)' : 'rgba(120,120,120,0.03)';
+                }
+                ctx.beginPath();
+                ctx.moveTo(cx + rGatesInner * Math.cos(tickAngle), cy + rGatesInner * Math.sin(tickAngle));
+                ctx.lineTo(cx + rDialInner * Math.cos(tickAngle), cy + rDialInner * Math.sin(tickAngle));
+                ctx.strokeStyle = tickColor;
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
+            }
 
             // Draw Gate Number
             const lx = cx + (rGatesOuter + rGatesInner) / 2 * Math.cos(midAngle);
             const ly = cy + (rGatesOuter + rGatesInner) / 2 * Math.sin(midAngle);
             
             let font = isCombinedActive ? 'bold 11px DM Sans, sans-serif' : '600 9.5px DM Sans, sans-serif';
-            // Color logic: Personality=black, Design=red, Both=black, inactive=softer grey
             const gBoth = isPersActive && isDesActive;
             let fillStyle = (gBoth || isPersActive) ? '#2E2A20'
                           : isDesActive             ? 'rgb(220,60,60)'
@@ -4085,7 +4420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.translate(-cx, -cy);
                 }
 
-                // Draw I Ching Hexagram (6 stacked horizontal lines, unrotated, matching reference)
+                // Draw I Ching Hexagram (6 stacked horizontal lines, unrotated)
                 const lineStr = HEX_LINES[gateNum] || "000000";
                 const rHexMid = (rHexagramsInner + rHexagramsOuter) / 2;
                 const hx = cx + rHexMid * Math.cos(midAngle);
@@ -4118,11 +4453,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     ctx.beginPath();
                     if (lineType === '1') {
-                        // Solid Yang line
                         ctx.moveTo(hx - halfLen, yLine);
                         ctx.lineTo(hx + halfLen, yLine);
                     } else {
-                        // Broken Yin line
                         ctx.moveTo(hx - halfLen, yLine);
                         ctx.lineTo(hx - halfGap, yLine);
                         ctx.moveTo(hx + halfGap, yLine);
@@ -4134,10 +4467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3.5 Mirror Ring — Зеркало Жизни
-        // Placed between hexagram lines (outer) and gate numbers ring.
-        // Gate sequence starts at the Ascendant (AS = 0°), step 5.625°.
-        // Shows ONLY activated gate numbers — inactive ones are completely hidden.
+        // 3.5 Mirror Ring — 2-й циферблат (Зеркало Жизни, CCW от Ascendant)
         const MIRROR_GATE_ORDER = [
             41, 61, 60, 10, 58, 54, 38, 24, 27, 42,  3, 25, 17, 51, 21, 13, 49, 55, 30, 36,
             22, 37, 63,  2, 23, 20,  8, 12, 45, 16, 35, 33, 31, 62, 56, 15, 52, 53, 39, 44,
@@ -4156,95 +4486,203 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
 
-            const AS = data.houses[0].longitude;
-            const MIRROR_INTERVAL = GATE_INTERVAL; // same 5.625°
+            const AS = getProgramBoundary(data.houses[0]);
+            const MIRROR_INTERVAL = GATE_INTERVAL; // 5.625°
 
-            // Determine which mirror sectors are activated (have a planet landing in them)
-            const mirrorActivated = new Set(); // indices 0-63
-            const mirrorHasPers  = new Set();
-            const mirrorHasDes   = new Set();
+            // Collect activations for 2nd dial
+            const mirrorActivationsBySector = {};
+            for (let i = 0; i < 64; i++) {
+                mirrorActivationsBySector[i] = [];
+            }
+            const mirrorActivePers = new Set();
+            const mirrorActiveDes  = new Set();
 
             data.planets.forEach(p => {
                 if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                    const mIdx = Math.floor(((p.longitude - AS + 360) % 360) / MIRROR_INTERVAL) % 64;
-                    mirrorActivated.add(mIdx);
-                    mirrorHasPers.add(mIdx);
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / MIRROR_INTERVAL) % 64;
+                    const mLine = Math.min(6, Math.max(1, Math.floor((relLon % MIRROR_INTERVAL) / (MIRROR_INTERVAL / 6)) + 1));
+                    const mGate = MIRROR_GATE_ORDER[mIdx];
+                    mirrorActivePers.add(mIdx);
+                    mirrorActivationsBySector[mIdx].push({
+                        type: 'personality',
+                        symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
+                        color: '#2E2A20',
+                        line: mLine,
+                        gate: mGate,
+                        name: p.name
+                    });
                 }
             });
-            (data.design_planets || []).forEach(p => {
+            designPlanetsList.forEach(p => {
                 if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                    const mIdx = Math.floor(((p.longitude - AS + 360) % 360) / MIRROR_INTERVAL) % 64;
-                    mirrorActivated.add(mIdx);
-                    mirrorHasDes.add(mIdx);
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / MIRROR_INTERVAL) % 64;
+                    const mLine = Math.min(6, Math.max(1, Math.floor((relLon % MIRROR_INTERVAL) / (MIRROR_INTERVAL / 6)) + 1));
+                    const mGate = MIRROR_GATE_ORDER[mIdx];
+                    mirrorActiveDes.add(mIdx);
+                    mirrorActivationsBySector[mIdx].push({
+                        type: 'design',
+                        symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
+                        color: 'rgb(255,96,96)',
+                        line: mLine,
+                        gate: mGate,
+                        name: p.name
+                    });
                 }
             });
-
-            const rMirrorMid = (rMirrorOuter + rMirrorInner) / 2;
-            const mirrorBand = rMirrorOuter - rMirrorInner;
-            const fontSize   = Math.round(mirrorBand * 0.65);
 
             for (let i = 0; i < 64; i++) {
-                const gateNum  = MIRROR_GATE_ORDER[i];
-                const hasAct   = mirrorActivated.has(i);
+                const isPersActive = mirrorActivePers.has(i);
+                const isDesActive  = mirrorActiveDes.has(i);
+                const isCombinedActive = isPersActive || isDesActive;
 
-                const isP      = mirrorHasPers.has(i);
-                const isD      = mirrorHasDes.has(i);
+                const gateNum = MIRROR_GATE_ORDER[i];
+                const isHighlighted = isGateHighlighted(gateNum, i);
+                const isAnyHovered  = (hoverType !== null);
 
+                // Sector boundaries (CCW from AS)
                 const startLon   = (AS + i * MIRROR_INTERVAL) % 360;
-                const startAngle = degToRad(180 - (startLon));
-                const endAngle   = degToRad(180 - (startLon - MIRROR_INTERVAL));
-                const midAngle   = (startAngle + endAngle) / 2;
+                const endLon     = (AS + (i + 1) * MIRROR_INTERVAL) % 360;
+                const startAngle = degToRad(180 - startLon);
+                const endAngle   = degToRad(180 - endLon);
+                const midLon     = (AS + i * MIRROR_INTERVAL + MIRROR_INTERVAL / 2) % 360;
+                const midAngle   = degToRad(180 - midLon);
 
-                // Sector background for activated sectors
-                if (hasAct) {
-                    let bgFill;
-                    if (isP && isD)       bgFill = 'rgba(46,42,32,0.11)';
-                    else if (isP)         bgFill = 'rgba(46,42,32,0.09)';
-                    else if (isD)         bgFill = 'rgba(255,96,96,0.10)';
-                    else                  bgFill = 'rgba(0,0,0,0)';
+                const activations = mirrorActivationsBySector[i] || [];
+                const byLine = {};
+                activations.forEach(act => {
+                    const ln = act.line || 1;
+                    if (!byLine[ln]) byLine[ln] = [];
+                    byLine[ln].push(act);
+                });
+
+                // Highlight active gate cell background (numbers band: rMirrorGateInner to rMirrorOuter)
+                if (isCombinedActive) {
                     ctx.beginPath();
-                    ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
-                    ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle);
-                    ctx.lineTo(cx + rMirrorInner * Math.cos(endAngle), cy + rMirrorInner * Math.sin(endAngle));
-                    ctx.arc(cx, cy, rMirrorInner, endAngle, startAngle, true);
+                    ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle, true);
+                    ctx.lineTo(cx + rMirrorGateInner * Math.cos(endAngle), cy + rMirrorGateInner * Math.sin(endAngle));
+                    ctx.arc(cx, cy, rMirrorGateInner, endAngle, startAngle, false);
                     ctx.closePath();
+
+                    let opacityScale = 1.0;
+                    if (isAnyHovered && !isHighlighted) opacityScale = 0.15;
+
+                    let bgFill;
+                    if (isPersActive && isDesActive) bgFill = `rgba(46,42,32,${0.12 * opacityScale})`;
+                    else if (isDesActive)           bgFill = `rgba(255,96,96,${0.12 * opacityScale})`;
+                    else if (isPersActive)          bgFill = `rgba(46,42,32,${0.10 * opacityScale})`;
+                    else                            bgFill = 'rgba(0,0,0,0)';
                     ctx.fillStyle = bgFill;
                     ctx.fill();
+
+                    // Draw colored activation blocks inside the 6 dial cells (scale band: rMirrorInner to rMirrorGateInner, Lines 1..6 CCW)
+                    const slotSize = MIRROR_INTERVAL / 6;
+                    Object.entries(byLine).forEach(([lineStr, acts]) => {
+                        const lineNum = parseInt(lineStr); // 1-6
+                        const slotStartLon = startLon + (lineNum - 1) * slotSize;
+                        const N = acts.length;
+
+                        acts.forEach((act, idx) => {
+                            const subStartLon = slotStartLon + idx * (slotSize / N);
+                            const subEndLon   = slotStartLon + (idx + 1) * (slotSize / N);
+
+                            const aStart = degToRad(180 - subStartLon);
+                            const aEnd   = degToRad(180 - subEndLon);
+
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, rMirrorGateInner, aStart, aEnd, true);
+                            ctx.lineTo(cx + rMirrorInner * Math.cos(aEnd), cy + rMirrorInner * Math.sin(aEnd));
+                            ctx.arc(cx, cy, rMirrorInner, aEnd, aStart, false);
+                            ctx.closePath();
+
+                            let fillColor = act.color;
+                            if (isAnyHovered) {
+                                fillColor = isHighlighted ? act.color : 'rgba(150, 150, 150, 0.08)';
+                            }
+                            ctx.fillStyle = fillColor;
+                            ctx.fill();
+                        });
+                    });
                 }
 
-                // Divider line at sector start
+                // Radial divider lines at boundaries of gate
+                let strokeColor;
+                if (isAnyHovered) {
+                    strokeColor = isHighlighted
+                        ? (isDesActive ? 'rgba(255,96,96,0.7)' : (isPersActive ? 'rgba(46,42,32,0.7)' : 'rgba(120,115,105,0.4)'))
+                        : 'rgba(120,120,120,0.04)';
+                } else {
+                    strokeColor = isCombinedActive
+                        ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
+                        : 'rgba(197,158,63,0.14)';
+                }
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 0.7 : 0.45);
+
                 ctx.beginPath();
                 ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
                 ctx.lineTo(cx + rMirrorOuter * Math.cos(startAngle), cy + rMirrorOuter * Math.sin(startAngle));
-                ctx.strokeStyle = hasAct ? 'rgba(160,155,145,0.35)' : 'rgba(197,158,63,0.14)';
-                ctx.lineWidth = hasAct ? 0.6 : 0.45;
                 ctx.stroke();
 
-                // Gate number — centered in sector
-                const gnx = cx + rMirrorMid * Math.cos(midAngle);
-                const gny = cy + rMirrorMid * Math.sin(midAngle);
+                ctx.beginPath();
+                ctx.moveTo(cx + rMirrorInner * Math.cos(endAngle), cy + rMirrorInner * Math.sin(endAngle));
+                ctx.lineTo(cx + rMirrorOuter * Math.cos(endAngle), cy + rMirrorOuter * Math.sin(endAngle));
+                ctx.stroke();
 
-                let numColor, numFont;
-                if (hasAct) {
-                    const mBoth = isP && isD;
-                    numColor = (mBoth || isP) ? '#2E2A20' : 'rgb(220,80,80)';
-                    numFont  = 'bold 10.5px "DM Sans", sans-serif';
-                } else {
-                    numColor = 'rgba(120,114,102,0.42)';
-                    numFont  = '500 9px "DM Sans", sans-serif';
+                // 6 slots per gate: sub-divider ticks in the dial ring (from rMirrorGateInner to rMirrorInner, CCW)
+                const tickSpacing = MIRROR_INTERVAL / 6;
+                for (let t = 1; t <= 5; t++) {
+                    const tickLon = startLon + t * tickSpacing;
+                    const tickAngle = degToRad(180 - tickLon);
+                    let tickColor = isCombinedActive ? 'rgba(180,175,165,0.22)' : 'rgba(197,158,63,0.10)';
+                    if (isAnyHovered) {
+                        tickColor = isHighlighted ? 'rgba(120,115,105,0.45)' : 'rgba(120,120,120,0.03)';
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(cx + rMirrorGateInner * Math.cos(tickAngle), cy + rMirrorGateInner * Math.sin(tickAngle));
+                    ctx.lineTo(cx + rMirrorInner * Math.cos(tickAngle), cy + rMirrorInner * Math.sin(tickAngle));
+                    ctx.strokeStyle = tickColor;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
                 }
 
-                ctx.font = numFont;
+                // Draw Gate Number in numbers band
+                const rMirrorGateMid = (rMirrorOuter + rMirrorGateInner) / 2;
+                const lx = cx + rMirrorGateMid * Math.cos(midAngle);
+                const ly = cy + rMirrorGateMid * Math.sin(midAngle);
+
+                let font = isCombinedActive ? 'bold 11px "DM Sans", sans-serif' : '500 9.5px "DM Sans", sans-serif';
+                const mBoth = isPersActive && isDesActive;
+                let fillStyle = (mBoth || isPersActive) ? '#2E2A20'
+                              : isDesActive             ? 'rgb(220,60,60)'
+                              : 'rgba(120, 114, 102, 0.42)';
+
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        font = 'bold 12.5px "DM Sans", sans-serif';
+                        fillStyle = (mBoth || isPersActive) ? '#000000' : isDesActive ? 'rgb(230,50,50)' : '#1E1A14';
+                    } else {
+                        fillStyle = 'rgba(180, 180, 180, 0.12)';
+                    }
+                }
+
+                ctx.font = font;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = numColor;
-                ctx.fillText(gateNum.toString(), gnx, gny);
+                ctx.fillStyle = fillStyle;
+                ctx.fillText(gateNum.toString(), lx, ly);
             }
             ctx.restore();
         }
 
-        // 4. Zodiac Ring and Ticks
+        // Draw light white inner circle background (before zodiac/houses so they render on top)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+        ctx.fill();
 
+        // 4. Zodiac Ring and Ticks (CCW from Aries 0°)
         const pZod = mandalaAnimState.zodiac.progress;
         if (pZod > 0.001) {
             ctx.save();
@@ -4256,84 +4694,99 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
 
-            const hoveredSignIdx = (hoverType === 'gate' && hoverTarget) 
-                ? Math.floor((((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30)) % 12
+            // hoveredSignIdx: Zodiac sign index (0=Aries..11=Pisces) based on gate longitude
+            const hoveredGateSec = (hoverType === 'gate' && hoverTarget)
+                ? Math.floor(((WHEEL_START + GATE_ORDER.indexOf(hoverTarget) * GATE_INTERVAL + GATE_INTERVAL / 2) % 360) / 30) % 12
                 : -1;
+            const hoveredSignIdx = hoveredGateSec;
 
             const hoveredSignIdxs = new Set();
             if (hoverType === 'house' && data.houses && data.houses.length === 12) {
-                const asc = data.houses[0].longitude;
-                const houseIdx = hoverTarget - 1;
-                let s = (asc + houseIdx * 30) % 360;
-                let e = (asc + (houseIdx + 1) * 30) % 360;
+                const houseIdx = hoverTarget - 1; // 0 for Sector 1
+                const asc = getProgramBoundary(data.houses[0]);
+                const s = (asc + houseIdx * 30.0) % 360.0;
+                const e = (asc + (houseIdx + 1) * 30.0) % 360.0;
+                
                 for (let j = 0; j < 12; j++) {
-                    const signMid = (j * 30 + 15) % 360;
+                    const signMidLon = (j * 30 + 15) % 360;
                     let inHouse = false;
                     if (e < s) {
-                        inHouse = (signMid >= s || signMid < e);
+                        inHouse = (signMidLon >= s || signMidLon < e);
                     } else {
-                        inHouse = (signMid >= s && signMid < e);
+                        inHouse = (signMidLon >= s && signMidLon < e);
                     }
-                    if (inHouse) hoveredSignIdxs.add(j);
+                    if (inHouse) {
+                        hoveredSignIdxs.add(j);
+                    }
                 }
             }
 
-            const MANDALA_ZODIAC_COLORS = [
-                '#C88C28', // Aries
-                '#8C7355', // Taurus
-                '#5E7A8C', // Gemini
-                '#3A5C80', // Cancer
-                '#D95238', // Leo
-                '#7A7865', // Virgo
-                '#A69C7C', // Libra
-                '#5B3D5C', // Scorpio
-                '#C86428', // Sagittarius
-                '#605E59', // Capricorn
-                '#7E8A9C', // Aquarius
-                '#3B7E8C'  // Pisces
+            // Element colors: Fire=orange, Earth=green, Water=blue, Air=light-blue
+            const ELEMENT_COLORS = {
+                fire:  '#E07820', // orange
+                earth: '#4A9A52', // green
+                water: '#2A6EBB', // blue
+                air:   '#4AB0D4'  // light blue
+            };
+            // Order: Aries(0:fire), Taurus(1:earth), Gemini(2:air), Cancer(3:water), Leo(4:fire), Virgo(5:earth), Libra(6:air), Scorpio(7:water), Sagittarius(8:fire), Capricorn(9:earth), Aquarius(10:air), Pisces(11:water)
+            const SIGN_ELEMENTS = [
+                'fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'
             ];
+            const MANDALA_ZODIAC_COLORS = SIGN_ELEMENTS.map(e => ELEMENT_COLORS[e]);
 
             for (let i = 0; i < 12; i++) {
-                const startAngle = degToRad(180 - (i * 30));
-                const endAngle = degToRad(180 - ((i + 1) * 30));
+                const signIdx = i;
+                const sLon = (i * 30) % 360;
+                const eLon = ((i + 1) * 30) % 360;
+                const startAngle = degToRad(180 - sLon);
+                const endAngle = degToRad(180 - eLon);
                 const isAnyHovered = (hoverType !== null);
-                const isHighlightedSign = (hoverType === 'gate') ? (i === hoveredSignIdx)
-                                        : (hoverType === 'house') ? hoveredSignIdxs.has(i)
+                const isHighlightedSign = (hoverType === 'gate') ? (signIdx === hoveredSignIdx)
+                                        : (hoverType === 'house') ? hoveredSignIdxs.has(signIdx)
                                         : true;
 
+                // Annular sector fill (ring segment, CCW)
                 ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle);
+                ctx.arc(cx, cy, rZodiacOuter, startAngle, endAngle, true);
+                ctx.lineTo(cx + rZodiacInner * Math.cos(endAngle), cy + rZodiacInner * Math.sin(endAngle));
+                ctx.arc(cx, cy, rZodiacInner, endAngle, startAngle, false);
                 ctx.closePath();
                 
-                let fillOpacity = 0.08;
+                let fillOpacity = 0.22;
                 if (isAnyHovered) {
-                    fillOpacity = isHighlightedSign ? 0.12 : 0.01;
+                    fillOpacity = isHighlightedSign ? 0.38 : 0.04;
                 }
-                ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[i], fillOpacity);
+                ctx.fillStyle = hexToRgba(MANDALA_ZODIAC_COLORS[signIdx], fillOpacity);
                 ctx.fill();
 
-                // Label
-                const midAngle = startAngle + degToRad(15);
+                // Sector divider line at start of each sign
+                ctx.beginPath();
+                ctx.moveTo(cx + rZodiacInner * Math.cos(startAngle), cy + rZodiacInner * Math.sin(startAngle));
+                ctx.lineTo(cx + rZodiacOuter * Math.cos(startAngle), cy + rZodiacOuter * Math.sin(startAngle));
+                ctx.strokeStyle = hexToRgba(MANDALA_ZODIAC_COLORS[signIdx], isAnyHovered ? (isHighlightedSign ? 0.7 : 0.08) : 0.45);
+                ctx.lineWidth = 1.0;
+                ctx.stroke();
+
+                // Label at midpoint of this sign's sector
+                const midLon = (i * 30 + 15) % 360;
+                const midAngle = degToRad(180 - midLon);
                 const gx = cx + (rZodiacOuter + rZodiacInner) / 2 * Math.cos(midAngle);
                 const gy = cy + (rZodiacOuter + rZodiacInner) / 2 * Math.sin(midAngle);
-                ctx.font = 'bold 14.5px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
+                ctx.font = '400 14px "Segoe UI Symbol", "Apple Symbols", "Arial Unicode MS", "DejaVu Sans", sans-serif';
                 
-                let labelColor = MANDALA_ZODIAC_COLORS[i];
+                let labelColor = MANDALA_ZODIAC_COLORS[signIdx];
                 if (isAnyHovered && !isHighlightedSign) {
                     labelColor = 'rgba(150, 150, 150, 0.12)';
                 }
                 ctx.fillStyle = labelColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(ZODIAC_META[i].sym, gx, gy);
+                ctx.fillText(ZODIAC_META[signIdx].sym, gx, gy);
             }
             ctx.restore();
         }
 
-        // 4.5 Nidana (Houses) Ring — Spatial layout matching reference
-        // Gold transparent background, house# (inner ring), gate.line (center), stacked ▲/▽ rulers (right)
-        // Visually drawn as 12 equal 30-degree sectors starting from the Ascendant
+        // 4.5 Nidana (Houses) Ring (CCW from Ascendant)
         const pHou = mandalaAnimState.houses.progress;
         if (pHou > 0.001 && data.houses && data.houses.length === 12) {
             ctx.save();
@@ -4347,44 +4800,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const band = rHousesOuter - rHousesInner;
             const rMid = (rHousesOuter + rHousesInner) / 2;
-            const asc = data.houses[0].longitude;
+            
+            const asc = getProgramBoundary(data.houses[0]);
 
+            // 1. Sector background fills
             for (let i = 0; i < 12; i++) {
-                const h     = data.houses[i];
-                let startAngle = degToRad(180 - ((asc + i * 30)) % 360);
-                let endAngle   = degToRad(180 - ((asc + (i + 1) * 30)) % 360);
-                if (endAngle < startAngle) endAngle += 2 * Math.PI;
+                const startLon = (asc + i * 30.0) % 360.0;
+                const endLon = (asc + (i + 1) * 30.0) % 360.0;
+                const aStart = degToRad(180.0 - startLon);
+                const aEnd   = degToRad(180.0 - endLon);
 
                 const houseNum = i + 1;
                 const isThisHouseHovered = (hoverType === 'house' && hoverTarget === houseNum);
                 const isAnyHouseHovered = (hoverType === 'house');
 
-                // 1. Sector background fill (gold transparent, gradient tone from house 1 to 12)
-                let fillOpacity = 0.05 + (i / 11) * 0.23;
+                let fillOpacity = 0.06 + (i / 11) * 0.22;
                 if (isAnyHouseHovered) {
-                    fillOpacity = isThisHouseHovered ? 0.28 : 0.02;
+                    fillOpacity = isThisHouseHovered ? 0.30 : 0.02;
                 }
                 ctx.beginPath();
-                ctx.moveTo(cx + rHousesInner * Math.cos(startAngle), cy + rHousesInner * Math.sin(startAngle));
-                ctx.arc(cx, cy, rHousesOuter, startAngle, endAngle);
-                ctx.lineTo(cx + rHousesInner * Math.cos(endAngle), cy + rHousesInner * Math.sin(endAngle));
-                ctx.arc(cx, cy, rHousesInner, endAngle, startAngle, true);
+                ctx.arc(cx, cy, rHousesOuter, aStart, aEnd, true);
+                ctx.lineTo(cx + rHousesInner * Math.cos(aEnd), cy + rHousesInner * Math.sin(aEnd));
+                ctx.arc(cx, cy, rHousesInner, aEnd, aStart, false);
                 ctx.closePath();
                 ctx.fillStyle = `rgba(225, 190, 110, ${fillOpacity})`;
                 ctx.fill();
+            }
 
-                // 2. Cusp divider line
+            // 2. Cusp divider lines (drawn on top of fills for crisp rendering)
+            for (let i = 0; i < 12; i++) {
+                const startLon = (asc + i * 30.0) % 360.0;
+                const aStart = degToRad(180.0 - startLon);
+                const houseNum = i + 1;
+                const prevHouseNum = (i === 0 ? 12 : i);
+
+                const isAngularCusp = (i % 3 === 0); // Houses 1 (Asc), 4 (IC), 7 (Desc), 10 (MC)
+                const isCuspBorderingHovered = (hoverType === 'house' && (hoverTarget === houseNum || hoverTarget === prevHouseNum));
+                const isAnyHouseHovered = (hoverType === 'house');
+
                 ctx.beginPath();
-                ctx.moveTo(cx + rHousesInner * Math.cos(startAngle), cy + rHousesInner * Math.sin(startAngle));
-                ctx.lineTo(cx + rHousesOuter * Math.cos(startAngle), cy + rHousesOuter * Math.sin(startAngle));
-                
-                let cuspColor = 'rgba(197, 158, 63, 0.35)';
+                ctx.moveTo(cx + rHousesInner * Math.cos(aStart), cy + rHousesInner * Math.sin(aStart));
+                ctx.lineTo(cx + rHousesOuter * Math.cos(aStart), cy + rHousesOuter * Math.sin(aStart));
+
+                let cuspColor, cuspWidth;
                 if (isAnyHouseHovered) {
-                    cuspColor = isThisHouseHovered ? 'rgba(197, 158, 63, 0.7)' : 'rgba(197, 158, 63, 0.08)';
+                    if (isCuspBorderingHovered) {
+                        cuspColor = 'rgba(150, 110, 25, 0.85)';
+                        cuspWidth = 1.6;
+                    } else {
+                        cuspColor = 'rgba(180, 145, 65, 0.08)';
+                        cuspWidth = 0.6;
+                    }
+                } else {
+                    if (isAngularCusp) {
+                        cuspColor = 'rgba(165, 130, 45, 0.65)';
+                        cuspWidth = 1.2;
+                    } else {
+                        cuspColor = 'rgba(180, 145, 65, 0.48)';
+                        cuspWidth = 1.0;
+                    }
                 }
                 ctx.strokeStyle = cuspColor;
-                ctx.lineWidth = isThisHouseHovered ? 1.2 : 0.8;
+                ctx.lineWidth = cuspWidth;
                 ctx.stroke();
+            }
+
+            // 3. Sector typography & glyphs
+            for (let i = 0; i < 12; i++) {
+                const h = data.houses[i];
+                const startLon = (asc + i * 30.0) % 360.0;
+                const houseNum = i + 1;
+                const isThisHouseHovered = (hoverType === 'house' && hoverTarget === houseNum);
+                const isAnyHouseHovered = (hoverType === 'house');
 
                 // Text opacity
                 let textAlpha = 1.0;
@@ -4392,38 +4879,61 @@ document.addEventListener('DOMContentLoaded', () => {
                     textAlpha = 0.12;
                 }
 
-                const midAngle = (startAngle + endAngle) / 2;
+                const midLon = (startLon + 15.0) % 360.0;
+                const midAngle = degToRad(180.0 - midLon);
                 const gate = h.hexagram ? h.hexagram.gate : '?';
                 const line = h.hexagram ? h.hexagram.line : '?';
 
-                // --- House Number: horizontal (unrotated), near start cusp, inside gold band ---
-                const houseAngleOffset = (endAngle - startAngle) * 0.15;
-                const angleHouseNum = startAngle + houseAngleOffset;
+                // --- House Number: near the cusp border (aStart), inside gold band ---
+                const angleHouseNum = degToRad(180.0 - ((startLon + 4.5) % 360.0));
                 const xHN = cx + rMid * Math.cos(angleHouseNum);
                 const yHN = cy + rMid * Math.sin(angleHouseNum);
-                ctx.font = 'bold 12.5px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba('#C59E3F', textAlpha);
+                ctx.font = isThisHouseHovered ? '700 12.5px "DM Sans", sans-serif' : '600 11.5px "DM Sans", sans-serif';
+                ctx.fillStyle = hexToRgba('#B88E28', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(houseNum.toString(), xHN, yHN);
 
-                // --- Gate.Line: horizontal (unrotated), centered in sector ---
+                // --- Gate.Line: elegant horizontal typography, centered in sector ---
                 const xGL = cx + rMid * Math.cos(midAngle);
                 const yGL = cy + rMid * Math.sin(midAngle);
-                ctx.font = 'bold italic 13.5px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba('#2E2A20', textAlpha);
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(`${gate}.${line}`, xGL, yGL);
+                
+                const gateStr = gate.toString();
+                const lineStr = line.toString();
 
-                // --- Rulers: near end cusp, inside gold band ---
+                ctx.save();
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+
+                const fontGate = isThisHouseHovered ? '700 13.5px "DM Sans", sans-serif' : '600 12.5px "DM Sans", sans-serif';
+                const fontLine = isThisHouseHovered ? '600 11px "DM Sans", sans-serif' : '500 10px "DM Sans", sans-serif';
+
+                ctx.font = fontGate;
+                const wGate = ctx.measureText(gateStr).width;
+                ctx.font = fontLine;
+                const wDotLine = ctx.measureText(`.${lineStr}`).width;
+                const totalW = wGate + wDotLine;
+
+                const startX = xGL - totalW / 2;
+
+                // Draw Gate number
+                ctx.font = fontGate;
+                ctx.fillStyle = hexToRgba('#1E1A14', textAlpha);
+                ctx.fillText(gateStr, startX, yGL);
+
+                // Draw dot & Line number
+                ctx.font = fontLine;
+                ctx.fillStyle = hexToRgba('#3A3428', textAlpha);
+                ctx.fillText(`.${lineStr}`, startX + wGate, yGL + 0.5);
+                ctx.restore();
+
+                // --- Rulers: near opposite border (aEnd), inside gold band ---
                 const pRulers = (mandalaAnimState.rulers ? mandalaAnimState.rulers.progress : 1);
                 const rulers = (typeof getNidanaRulers === 'function' && pRulers > 0.01)
                     ? getNidanaRulers(gate, line) : null;
 
                 if (rulers) {
-                    const rulerAngleOffset = (endAngle - startAngle) * 0.82;
-                    const angleRulerPos = startAngle + rulerAngleOffset;
+                    const angleRulerPos = degToRad(180.0 - ((startLon + 24.5) % 360.0));
                     const xRP = cx + rMid * Math.cos(angleRulerPos);
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
 
@@ -4490,32 +5000,66 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         }
 
-        // Ticks around the Zodiac Outer Border removed as requested
-
         // 5. Draw concentric circle dividing lines
+        // Structural borders
         const concentricBorders = [
-            { r: rInnerBorder, alpha: 1.0 },
-            { r: rDialInner, alpha: 1.0 },
-            { r: rGatesInner, alpha: 1.0 },
-            { r: rZodiacInner, alpha: Math.max(mandalaAnimState.zodiac.progress, mandalaAnimState.houses.progress) },
-            { r: rMirrorInner, alpha: mandalaAnimState.mirror.progress },
-            { r: rHexagramsInner, alpha: mandalaAnimState.hexagrams.progress },
-            { r: rHexagramsOuter, alpha: mandalaAnimState.hexagrams.progress }
+            { r: rInnerBorder, alpha: 1.0, stroke: 'rgba(180,145,65,0.42)', width: 1.1 },
+            { r: rDialInner, alpha: mandalaAnimState.zodiac.progress, stroke: 'rgba(197,158,63,0.22)', width: 0.8 },
+            { r: rGatesInner, alpha: 1.0, stroke: 'rgba(197,158,63,0.18)', width: 0.8 },
+            { r: rZodiacInner, alpha: Math.max(mandalaAnimState.zodiac.progress, mandalaAnimState.houses.progress), stroke: 'rgba(180,145,65,0.32)', width: 0.9 },
+            { r: rMirrorGateInner, alpha: mandalaAnimState.mirror.progress, stroke: 'rgba(197,158,63,0.18)', width: 0.8 }
         ];
-        concentricBorders.forEach(({ r, alpha }, idx) => {
+        concentricBorders.forEach(({ r, alpha, stroke, width }) => {
             if (alpha < 0.001) return;
             ctx.save();
             ctx.globalAlpha = alpha;
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.strokeStyle = idx === 0 ? 'rgba(197,158,63,0.35)' : 'rgba(197,158,63,0.18)';
-            ctx.lineWidth = idx === 0 ? 1.5 : 1.0;
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = width;
             ctx.stroke();
             ctx.restore();
         });
-        // 6. Quarters dividing rods removed as requested
 
-        // 7. Draw radial activation wedges (rays) from the center to the gates
+        // 1px golden dividing rings (50% opacity):
+        // 1. Bound to 2nd dial (Mirror): turns off when 2nd dial is disabled (progress = 0)
+        // 2. Bound to Hexagrams: turns off when Hexagrams ring is disabled (progress = 0)
+        const goldenDividers = [
+            { r: rMirrorInner, alpha: mandalaAnimState.mirror.progress },
+            { r: rHexagramsInner, alpha: mandalaAnimState.hexagrams.progress }
+        ];
+        goldenDividers.forEach(({ r, alpha }) => {
+            if (alpha < 0.001) return;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(197, 158, 63, 0.50)'; // 50% opacity gold
+            ctx.lineWidth = 1.0;
+            ctx.stroke();
+            ctx.restore();
+        });
+
+        // 7. Draw radial activation wedges (rays) from the center to the gates (CCW)
+        const GATE_CENTER_COLORS = {};
+        const CENTER_HUES = {
+            'Head':        'rgba(255,230,0,',   // yellow
+            'Ajna':        'rgba(76,175,80,',    // green
+            'Throat':      'rgba(41,182,246,',   // blue
+            'G-Center':    'rgba(255,215,0,',    // gold-yellow
+            'Heart':       'rgba(198,40,40,',    // dark red
+            'Sacral':      'rgba(229,57,53,',    // red
+            'Root':        'rgba(255,140,0,',    // orange
+            'Spleen':      'rgba(255,140,0,',    // orange
+            'SolarPlexus': 'rgba(255,140,0,'     // orange
+        };
+        Object.entries(BG_CENTERS).forEach(([cName, c]) => {
+            const hue = CENTER_HUES[cName] || 'rgba(150,150,150,';
+            Object.keys(c.gates).forEach(gStr => {
+                GATE_CENTER_COLORS[parseInt(gStr)] = hue;
+            });
+        });
+
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
             const activations = activationsByGate[gateNum];
@@ -4524,45 +5068,47 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHighlighted = isGateHighlighted(gateNum, i);
             const isAnyHovered = (hoverType !== null);
 
-            const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
-            const startAngle = degToRad(180 - (startLon));
-            const endAngle = degToRad(180 - (startLon - GATE_INTERVAL));
+            const startLon = (WHEEL_START + i * GATE_INTERVAL) % 360;
+            const endLon = (WHEEL_START + (i + 1) * GATE_INTERVAL) % 360;
+            const startAngle = degToRad(180 - startLon);
+            const endAngle = degToRad(180 - endLon);
 
             const isP = activations.some(a => a.type === 'personality');
             const isD = activations.some(a => a.type === 'design');
 
-            let fillStyle = 'rgba(0,0,0,0)';
+            const centerHue = GATE_CENTER_COLORS[gateNum] || 'rgba(150,150,150,';
+
             let opacity = 1.0;
-            
             if (isAnyHovered) {
-                opacity = isHighlighted ? 1.0 : 0.08;
+                opacity = isHighlighted ? 1.0 : 0.06;
             }
 
+            let fillStyle;
             if (isP && isD) {
-                fillStyle = `rgba(46,42,32, ${0.08 * opacity})`;
+                fillStyle = centerHue + (0.13 * opacity) + ')';
             } else if (isD) {
-                fillStyle = `rgba(255,96,96, ${0.08 * opacity})`;
+                fillStyle = centerHue + (0.09 * opacity) + ')';
             } else if (isP) {
-                fillStyle = `rgba(46,42,32, ${0.07 * opacity})`;
+                fillStyle = centerHue + (0.08 * opacity) + ')';
             } else {
                 fillStyle = 'rgba(0,0,0,0)';
             }
 
             ctx.beginPath();
             ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, rGatesInner, startAngle, endAngle);
+            ctx.arc(cx, cy, rDialInner, startAngle, endAngle, true);
             ctx.closePath();
             ctx.fillStyle = fillStyle;
             ctx.fill();
         }
 
-        // 7.5 Soft white overlay over rays
+        // 7.5 Soft white overlay over rays before bodygraph and planet symbols render on top
         ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
 
-        // 7.8 Planet activation lines and symbols inside the wheel (crisp on top)
+        // 7.8 Planet activation lines and symbols inside the wheel (CCW, rendered crisp on top of background)
         const pRaysPlanets = (mandalaAnimState.raysPlanets ? mandalaAnimState.raysPlanets.progress : 1);
 
         if (pRaysPlanets > 0.005) {
@@ -4574,11 +5120,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isHighlighted = isGateHighlighted(gateNum, i);
                 const isAnyHovered = (hoverType !== null);
 
-                const midAngle = degToRad(180 - ((WHEEL_START - i * GATE_INTERVAL + 360 + GATE_INTERVAL / 2)) % 360);
+                const midLon = (WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
+                const midAngle = degToRad(180 - midLon);
                 const cos = Math.cos(midAngle);
                 const sin = Math.sin(midAngle);
 
-                // Draw stacked planet symbols inside the inner circle
+                // Draw stacked planet symbols inside the inner circle (crisp, solid, high-contrast)
                 activations.forEach((act, aIdx) => {
                     const rAct = rInnerBorder - 14 - aIdx * 20;
                     const ax = cx + rAct * cos;
@@ -4604,7 +5151,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-
         // 8. Bodygraph overlay inside inner circle
         const activeGatesCombinedForBG = new Set([...activeGatesPersonality, ...activeGatesDesign]);
         const definedCenters = new Set();
@@ -4615,46 +5161,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Draw bodygraph with transparent white background overlay for premium UX depth on canvas
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-        ctx.fill();
-
         // 8.5 Incarnation Cross bars already drawn early (step after gate setup above)
 
 
         // Position and update the HTML SVG overlay
-        const bgScale = (rInnerBorder * 2 * 0.88) / BG_H;
+        const bgScale = (R * 0.630 * 2 * 0.748) / BG_H; // fixed size — does not change when rings toggle
         const bgOffX = cx - (BG_W * bgScale) / 2 + (10 * bgScale);
         const bgOffY = cy - (BG_H * bgScale) / 2;
 
         updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState);
     }
 
-    function updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState) {
+    function syncMandalaBodygraph() {
         const wrap = document.getElementById('mandala-bodygraph-wrap');
-        if (!wrap) return;
-
-        wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
-        wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
-        wrap.style.pointerEvents = 'none';
-
-        // Position the wrapper exactly over the canvas inner circle (adding 20px to compensate for #mandala-container padding)
-        wrap.style.left = (bgOffX + 20) + 'px';
-        wrap.style.top = (bgOffY + 20) + 'px';
-        wrap.style.width = (400 * bgScale) + 'px';
-        wrap.style.height = (650 * bgScale) + 'px';
-
-        // Always copy the main SVG bodygraph to ensure it mirrors the main chart perfectly
         const mainSvg = document.querySelector('#bodygraph-svg-wrap > svg#Слой_1') || document.querySelector('#bodygraph-svg-wrap > svg');
-        if (!mainSvg) return;
-        
+        if (!wrap || !mainSvg) return;
+
         let svg = mainSvg.cloneNode(true);
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
         svg.removeAttribute('id');
-        
+
         // Make all IDs inside the cloned SVG unique to avoid ID conflicts and browser rendering/clip-path bugs
         const suffix = '-mandala';
         svg.querySelectorAll('[id]').forEach(el => {
@@ -4709,10 +5236,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.style.setProperty(target.prop, `url(#${target.id}${suffix})`, 'important');
             });
         });
-        
-        // Remove old bodygraph completely and append new
+
         wrap.innerHTML = '';
         wrap.appendChild(svg);
+    }
+
+    function updateMandalaSvgOverlay(data, bgScale, bgOffX, bgOffY, activeGatesPersonality, activeGatesDesign, definedCenters, hoverState) {
+        const wrap = document.getElementById('mandala-bodygraph-wrap');
+        if (!wrap) return;
+
+        wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
+        wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
+        wrap.style.pointerEvents = 'none';
+
+        // Position the wrapper exactly over the canvas inner circle (adding 20px to compensate for #mandala-container padding)
+        wrap.style.left = (bgOffX + 20) + 'px';
+        wrap.style.top = (bgOffY + 20) + 'px';
+        wrap.style.width = (400 * bgScale) + 'px';
+        wrap.style.height = (650 * bgScale) + 'px';
+
+        let svg = wrap.querySelector('svg');
+        if (!svg) {
+            syncMandalaBodygraph();
+            svg = wrap.querySelector('svg');
+            if (!svg) return;
+        }
 
         const hoverType = hoverState ? hoverState.type : null;
         const hoverTarget = hoverState ? hoverState.target : null;
@@ -4746,10 +5294,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const GATE_ORDER = [
-            25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
-            10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
-            46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
-            15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
         ];
 
         // Apply dimming / highlights based on hover
@@ -4942,10 +5493,13 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
 
         const GATE_ORDER = [
-            25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
-            10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
-            46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
-            15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
         ];
         const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
         const GATE_INTERVAL = 5.625;
@@ -4979,9 +5533,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < 64; i++) {
             const gateNum = GATE_ORDER[i];
-            const startLon = (WHEEL_START - i * GATE_INTERVAL + 360) % 360;
-            
-            const signIdx = Math.floor(startLon / 30) % 12;
+            const midLon = (WHEEL_START + i * GATE_INTERVAL + GATE_INTERVAL / 2) % 360;
+            const signIdx = Math.floor(midLon / 30) % 12;
             const sm = ZODIAC_META[signIdx];
             const activatorHtml = gateActivators[gateNum] ? gateActivators[gateNum].join('') : '<span style="color:#9E978A;">—</span>';
             const isActive = !!gateActivators[gateNum];
@@ -5034,9 +5587,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * Each planet row click toggles that planet's gate on/off.
      */
     function renderSvgBodygraph(data) {
-        const mandalaWrap = document.getElementById('mandala-bodygraph-wrap');
-        if (mandalaWrap) mandalaWrap.innerHTML = '';
-
         const svgWrap = document.getElementById('bodygraph-svg-wrap');
         const designList = document.getElementById('bg-design-list');
         const persList   = document.getElementById('bg-personality-list');
@@ -5123,28 +5673,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Helper to get gate for the currently selected dial (1st vs 2nd)
+        const getDialGate = (p) => {
+            if (currentBodygraphDial === '2') {
+                if (p.longitude != null && data && data.houses && data.houses.length >= 1) {
+                    const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                        25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                         8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                        62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                        47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                         1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                        38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                        37, 63, 22, 36
+                    ];
+                    const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+                    const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+                    const getProgramBoundary = (houseData) => {
+                        if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                        const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                        if (gateIdx === -1) return houseData.longitude;
+                        const lineIdx = (houseData.hexagram.line || 1) - 1;
+                        return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+                    };
+                    const AS = getProgramBoundary(data.houses[0]);
+                    const relLon = (p.longitude - AS + 360) % 360;
+                    const mIdx = Math.floor(relLon / 5.625) % 64;
+                    return MIRROR_GATE_ORDER[mIdx];
+                }
+            }
+            return p.hexagram ? p.hexagram.gate : null;
+        };
+
         // Maps: gate# -> array of planet names
         const persGates   = {};
         const designGates = {};
 
         personalityPlanets.forEach(p => {
-            if (!p.hexagram) return;
             if (activeBgPers && !activeBgPers.has(p.name)) return;
-            const g = p.hexagram.gate;
+            const g = getDialGate(p);
+            if (!g) return;
             if (!persGates[g]) persGates[g] = [];
             persGates[g].push(p.name);
         });
 
         designPlanets.forEach(p => {
-            if (!p.hexagram) return;
             if (activeBgDesign && !activeBgDesign.has(p.name)) return;
-            const g = p.hexagram.gate;
+            const g = getDialGate(p);
+            if (!g) return;
             if (!designGates[g]) designGates[g] = [];
             designGates[g].push(p.name);
         });
 
         // ── Apply gate visibility on SVG ───────────────────────────────
         function applyGatesToSvg() {
+            // Update container mode class on layout for visual styling
+            const bgLayoutEl = document.querySelector('.bg-layout');
+            if (bgLayoutEl) {
+                bgLayoutEl.classList.toggle('mode-dial-1', currentBodygraphDial === '1');
+                bgLayoutEl.classList.toggle('mode-dial-2', currentBodygraphDial === '2');
+            }
+
             // Reset all gate elements to hidden
             svgWrap.querySelectorAll('[class*="cls__"], [class*="cls_"]').forEach(el => {
                 el.classList.remove(
@@ -5160,17 +5748,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const activeDesignGates = {};
 
             personalityPlanets.forEach(p => {
-                if (!p.hexagram) return;
                 if (activeBgPers && !activeBgPers.has(p.name)) return;
-                const g = p.hexagram.gate;
+                const g = getDialGate(p);
+                if (!g) return;
                 if (!activePersGates[g]) activePersGates[g] = [];
                 activePersGates[g].push(p.name);
             });
 
             designPlanets.forEach(p => {
-                if (!p.hexagram) return;
                 if (activeBgDesign && !activeBgDesign.has(p.name)) return;
-                const g = p.hexagram.gate;
+                const g = getDialGate(p);
+                if (!g) return;
                 if (!activeDesignGates[g]) activeDesignGates[g] = [];
                 activeDesignGates[g].push(p.name);
             });
@@ -5323,6 +5911,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
+
+            // Keep mandala central bodygraph in sync
+            if (typeof syncMandalaBodygraph === 'function') {
+                syncMandalaBodygraph();
+            }
         }
 
         // ── Planet symbols map ─────────────────────────────────────────
@@ -5454,11 +6047,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Compute 2nd dial (Зеркало Жизни) program for this planet if houses data exists
             let mirrorGateCellHtml = '';
             if (p.longitude != null && data && data.houses && data.houses.length >= 1) {
-                const AS = data.houses[0].longitude;
+                const getProgramBoundary = (houseData) => {
+                    if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                    const gateIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                    if (gateIdx === -1) return houseData.longitude;
+                    const lineIdx = (houseData.hexagram.line || 1) - 1;
+                    return (WHEEL_START + gateIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                };
+                const AS = getProgramBoundary(data.houses[0]);
+                // Counter-clockwise from AS: mirror offset = (p.longitude - AS + 360) % 360
                 const relLon = (p.longitude - AS + 360) % 360;
                 const mIdx = Math.floor(relLon / 5.625) % 64;
                 const mGate = MIRROR_GATE_ORDER[mIdx];
-                const mLine = Math.floor((relLon % 5.625) / (5.625 / 6)) + 1;
+                const mLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
 
                 const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro);
 
@@ -5474,7 +6075,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (isDesign) {
-                // Left column: 2nd Dial Mirror Gate | Planet | 1st Dial Gate | Zodiac
+                // Left column (Красный / Дизайн): 2nd Dial Mirror Gate | Planet Icon | 1st Dial Gate | Zodiac
                 row.innerHTML = `
                     ${mirrorGateCellHtml}
                     <div class="bg-planet-wrap">
@@ -5484,7 +6085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
                 `;
             } else {
-                // Right column: Zodiac | 1st Dial Gate | Planet | 2nd Dial Mirror Gate
+                // Right column (Черный / Личность): Zodiac | 1st Dial Gate | Planet Icon | 2nd Dial Mirror Gate
                 row.innerHTML = `
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
                     ${gateCellHtml}
@@ -5542,6 +6143,154 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Apply initial gate state ───────────────────────────────────
         applyGatesToSvg();
+
+        // ── Render Variables (HD 4 Arrows, Lines, Colors, Tones, Bases) ──
+        function renderVariables() {
+            const varDesignEl = document.getElementById('bg-var-design');
+            const varPersEl   = document.getElementById('bg-var-personality');
+            if (!varDesignEl || !varPersEl) return;
+
+            // Design Sun & North Node
+            const dSun = designPlanets.find(p => p.name === 'Солнце' || p.name === 'Sun' || p.id === 0);
+            const dNode = designPlanets.find(p => p.name.includes('Северный Узел'));
+
+            // Personality Sun & North Node
+            const pSun = personalityPlanets.find(p => p.name === 'Солнце' || p.name === 'Sun' || p.id === 0);
+            const pNode = personalityPlanets.find(p => p.name.includes('Северный Узел'));
+
+            // Helper to get substructure (line, color, tone, base) for the current dial
+            function getPlanetSubstructure(p) {
+                if (!p) return { line: 1, color: 1, tone: 1, base: 1, gate: null };
+                if (currentBodygraphDial === '2' && p.longitude != null && data && data.houses && data.houses.length >= 1) {
+                    const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+                        25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                         8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                        62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                        47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                         1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                        38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                        37, 63, 22, 36
+                    ];
+                    const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+                    const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+                    const getProgramBoundary = (houseData) => {
+                        if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                        const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                        if (gateIdx === -1) return houseData.longitude;
+                        const lineIdx = (houseData.hexagram.line || 1) - 1;
+                        return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+                    };
+                    const AS = getProgramBoundary(data.houses[0]);
+                    const relLon = (p.longitude - AS + 360.0) % 360.0;
+                    const gateIdx = Math.floor(relLon / 5.625) % 64;
+                    const gate = MIRROR_GATE_ORDER[gateIdx];
+                    const gateOffset = (relLon % 5.625 + 5.625) % 5.625;
+
+                    const lineInterval = 5.625 / 6; // 0.9375
+                    const lineIdx = Math.min(5, Math.max(0, Math.floor(gateOffset / lineInterval)));
+                    const line = lineIdx + 1;
+                    const lineOffset = gateOffset - (lineIdx * lineInterval);
+
+                    const colorInterval = lineInterval / 6; // 0.15625
+                    const colorIdx = Math.min(5, Math.max(0, Math.floor(lineOffset / colorInterval)));
+                    const color = colorIdx + 1;
+                    const colorOffset = lineOffset - (colorIdx * colorInterval);
+
+                    const toneInterval = colorInterval / 6; // 0.026041666666666668
+                    const toneIdx = Math.min(5, Math.max(0, Math.floor(colorOffset / toneInterval)));
+                    const tone = toneIdx + 1;
+                    const toneOffset = colorOffset - (toneIdx * toneInterval);
+
+                    const baseInterval = toneInterval / 5; // 0.005208333333333333
+                    const baseIdx = Math.min(4, Math.max(0, Math.floor(toneOffset / baseInterval)));
+                    const base = baseIdx + 1;
+
+                    return { gate, line, color, tone, base };
+                }
+                return p.hexagram || { line: 1, color: 1, tone: 1, base: 1, gate: null };
+            }
+
+            const dSunHex = getPlanetSubstructure(dSun);
+            const dNodeHex = getPlanetSubstructure(dNode);
+            const pSunHex = getPlanetSubstructure(pSun);
+            const pNodeHex = getPlanetSubstructure(pNode);
+
+            function renderBadgeSvg(type, num) {
+                const n = (num !== undefined && num !== null) ? num : '1';
+                if (type === 'line') {
+                    // Circle
+                    return `<svg viewBox="0 0 24 24" class="var-badge-svg"><circle cx="12" cy="12" r="11" fill="currentColor"/><text x="12" y="15.8" fill="#fff" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700" text-anchor="middle">${n}</text></svg>`;
+                } else if (type === 'color') {
+                    // Hexagon (pointy top & bottom)
+                    return `<svg viewBox="0 0 24 24" class="var-badge-svg"><polygon points="12,1.5 21.5,6.8 21.5,17.2 12,22.5 2.5,17.2 2.5,6.8" fill="currentColor"/><text x="12" y="15.8" fill="#fff" font-family="'DM Sans', sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">${n}</text></svg>`;
+                } else if (type === 'tone') {
+                    // Softly rounded triangle
+                    return `<svg viewBox="0 0 24 24" class="var-badge-svg"><path d="M12 2.2 C12.8 2.2 13.5 3.1 13.9 3.9 L22.4 18.6 C22.9 19.5 22.4 21.5 21 21.5 L3 21.5 C1.6 21.5 1.1 19.5 1.6 18.6 L10.1 3.9 C10.5 3.1 11.2 2.2 12 2.2 Z" fill="currentColor"/><text x="12" y="18.2" fill="#fff" font-family="'DM Sans', sans-serif" font-size="11" font-weight="700" text-anchor="middle">${n}</text></svg>`;
+                } else if (type === 'base') {
+                    // Rounded square
+                    return `<svg viewBox="0 0 24 24" class="var-badge-svg"><rect x="2" y="2" width="20" height="20" rx="4.5" fill="currentColor"/><text x="12" y="15.8" fill="#fff" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700" text-anchor="middle">${n}</text></svg>`;
+                }
+                return '';
+            }
+
+            function renderArrowSvg(dir) {
+                if (dir === 'left') {
+                    return `<svg viewBox="0 0 68 18" class="bg-var-arrow-svg var-arrow-svg"><path d="M68 5.5 H18 V0.5 L0 9 L18 17.5 V12.5 H68 Z" fill="currentColor"/></svg>`;
+                } else {
+                    return `<svg viewBox="0 0 68 18" class="bg-var-arrow-svg var-arrow-svg"><path d="M0 5.5 H50 V0.5 L68 9 L50 17.5 V12.5 H0 Z" fill="currentColor"/></svg>`;
+                }
+            }
+
+            function buildVarHtml(sunHex, nodeHex, isDesign) {
+                const sunLine  = sunHex.line  || 1;
+                const sunColor = sunHex.color || 1;
+                const sunTone  = sunHex.tone  || 1;
+                const sunBase  = sunHex.base  || 1;
+
+                const nodeLine  = nodeHex.line  || 1;
+                const nodeColor = nodeHex.color || 1;
+                const nodeTone  = nodeHex.tone  || 1;
+                const nodeBase  = nodeHex.base  || 1;
+
+                const sunArrow  = sunTone <= 3 ? 'left' : 'right';
+                const nodeArrow = nodeTone <= 3 ? 'left' : 'right';
+
+                const sideName = isDesign ? 'Дизайн' : 'Личность';
+
+                return `
+                    <div class="bg-var-arrow-wrap bg-var-arrow-top">
+                        ${renderArrowSvg(sunArrow)}
+                    </div>
+                    <div class="bg-var-row bg-var-row-top">
+                        <div class="bg-var-item">${renderBadgeSvg('line', sunLine)}</div>
+                        <div class="bg-var-item">${renderBadgeSvg('color', sunColor)}</div>
+                        <div class="bg-var-item">${renderBadgeSvg('tone', sunTone)}</div>
+                        <div class="bg-var-item">${renderBadgeSvg('base', sunBase)}</div>
+                    </div>
+                    <div class="bg-var-labels">
+                        <span>ЛИНИЯ</span>
+                        <span>ЦВЕТ</span>
+                        <span>ТОН</span>
+                        <span>БАЗА</span>
+                    </div>
+                    <div class="bg-var-row bg-var-row-bottom">
+                        <div class="bg-var-item">${renderBadgeSvg('line', nodeLine)}</div>
+                        <div class="bg-var-item">${renderBadgeSvg('color', nodeColor)}</div>
+                        <div class="bg-var-item">${renderBadgeSvg('tone', nodeTone)}</div>
+                        <div class="bg-var-item">${renderBadgeSvg('base', nodeBase)}</div>
+                    </div>
+                    <div class="bg-var-arrow-wrap bg-var-arrow-bottom">
+                        ${renderArrowSvg(nodeArrow)}
+                    </div>
+                `;
+            }
+
+            varDesignEl.innerHTML = buildVarHtml(dSunHex, dNodeHex, true);
+            varPersEl.innerHTML   = buildVarHtml(pSunHex, pNodeHex, false);
+        }
+
+        renderVariables();
+        updateHdTypeProfile(data);
 
         // ── Bodygraph interactivity ────────────────────────────────────
         function initBodygraphInteractivity() {
@@ -5931,10 +6680,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             const GATE_ORDER = [
-                25, 36, 22, 63, 37, 55, 30, 49, 13, 19, 41, 60, 61, 54, 38, 58,
-                10, 11, 26,  5,  9, 34, 14, 43,  1, 44, 28, 50, 32, 57, 48, 18,
-                46,  6, 47, 64, 40, 59, 29,  4,  7, 33, 31, 56, 62, 53, 39, 52,
-                15, 12, 45, 35, 16, 20,  8, 23,  2, 24, 27,  3, 42, 51, 21, 17
+                25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+                 8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+                62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+                47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+                 1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+                38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+                37, 63, 22, 36
             ];
             
             const WHEEL_START = 358.0 + 15.0 / 60.0 + 1.0 / 3600.0;
@@ -5957,9 +6709,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cy = displayW / 2;
                 const R = displayW / 2 - 8;
                 
-                const rHousesOuter = R * 0.720;
-                const rHousesInner = R * 0.630;
-                const rInnerBorder = rHousesInner;
+                const pH  = mandalaAnimState.hexagrams.progress;
+                const pM  = mandalaAnimState.mirror.progress;
+                const pZ  = mandalaAnimState.zodiac.progress;
+                const pH2 = mandalaAnimState.houses.progress;
+
+                const W_HEX           = R * 0.080;
+                const W_MIRROR_GATENUM= R * 0.054;
+                const W_MIRROR_DIAL   = R * 0.024;
+                const W_MIRROR        = W_MIRROR_GATENUM + W_MIRROR_DIAL;
+                const W_GATENUM       = R * 0.054;
+                const W_DIAL          = R * 0.024;
+                const W_GATES         = W_GATENUM + W_DIAL;
+                const W_ZODIAC        = R * 0.070;
+                const W_HOUSES        = R * 0.090;
+
+                const rHexagramsOuter = R;
+                const rHexagramsInner = R - W_HEX * pH;
+                const rMirrorOuter    = rHexagramsInner;
+                const rMirrorInner    = rMirrorOuter - W_MIRROR * pM;
+                const rGatesOuter     = rMirrorInner;
+                const rDialInner      = rGatesOuter - W_GATES;
+                const rZodiacInner    = rDialInner - W_ZODIAC * pZ;
+                const rHousesOuter    = rZodiacInner;
+                const rHousesInner    = rHousesOuter - W_HOUSES * pH2;
+                const rInnerBorder    = rHousesInner;
 
                 const dx = mx - cx;
                 const dy = my - cy;
@@ -5990,31 +6764,70 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 } else if (dist <= R) {
-                    // On the wheel
+                    // On the wheel (CCW angle mapping)
                     let angle = Math.atan2(dy, dx);
-                    let deg = angle * (180 / Math.PI) + 180;
-                    if (deg < 0) deg += 360;
+                    let deg = (180.0 - angle * (180.0 / Math.PI) + 720.0) % 360.0;
 
                     // Check if hovering the Houses Ring (rHousesInner <= dist <= rHousesOuter)
-                    if (dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses) {
-                        const asc = lastChart.houses[0].longitude;
-                        let houseIdx = Math.floor(((deg - asc) % 360 + 360) % 360 / 30);
+                    if (pH2 > 0.5 && dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses && lastChart.houses.length === 12) {
+                        const getProgramBoundary = (houseData) => {
+                            if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                            const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                            if (gIdx === -1) return houseData.longitude;
+                            const lineIdx = (houseData.hexagram.line || 1) - 1;
+                            return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                        };
+                        const asc = getProgramBoundary(lastChart.houses[0]);
+                        const relDeg = (deg - asc + 720.0) % 360.0;
+                        const houseIdx = Math.floor(relDeg / 30) % 12;
                         if (houseIdx >= 0 && houseIdx < 12) {
                             type = 'house';
                             target = houseIdx + 1;
                         }
                     }
 
-                    if (!type) {
-                        // On the Gates/Zodiac Ring
-                        let offset = (WHEEL_START - deg) % 360;
-                        if (offset < 0) offset += 360;
-                        gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
-                        const gateNum = GATE_ORDER[gateIdx];
+                        // Check if hovering 2nd dial (Mirror Ring) - only active programs can be hovered
+                        if (pM > 0.5 && dist >= rMirrorInner && dist <= rMirrorOuter && lastChart && lastChart.houses && lastChart.houses.length >= 1) {
+                            const getProgramBoundary = (houseData) => {
+                                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                                const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                                if (gIdx === -1) return houseData.longitude;
+                                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                                return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                            };
+                            const AS = getProgramBoundary(lastChart.houses[0]);
+                            const relLon = (deg - AS + 720.0) % 360.0;
+                            const mIdx = Math.floor(relLon / GATE_INTERVAL) % 64;
 
-                        type = 'gate';
-                        target = gateNum;
-                    }
+                            let isMirrorActive = false;
+                            (lastChart.planets || []).forEach(p => {
+                                if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
+                                    const pRel = (p.longitude - AS + 720.0) % 360.0;
+                                    if (Math.floor(pRel / GATE_INTERVAL) % 64 === mIdx) isMirrorActive = true;
+                                }
+                            });
+                            (lastChart.design_planets || []).forEach(p => {
+                                if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
+                                    const pRel = (p.longitude - AS + 720.0) % 360.0;
+                                    if (Math.floor(pRel / GATE_INTERVAL) % 64 === mIdx) isMirrorActive = true;
+                                }
+                            });
+
+                            if (isMirrorActive) {
+                                const mGate = MIRROR_GATE_ORDER[mIdx];
+                                type = 'gate';
+                                target = mGate;
+                                gateIdx = GATE_ORDER.indexOf(mGate);
+                            }
+                        } else {
+                            // On the 1st dial / Gates Ring
+                            let offset = (deg - WHEEL_START + 720.0) % 360.0;
+                            gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
+                            const gateNum = GATE_ORDER[gateIdx];
+
+                            type = 'gate';
+                            target = gateNum;
+                        }
                 }
 
                 const changed = (type !== mandalaHoverState.type || target !== mandalaHoverState.target);
