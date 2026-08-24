@@ -4557,9 +4557,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
 
                     // Draw line number subscript in the bottom-left corner near planet symbol
-                    const sx = ax - 7.5;
-                    const sy = ay + 5.5;
-                    ctx.font = 'bold 9px "DM Sans", sans-serif';
+                    const sx = ax - 5.5;
+                    const sy = ay + 5.0;
+                    ctx.font = '500 8.5px "DM Sans", sans-serif';
                     ctx.textAlign = 'right';
                     ctx.textBaseline = 'middle';
                     
