@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
         icJd.textContent = jd.toFixed(5);
 
         // Planets table
-        renderPlanetsTable(data.planets);
+        renderPlanetsTable(data.planets, data.houses);
 
         // Houses table
         renderHousesTable(data.houses);
@@ -1379,7 +1379,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ── Planets table ─────────────────────────────────────────
-    function renderPlanetsTable(planets) {
+    function renderPlanetsTable(planets, houses) {
         if (activePlanets === null) {
             activePlanets = new Set();
             planets.forEach(p => {
@@ -1389,10 +1389,43 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const GATE_ORDER_LOCAL = typeof GATE_ORDER !== 'undefined' ? GATE_ORDER : [
+            25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
+             8, 20, 16, 35, 45, 12, 15, 52, 39, 53,
+            62, 56, 31, 33,  7,  4, 29, 59, 40, 64,
+            47,  6, 46, 18, 48, 57, 32, 50, 28, 44,
+             1, 43, 14, 34,  9,  5, 26, 11, 10, 58,
+            38, 54, 61, 60, 41, 19, 13, 49, 30, 55,
+            37, 63, 22, 36
+        ];
+        const WHEEL_START_LOCAL = typeof WHEEL_START !== 'undefined' ? WHEEL_START : (358.0 + 15.0 / 60.0 + 1.0 / 3600.0);
+        const GATE_INTERVAL_LOCAL = typeof GATE_INTERVAL !== 'undefined' ? GATE_INTERVAL : 5.625;
+
+        const housesList = houses || (typeof lastChart !== 'undefined' && lastChart && lastChart.houses);
+        let AS = 0;
+        let hasHouses = false;
+        if (housesList && housesList.length >= 1) {
+            hasHouses = true;
+            const getProgramBoundary = (houseData) => {
+                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                const gateIdx = GATE_ORDER_LOCAL.indexOf(houseData.hexagram.gate);
+                if (gateIdx === -1) return houseData.longitude;
+                const lineIdx = (houseData.hexagram.line || 1) - 1;
+                return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
+            };
+            AS = getProgramBoundary(housesList[0]);
+        }
+
         planetsTbody.innerHTML = '';
         planets.forEach(p => {
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
             const sm   = signMeta(p.formatted.sign);
+
+            let mirrorLonHtml = '—';
+            if (p.longitude != null && hasHouses) {
+                const relLon = (p.longitude - AS + 360) % 360;
+                mirrorLonHtml = lonToStr(relLon);
+            }
 
             const tr = document.createElement('tr');
             if (p.is_retrograde) {
@@ -1417,6 +1450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </td>
                 <td>${fmtPos(p.formatted)}</td>
+                <td class="lon-cell">${mirrorLonHtml}</td>
                 <td>${p.is_retrograde
                     ? '<span class="retro-badge">R</span>'
                     : '<span class="direct-dash">—</span>'}</td>`;
