@@ -5858,15 +5858,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const pMeta = PLANET_META[key] || PLANET_META[p.name] || {};
             const glyphCls = pMeta.cls || '';
 
-            const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro);
-
             const gateCellHtml = `
                 <div class="bg-gate-cell" style="color:${colorCss}" title="1-й цифербат (Основной Рейв): ворота ${gate}.${line}">
                     <span class="bg-gate-main">${gate}</span>
-                    <div class="bg-line-stack">
-                        ${fixBadge}
-                        <span class="bg-line-sub">${line || ''}</span>
-                    </div>
+                    <span class="bg-line-sub">${line || ''}</span>
                 </div>
             `;
 
@@ -5887,15 +5882,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mGate = MIRROR_GATE_ORDER[mIdx];
                 const mLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
 
-                const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro);
-
                 mirrorGateCellHtml = `
                     <div class="bg-gate-cell bg-mirror-cell" title="2-й цифербат (Зеркало Жизни): ворота ${mGate}.${mLine}">
                         <span class="bg-gate-main">${mGate}</span>
-                        <div class="bg-line-stack">
-                            ${mirrorFixBadge}
-                            <span class="bg-line-sub">${mLine}</span>
-                        </div>
+                        <span class="bg-line-sub">${mLine}</span>
                     </div>
                 `;
             }

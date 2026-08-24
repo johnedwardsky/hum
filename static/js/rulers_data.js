@@ -17,7 +17,7 @@ const SVG_NODE_SOUTH = `<svg class="planet-svg-icon" viewBox="0 0 143 147" width
 
 const SVG_MERCURY = `<svg class="planet-svg-icon" viewBox="0 0 143 147" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="71.5" cy="69" r="18"/><line x1="71.5" y1="87" x2="71.5" y2="108"/><line x1="64" y1="99" x2="79" y2="99"/><path d="M56,53 C60,47 65,45 71.5,45 C78,45 83,47 87,53"/></svg>`;
 
-const SVG_VENUS = `<svg class="planet-svg-icon" viewBox="0 0 143 147" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="71.5" cy="63.5" r="22"/><line x1="71.5" y1="85.5" x2="71.5" y2="107.5"/><line x1="63.5" y1="98" x2="79.5" y2="98"/></svg>`;
+const SVG_VENUS = `<svg class="planet-svg-icon" viewBox="0 0 143 147" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="71.5" cy="63.5" r="21"/><line x1="71.5" y1="85.5" x2="71.5" y2="104.5"/><line x1="66.5" y1="97.5" x2="76.5" y2="97.5"/></svg>`;
 
 const SVG_MARS = `<svg class="planet-svg-icon" viewBox="0 0 143 147" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-0.15em;"><circle cx="64" cy="83" r="22"/><line x1="79.5" y1="67.5" x2="94" y2="50"/><polyline points="83,50 94,50 94,61"/></svg>`;
 

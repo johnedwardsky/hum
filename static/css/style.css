@@ -3085,7 +3085,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 12px 10px;
+    padding: 10px 8px;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -3098,8 +3098,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
-    padding: 4px 6px;
+    gap: 5px;
+    padding: 3px 5px;
     border-radius: 7px;
     cursor: pointer;
     transition: background 0.18s, opacity 0.25s ease, box-shadow 0.18s, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3161,9 +3161,9 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
     background: rgba(245, 243, 238, 0.55);
     border: 1px solid rgba(220, 215, 205, 0.45);
     flex-shrink: 0;
@@ -3171,7 +3171,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 .bg-planet-wrap .bg-planet-sym {
-    font-size: 32px;
+    font-size: 26px;
     text-align: center;
     line-height: 1;
     display: inline-flex;
@@ -3182,8 +3182,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 .bg-planet-wrap .planet-svg-icon {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     display: block;
     flex-shrink: 0;
 }
@@ -3195,11 +3195,11 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     position: absolute;
     bottom: -1px;
     right: -1px;
-    font-size: 8px;
+    font-size: 7.5px;
     line-height: 1;
     font-weight: 700;
-    padding: 1px 3px;
-    border-radius: 3px;
+    padding: 0.5px 2.5px;
+    border-radius: 2px;
     background: rgba(197,158,63,0.92);
     color: #fff;
     box-shadow: 0 1px 2px rgba(0,0,0,0.15);
@@ -3238,7 +3238,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     justify-content: space-between;
 }
 
-/* Gate Cell Stack: Gate Number + Subscript Line + Fixation Badge SuperScript */
+/* Gate Cell: Gate Number + Subscript Line */
 .bg-gate-cell {
     display: inline-flex;
     align-items: flex-end;
@@ -3246,7 +3246,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     position: relative;
     font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1;
-    min-width: 30px;
+    min-width: 28px;
 }
 
 .bg-gate-main {
@@ -3256,27 +3256,13 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     letter-spacing: -0.02em;
 }
 
-.bg-line-stack {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    margin-left: 1px;
-    position: relative;
-    bottom: -1px;
-}
-
-.bg-fix-badge {
-    font-size: 8.5px;
-    line-height: 1;
-    font-weight: 700;
-    margin-bottom: -1px;
-}
-
 .bg-line-sub {
     font-size: 9.5px;
     font-weight: 700;
     line-height: 1;
+    margin-left: 1px;
+    position: relative;
+    bottom: -1px;
 }
 
 .bg-col-design .bg-gate-cell { color: #fe0000; }
@@ -3285,9 +3271,10 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 /* Mirror Cell (Second Dial Program) Styling */
 .bg-mirror-cell {
     opacity: 0.68;
-    padding: 0 3px;
+    padding: 0 2px;
     border: none;
     margin: 0;
+    min-width: 24px;
 }
 .bg-mirror-cell .bg-gate-main {
     font-size: 13.5px;
