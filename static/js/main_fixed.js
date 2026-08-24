@@ -4613,7 +4613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wrap.style.height = (650 * bgScale) + 'px';
 
         // Always copy the main SVG bodygraph to ensure it mirrors the main chart perfectly
-        const mainSvg = document.querySelector('#bodygraph-svg-wrap svg');
+        const mainSvg = document.querySelector('#bodygraph-svg-wrap > svg#Слой_1') || document.querySelector('#bodygraph-svg-wrap > svg');
         if (!mainSvg) return;
         
         let svg = mainSvg.cloneNode(true);

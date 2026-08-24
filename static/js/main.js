@@ -5063,7 +5063,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function syncMandalaBodygraph() {
         const wrap = document.getElementById('mandala-bodygraph-wrap');
-        const mainSvg = document.querySelector('#bodygraph-svg-wrap svg');
+        const mainSvg = document.querySelector('#bodygraph-svg-wrap > svg#Слой_1') || document.querySelector('#bodygraph-svg-wrap > svg');
         if (!wrap || !mainSvg) return;
 
         let svg = mainSvg.cloneNode(true);
