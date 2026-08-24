@@ -3161,9 +3161,9 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 5px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
     background: rgba(245, 243, 238, 0.55);
     border: 1px solid rgba(220, 215, 205, 0.45);
     flex-shrink: 0;
@@ -3171,7 +3171,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 .bg-planet-wrap .bg-planet-sym {
-    font-size: 16px;
+    font-size: 32px;
     text-align: center;
     line-height: 1;
     display: inline-flex;
@@ -3182,8 +3182,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 .bg-planet-wrap .planet-svg-icon {
-    width: 18px;
-    height: 18px;
+    width: 36px;
+    height: 36px;
     display: block;
     flex-shrink: 0;
 }
@@ -3193,13 +3193,13 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 .bg-planet-wrap .bg-retro-badge {
     position: absolute;
-    bottom: -2px;
-    right: -2px;
-    font-size: 7px;
+    bottom: -1px;
+    right: -1px;
+    font-size: 8px;
     line-height: 1;
     font-weight: 700;
-    padding: 0.5px 2px;
-    border-radius: 2px;
+    padding: 1px 3px;
+    border-radius: 3px;
     background: rgba(197,158,63,0.92);
     color: #fff;
     box-shadow: 0 1px 2px rgba(0,0,0,0.15);
