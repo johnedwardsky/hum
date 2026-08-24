@@ -984,7 +984,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tr.innerHTML = `
                     <td>
                         <div class="print-planet-cell">
-                            <div class="print-planet-glyph ${pMeta.cls}">${pMeta.sym}</div>
+                            <div class="print-planet-glyph ${pMeta.cls}">${getPlanetSym(p.name)}</div>
                             <strong>${p.name}</strong>
                         </div>
                     </td>
@@ -1116,6 +1116,31 @@ document.addEventListener('DOMContentLoaded', () => {
         'Лилит (интерп.)':       { sym: '⚸', cls: 'glyph-lilith-intp' },
         'Приап (интерп.)':       { sym: '⯓', cls: 'glyph-priapus' },
     };
+
+    function getPlanetSym(name) {
+        if (!name) return '';
+        const nameLower = name.toLowerCase().trim();
+        if (nameLower.includes('солнце')) return typeof SVG_SUN !== 'undefined' ? SVG_SUN : '☉';
+        if (nameLower.includes('земля')) return typeof SVG_EARTH !== 'undefined' ? SVG_EARTH : '⊕';
+        if (nameLower.includes('луна')) return typeof SVG_MOON !== 'undefined' ? SVG_MOON : '☽';
+        if (nameLower.includes('северный узел')) return typeof SVG_NODE_NORTH !== 'undefined' ? SVG_NODE_NORTH : '☊';
+        if (nameLower.includes('южный узел')) return typeof SVG_NODE_SOUTH !== 'undefined' ? SVG_NODE_SOUTH : '☋';
+        if (nameLower.includes('меркурий')) return typeof SVG_MERCURY !== 'undefined' ? SVG_MERCURY : '☿';
+        if (nameLower.includes('венера')) return typeof SVG_VENUS !== 'undefined' ? SVG_VENUS : '♀';
+        if (nameLower.includes('марс')) return typeof SVG_MARS !== 'undefined' ? SVG_MARS : '♂';
+        if (nameLower.includes('юпитер')) return typeof SVG_JUPITER !== 'undefined' ? SVG_JUPITER : '♃';
+        if (nameLower.includes('сатурн')) return typeof SVG_SATURN !== 'undefined' ? SVG_SATURN : '♄';
+        if (nameLower.includes('уран')) return typeof SVG_URANUS !== 'undefined' ? SVG_URANUS : '♅';
+        if (nameLower.includes('нептун')) return typeof SVG_NEPTUNE !== 'undefined' ? SVG_NEPTUNE : '♆';
+        if (nameLower.includes('плутон')) return typeof SVG_PLUTO !== 'undefined' ? SVG_PLUTO : '♇';
+        if (nameLower.includes('хирон')) return typeof SVG_CHIRON !== 'undefined' ? SVG_CHIRON : '⚷';
+        if (nameLower.includes('лилит')) return typeof SVG_LILITH !== 'undefined' ? SVG_LILITH : '⚸';
+        if (nameLower.includes('приап')) return typeof SVG_PRIAPUS !== 'undefined' ? SVG_PRIAPUS : '⯓';
+
+        const key = name === 'Северный Узел' ? 'Истинный Северный Узел' : (name === 'Южный Узел' ? 'Истинный Южный Узел' : name);
+        const meta = PLANET_META[key] || PLANET_META[name];
+        return meta ? meta.sym : name.substring(0, 2);
+    }
 
     const ZODIAC_META = [
         { sym: '♈\uFE0E', name: 'Овен' },
@@ -1380,7 +1405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td>
                     <div class="planet-cell">
-                        <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
+                        <div class="planet-glyph ${meta.cls}">${getPlanetSym(p.name)}</div>
                         <span class="planet-name">${p.name}</span>
                     </div>
                 </td>
@@ -1468,7 +1493,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td>
                     <div class="planet-cell">
-                        <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
+                        <div class="planet-glyph ${meta.cls}">${getPlanetSym(p.name)}</div>
                         <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Личность)</span></span>
                     </div>
                 </td>
@@ -1494,7 +1519,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td>
                     <div class="planet-cell">
-                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${meta.sym}</div>
+                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${getPlanetSym(p.name)}</div>
                         <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Дизайн)</span></span>
                     </div>
                 </td>
@@ -4820,7 +4845,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td>
                     <div class="planet-cell">
-                        <div class="planet-glyph ${meta.cls}">${meta.sym}</div>
+                        <div class="planet-glyph ${meta.cls}">${getPlanetSym(p.name)}</div>
                         <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Личность)</span></span>
                     </div>
                 </td>
@@ -4852,7 +4877,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td>
                     <div class="planet-cell">
-                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${meta.sym}</div>
+                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${getPlanetSym(p.name)}</div>
                         <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Дизайн)</span></span>
                     </div>
                 </td>
