@@ -1160,7 +1160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PLANET_VECTORS = {
         'солнце': (ctx) => {
             ctx.beginPath(); ctx.arc(71.5, 73.5, 24.8, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.arc(71.5, 73.5, 3.12, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(71.5, 73.5, 2.6, 0, 2*Math.PI); ctx.fill();
         },
         'земля': (ctx) => {
             ctx.beginPath(); ctx.arc(71.5, 73.5, 24.8, 0, 2*Math.PI); ctx.stroke();
@@ -1311,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.translate(x, y);
             ctx.scale(size / 64.0, size / 64.0);
             ctx.translate(-71.5, -73.5);
-            ctx.lineWidth = 4.8; // 20% bolder (was 4.0)
+            ctx.lineWidth = 4.0;
             drawFn(ctx);
             ctx.restore();
         } else {
@@ -4556,11 +4556,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
 
-                    // Draw line number subscript next to planet symbol
-                    const subAngle = midAngle + 0.032;
-                    const sx = cx + (rAct + 1) * Math.cos(subAngle);
-                    const sy = cy + (rAct + 1) * Math.sin(subAngle);
-                    ctx.font = 'bold 9.5px DM Sans, sans-serif';
+                    // Draw line number subscript in the bottom-left corner near planet symbol
+                    const sx = ax - 7.5;
+                    const sy = ay + 5.5;
+                    ctx.font = 'bold 9px "DM Sans", sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
                     
                     let lineAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
                     ctx.fillStyle = hexToRgba(baseHex, lineAlpha);
