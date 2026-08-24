@@ -4927,6 +4927,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 1.0;
             ctx.stroke();
             ctx.restore();
+        });
+
         // 7. Draw radial activation wedges (rays) from the center to the gates (CCW)
         const GATE_CENTER_COLORS = {};
         const CENTER_HUES = {
