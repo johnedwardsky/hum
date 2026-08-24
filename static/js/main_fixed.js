@@ -5373,10 +5373,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const pMeta = PLANET_META[key] || PLANET_META[p.name] || {};
             const glyphCls = pMeta.cls || '';
 
+            const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro);
+
             const gateCellHtml = `
                 <div class="bg-gate-cell" style="color:${colorCss}" title="1-й цифербат (Основной Рейв): ворота ${gate}.${line}">
                     <span class="bg-gate-main">${gate}</span>
-                    <span class="bg-line-sub">${line || ''}</span>
+                    <div class="bg-line-stack">
+                        ${fixBadge}
+                        <span class="bg-line-sub">${line || ''}</span>
+                    </div>
                 </div>
             `;
 
@@ -5389,35 +5394,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mGate = MIRROR_GATE_ORDER[mIdx];
                 const mLine = Math.floor((relLon % 5.625) / (5.625 / 6)) + 1;
 
+                const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro);
+
                 mirrorGateCellHtml = `
                     <div class="bg-gate-cell bg-mirror-cell" title="2-й цифербат (Зеркало Жизни): ворота ${mGate}.${mLine}">
                         <span class="bg-gate-main">${mGate}</span>
-                        <span class="bg-line-sub">${mLine}</span>
+                        <div class="bg-line-stack">
+                            ${mirrorFixBadge}
+                            <span class="bg-line-sub">${mLine}</span>
+                        </div>
                     </div>
                 `;
             }
 
             if (isDesign) {
-                // Left column: Planet | 1st Dial Gate | 2nd Dial Mirror Gate | Zodiac
+                // Left column: 2nd Dial Mirror Gate | Planet | 1st Dial Gate | Zodiac
                 row.innerHTML = `
+                    ${mirrorGateCellHtml}
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym ${glyphCls}" style="color:${colorCss}">${sym}</span>
-                        ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
                     </div>
                     ${gateCellHtml}
-                    ${mirrorGateCellHtml}
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
                 `;
             } else {
-                // Right column: Zodiac | 2nd Dial Mirror Gate | 1st Dial Gate | Planet
+                // Right column: Zodiac | 1st Dial Gate | Planet | 2nd Dial Mirror Gate
                 row.innerHTML = `
                     <span class="bg-zodiac-sym">${zodiacSym}</span>
-                    ${mirrorGateCellHtml}
                     ${gateCellHtml}
                     <div class="bg-planet-wrap">
                         <span class="bg-planet-sym ${glyphCls}" style="color:${colorCss}">${sym}</span>
-                        ${isRetro ? '<span class="bg-retro-badge">R</span>' : ''}
                     </div>
+                    ${mirrorGateCellHtml}
                 `;
             }
 
