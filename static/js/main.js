@@ -1173,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PLANET_VECTORS = {
         'солнце': (ctx) => {
             ctx.beginPath(); ctx.arc(71.5, 73.5, 24.8, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.arc(71.5, 73.5, 2.6, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(71.5, 73.5, 3.12, 0, 2*Math.PI); ctx.fill();
         },
         'земля': (ctx) => {
             ctx.beginPath(); ctx.arc(71.5, 73.5, 24.8, 0, 2*Math.PI); ctx.stroke();
@@ -1324,7 +1324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.translate(x, y);
             ctx.scale(size / 64.0, size / 64.0);
             ctx.translate(-71.5, -73.5);
-            ctx.lineWidth = 4.0;
+            ctx.lineWidth = 4.8; // 20% bolder (was 4.0)
             drawFn(ctx);
             ctx.restore();
         } else {
