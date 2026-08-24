@@ -2618,8 +2618,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 /* ═══════════════════════════════════════════════════════
-   HUMAN DESIGN VARIABLES (ПЕРЕМЕННЫЕ) - STABLE & COMPACT
-═══════════════════════════════════════════════════════ */
+   HUMAN DESIGN VARIABLES (ПЕРЕМЕННЫЕ) - 20% LARGER
+   ═══════════════════════════════════════════════════════ */
 .bg-var-block {
     position: absolute;
     top: 1%;
@@ -2627,9 +2627,9 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: 2.5px;
-    width: 25%;
-    max-width: 98px;
+    gap: 3px;
+    width: 28%;
+    max-width: 118px;
     z-index: 10;
     pointer-events: auto;
     user-select: none;
@@ -2657,9 +2657,9 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-var-arrow-svg,
 .var-arrow-svg {
     width: 100%;
-    max-width: 65px;
+    max-width: 78px;
     height: auto;
-    max-height: 14px;
+    max-height: 17px;
     display: block;
     pointer-events: none;
 }
@@ -2669,7 +2669,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 1.5px;
+    gap: 2px;
 }
 
 .bg-var-item {
@@ -2682,7 +2682,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 .var-badge-svg {
     width: 100%;
-    max-width: 18px;
+    max-width: 22px;
     height: auto;
     aspect-ratio: 1 / 1;
     display: block;
@@ -2701,7 +2701,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 .bg-var-labels span {
     font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 6.5px;
+    font-size: 8px;
     font-weight: 700;
     letter-spacing: 0.02em;
     text-align: center;
@@ -2720,16 +2720,16 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 @media (max-width: 480px) {
     .bg-var-block {
-        max-width: 78px;
+        max-width: 94px;
     }
     .bg-var-labels span {
-        font-size: 5.5px;
+        font-size: 6.5px;
     }
     .var-badge-svg {
-        max-width: 15px;
+        max-width: 18px;
     }
     .bg-var-arrow-svg {
-        max-width: 50px;
+        max-width: 60px;
     }
 }
 
