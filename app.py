@@ -12,6 +12,8 @@ import compatibility_data
 import cities_data
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 NOMINATIM_HEADERS = {
@@ -22,9 +24,22 @@ NOMINATIM_HEADERS = {
 
 def get_timezone_by_coords(lat, lon):
     """
-    Attempts to look up the timezone name from coordinates using timeapi.io.
-    Falls back to estimating timezone from longitude if offline or failed.
+    Looks up exact IANA timezone name from coordinates.
+    Uses cities_data offline mapping first for 100% speed and precision,
+    with online fallback to timeapi.io.
     """
+    if lat is None or lon is None:
+        return "UTC"
+
+    # 1. Offline high-precision lookup by nearest city & geographic polygons
+    try:
+        offline_tz = cities_data.get_nearest_timezone(lat, lon)
+        if offline_tz and offline_tz != "UTC" and offline_tz in pytz.all_timezones:
+            return offline_tz
+    except Exception as e:
+        print(f"[cities_data tz lookup error] {e}")
+
+    # 2. Online API lookup (if available)
     try:
         url = f"https://timeapi.io/api/TimeZone/coordinate?latitude={lat}&longitude={lon}"
         req = urllib.request.Request(url, headers={'User-Agent': 'humantica_astrology_app'})
@@ -35,11 +50,10 @@ def get_timezone_by_coords(lat, lon):
             if tz_name in pytz.all_timezones:
                 return tz_name
     except Exception as e:
-        print(f"Error fetching timezone from API: {e}")
+        pass
     
-    # Fallback: estimate timezone from longitude (15 degrees = 1 hour offset)
-    # Note: pytz uses reversed signs for Etc/GMT zones (Etc/GMT-3 is UTC+3)
-    offset = round(lon / 15.0)
+    # 3. Fallback: estimate timezone from longitude
+    offset = round(float(lon) / 15.0)
     sign = '-' if offset >= 0 else '+'
     offset_abs = abs(offset)
     

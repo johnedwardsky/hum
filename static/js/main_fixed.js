@@ -1134,80 +1134,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const PLANET_VECTORS = {
         'солнце': (ctx) => {
-            ctx.beginPath(); ctx.arc(8, 8, 5.6, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.arc(8, 8, 1.1, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(71.5, 73.5, 24.8, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(71.5, 73.5, 2.6, 0, 2*Math.PI); ctx.fill();
         },
         'земля': (ctx) => {
-            ctx.beginPath(); ctx.arc(8, 8, 5.6, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(2.4, 8); ctx.lineTo(13.6, 8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(8, 2.4); ctx.lineTo(8, 13.6); ctx.stroke();
+            ctx.beginPath(); ctx.arc(71.5, 73.5, 24.8, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(46.7, 73.5); ctx.lineTo(96.3, 73.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(71.5, 48.7); ctx.lineTo(71.5, 98.3); ctx.stroke();
         },
         'луна': (ctx) => {
-            const p = new Path2D("M 10.5 2.6 A 5.8 5.8 0 0 0 10.5 13.4 A 4.6 4.6 0 0 1 10.5 2.6 Z");
+            ctx.save();
+            ctx.translate(71.5, 73.5);
+            ctx.scale(0.8, 0.8);
+            ctx.translate(-71.5, -73.5);
+            const p = new Path2D("M79.5,42.5 C83.718465,42.5 87.74017,43.3424809 91.4045438,44.8686483 C84.8840334,45.9259025 79.1052987,49.1951028 74.8635865,53.881654 C70.2873579,58.937803 67.5,65.6433814 67.5,73 C67.5,80.669265 70.5292861,87.6309946 75.4565598,92.753961 C80.0171656,97.4956968 86.2038328,100.662027 93.1183045,101.356236 C89.0076692,103.369841 84.3858058,104.5 79.5,104.5 C70.9395864,104.5 63.1895864,101.030207 57.5796898,95.4203102 C51.9697932,89.8104136 48.5,82.0604136 48.5,73.5 C48.5,64.9395864 51.9697932,57.1895864 57.5796898,51.5796898 C63.1895864,45.9697932 70.9395864,42.5 79.5,42.5 Z");
             ctx.stroke(p);
+            ctx.restore();
         },
         'северный узел': (ctx) => {
-            const p = new Path2D("M 3.8 11.2 A 4.6 4.6 0 0 1 12.2 11.2");
+            ctx.beginPath(); ctx.arc(51.5, 87.5, 6, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(91.5, 87.5, 6, 0, 2*Math.PI); ctx.stroke();
+            const p = new Path2D("M51.5,81 C51.5,61.0910376 58.1666667,51.1365563 71.5,51.1365563 C91.5,51.1365563 91.5,81 91.5,81");
             ctx.stroke(p);
-            ctx.beginPath(); ctx.arc(3.8, 11.8, 1.3, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.arc(12.2, 11.8, 1.3, 0, 2*Math.PI); ctx.stroke();
         },
         'южный узел': (ctx) => {
-            const p = new Path2D("M 3.8 4.8 A 4.6 4.6 0 0 0 12.2 4.8");
+            ctx.beginPath(); ctx.arc(51.5, 58.5, 6, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(91.5, 58.5, 6, 0, 2*Math.PI); ctx.stroke();
+            const p = new Path2D("M51.5,65 C51.5,84.9089624 58.1666667,94.8634437 71.5,94.8634437 C91.5,94.8634437 91.5,65 91.5,65");
             ctx.stroke(p);
-            ctx.beginPath(); ctx.arc(3.8, 4.2, 1.3, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.arc(12.2, 4.2, 1.3, 0, 2*Math.PI); ctx.stroke();
         },
         'меркурий': (ctx) => {
-            const p = new Path2D("M 4.2 2.4 A 3.8 3.8 0 0 0 11.8 2.4");
-            ctx.stroke(p);
-            ctx.beginPath(); ctx.arc(8, 6.8, 2.8, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(8, 9.6); ctx.lineTo(8, 14.8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(5.2, 12.5); ctx.lineTo(10.8, 12.5); ctx.stroke();
+            ctx.beginPath(); ctx.arc(71.5, 68, 17.5, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(71.5, 85.5); ctx.lineTo(71.5, 104.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(66.5, 97.5); ctx.lineTo(76.5, 97.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(59.5, 55.5); ctx.lineTo(52.5, 48.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(83.5, 55.5); ctx.lineTo(90.5, 48.5); ctx.stroke();
         },
         'венера': (ctx) => {
-            ctx.beginPath(); ctx.arc(8, 5.4, 3.8, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(8, 9.2); ctx.lineTo(8, 14.8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(5.0, 12.2); ctx.lineTo(11.0, 12.2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(71.5, 63.5, 21, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(71.5, 85.5); ctx.lineTo(71.5, 104.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(66.5, 97.5); ctx.lineTo(76.5, 97.5); ctx.stroke();
         },
         'марс': (ctx) => {
-            ctx.beginPath(); ctx.arc(6.5, 9.5, 3.8, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(9.2, 6.8); ctx.lineTo(14.0, 2.0); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(10.2, 2.0); ctx.lineTo(14.0, 2.0); ctx.lineTo(14.0, 5.8); ctx.stroke();
+            ctx.beginPath(); ctx.arc(65.5, 81.5, 21, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(80.5, 66.5); ctx.lineTo(92, 50); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(82.5, 51.5); ctx.lineTo(92, 50); ctx.lineTo(90.5, 59.5); ctx.stroke();
         },
         'юпитер': (ctx) => {
-            const p = new Path2D("M 2.0 6.5 C 2.0 1.5 6.5 0.8 6.5 4.5 C 6.5 7.0 2.5 8.5 2.5 9.8 L 13.5 9.8");
+            ctx.beginPath(); ctx.moveTo(83.09, 61.4); ctx.lineTo(83.09, 101.8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(52.19, 89.92); ctx.lineTo(94.98, 89.92); ctx.stroke();
+            const p = new Path2D("M52.1886729,89.9245984 C52.1886729,89.9245984 64.2741295,82.2504408 70.7872216,73.8484287 C80.9190972,60.7781176 81.6208703,44.9651461 59.4197622,55.3733001");
             ctx.stroke(p);
-            ctx.beginPath(); ctx.moveTo(9.8, 1.8); ctx.lineTo(9.8, 14.8); ctx.stroke();
         },
         'сатурн': (ctx) => {
-            ctx.beginPath(); ctx.moveTo(5.2, 2.0); ctx.lineTo(5.2, 14.8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(2.6, 4.8); ctx.lineTo(7.8, 4.8); ctx.stroke();
-            const p = new Path2D("M 5.2 8.2 C 9.5 8.2 11.8 10.5 9.5 13.8 C 8.5 15.2 7.0 14.5 7.5 13.2");
+            ctx.beginPath(); ctx.moveTo(66.42, 42.79); ctx.lineTo(66.5, 95.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(52.08, 54.88); ctx.lineTo(80.25, 54.88); ctx.stroke();
+            const p = new Path2D("M66.4998276,66.6622779 C75.862026,59.0645519 83.9190585,57.3092757 90.6709253,61.3964494 C100.798726,67.52721 72.7894749,100.913731 84.1387251,95.5 C91.7048919,91.8908462 94.6767777,90.5386299 93.0543825,91.4433512");
             ctx.stroke(p);
         },
         'уран': (ctx) => {
-            ctx.beginPath(); ctx.arc(8, 12.8, 2.0, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(8, 2.0); ctx.lineTo(8, 10.8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(3.2, 5.2); ctx.lineTo(12.8, 5.2); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(3.2, 2.0); ctx.lineTo(3.2, 8.4); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(12.8, 2.0); ctx.lineTo(12.8, 8.4); ctx.stroke();
+            ctx.beginPath(); ctx.arc(71.5, 98.5, 6, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(71.5, 53.5); ctx.lineTo(71.5, 92.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(62.5, 72.5); ctx.lineTo(80.5, 72.5); ctx.stroke();
+            const p1 = new Path2D("M51.7941551,53.5 C58.931385,57.7845418 62.5,64.1178751 62.5,72.5 C62.5,80.8821249 58.931385,87.2154582 51.7941551,91.5");
+            ctx.stroke(p1);
+            const p2 = new Path2D("M91.2058449,53.5 C84.068615,57.7845418 80.5,64.1178751 80.5,72.5 C80.5,80.8821249 84.068615,87.2154582 91.2058449,91.5");
+            ctx.stroke(p2);
         },
         'нептун': (ctx) => {
-            const p = new Path2D("M 3.2 3.2 L 3.2 6.8 C 3.2 9.2 12.8 9.2 12.8 6.8 L 12.8 3.2");
+            ctx.beginPath(); ctx.moveTo(71.5, 84.5); ctx.lineTo(71.5, 99.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(66.5, 92.5); ctx.lineTo(76.5, 92.5); ctx.stroke();
+            const p = new Path2D("M52.5,53 C54.5,77 61.5,84.5 71.5,84.5 C81.5,84.5 88.5,77 90.5,53");
             ctx.stroke(p);
-            ctx.beginPath(); ctx.moveTo(8, 2.0); ctx.lineTo(8, 14.8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(5.0, 12.5); ctx.lineTo(11.0, 12.5); ctx.stroke();
-            const p2 = new Path2D("M 2.2 4.0 L 3.2 2.4 L 4.2 4.0"); ctx.stroke(p2);
-            const p3 = new Path2D("M 7.0 2.8 L 8.0 1.5 L 9.0 2.8"); ctx.stroke(p3);
-            const p4 = new Path2D("M 11.8 4.0 L 12.8 2.4 L 13.8 4.0"); ctx.stroke(p4);
+            ctx.beginPath(); ctx.moveTo(71.5, 46); ctx.lineTo(71.5, 84.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(66.5, 55); ctx.lineTo(71.5, 46); ctx.lineTo(76.5, 55); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(48.5, 61.9); ctx.lineTo(52.5, 53); ctx.lineTo(57.6, 61); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(85.3, 61); ctx.lineTo(90.5, 53); ctx.lineTo(94.5, 61.9); ctx.stroke();
         },
         'плутон': (ctx) => {
-            ctx.beginPath(); ctx.arc(8, 3.6, 2.5, 0, 2*Math.PI); ctx.stroke();
-            const p = new Path2D("M 2.4 6.0 A 5.6 5.6 0 0 0 13.6 6.0");
+            ctx.beginPath(); ctx.arc(72.14, 58.33, 11.83, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(72.14, 77.29); ctx.lineTo(72.14, 100.05); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(64.56, 86.78); ctx.lineTo(79.73, 86.78); ctx.stroke();
+            const p = new Path2D("M59.8266063,40.5406699 C75.9638653,45.4800272 84.0324948,53.6913387 84.0324948,65.1746043 C84.0324948,76.65787 75.9638653,84.8004716 59.8266063,89.6024092");
+            ctx.save();
+            ctx.translate(71.929551, 65.071540);
+            ctx.scale(-1, -1);
+            ctx.rotate(-Math.PI / 2);
+            ctx.translate(-71.929551, -65.071540);
             ctx.stroke(p);
-            ctx.beginPath(); ctx.moveTo(8, 9.4); ctx.lineTo(8, 14.8); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(4.8, 12.4); ctx.lineTo(11.2, 12.4); ctx.stroke();
+            ctx.restore();
         }
     };
 
@@ -1238,7 +1253,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.save();
         ctx.strokeStyle = color;
         ctx.fillStyle = color;
-        ctx.lineWidth = Math.max(1.1, size * 0.08);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -1251,14 +1265,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (!drawFn) {
-            if (symStr === "☊") drawFn = PLANET_VECTORS["северный узел"];
-            else if (symStr === "☋") drawFn = PLANET_VECTORS["южный узел"];
+            const sym = symStr || pName;
+            if (sym === "☉" || nameStr === "солнце") drawFn = PLANET_VECTORS["солнце"];
+            else if (sym === "⊕" || nameStr === "земля") drawFn = PLANET_VECTORS["земля"];
+            else if (sym === "☽" || nameStr === "луна") drawFn = PLANET_VECTORS["луна"];
+            else if (sym === "☊" || nameStr.includes("северный узел")) drawFn = PLANET_VECTORS["северный узел"];
+            else if (sym === "☋" || nameStr.includes("южный узел")) drawFn = PLANET_VECTORS["южный узел"];
+            else if (sym === "☿" || nameStr === "меркурий") drawFn = PLANET_VECTORS["меркурий"];
+            else if (sym === "♀" || nameStr === "венера") drawFn = PLANET_VECTORS["венера"];
+            else if (sym === "♂" || nameStr === "марс") drawFn = PLANET_VECTORS["марс"];
+            else if (sym === "♃" || nameStr === "юпитер") drawFn = PLANET_VECTORS["юпитер"];
+            else if (sym === "♄" || nameStr === "сатурн") drawFn = PLANET_VECTORS["сатурн"];
+            else if (sym === "♅" || nameStr === "уран") drawFn = PLANET_VECTORS["уран"];
+            else if (sym === "♆" || nameStr === "нептун") drawFn = PLANET_VECTORS["нептун"];
+            else if (sym === "♇" || nameStr === "плутон") drawFn = PLANET_VECTORS["плутон"];
         }
 
         if (drawFn) {
-            ctx.translate(x - size/2, y - size/2);
-            ctx.scale(size/16, size/16);
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(size / 64.0, size / 64.0);
+            ctx.translate(-71.5, -73.5);
+            ctx.lineWidth = 4.0;
             drawFn(ctx);
+            ctx.restore();
         } else {
             ctx.font = `bold ${size}px "DM Sans", "Segoe UI Symbol", sans-serif`;
             ctx.textAlign = 'center';
@@ -3525,15 +3555,19 @@ document.addEventListener('DOMContentLoaded', () => {
         mirror: true,
         zodiac: true,
         houses: true,
+        rulers: true,
+        raysPlanets: true,
         cross: true
     };
 
     const mandalaAnimState = {
-        hexagrams: { progress: 1, startAngle: -0.22 },
-        mirror:    { progress: 1, startAngle:  0.22 },
-        zodiac:    { progress: 1, startAngle: -0.18 },
-        houses:    { progress: 1, startAngle:  0.18 },
-        cross:     { progress: 1, startAngle: -0.25 }
+        hexagrams:   { progress: 1, startAngle: -0.22 },
+        mirror:      { progress: 1, startAngle:  0.22 },
+        zodiac:      { progress: 1, startAngle: -0.18 },
+        houses:      { progress: 1, startAngle:  0.18 },
+        rulers:      { progress: 1, startAngle:  0.18 },
+        raysPlanets: { progress: 1, startAngle:  0.18 },
+        cross:       { progress: 1, startAngle: -0.25 }
     };
 
     let mandalaAnimFrameId = null;
@@ -4094,9 +4128,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gateNum  = MIRROR_GATE_ORDER[i];
                 const hasAct   = mirrorActivated.has(i);
 
-                // Completely hide inactive (dimmed) mirror programs
-                if (!hasAct) continue;
-
                 const isP      = mirrorHasPers.has(i);
                 const isD      = mirrorHasDes.has(i);
 
@@ -4105,27 +4136,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 const endAngle   = degToRad(180 - (startLon - MIRROR_INTERVAL));
                 const midAngle   = (startAngle + endAngle) / 2;
 
-                // Sector background
-                let bgFill;
-                if (isP && isD)       bgFill = 'rgba(46,42,32,0.11)';
-                else if (isP)         bgFill = 'rgba(46,42,32,0.09)';
-                else if (isD)         bgFill = 'rgba(255,96,96,0.10)';
-                else                  bgFill = 'rgba(0,0,0,0)';
-                ctx.beginPath();
-                ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
-                ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle);
-                ctx.lineTo(cx + rMirrorInner * Math.cos(endAngle), cy + rMirrorInner * Math.sin(endAngle));
-                ctx.arc(cx, cy, rMirrorInner, endAngle, startAngle, true);
-                ctx.closePath();
-                ctx.fillStyle = bgFill;
-                ctx.fill();
+                // Sector background for activated sectors
+                if (hasAct) {
+                    let bgFill;
+                    if (isP && isD)       bgFill = 'rgba(46,42,32,0.11)';
+                    else if (isP)         bgFill = 'rgba(46,42,32,0.09)';
+                    else if (isD)         bgFill = 'rgba(255,96,96,0.10)';
+                    else                  bgFill = 'rgba(0,0,0,0)';
+                    ctx.beginPath();
+                    ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
+                    ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle);
+                    ctx.lineTo(cx + rMirrorInner * Math.cos(endAngle), cy + rMirrorInner * Math.sin(endAngle));
+                    ctx.arc(cx, cy, rMirrorInner, endAngle, startAngle, true);
+                    ctx.closePath();
+                    ctx.fillStyle = bgFill;
+                    ctx.fill();
+                }
 
                 // Divider line at sector start
                 ctx.beginPath();
                 ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
                 ctx.lineTo(cx + rMirrorOuter * Math.cos(startAngle), cy + rMirrorOuter * Math.sin(startAngle));
-                ctx.strokeStyle = 'rgba(160,155,145,0.22)';
-                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = hasAct ? 'rgba(160,155,145,0.35)' : 'rgba(197,158,63,0.14)';
+                ctx.lineWidth = hasAct ? 0.6 : 0.45;
                 ctx.stroke();
 
                 // Gate number — centered in sector
@@ -4138,7 +4171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     numColor = (mBoth || isP) ? '#2E2A20' : 'rgb(220,80,80)';
                     numFont  = 'bold 10.5px "DM Sans", sans-serif';
                 } else {
-                    numColor = 'rgba(150,145,130,0.28)';
+                    numColor = 'rgba(120,114,102,0.42)';
                     numFont  = '500 9px "DM Sans", sans-serif';
                 }
 
@@ -4325,7 +4358,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillText(`${gate}.${line}`, xGL, yGL);
 
                 // --- Rulers: near end cusp, inside gold band ---
-                const rulers = (typeof getNidanaRulers === 'function')
+                const pRulers = (mandalaAnimState.rulers ? mandalaAnimState.rulers.progress : 1);
+                const rulers = (typeof getNidanaRulers === 'function' && pRulers > 0.01)
                     ? getNidanaRulers(gate, line) : null;
 
                 if (rulers) {
@@ -4334,8 +4368,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const xRP = cx + rMid * Math.cos(angleRulerPos);
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
 
-                    const upColor   = hexToRgba('#2E2A20', textAlpha);
-                    const downColor = hexToRgba('#2E2A20', textAlpha);
+                    const upColor   = hexToRgba('#2E2A20', textAlpha * pRulers);
+                    const downColor = hexToRgba('#2E2A20', textAlpha * pRulers);
 
                     const tx = xRP - 8.0; // Column for triangles (strictly aligned vertically)
                     const px = xRP + 5.0; // Column for planet symbols
@@ -4353,24 +4387,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.fillStyle = upColor;
                     ctx.fill();
 
-                    // ▲ Exaltation planet symbol
-                    const upSym = rulers.up === '⊕' ? '⊕' : rulers.up;
-                    if (upSym === '⊕') {
-                        ctx.strokeStyle = upColor;
-                        ctx.lineWidth = 1.2;
-                        ctx.beginPath();
-                        ctx.arc(px, yUp, 4.2, 0, Math.PI * 2);
-                        ctx.stroke();
-                        ctx.beginPath();
-                        ctx.moveTo(px - 4.2, yUp); ctx.lineTo(px + 4.2, yUp);
-                        ctx.moveTo(px, yUp - 4.2); ctx.lineTo(px, yUp + 4.2);
-                        ctx.stroke();
-                    } else {
-                        ctx.font = 'bold 13px "DM Sans", sans-serif';
-                        ctx.fillStyle = upColor;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(upSym, px, yUp);
+                    // ▲ Exaltation planet symbol(s)
+                    const upPlanets = rulers.upPlanets && rulers.upPlanets.length > 0
+                        ? rulers.upPlanets
+                        : (rulers.up ? [rulers.up] : []);
+                    const rulerIconSize = 10.0; // 20% smaller (10.0px)
+                    if (upPlanets.length === 1) {
+                        drawPlanetOnCanvas(ctx, upPlanets[0], rulers.up, px, yUp, rulerIconSize, upColor);
+                    } else if (upPlanets.length > 1) {
+                        const step = rulerIconSize * 0.95;
+                        const startOffset = -((upPlanets.length - 1) * step) / 2;
+                        upPlanets.forEach((p, idx) => {
+                            drawPlanetOnCanvas(ctx, p, p, px + startOffset + idx * step, yUp, rulerIconSize, upColor);
+                        });
                     }
 
                     // ▽ Detriment triangle (stroke, pointing DOWN - strictly under Exaltation triangle)
@@ -4384,24 +4413,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.lineWidth = 1.2;
                     ctx.stroke();
 
-                    // ▽ Detriment planet symbol
-                    const downSym = rulers.down === '⊕' ? '⊕' : rulers.down;
-                    if (downSym === '⊕') {
-                        ctx.strokeStyle = downColor;
-                        ctx.lineWidth = 1.2;
-                        ctx.beginPath();
-                        ctx.arc(px, yDown, 4.2, 0, Math.PI * 2);
-                        ctx.stroke();
-                        ctx.beginPath();
-                        ctx.moveTo(px - 4.2, yDown); ctx.lineTo(px + 4.2, yDown);
-                        ctx.moveTo(px, yDown - 4.2); ctx.lineTo(px, yDown + 4.2);
-                        ctx.stroke();
-                    } else {
-                        ctx.font = 'bold 13px "DM Sans", sans-serif';
-                        ctx.fillStyle = downColor;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(downSym, px, yDown);
+                    // ▽ Detriment planet symbol(s)
+                    const downPlanets = rulers.downPlanets && rulers.downPlanets.length > 0
+                        ? rulers.downPlanets
+                        : (rulers.down ? [rulers.down] : []);
+                    if (downPlanets.length === 1) {
+                        drawPlanetOnCanvas(ctx, downPlanets[0], rulers.down, px, yDown, rulerIconSize, downColor);
+                    } else if (downPlanets.length > 1) {
+                        const step = rulerIconSize * 0.95;
+                        const startOffset = -((downPlanets.length - 1) * step) / 2;
+                        downPlanets.forEach((p, idx) => {
+                            drawPlanetOnCanvas(ctx, p, p, px + startOffset + idx * step, yDown, rulerIconSize, downColor);
+                        });
                     }
                 }
             }
@@ -4434,111 +4457,44 @@ document.addEventListener('DOMContentLoaded', () => {
         // 6. Quarters dividing rods removed as requested
 
         // 7. Planet activation lines and symbols inside the wheel
-        for (let i = 0; i < 64; i++) {
-            const gateNum = GATE_ORDER[i];
-            const activations = activationsByGate[gateNum];
-            if (!activations || activations.length === 0) continue;
+        const pRaysPlanets = (mandalaAnimState.raysPlanets ? mandalaAnimState.raysPlanets.progress : 1);
 
-            const isHighlighted = isGateHighlighted(gateNum, i);
-            const isAnyHovered = (hoverType !== null);
+        if (pRaysPlanets > 0.005) {
+            for (let i = 0; i < 64; i++) {
+                const gateNum = GATE_ORDER[i];
+                const activations = activationsByGate[gateNum];
+                if (!activations || activations.length === 0) continue;
 
-            const midAngle = degToRad(180 - ((WHEEL_START - i * GATE_INTERVAL + 360 + GATE_INTERVAL / 2)) % 360);
-            const cos = Math.cos(midAngle);
-            const sin = Math.sin(midAngle);
+                const isHighlighted = isGateHighlighted(gateNum, i);
+                const isAnyHovered = (hoverType !== null);
 
-        function drawPlutoCanvas(ctx, ax, ay, size, color) {
-            ctx.save();
-            ctx.strokeStyle = color;
-            ctx.fillStyle = color;
-            ctx.lineWidth = 1.35;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+                const midAngle = degToRad(180 - ((WHEEL_START - i * GATE_INTERVAL + 360 + GATE_INTERVAL / 2)) % 360);
+                const cos = Math.cos(midAngle);
+                const sin = Math.sin(midAngle);
 
-            const s = size / 16;
-            // 1. Top circle
-            ctx.beginPath();
-            ctx.arc(ax, ay - 4.2 * s, 2.5 * s, 0, Math.PI * 2);
-            ctx.stroke();
+                // Draw stacked planet symbols inside the inner circle
+                activations.forEach((act, aIdx) => {
+                    const rAct = rInnerBorder - 14 - aIdx * 20;
+                    const ax = cx + rAct * cos;
+                    const ay = cy + rAct * sin;
 
-            // 2. Crescent cup holding the circle
-            ctx.beginPath();
-            ctx.arc(ax, ay - 1.8 * s, 5.6 * s, 0.15 * Math.PI, 0.85 * Math.PI, false);
-            ctx.stroke();
+                    let baseHex = act.type === 'design' ? '#DC3C3C' : '#2E2A20';
+                    let planetAlpha = (isAnyHovered && !isHighlighted ? 0.1 : 1.0) * pRaysPlanets;
+                    let planetColor = hexToRgba(baseHex, planetAlpha);
 
-            // 3. Vertical stem & horizontal cross bar
-            const botY = ay + 3.8 * s;
-            const endY = ay + 8.2 * s;
-            const barY = ay + 6.0 * s;
-            const barW = 3.2 * s;
+                    drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
 
-            ctx.beginPath();
-            ctx.moveTo(ax, botY);
-            ctx.lineTo(ax, endY);
-            ctx.moveTo(ax - barW, barY);
-            ctx.lineTo(ax + barW, barY);
-            ctx.stroke();
-
-            ctx.restore();
-        }
-
-        function drawJupiterCanvas(ctx, ax, ay, size, color) {
-            ctx.save();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 1.35;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-
-            const s = size / 16;
-            const hY = ay + 1.8 * s; // Horizontal bar height
-
-            // 1. Left 2-shaped curve into horizontal bar
-            ctx.beginPath();
-            ctx.moveTo(ax - 6.0 * s, ay - 1.2 * s);
-            ctx.bezierCurveTo(ax - 6.0 * s, ay - 6.5 * s, ax - 1.5 * s, ay - 7.2 * s, ax - 1.5 * s, ay - 3.2 * s);
-            ctx.bezierCurveTo(ax - 1.5 * s, ay - 1.0 * s, ax - 5.5 * s, ay + 0.2 * s, ax - 5.5 * s, hY);
-            ctx.lineTo(ax + 5.5 * s, hY);
-            ctx.stroke();
-
-            // 2. Vertical cross stroke
-            const vX = ax + 1.8 * s;
-            ctx.beginPath();
-            ctx.moveTo(vX, ay - 6.2 * s);
-            ctx.lineTo(vX, ay + 7.5 * s);
-            ctx.stroke();
-
-            ctx.restore();
-        }
-
-        // Draw stacked planet symbols inside the inner circle
-            activations.forEach((act, aIdx) => {
-                const rAct = rInnerBorder - 14 - aIdx * 20;
-                const ax = cx + rAct * cos;
-                const ay = cy + rAct * sin;
-
-                let planetColor = act.color;
-                if (isAnyHovered) {
-                    if (isHighlighted) {
-                        planetColor = act.color;
-                    } else {
-                        planetColor = 'rgba(150, 150, 150, 0.1)';
-                    }
-                }
-
-                drawPlanetOnCanvas(ctx, act.name, act.symbol, ax, ay, isAnyHovered && isHighlighted ? 18 : 15, planetColor);
-
-                // Draw line number subscript next to planet symbol
-                const subAngle = midAngle + 0.032;
-                const sx = cx + (rAct + 1) * Math.cos(subAngle);
-                const sy = cy + (rAct + 1) * Math.sin(subAngle);
-                ctx.font = 'bold 9px DM Sans, sans-serif';
-                
-                let lineCol = act.type === 'design' ? 'rgba(220,60,60,1.0)' : 'rgba(46,42,32,0.95)';
-                if (isAnyHovered && !isHighlighted) {
-                    lineCol = 'rgba(150, 150, 150, 0.1)';
-                }
-                ctx.fillStyle = lineCol;
-                ctx.fillText(act.line.toString(), sx, sy);
-            });
+                    // Draw line number subscript next to planet symbol
+                    const subAngle = midAngle + 0.032;
+                    const sx = cx + (rAct + 1) * Math.cos(subAngle);
+                    const sy = cy + (rAct + 1) * Math.sin(subAngle);
+                    ctx.font = 'bold 9px DM Sans, sans-serif';
+                    
+                    let lineAlpha = (isAnyHovered && !isHighlighted ? 0.1 : 0.95) * pRaysPlanets;
+                    ctx.fillStyle = hexToRgba(baseHex, lineAlpha);
+                    ctx.fillText(act.line.toString(), sx, sy);
+                });
+            }
         }
 
         // 7.5 Draw radial activation wedges (rays) from the center to the gates
@@ -5305,11 +5261,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Planet symbols map ─────────────────────────────────────────
         function getPlanetSym(name) {
+            if (!name) return '';
+            const nameLower = name.toLowerCase().trim();
+            if (nameLower.includes('солнце')) return typeof SVG_SUN !== 'undefined' ? SVG_SUN : '☉';
+            if (nameLower.includes('земля')) return typeof SVG_EARTH !== 'undefined' ? SVG_EARTH : '⊕';
+            if (nameLower.includes('луна')) return typeof SVG_MOON !== 'undefined' ? SVG_MOON : '☽';
+            if (nameLower.includes('северный узел')) return typeof SVG_NODE_NORTH !== 'undefined' ? SVG_NODE_NORTH : '☊';
+            if (nameLower.includes('южный узел')) return typeof SVG_NODE_SOUTH !== 'undefined' ? SVG_NODE_SOUTH : '☋';
+            if (nameLower.includes('меркурий')) return typeof SVG_MERCURY !== 'undefined' ? SVG_MERCURY : '☿';
+            if (nameLower.includes('венера')) return typeof SVG_VENUS !== 'undefined' ? SVG_VENUS : '♀';
+            if (nameLower.includes('марс')) return typeof SVG_MARS !== 'undefined' ? SVG_MARS : '♂';
+            if (nameLower.includes('юпитер')) return typeof SVG_JUPITER !== 'undefined' ? SVG_JUPITER : '♃';
+            if (nameLower.includes('сатурн')) return typeof SVG_SATURN !== 'undefined' ? SVG_SATURN : '♄';
+            if (nameLower.includes('уран')) return typeof SVG_URANUS !== 'undefined' ? SVG_URANUS : '♅';
+            if (nameLower.includes('нептун')) return typeof SVG_NEPTUNE !== 'undefined' ? SVG_NEPTUNE : '♆';
+            if (nameLower.includes('плутон')) return typeof SVG_PLUTO !== 'undefined' ? SVG_PLUTO : '♇';
+
             const key = name === 'Северный Узел' ? 'Истинный Северный Узел' : (name === 'Южный Узел' ? 'Истинный Южный Узел' : name);
-            if (key === 'Юпитер' || name === 'Юпитер') return SVG_JUPITER;
-            if (key === 'Плутон' || name === 'Плутон') return SVG_PLUTO;
             const meta = PLANET_META[key] || PLANET_META[name];
-            return meta ? meta.sym : name.substring(0,2);
+            return meta ? meta.sym : name.substring(0, 2);
         }
 
         // ── Build hexagram bars SVG icon ───────────────────────────────
@@ -5764,6 +5734,43 @@ document.addEventListener('DOMContentLoaded', () => {
         function initMandalaInteractivity() {
             const canvasEl = document.getElementById('mandala-canvas');
             if (!canvasEl) return;
+
+            // Ensure 'rulers' chip is present in DOM even if cached template was served
+            const chipsContainer = document.querySelector('.mandala-toggle-chips');
+            if (chipsContainer) {
+                if (!document.querySelector('.mandala-chip[data-ring="rulers"]')) {
+                    const rulersBtn = document.createElement('button');
+                    rulersBtn.className = 'mandala-chip' + (mandalaSettings.rulers ? ' active' : '');
+                    rulersBtn.setAttribute('data-ring', 'rulers');
+                    rulersBtn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">Управители</span>';
+                    
+                    const crossBtn = document.querySelector('.mandala-chip[data-ring="cross"]');
+                    if (crossBtn) {
+                        chipsContainer.insertBefore(rulersBtn, crossBtn);
+                    } else {
+                        chipsContainer.appendChild(rulersBtn);
+                    }
+                }
+
+                if (!document.querySelector('.mandala-chip[data-ring="raysPlanets"]')) {
+                    const raysBtn = document.createElement('button');
+                    raysBtn.className = 'mandala-chip' + (mandalaSettings.raysPlanets ? ' active' : '');
+                    raysBtn.setAttribute('data-ring', 'raysPlanets');
+                    raysBtn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">Планеты программ</span>';
+                    
+                    const crossBtn = document.querySelector('.mandala-chip[data-ring="cross"]');
+                    if (crossBtn) {
+                        chipsContainer.insertBefore(raysBtn, crossBtn);
+                    } else {
+                        const resetBtn = document.getElementById('mandala-toggle-all');
+                        if (resetBtn) {
+                            chipsContainer.insertBefore(raysBtn, resetBtn);
+                        } else {
+                            chipsContainer.appendChild(raysBtn);
+                        }
+                    }
+                }
+            }
 
             const btnToggleAll = document.getElementById('mandala-toggle-all');
 

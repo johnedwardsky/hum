@@ -2864,15 +2864,15 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .cls-6,
 .bg-svg-wrap .cls-7,
 .bg-svg-wrap .cls-8  { fill-rule: evenodd; }
-.bg-svg-wrap .block__1 { fill: rgba(255,255,255,0.08); }
-.bg-svg-wrap .block__2 { fill: rgba(255,255,255,0.08); }
-.bg-svg-wrap .block__3 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
-.bg-svg-wrap .block__4 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
-.bg-svg-wrap .block__5 { fill: rgba(255,255,255,0.08); }
-.bg-svg-wrap .block__6 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.2); stroke-width: 1.3px; }
-.bg-svg-wrap .block__7 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
-.bg-svg-wrap .block__8 { fill: rgba(255,255,255,0.08); }
-.bg-svg-wrap .block__9 { fill: rgba(255,255,255,0.08); stroke: rgba(197,158,63,0.25); stroke-width: 1.7px; }
+.bg-svg-wrap .block__1 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__2 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__3 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__4 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__5 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__6 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__7 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__8 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
+.bg-svg-wrap .block__9 { fill: #ffffff; stroke: #8E887E; stroke-width: 1.7px; }
 .bg-svg-wrap .cls-4  { stroke: rgba(197,158,63,0.3); stroke-width: 3.97px; }
 .bg-svg-wrap .cls-5  { fill: rgba(197,158,63,0.04); }
 .bg-svg-wrap .cls-6  { stroke: rgba(255,255,255,0.05); }
@@ -3113,13 +3113,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .planet-svg-icon {
     display: inline-block;
     vertical-align: -0.15em;
-    width: 1.1em;
-    height: 1.1em;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.35;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    width: 1.15em;
+    height: 1.15em;
     overflow: visible;
 }
 
@@ -3165,8 +3160,8 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: rgba(245, 243, 238, 0.45);
     border: 1px solid rgba(220, 215, 205, 0.35);
@@ -3175,12 +3170,21 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 .bg-planet-wrap .bg-planet-sym {
-    font-size: 14px;
+    font-size: 24px;
     text-align: center;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.bg-planet-wrap .planet-svg-icon {
+    width: 30px;
+    height: 30px;
+    display: block;
+    flex-shrink: 0;
 }
 
 .bg-col-design .bg-planet-sym     { color: #fe0000; }
@@ -3190,10 +3194,10 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     position: absolute;
     bottom: -2px;
     right: -2px;
-    font-size: 7px;
+    font-size: 7.5px;
     line-height: 1;
     font-weight: 700;
-    padding: 1px 2.5px;
+    padding: 1px 3px;
     border-radius: 3px;
     background: rgba(197,158,63,0.92);
     color: #fff;
@@ -3519,35 +3523,35 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-svg-wrap .cls-1,.bg-svg-wrap .cls-2{clip-rule:evenodd}
 .bg-svg-wrap .cls-2,.bg-svg-wrap .cls-25,.bg-svg-wrap .cls-36{fill:#fe0000}
 .bg-svg-wrap .cls-10,.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-15,.bg-svg-wrap .cls-21,.bg-svg-wrap .cls-3,.bg-svg-wrap .cls-30,.bg-svg-wrap .cls-31,.bg-svg-wrap .cls-32,.bg-svg-wrap .cls-35,.bg-svg-wrap .cls-4,.bg-svg-wrap .cls-6{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.bg-svg-wrap .cls-3{stroke:#ededed;stroke-width:1.42px}
+.bg-svg-wrap .cls-3{stroke:#BEB8AC;stroke-width:1.5px}
 .bg-svg-wrap .cls-10,.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-13,.bg-svg-wrap .cls-14,.bg-svg-wrap .cls-17,.bg-svg-wrap .cls-19,.bg-svg-wrap .cls-21,.bg-svg-wrap .cls-23,.bg-svg-wrap .cls-24,.bg-svg-wrap .cls-25,.bg-svg-wrap .cls-29,.bg-svg-wrap .cls-3,.bg-svg-wrap .cls-34,.bg-svg-wrap .cls-35,.bg-svg-wrap .cls-37,.bg-svg-wrap .cls-4,.bg-svg-wrap .cls-5,.bg-svg-wrap .cls-6,.bg-svg-wrap .cls-7,.bg-svg-wrap .cls-8{fill-rule:evenodd}
-.bg-svg-wrap .block__1{fill:#fff}
+.bg-svg-wrap .block__1{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
 .bg-svg-wrap .block__1_active{fill:#ffe500!important}
-.bg-svg-wrap .block__2{fill:#fff}
+.bg-svg-wrap .block__2{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
 .bg-svg-wrap .block__2_active{fill:#76ce00!important}
-.bg-svg-wrap .block__3{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-.bg-svg-wrap .block__3_active{fill:#00a8dc}
-.bg-svg-wrap .block__4{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-.bg-svg-wrap .block__4_active{fill:#ffe500}
-.bg-svg-wrap .block__5{fill:#fff}
+.bg-svg-wrap .block__3{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
+.bg-svg-wrap .block__3_active{fill:#00a8dc!important}
+.bg-svg-wrap .block__4{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
+.bg-svg-wrap .block__4_active{fill:#ffe500!important}
+.bg-svg-wrap .block__5{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
 .bg-svg-wrap .block__5_active{fill:#e02300!important}
-.bg-svg-wrap .block__6{fill:#fff;stroke:#706f6f;stroke-width:1.3px}
-.bg-svg-wrap .block__6_active{fill:#e67900}
-.bg-svg-wrap .block__7{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
-.bg-svg-wrap .block__7_active{fill:#e02300}
-.bg-svg-wrap .block__8{fill:#fff}
-.bg-svg-wrap .block__8_active{fill:#e67900}
-.bg-svg-wrap .block__9{fill:#fff;stroke:#9d9d9c;stroke-width:1.7px}
+.bg-svg-wrap .block__6{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
+.bg-svg-wrap .block__6_active{fill:#e67900!important}
+.bg-svg-wrap .block__7{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
+.bg-svg-wrap .block__7_active{fill:#e02300!important}
+.bg-svg-wrap .block__8{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
+.bg-svg-wrap .block__8_active{fill:#e67900!important}
+.bg-svg-wrap .block__9{fill:#fff;stroke:#8E887E;stroke-width:1.7px}
 .bg-svg-wrap .block__9_active{fill:#ff8900!important}
-.bg-svg-wrap .cls-4{stroke:#878787;stroke-width:3.97px}
+.bg-svg-wrap .cls-4{stroke:#A69F92;stroke-width:2.2px}
 .bg-svg-wrap .cls-5{fill:url(#GradientFill_1)}
 .bg-svg-wrap .cls-6{stroke:#fff}
 .bg-svg-wrap .cls-10,.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-15,.bg-svg-wrap .cls-21,.bg-svg-wrap .cls-30,.bg-svg-wrap .cls-31,.bg-svg-wrap .cls-32,.bg-svg-wrap .cls-35,.bg-svg-wrap .cls-6{stroke-width:2.83px}
 .bg-svg-wrap .cls-7{fill:#dadada}
 .bg-svg-wrap .cls-8,.bg-svg-wrap .cls-9{fill:#fff}
-.bg-svg-wrap .cls-10{stroke:#9d9d9c}
+.bg-svg-wrap .cls-10{stroke:#8E887E;stroke-width:1.7px}
 .bg-svg-wrap .cls-11,.bg-svg-wrap .cls-37{fill:#1d1d1b}
-.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-32{stroke:#706f6f}
+.bg-svg-wrap .cls-12,.bg-svg-wrap .cls-32{stroke:#8E887E;stroke-width:1.7px}
 .bg-svg-wrap .cls-13{fill:url(#GradientFill_2)}
 .bg-svg-wrap .cls-14{fill:#64350d}
 .bg-svg-wrap .cls-15,.bg-svg-wrap .cls-21{stroke:#fe0000}
@@ -3584,77 +3588,14 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     color: #3040B8;
 }
 
-/* Custom Earth Glyph to avoid font rendering issues */
-.planet-glyph.glyph-earth,
-.bg-planet-sym.glyph-earth {
-    position: relative !important;
-    font-size: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* Earth symbol dimensions inside bodygraph lists */
-.bg-planet-sym.glyph-earth::before {
-    content: '' !important;
-    position: absolute !important;
-    width: 15px !important;
-    height: 15px !important;
-    border: 1.5px solid currentColor !important;
-    border-radius: 50% !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    box-sizing: border-box !important;
-}
-.bg-planet-sym.glyph-earth::after {
-    content: '' !important;
-    position: absolute !important;
-    width: 15px !important;
-    height: 15px !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    background: 
-        linear-gradient(to right, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important,
-        linear-gradient(to bottom, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important;
-    box-sizing: border-box !important;
-}
-
-/* Earth symbol dimensions inside general tables */
-.planet-glyph.glyph-earth::before {
-    content: '' !important;
-    position: absolute !important;
-    width: 14px !important;
-    height: 14px !important;
-    border: 1.5px solid currentColor !important;
-    border-radius: 50% !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    box-sizing: border-box !important;
-}
-.planet-glyph.glyph-earth::after {
-    content: '' !important;
-    position: absolute !important;
-    width: 14px !important;
-    height: 14px !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    background: 
-        linear-gradient(to right, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important,
-        linear-gradient(to bottom, transparent 44%, currentColor 44%, currentColor 56%, transparent 56%) !important;
-    box-sizing: border-box !important;
-}
-
-/* Custom size increases to match Earth glyph size */
-/* Custom size increases to match Earth glyph size */
+/* Custom size defaults */
 .bg-planet-sym {
-    font-size: 21px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .planet-glyph {
-    font-size: 19px !important;
+    font-size: 16px;
 }
 
 /* ============================================================

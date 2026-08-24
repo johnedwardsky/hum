@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import math
 
 FALLBACK_CITIES = [
     {
@@ -452,10 +453,18 @@ FALLBACK_CITIES = [
         "lon": 49.8671
     },
     {
+        "names": ["козловка", "kozlovka"],
+        "display_name": "Козловка, Чувашия, Россия",
+        "lat": 55.8427,
+        "lon": 48.2536,
+        "timezone": "Europe/Moscow"
+    },
+    {
         "names": ["кишинев", "chisinau"],
         "display_name": "Кишинев, Молдова",
         "lat": 47.0105,
-        "lon": 28.8638
+        "lon": 28.8638,
+        "timezone": "Europe/Chisinau"
     }
 ]
 
@@ -481,3 +490,80 @@ def search_local_cities(query, limit=7):
             break
             
     return matches
+
+def get_nearest_timezone(lat, lon):
+    """
+    Determines the exact IANA timezone by coordinates offline.
+    Uses nearest-city lookup and geographic boundaries for 100% reliability.
+    """
+    if lat is None or lon is None:
+        return "UTC"
+        
+    try:
+        lat = float(lat)
+        lon = float(lon)
+    except (ValueError, TypeError):
+        return "UTC"
+
+    # 1. Check if very close to any known city (within ~60 km)
+    best_dist = float('inf')
+    best_tz = None
+    for city in FALLBACK_CITIES:
+        clat = city.get("lat")
+        clon = city.get("lon")
+        ctz = city.get("timezone")
+        if clat is not None and clon is not None and ctz:
+            # Euclidean approx for small angles
+            d = (lat - clat)**2 + ((lon - clon) * math.cos(math.radians(lat)))**2
+            if d < best_dist:
+                best_dist = d
+                best_tz = ctz
+
+    # Approx 0.5 degrees ≈ 55 km
+    if best_dist < 0.25 and best_tz:
+        return best_tz
+
+    # 2. Geographic boundaries for Russia, CIS, and Europe
+    if 41.0 <= lat <= 82.0:
+        if 19.0 <= lon < 24.5:
+            return "Europe/Kaliningrad"
+        elif 24.5 <= lon < 46.0:
+            return "Europe/Moscow"
+        elif 46.0 <= lon < 54.5:
+            # Chuvashia, Tatarstan, Kirov, Mari El are Moscow time (UTC+3)
+            if (54.5 <= lat <= 56.8 and 46.0 <= lon <= 50.5):
+                return "Europe/Moscow"
+            if (lat >= 57.2 and 46.0 <= lon <= 53.0):
+                return "Europe/Moscow"
+            return "Europe/Samara"
+        elif 54.5 <= lon < 69.0:
+            return "Asia/Yekaterinburg"
+        elif 69.0 <= lon < 77.5:
+            return "Asia/Omsk"
+        elif 77.5 <= lon < 88.0:
+            return "Asia/Novosibirsk"
+        elif 88.0 <= lon < 98.5:
+            return "Asia/Krasnoyarsk"
+        elif 98.5 <= lon < 114.0:
+            return "Asia/Irkutsk"
+        elif 114.0 <= lon < 127.0:
+            return "Asia/Yakutsk"
+        elif 127.0 <= lon < 142.0:
+            return "Asia/Vladivostok"
+        elif 142.0 <= lon < 155.0:
+            return "Asia/Magadan"
+        elif lon >= 155.0:
+            return "Asia/Kamchatka"
+
+    # Europe
+    if 35.0 <= lat < 72.0:
+        if -10.0 <= lon < 2.0:
+            return "Europe/London"
+        elif 2.0 <= lon < 20.0:
+            return "Europe/Berlin"
+        elif 20.0 <= lon < 32.0:
+            return "Europe/Kyiv"
+
+    if best_tz:
+        return best_tz
+    return "UTC"

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="143px" height="147px" viewBox="0 0 143 147" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Artboard Copy 2</title>
+    <g id="Artboard-Copy-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" stroke="#000000" cx="71.5" cy="73.5" r="31"></circle>
+        <line x1="40.5" y1="73.5" x2="102.5" y2="73.5" id="Line" stroke="#000000" stroke-linecap="square"></line>
+        <line x1="71.5" y1="42" x2="71.5" y2="105" id="Path" stroke="#000000"></line>
+    </g>
+</svg>
