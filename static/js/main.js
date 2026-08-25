@@ -5564,8 +5564,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else if (isDes) {
                                 // Design only
                                 if (isCenterDefined) {
-                                    // Defined center: dark golden circle under number
-                                    bgEl.style.setProperty('fill', '#8A6D15', 'important');
+                                    // Defined center: dark bronze/golden circle under number
+                                    bgEl.style.setProperty('fill', '#3D2D06', 'important');
                                     bgEl.style.removeProperty('stroke');
                                     bgEl.style.removeProperty('stroke-width');
                                 } else {
@@ -5584,18 +5584,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    // 2. Gate numbers
+                    // 2. Numbers inside the gate (White on dark/blue circle backgrounds)
                     svg.querySelectorAll('.a' + gNum).forEach(el => {
-                        if (isPers || isBoth) {
-                            // White number on blue circle
+                        if (isGateDef) {
+                            // Active gates with dark/blue circle backgrounds have white numbers
                             el.style.setProperty('fill', '#FFFFFF', 'important');
-                        } else if (isDes) {
-                            // Design: dark number in defined center, light gold in undefined center
-                            if (isCenterDefined) {
-                                el.style.setProperty('fill', '#0A0E17', 'important');
-                            } else {
-                                el.style.setProperty('fill', '#FFEFA6', 'important');
-                            }
                         } else {
                             // Inactive gate: dark in defined gold center, gold in undefined dark center
                             if (isCenterDefined) {
@@ -6290,8 +6283,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 } else if (isDes) {
                                     // Design only
                                     if (isCenterDef) {
-                                        // Defined center: dark golden circle under number (a couple of tones darker than gold center)
-                                        bgEl.style.setProperty('fill', '#8A6D15', 'important');
+                                        // Defined center: dark bronze/golden circle under number
+                                        bgEl.style.setProperty('fill', '#3D2D06', 'important');
                                         bgEl.style.removeProperty('stroke');
                                         bgEl.style.removeProperty('stroke-width');
                                     } else {
@@ -6310,18 +6303,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         });
 
-                        // 2. Numbers inside the gate
+                        // 2. Numbers inside the gate (White on dark/blue circle backgrounds)
                         svgWrap.querySelectorAll('.a' + gNum).forEach(el => {
-                            if (isPers || isBoth) {
-                                // White number on blue circle
+                            if (isGateDef) {
+                                // Active gates with dark/blue circle backgrounds have white numbers
                                 el.style.setProperty('fill', '#FFFFFF', 'important');
-                            } else if (isDes) {
-                                // Design: dark number in defined center, light gold in undefined center
-                                if (isCenterDef) {
-                                    el.style.setProperty('fill', '#0A0E17', 'important');
-                                } else {
-                                    el.style.setProperty('fill', '#FFEFA6', 'important');
-                                }
                             } else {
                                 // Inactive gate: dark in defined gold center, gold in undefined dark center
                                 if (isCenterDef) {
