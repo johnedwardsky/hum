@@ -1,4 +1,5 @@
 import os
+import math
 import ssl
 import urllib.request
 import urllib.parse
@@ -26,9 +27,19 @@ def get_timezone_by_coords(lat, lon):
     """
     Looks up exact IANA timezone name from coordinates.
     Uses cities_data offline mapping first for 100% speed and precision,
-    with online fallback to timeapi.io.
+    with online fallback to timeapi.io and longitude-based meridian fallback.
     """
-    if lat is None or lon is None:
+    if lat is None or lon is None or isinstance(lat, bool) or isinstance(lon, bool):
+        return "UTC"
+
+    try:
+        lat = float(lat)
+        lon = float(lon)
+        if math.isnan(lat) or math.isnan(lon) or math.isinf(lat) or math.isinf(lon):
+            return "UTC"
+        # Normalize lon to [-180, 180]
+        lon = (lon + 180.0) % 360.0 - 180.0
+    except (ValueError, TypeError):
         return "UTC"
 
     # 1. Offline high-precision lookup by nearest city & geographic polygons
@@ -53,7 +64,10 @@ def get_timezone_by_coords(lat, lon):
         pass
     
     # 3. Fallback: estimate timezone from longitude
-    offset = round(float(lon) / 15.0)
+    offset = int(round(lon / 15.0))
+    if offset == 0:
+        return "UTC"
+    offset = max(-12, min(12, offset))
     sign = '-' if offset >= 0 else '+'
     offset_abs = abs(offset)
     
@@ -128,38 +142,63 @@ def calculate_person_chart(data):
     time_obj = None
     for fmt in ("%H:%M:%S", "%H:%M"):
         try:
-            time_obj = datetime.strptime(birth_time, fmt).time()
+            time_obj = datetime.strptime(birth_time.strip(), fmt).time()
             break
         except ValueError:
             continue
     if not time_obj:
         raise ValueError("Неверный формат времени. Используйте ЧЧ:ММ или ЧЧ:ММ:СС")
         
-    date_obj = datetime.strptime(birth_date, "%Y-%m-%d").date()
+    date_obj = None
+    for fmt in ("%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%Y.%m.%d", "%d-%m-%Y"):
+        try:
+            date_obj = datetime.strptime(str(birth_date).strip(), fmt).date()
+            break
+        except ValueError:
+            continue
+    if not date_obj:
+        raise ValueError("Неверный формат даты. Используйте ГГГГ-ММ-ДД или ДД.ММ.ГГГГ")
+        
     dt_local = datetime.combine(date_obj, time_obj)
     
-    if not is_gmt:
-        if lat is None or lon is None:
-            raise ValueError("Координаты обязательны для расчета местного времени")
-        try:
-            lat = float(lat)
-            lon = float(lon)
-        except ValueError:
+    # Coordinate validation and parsing
+    calc_lat = 0.0
+    calc_lon = 0.0
+    if lat is not None and lon is not None:
+        if isinstance(lat, bool) or isinstance(lon, bool):
             raise ValueError("Неверный формат координат")
+        try:
+            calc_lat = float(lat)
+            calc_lon = float(lon)
+            if math.isnan(calc_lat) or math.isnan(calc_lon) or math.isinf(calc_lat) or math.isinf(calc_lon):
+                raise ValueError("Неверный формат координат")
+        except (ValueError, TypeError):
+            raise ValueError("Неверный формат координат")
+        if calc_lat < -90.0 or calc_lat > 90.0:
+            raise ValueError("Широта должна быть в диапазоне от -90 до 90 градусов")
+        if calc_lon < -180.0 or calc_lon > 360.0:
+            raise ValueError("Долгота должна быть в диапазоне от -180 до 360 градусов")
+    elif not is_gmt:
+        raise ValueError("Координаты обязательны для расчета местного времени")
         
     timezone_name = "UTC"
     if is_gmt:
         dt_gmt = dt_local.replace(tzinfo=pytz.UTC)
-        dt_localized = dt_local.replace(tzinfo=pytz.UTC)
-    else:
-        timezone_name = get_timezone_by_coords(lat, lon)
-        local_tz = pytz.timezone(timezone_name)
-        dt_localized = local_tz.localize(dt_local, is_dst=None)
-        dt_gmt = dt_localized.astimezone(pytz.UTC)
-        
-    if is_gmt:
+        dt_localized = dt_gmt
         utc_offset_str = "UTC+0"
     else:
+        timezone_name = get_timezone_by_coords(calc_lat, calc_lon)
+        local_tz = pytz.timezone(timezone_name)
+        try:
+            dt_localized = local_tz.localize(dt_local, is_dst=None)
+        except pytz.AmbiguousTimeError:
+            # During DST fall-back (clock fold), default to standard time
+            dt_localized = local_tz.localize(dt_local, is_dst=False)
+        except pytz.NonExistentTimeError:
+            # During DST spring-forward (clock gap), default to daylight time
+            dt_localized = local_tz.localize(dt_local, is_dst=True)
+            
+        dt_gmt = dt_localized.astimezone(pytz.UTC)
         offset_seconds = dt_localized.utcoffset().total_seconds()
         offset_hours = offset_seconds / 3600.0
         utc_offset_str = f"UTC{'+' if offset_hours >= 0 else ''}{offset_hours:g}"
@@ -168,9 +207,6 @@ def calculate_person_chart(data):
     gmt_month = dt_gmt.month
     gmt_day = dt_gmt.day
     gmt_hour_dec = dt_gmt.hour + dt_gmt.minute / 60.0 + dt_gmt.second / 3600.0
-    
-    calc_lat = lat if lat is not None else 0.0
-    calc_lon = lon if lon is not None else 0.0
     
     house_system = data.get('house_system', 'E')
     try:
@@ -221,8 +257,8 @@ def calculate_person_chart(data):
         "timezone": timezone_name,
         "utc_offset": utc_offset_str,
         "datetime_gmt": dt_gmt.strftime("%Y-%m-%d %H:%M:%S"),
-        "latitude": lat,
-        "longitude": lon,
+        "latitude": calc_lat,
+        "longitude": calc_lon,
         "is_gmt": is_gmt,
         "house_system": house_system,
         "cusp_offset": cusp_offset,

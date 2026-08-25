@@ -67,6 +67,7 @@ PLANETS_MAP = {
 
 def format_longitude(lon):
     """Converts a longitude (0-360) into zodiac sign, degrees, minutes, seconds."""
+    lon = lon % 360.0
     sign_index = int(lon // 30) % 12
     sign_info = ZODIAC_SIGNS[sign_index]
     
@@ -106,7 +107,7 @@ def calculate_design_jd(jd_birth, sun_lon):
     jd = jd_birth - 89.28
     
     for _ in range(15):
-        res, flags = swe.calc_ut(jd, swe.SUN)
+        res, flags = swe.calc_ut(jd, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SPEED)
         lon = res[0]
         speed = res[3]  # speed in degrees per day
         
@@ -114,7 +115,7 @@ def calculate_design_jd(jd_birth, sun_lon):
         # Normalize to [-180, 180]
         diff = (diff + 180) % 360 - 180
         
-        if abs(diff) < 1e-7:
+        if abs(diff) < 1e-9:
             break
             
         jd -= diff / speed
@@ -124,8 +125,8 @@ def _calculate_planets_only(jd_ut):
     planets = []
     # Calculate Planets
     for planet_id, info in PLANETS_MAP.items():
-        res, flags = swe.calc_ut(jd_ut, planet_id)
-        longitude = res[0]
+        res, flags = swe.calc_ut(jd_ut, planet_id, swe.FLG_SWIEPH | swe.FLG_SPEED)
+        longitude = res[0] % 360.0
         speed_lon = res[3]
         is_retrograde = speed_lon < 0
         formatted = format_longitude(longitude)
@@ -170,7 +171,7 @@ def _calculate_planets_only(jd_ut):
     # Earth (opposition of the Sun)
     sun_lon = [p["longitude"] for p in planets if p["id"] == swe.SUN][0]
     sun_speed = [p["speed"] for p in planets if p["id"] == swe.SUN][0]
-    earth_lon = (sun_lon - 180.0) % 360.0
+    earth_lon = (sun_lon + 180.0) % 360.0
     planets.append({
         "id": -3,
         "name": "Земля",
@@ -217,6 +218,19 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='E', cusp
     Calculates planetary positions and house cusps.
     hour_gmt should be a decimal hour in GMT (e.g. 14.5 for 14:30 GMT).
     """
+    year = int(year)
+    month = int(month)
+    day = int(day)
+    hour_gmt = float(hour_gmt)
+    if isinstance(lat, bool) or isinstance(lon, bool):
+        raise ValueError("Invalid coordinates")
+    lat = float(lat)
+    lon = float(lon)
+    if math.isnan(lat) or math.isnan(lon) or math.isinf(lat) or math.isinf(lon):
+        raise ValueError("Invalid coordinates")
+    # Defensively normalize longitude to [-180, 180]
+    lon = (lon + 180.0) % 360.0 - 180.0
+    
     # 1. Calculate Julian Day UT
     jd_ut = swe.julday(year, month, day, hour_gmt)
     
@@ -236,13 +250,10 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='E', cusp
     design_jd = calculate_design_jd(jd_ut, sun_lon)
     results["design_planets"] = _calculate_planets_only(design_jd)
 
-    
     # 4. Calculate Houses (with fallback if the selected system fails)
     effective_house_system = house_system
     if house_system == 'P' and use_polar_equal and abs(lat) > polar_boundary:
         effective_house_system = 'D'
-        
-    results["calculated_house_system"] = effective_house_system
 
     hs_code = effective_house_system.encode('utf-8') if isinstance(effective_house_system, str) else effective_house_system
     try:
@@ -251,9 +262,13 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='E', cusp
         try:
             # Fallback to Porphyry system (quadrant system that doesn't fail at high latitudes)
             cusps, ascmc = swe.houses(jd_ut, lat, lon, b'O')
+            effective_house_system = 'O'
         except Exception:
             # Final fallback to Equal system (from MC)
             cusps, ascmc = swe.houses(jd_ut, lat, lon, b'D')
+            effective_house_system = 'D'
+            
+    results["calculated_house_system"] = effective_house_system
     
     cusps_list = list(cusps)
     if effective_house_system == 'D' and cusp_offset != 0.0:
@@ -263,7 +278,7 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='E', cusp
     house_names = ["I (As)", "II", "III", "IV (Ic)", "V", "VI", "VII (Ds)", "VIII", "IX", "X (Mc)", "XI", "XII"]
     
     for i in range(1, 13):
-        cusp_lon = cusps_list[i-1]
+        cusp_lon = cusps_list[i-1] % 360.0
         formatted = format_longitude(cusp_lon)
         results["houses"].append({
             "number": i,
@@ -275,8 +290,8 @@ def calculate_chart(year, month, day, hour_gmt, lat, lon, house_system='E', cusp
         
     # Store Ascendant and MC explicitly
     results["angles"] = {
-        "ascendant": format_longitude(ascmc[0]),
-        "mc": format_longitude(ascmc[1])
+        "ascendant": format_longitude(ascmc[0] % 360.0),
+        "mc": format_longitude(ascmc[1] % 360.0)
     }
     
     return results

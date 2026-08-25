@@ -933,10 +933,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Info strip
         const cityName = selectedCity ? selectedCity.display : '—';
         icCity.textContent = cityName;
-        if (meta.latitude && meta.longitude) {
-            const lat = truncTo(meta.latitude, 4);
-            const lon = truncTo(meta.longitude, 4);
-            icCoords.textContent = `${lat}° N, ${lon}° E`;
+        if (meta.latitude != null && meta.longitude != null && !meta.is_gmt) {
+            const latVal = Number(meta.latitude);
+            const lonVal = Number(meta.longitude);
+            const latStr = `${Math.abs(latVal).toFixed(4)}° ${latVal >= 0 ? 'N' : 'S'}`;
+            const lonStr = `${Math.abs(lonVal).toFixed(4)}° ${lonVal >= 0 ? 'E' : 'W'}`;
+            icCoords.textContent = `${latStr}, ${lonStr}`;
         } else {
             icCoords.textContent = '—';
         }
@@ -1695,8 +1697,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Часовой пояс',         value: meta.timezone,   sub: meta.utc_offset },
             { label: 'GMT / UTC',            value: meta.datetime_gmt },
             { label: 'Юлианский день (UT)',  value: jd.toFixed(5) },
-            { label: 'Широта',               value: meta.latitude  ? `${truncTo(meta.latitude, 6)}°` : '—' },
-            { label: 'Долгота',              value: meta.longitude ? `${truncTo(meta.longitude, 6)}°` : '—' },
+            { label: 'Широта',               value: (meta.latitude != null && !meta.is_gmt) ? `${Math.abs(Number(meta.latitude)).toFixed(4)}° ${Number(meta.latitude) >= 0 ? 'N' : 'S'}` : '—' },
+            { label: 'Долгота',              value: (meta.longitude != null && !meta.is_gmt) ? `${Math.abs(Number(meta.longitude)).toFixed(4)}° ${Number(meta.longitude) >= 0 ? 'E' : 'W'}` : '—' },
             { 
                 label: 'Система домов',        
                 value: meta.calculated_house_system === 'E'
