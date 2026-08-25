@@ -4720,7 +4720,6 @@ body.theme-dark .bg-svg-wrap .bg-gate-active-design,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design {
     fill: #D4AF37 !important;
     display: block !important;
-    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.7));
 }
 
 body.theme-dark .bg-svg-wrap .bg-gate-active-design.red_border,
@@ -4742,7 +4741,6 @@ body.theme-dark .bg-svg-wrap .bg-gate-active-personality,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality {
     fill: #2A6EBB !important;
     display: block !important;
-    filter: drop-shadow(0 0 5px rgba(42, 110, 187, 0.85));
 }
 
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.red_border,
@@ -4773,7 +4771,6 @@ body.theme-dark #mandala-bodygraph-wrap polygon.bg-gate-active-both {
     fill: #D4AF37 !important;
     stroke: none !important;
     display: block !important;
-    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.6));
 }
 body.theme-dark .bg-svg-wrap path.bg-gate-active-both.red_border,
 body.theme-dark .bg-svg-wrap path.bg-gate-active-both.cls-15,
@@ -4812,7 +4809,6 @@ body.theme-dark .bg-svg-wrap g.bg-gate-active-both *,
 body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both * {
     display: block !important;
     fill: #2A6EBB !important;
-    filter: drop-shadow(0 0 3px rgba(42, 110, 187, 0.8));
 }
 
 /* Gate numbers in Night Mode */
@@ -4861,7 +4857,6 @@ body.theme-dark #mandala-bodygraph-wrap [class*="block__"][class*="-active"] {
     stroke: #FFEFA6 !important;
     stroke-width: 1.5px !important;
     display: block !important;
-    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.65)) !important;
 }
 
 /* 5. Undefined Centers: Dark cosmic indigo with gold outline */
