@@ -3657,6 +3657,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bodygraph: true,
         hexagrams: true,
         mirror: true,
+        dial2: false,
         zodiac: true,
         houses: true,
         rulers: true,
@@ -4536,6 +4537,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isPersActive = mirrorActivePers.has(i);
                 const isDesActive  = mirrorActiveDes.has(i);
                 const isCombinedActive = isPersActive || isDesActive;
+
+                // By default (dial2 === false), inactive programs are invisible.
+                // When '2 циферблат' is clicked (dial2 === true), all programs are shown.
+                if (!mandalaSettings.dial2 && !isCombinedActive) {
+                    continue;
+                }
 
                 const gateNum = MIRROR_GATE_ORDER[i];
                 const isHighlighted = isGateHighlighted(gateNum, i);
@@ -6554,6 +6561,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ensure 'rulers' chip is present in DOM even if cached template was served
             const chipsContainer = document.querySelector('.mandala-toggle-chips');
             if (chipsContainer) {
+                if (!document.querySelector('.mandala-chip[data-ring="dial2"]')) {
+                    const dial2Btn = document.createElement('button');
+                    dial2Btn.className = 'mandala-chip' + (mandalaSettings.dial2 ? ' active' : '');
+                    dial2Btn.setAttribute('data-ring', 'dial2');
+                    dial2Btn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">2 циферблат</span>';
+                    
+                    const zodiacBtn = document.querySelector('.mandala-chip[data-ring="zodiac"]');
+                    if (zodiacBtn) {
+                        chipsContainer.insertBefore(dial2Btn, zodiacBtn);
+                    } else {
+                        const mirrorBtn = document.querySelector('.mandala-chip[data-ring="mirror"]');
+                        if (mirrorBtn && mirrorBtn.nextSibling) {
+                            chipsContainer.insertBefore(dial2Btn, mirrorBtn.nextSibling);
+                        } else {
+                            chipsContainer.appendChild(dial2Btn);
+                        }
+                    }
+                }
+
                 if (!document.querySelector('.mandala-chip[data-ring="rulers"]')) {
                     const rulersBtn = document.createElement('button');
                     rulersBtn.className = 'mandala-chip' + (mandalaSettings.rulers ? ' active' : '');
@@ -6588,28 +6614,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            const RING_KEYS = ['bodygraph', 'hexagrams', 'mirror', 'zodiac', 'houses', 'rulers', 'raysPlanets', 'cross'];
             const btnToggleAll = document.getElementById('mandala-toggle-all');
 
             function updateToggleAllBtnState() {
                 if (!btnToggleAll) return;
-                const allKeys = Object.keys(mandalaSettings);
-                const areAllOn = allKeys.every(k => mandalaSettings[k]);
+                const areAllOn = RING_KEYS.every(k => mandalaSettings[k]);
                 btnToggleAll.innerHTML = areAllOn ? '↺ Сбросить' : 'Всё';
             }
 
             if (btnToggleAll) {
                 btnToggleAll.addEventListener('click', () => {
-                    const allKeys = Object.keys(mandalaSettings);
-                    const areAllOn = allKeys.every(k => mandalaSettings[k]);
+                    const areAllOn = RING_KEYS.every(k => mandalaSettings[k]);
 
                     const newState = !areAllOn;
-                    allKeys.forEach(k => {
+                    RING_KEYS.forEach(k => {
                         mandalaSettings[k] = newState;
                     });
+                    if (!newState) {
+                        mandalaSettings.dial2 = false;
+                    }
 
                     document.querySelectorAll('.mandala-chip').forEach(chip => {
                         const ring = chip.getAttribute('data-ring');
-                        chip.classList.toggle('active', mandalaSettings[ring]);
+                        if (ring in mandalaSettings) {
+                            chip.classList.toggle('active', mandalaSettings[ring]);
+                        }
                     });
 
                     updateToggleAllBtnState();
@@ -6632,6 +6662,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         mandalaSettings[ring] = !mandalaSettings[ring];
                         chip.classList.toggle('active', mandalaSettings[ring]);
                         
+                        // If user enabled dial2, ensure mirror ring itself is active
+                        if (ring === 'dial2' && mandalaSettings.dial2 && !mandalaSettings.mirror) {
+                            mandalaSettings.mirror = true;
+                            const mirrorChip = document.querySelector('.mandala-chip[data-ring="mirror"]');
+                            if (mirrorChip) mirrorChip.classList.add('active');
+                        }
+
                         updateToggleAllBtnState();
 
                         // Update bodygraph CSS overlay transition immediately
