@@ -490,15 +490,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyTheme(theme) {
         const isDark = (theme === 'dark');
         document.body.classList.toggle('theme-dark', isDark);
+        document.body.classList.toggle('theme-light', !isDark);
         localStorage.setItem('humantica_theme', isDark ? 'dark' : 'light');
 
         const btnLight = document.getElementById('theme-btn-light');
         const btnDark = document.getElementById('theme-btn-dark');
         if (btnLight && btnDark) {
             btnLight.classList.toggle('active', !isDark);
-            btnLight.setAttribute('aria-checked', !isDark);
+            btnLight.setAttribute('aria-checked', String(!isDark));
             btnDark.classList.toggle('active', isDark);
-            btnDark.setAttribute('aria-checked', isDark);
+            btnDark.setAttribute('aria-checked', String(isDark));
         }
 
         if (lastChart) {
