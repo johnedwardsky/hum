@@ -5543,38 +5543,68 @@ document.addEventListener('DOMContentLoaded', () => {
                     const num = Number(gNum);
                     const isDes = activeGatesDesign && activeGatesDesign.has(num);
                     const isPers = activeGatesPersonality && activeGatesPersonality.has(num);
+                    const isBoth = isDes && isPers;
                     const isGateDef = isDes || isPers;
 
-                    // Gate numbers
-                    svg.querySelectorAll('.a' + gNum).forEach(el => {
-                        if (isCenterDefined) {
-                            el.style.setProperty('fill', '#0A0E17', 'important');
+                    // 1. Background disk under the gate number
+                    const bgEls = svg.querySelectorAll('.cls-8.cls__' + gNum + ', .red_bg.cls__' + gNum);
+                    bgEls.forEach(bgEl => {
+                        if (isGateDef) {
+                            bgEl.style.setProperty('display', 'block', 'important');
+                            if (isPers || isBoth) {
+                                // Personality or Both: solid blue circle under number
+                                bgEl.style.setProperty('fill', '#2A6EBB', 'important');
+                                if (isBoth) {
+                                    bgEl.style.setProperty('stroke', isCenterDefined ? '#8A6D15' : '#D4AF37', 'important');
+                                    bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                } else {
+                                    bgEl.style.removeProperty('stroke');
+                                    bgEl.style.removeProperty('stroke-width');
+                                }
+                            } else if (isDes) {
+                                // Design only
+                                if (isCenterDefined) {
+                                    // Defined center: dark golden circle under number
+                                    bgEl.style.setProperty('fill', '#8A6D15', 'important');
+                                    bgEl.style.removeProperty('stroke');
+                                    bgEl.style.removeProperty('stroke-width');
+                                } else {
+                                    // Undefined center: circle outline with its line
+                                    bgEl.style.setProperty('fill', 'transparent', 'important');
+                                    bgEl.style.setProperty('stroke', '#D4AF37', 'important');
+                                    bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                }
+                            }
                         } else {
-                            if (isGateDef) {
-                                el.style.setProperty('fill', isDes ? '#FFEFA6' : '#93C5FD', 'important');
+                            // Inactive gate: hide background disk
+                            bgEl.style.setProperty('display', 'none', 'important');
+                            bgEl.style.removeProperty('fill');
+                            bgEl.style.removeProperty('stroke');
+                            bgEl.style.removeProperty('stroke-width');
+                        }
+                    });
+
+                    // 2. Gate numbers
+                    svg.querySelectorAll('.a' + gNum).forEach(el => {
+                        if (isPers || isBoth) {
+                            // White number on blue circle
+                            el.style.setProperty('fill', '#FFFFFF', 'important');
+                        } else if (isDes) {
+                            // Design: dark number in defined center, light gold in undefined center
+                            if (isCenterDefined) {
+                                el.style.setProperty('fill', '#0A0E17', 'important');
+                            } else {
+                                el.style.setProperty('fill', '#FFEFA6', 'important');
+                            }
+                        } else {
+                            // Inactive gate: dark in defined gold center, gold in undefined dark center
+                            if (isCenterDefined) {
+                                el.style.setProperty('fill', '#0A0E17', 'important');
                             } else {
                                 el.style.setProperty('fill', '#D4AF37', 'important');
                             }
                         }
                         el.style.setProperty('display', 'block', 'important');
-                    });
-
-                    // Circle border around gate number
-                    const bgEls = svg.querySelectorAll('.cls-8.cls__' + gNum + ', .red_bg.cls__' + gNum);
-                    bgEls.forEach(bgEl => {
-                        bgEl.style.setProperty('fill', 'transparent', 'important');
-                        if (isGateDef) {
-                            bgEl.style.setProperty('display', 'block', 'important');
-                            if (isCenterDefined) {
-                                bgEl.style.setProperty('stroke', '#FFFFFF', 'important');
-                                bgEl.style.setProperty('stroke-width', '1.6px', 'important');
-                            } else {
-                                bgEl.style.setProperty('stroke', (isDes && isPers) ? '#D4AF37' : (isDes ? '#D4AF37' : '#2A6EBB'), 'important');
-                                bgEl.style.setProperty('stroke-width', '1.2px', 'important');
-                            }
-                        } else {
-                            bgEl.style.setProperty('display', 'none', 'important');
-                        }
                     });
 
                     // Ensure channel endpoint dots don't have white stroke
@@ -6237,50 +6267,70 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isCenterDef = definedCenters.has(cKey);
 
                     gates.forEach(gNum => {
-                        const isGateDef = allActive.has(gNum);
+                        const isDes = !!activeDesignGates[gNum];
+                        const isPers = !!activePersGates[gNum];
+                        const isBoth = isDes && isPers;
+                        const isGateDef = isDes || isPers;
 
-                        // Numbers inside the gate
-                        svgWrap.querySelectorAll('.a' + gNum).forEach(el => {
-                            if (isCenterDef) {
-                                // Dark readable number on Gold center
-                                el.style.setProperty('fill', '#0A0E17', 'important');
-                                el.style.setProperty('display', 'block', 'important');
-                            } else {
-                                // Light readable number on dark undefined center
-                                if (isGateDef) {
-                                    el.style.setProperty('fill', activeDesignGates[gNum] ? '#FFEFA6' : '#93C5FD', 'important');
-                                } else {
-                                    el.style.setProperty('fill', '#D4AF37', 'important');
+                        // 1. Background disk under the gate number
+                        const bgEls = svgWrap.querySelectorAll('.cls-8.cls__' + gNum + ', .red_bg.cls__' + gNum);
+                        bgEls.forEach(bgEl => {
+                            if (isGateDef) {
+                                bgEl.style.setProperty('display', 'block', 'important');
+                                if (isPers || isBoth) {
+                                    // Personality or Both: solid blue circle under number
+                                    bgEl.style.setProperty('fill', '#2A6EBB', 'important');
+                                    if (isBoth) {
+                                        bgEl.style.setProperty('stroke', isCenterDef ? '#8A6D15' : '#D4AF37', 'important');
+                                        bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                    } else {
+                                        bgEl.style.removeProperty('stroke');
+                                        bgEl.style.removeProperty('stroke-width');
+                                    }
+                                } else if (isDes) {
+                                    // Design only
+                                    if (isCenterDef) {
+                                        // Defined center: dark golden circle under number (a couple of tones darker than gold center)
+                                        bgEl.style.setProperty('fill', '#8A6D15', 'important');
+                                        bgEl.style.removeProperty('stroke');
+                                        bgEl.style.removeProperty('stroke-width');
+                                    } else {
+                                        // Undefined center: circle outline with its line (stroke gold, transparent fill)
+                                        bgEl.style.setProperty('fill', 'transparent', 'important');
+                                        bgEl.style.setProperty('stroke', '#D4AF37', 'important');
+                                        bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                    }
                                 }
-                                el.style.setProperty('display', 'block', 'important');
+                            } else {
+                                // Inactive gate: hide background disk
+                                bgEl.style.setProperty('display', 'none', 'important');
+                                bgEl.style.removeProperty('fill');
+                                bgEl.style.removeProperty('stroke');
+                                bgEl.style.removeProperty('stroke-width');
                             }
                         });
 
-                        // Circle border around gate number
-                        // We use the background disk path (.cls-8) to draw the stroke, because .cls______ elements 
-                        // are actually channel endpoints in some gates (e.g. 18, 58) and not concentric with the text!
-                        const bgEls = svgWrap.querySelectorAll('.cls-8.cls__' + gNum + ', .red_bg.cls__' + gNum);
-                        bgEls.forEach(bgEl => {
-                            // Ensure background disk fill is transparent so center color shines through
-                            bgEl.style.setProperty('fill', 'transparent', 'important');
-                            
-                            if (isGateDef) {
-                                bgEl.style.setProperty('display', 'block', 'important');
+                        // 2. Numbers inside the gate
+                        svgWrap.querySelectorAll('.a' + gNum).forEach(el => {
+                            if (isPers || isBoth) {
+                                // White number on blue circle
+                                el.style.setProperty('fill', '#FFFFFF', 'important');
+                            } else if (isDes) {
+                                // Design: dark number in defined center, light gold in undefined center
                                 if (isCenterDef) {
-                                    // White circle outline around number in defined center!
-                                    bgEl.style.setProperty('stroke', '#FFFFFF', 'important');
-                                    bgEl.style.setProperty('stroke-width', '1.6px', 'important');
+                                    el.style.setProperty('fill', '#0A0E17', 'important');
                                 } else {
-                                    // Colored border in undefined center
-                                    const isDes = !!activeDesignGates[gNum];
-                                    const isPers = !!activePersGates[gNum];
-                                    bgEl.style.setProperty('stroke', (isDes && isPers) ? '#D4AF37' : (isDes ? '#D4AF37' : '#2A6EBB'), 'important');
-                                    bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                    el.style.setProperty('fill', '#FFEFA6', 'important');
                                 }
                             } else {
-                                // Hide background disk entirely if gate is inactive
-                                bgEl.style.setProperty('display', 'none', 'important');
+                                // Inactive gate: dark in defined gold center, gold in undefined dark center
+                                if (isCenterDef) {
+                                    el.style.setProperty('fill', '#0A0E17', 'important');
+                                } else {
+                                    el.style.setProperty('fill', '#D4AF37', 'important');
+                                }
                             }
+                            el.style.setProperty('display', 'block', 'important');
                         });
 
                         // Make sure we DON'T accidentally add white stroke to channel endpoints (.cls______)

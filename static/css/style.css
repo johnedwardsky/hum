@@ -4826,26 +4826,14 @@ body.theme-dark #mandala-bodygraph-wrap text {
     fill: #D4AF37 !important;
 }
 
-/* Always transparent circle background disks under gate numbers in night mode */
+/* Circle background disks under gate numbers in night mode (default transparent) */
 body.theme-dark .bg-svg-wrap .red_bg,
 body.theme-dark .bg-svg-wrap path.red_bg,
 body.theme-dark .bg-svg-wrap .cls-8[class*="cls__"],
-body.theme-dark .bg-svg-wrap path.bg-gate-active-personality.cls-8,
-body.theme-dark .bg-svg-wrap path.bg-gate-active-personality.red_bg,
-body.theme-dark .bg-svg-wrap path.bg-gate-active-design.cls-8,
-body.theme-dark .bg-svg-wrap path.bg-gate-active-design.red_bg,
-body.theme-dark .bg-svg-wrap path.bg-gate-active-both.cls-8,
-body.theme-dark .bg-svg-wrap path.bg-gate-active-both.red_bg,
 body.theme-dark #mandala-bodygraph-wrap .red_bg,
 body.theme-dark #mandala-bodygraph-wrap path.red_bg,
-body.theme-dark #mandala-bodygraph-wrap .cls-8[class*="cls__"],
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-personality.cls-8,
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-personality.red_bg,
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-design.cls-8,
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-design.red_bg,
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.cls-8,
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.red_bg {
-    fill: transparent !important;
+body.theme-dark #mandala-bodygraph-wrap .cls-8[class*="cls__"] {
+    fill: transparent;
 }
 
 /* 4. Defined Centers: Radiant Warm Gold */
