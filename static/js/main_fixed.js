@@ -5524,9 +5524,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Reset opacities, filters, and all inline styles
-        svg.querySelectorAll('*').forEach(el => {
-            el.removeAttribute('style');
+        // Reset our specific dark-mode inline styles from elements
+        svg.querySelectorAll('[class*="a"], .cls-8, .red_bg, .red_border, [class*="cls______"]').forEach(el => {
+            el.style.removeProperty('fill');
+            el.style.removeProperty('stroke');
+            el.style.removeProperty('stroke-width');
+            el.style.removeProperty('display');
         });
 
         // In night mode: gate numbers are Black on Gold in defined centers, Gold on Black in undefined centers
@@ -5536,38 +5539,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isCenterDefined = definedCenters && definedCenters.has(cName);
                 
                 Object.keys(centerObj.gates).forEach(gNum => {
-                    const isGateDef = activeGatesCombined.has(Number(gNum));
+                    const num = Number(gNum);
+                    const isDes = activeGatesDesign && activeGatesDesign.has(num);
+                    const isPers = activeGatesPersonality && activeGatesPersonality.has(num);
+                    const isGateDef = isDes || isPers;
 
                     // Gate numbers
                     svg.querySelectorAll('.a' + gNum).forEach(el => {
-                        el.style.setProperty('fill', isCenterDefined ? '#0A0E17' : (isGateDef ? '#FFEFA6' : '#D4AF37'), 'important');
+                        if (isCenterDefined) {
+                            el.style.setProperty('fill', '#0A0E17', 'important');
+                        } else {
+                            if (isGateDef) {
+                                el.style.setProperty('fill', isDes ? '#FFEFA6' : '#93C5FD', 'important');
+                            } else {
+                                el.style.setProperty('fill', '#D4AF37', 'important');
+                            }
+                        }
                         el.style.setProperty('display', 'block', 'important');
                     });
 
                     // Circle border around gate number
+                    const bgEls = svg.querySelectorAll('.cls-8.cls__' + gNum + ', .red_bg.cls__' + gNum);
+                    bgEls.forEach(bgEl => {
+                        bgEl.style.setProperty('fill', 'transparent', 'important');
+                        if (isGateDef) {
+                            bgEl.style.setProperty('display', 'block', 'important');
+                            if (isCenterDefined) {
+                                bgEl.style.setProperty('stroke', '#FFFFFF', 'important');
+                                bgEl.style.setProperty('stroke-width', '1.6px', 'important');
+                            } else {
+                                bgEl.style.setProperty('stroke', (isDes && isPers) ? '#D4AF37' : (isDes ? '#D4AF37' : '#2A6EBB'), 'important');
+                                bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                            }
+                        } else {
+                            bgEl.style.setProperty('display', 'none', 'important');
+                        }
+                    });
+
+                    // Ensure channel endpoint dots don't have white stroke
                     const borderEls = svg.querySelectorAll('.red_border.cls__' + gNum + ', .cls______' + gNum);
                     borderEls.forEach(bEl => {
                         if (isGateDef) {
                             bEl.style.setProperty('display', 'block', 'important');
-                            if (isCenterDefined) {
-                                bEl.style.setProperty('stroke', '#FFFFFF', 'important');
-                                bEl.style.setProperty('stroke-width', '1.6px', 'important');
-                                bEl.style.setProperty('fill', 'none', 'important');
-                            } else {
-                                bEl.style.setProperty('stroke', '#D4AF37', 'important');
-                                bEl.style.setProperty('stroke-width', '1.2px', 'important');
-                                bEl.style.setProperty('fill', 'none', 'important');
-                            }
+                            bEl.style.removeProperty('stroke');
+                            bEl.style.removeProperty('stroke-width');
+                            bEl.style.removeProperty('fill');
                         } else {
                             bEl.style.setProperty('display', 'none', 'important');
                         }
-                    });
-
-                    // Transparent background disk
-                    const bgEls = svg.querySelectorAll('.red_bg.cls__' + gNum);
-                    bgEls.forEach(bgEl => {
-                        bgEl.style.setProperty('fill', 'transparent', 'important');
-                        bgEl.style.setProperty('display', 'block', 'important');
                     });
                 });
             });
