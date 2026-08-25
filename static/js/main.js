@@ -486,6 +486,42 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     const geoCache   = new Map(); // local geocoding cache
 
+    // ── Theme Switcher (Day / Night Mode Pill) ────────────────
+    function applyTheme(theme) {
+        const isDark = (theme === 'dark');
+        document.body.classList.toggle('theme-dark', isDark);
+        localStorage.setItem('humantica_theme', isDark ? 'dark' : 'light');
+
+        const btnLight = document.getElementById('theme-btn-light');
+        const btnDark = document.getElementById('theme-btn-dark');
+        if (btnLight && btnDark) {
+            btnLight.classList.toggle('active', !isDark);
+            btnLight.setAttribute('aria-checked', !isDark);
+            btnDark.classList.toggle('active', isDark);
+            btnDark.setAttribute('aria-checked', isDark);
+        }
+
+        if (lastChart) {
+            const mandalaCv = document.getElementById('mandala-canvas');
+            if (mandalaCv) drawMandala(lastChart, mandalaCv);
+            const chartCv = document.getElementById('chart-canvas');
+            if (chartCv) drawChart(lastChart, chartCv);
+            if (typeof renderSvgBodygraph === 'function') renderSvgBodygraph(lastChart);
+        }
+    }
+
+    const savedTheme = localStorage.getItem('humantica_theme') || 'light';
+    applyTheme(savedTheme);
+
+    const btnThemeLight = document.getElementById('theme-btn-light');
+    const btnThemeDark = document.getElementById('theme-btn-dark');
+    if (btnThemeLight) {
+        btnThemeLight.addEventListener('click', () => applyTheme('light'));
+    }
+    if (btnThemeDark) {
+        btnThemeDark.addEventListener('click', () => applyTheme('dark'));
+    }
+
     // ── Bodygraph Dial Switcher ───────────────────────────────
     document.querySelectorAll('.bg-dial-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -916,7 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
         icJd.textContent = jd.toFixed(5);
 
         // Planets table
-        renderPlanetsTable(data.planets, data.houses);
+        renderPlanetsTable(data.planets, data.houses, data.design_planets);
 
         // Houses table
         renderHousesTable(data.houses);
@@ -1409,7 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ── Planets table ─────────────────────────────────────────
-    function renderPlanetsTable(planets, houses) {
+    function renderPlanetsTable(planets, houses, designPlanets) {
         if (activePlanets === null) {
             activePlanets = new Set();
             planets.forEach(p => {
@@ -1446,19 +1482,71 @@ document.addEventListener('DOMContentLoaded', () => {
             AS = getProgramBoundary(housesList[0]);
         }
 
+        const designList = designPlanets || (typeof lastChart !== 'undefined' && lastChart && lastChart.design_planets) || [];
+        const designMap = {};
+        designList.forEach(dp => {
+            designMap[dp.name] = dp;
+            if (dp.name === 'Истинный Северный Узел' || dp.name === 'Средний Северный Узел' || dp.name === 'Северный Узел') {
+                designMap['Северный Узел'] = dp;
+                designMap['Истинный Северный Узел'] = dp;
+                designMap['Средний Северный Узел'] = dp;
+            }
+            if (dp.name === 'Истинный Южный Узел' || dp.name === 'Средний Южный Узел' || dp.name === 'Южный Узел') {
+                designMap['Южный Узел'] = dp;
+                designMap['Истинный Южный Узел'] = dp;
+                designMap['Средний Южный Узел'] = dp;
+            }
+        });
+
         planetsTbody.innerHTML = '';
         planets.forEach(p => {
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
-            const sm   = signMeta(p.formatted.sign);
+            const dp   = designMap[p.name];
 
-            let mirrorLonHtml = '—';
-            if (p.longitude != null && hasHouses) {
-                const relLon = (p.longitude - AS + 360) % 360;
-                mirrorLonHtml = lonToStr(relLon);
+            // 1st Dial - Design (Red)
+            let d1Html = '—';
+            if (dp && dp.longitude != null) {
+                const smD = dp.formatted ? signMeta(dp.formatted.sign) : null;
+                const signSymHtml = smD ? `<span class="sign-glyph-inline" title="${smD.name}">${smD.sym}</span>` : '';
+                d1Html = `${signSymHtml}${lonToStr(dp.longitude)}`;
+            }
+
+            // 1st Dial - Personality (Black)
+            let p1Html = '—';
+            if (p && p.longitude != null) {
+                const smP = p.formatted ? signMeta(p.formatted.sign) : null;
+                const signSymHtml = smP ? `<span class="sign-glyph-inline" title="${smP.name}">${smP.sym}</span>` : '';
+                p1Html = `${signSymHtml}${lonToStr(p.longitude)}`;
+            }
+
+            // 2nd Dial - Design (Red)
+            let d2Html = '—';
+            if (dp && dp.longitude != null && hasHouses) {
+                const relLonD = (dp.longitude - AS + 360) % 360;
+                d2Html = lonToStr(relLonD);
+            }
+
+            // 2nd Dial - Personality (Black)
+            let p2Html = '—';
+            if (p && p.longitude != null && hasHouses) {
+                const relLonP = (p.longitude - AS + 360) % 360;
+                p2Html = lonToStr(relLonP);
+            }
+
+            // Retrograde Badges
+            const isDesignRetro = dp && dp.is_retrograde;
+            const isPersRetro   = p.is_retrograde;
+            let retroHtml = '<span class="direct-dash">—</span>';
+            if (isDesignRetro && isPersRetro) {
+                retroHtml = `<span class="retro-badge badge-design" title="Дизайн: Ретроградный">R</span> <span class="retro-badge badge-pers" title="Личность: Ретроградный">R</span>`;
+            } else if (isDesignRetro) {
+                retroHtml = `<span class="retro-badge badge-design" title="Дизайн: Ретроградный">R</span>`;
+            } else if (isPersRetro) {
+                retroHtml = `<span class="retro-badge badge-pers" title="Личность: Ретроградный">R</span>`;
             }
 
             const tr = document.createElement('tr');
-            if (p.is_retrograde) {
+            if (isPersRetro || isDesignRetro) {
                 tr.classList.add('retro-row');
             }
             const isChecked = activePlanets.has(p.name) ? 'checked' : '';
@@ -1472,18 +1560,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="planet-name">${p.name}</span>
                     </div>
                 </td>
-                <td class="lon-cell">${lonToStr(p.longitude)}</td>
-                <td>
-                    <div class="sign-cell">
-                        <span class="sign-glyph">${sm.sym}</span>
-                        <span class="sign-name">${sm.name}</span>
-                    </div>
-                </td>
-                <td class="pos-cell">${fmtPos(p.formatted)}</td>
-                <td class="lon-cell col-grad2">${mirrorLonHtml}</td>
-                <td style="text-align: center;">${p.is_retrograde
-                    ? '<span class="retro-badge">R</span>'
-                    : '<span class="direct-dash">—</span>'}</td>`;
+                <td class="lon-cell cell-design">${d1Html}</td>
+                <td class="lon-cell cell-pers">${p1Html}</td>
+                <td class="lon-cell cell-design">${d2Html}</td>
+                <td class="lon-cell cell-pers">${p2Html}</td>
+                <td style="text-align: center;">${retroHtml}</td>`;
             planetsTbody.appendChild(tr);
         });
 
@@ -1554,21 +1635,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
             const hx = p.hexagram;
             const tr = document.createElement('tr');
+            tr.className = 'hex-row hex-row-pers';
             tr.innerHTML = `
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}">${getPlanetSym(p.name)}</div>
-                        <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Личность)</span></span>
+                        <span class="planet-name">${p.name} <span class="hex-type-badge badge-pers">(Личность)</span></span>
                     </div>
                 </td>
                 <td>
-                    <span class="hex-gate-badge">Гекс. ${hx.gate}</span>
+                    <span class="hex-gate-badge badge-pers">Гекс. ${hx.gate}</span>
                 </td>
-                <td><span class="hex-num">${hx.line}</span></td>
-                <td><span class="hex-num">${hx.color}</span></td>
-                <td><span class="hex-num">${hx.tone}</span></td>
-                <td><span class="hex-num">${hx.base}</span></td>
-                <td><span class="hex-num">${hx.theos}</span></td>
+                <td><span class="hex-num hex-num-pers">${hx.line}</span></td>
+                <td><span class="hex-num hex-num-pers">${hx.color}</span></td>
+                <td><span class="hex-num hex-num-pers">${hx.tone}</span></td>
+                <td><span class="hex-num hex-num-pers">${hx.base}</span></td>
+                <td><span class="hex-num hex-num-pers">${hx.theos}</span></td>
             `;
             hexagramsTbody.appendChild(tr);
         });
@@ -1580,21 +1662,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const meta = PLANET_META[p.name] || { sym: p.symbol, cls: 'glyph-node' };
             const hx = p.hexagram;
             const tr = document.createElement('tr');
+            tr.className = 'hex-row hex-row-design';
             tr.innerHTML = `
                 <td>
                     <div class="planet-cell">
-                        <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${getPlanetSym(p.name)}</div>
-                        <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Дизайн)</span></span>
+                        <div class="planet-glyph ${meta.cls} glyph-design">${getPlanetSym(p.name)}</div>
+                        <span class="planet-name planet-name-design">${p.name} <span class="hex-type-badge badge-design">(Дизайн)</span></span>
                     </div>
                 </td>
                 <td>
-                    <span class="hex-gate-badge" style="background:rgba(255,96,96,0.1); color:rgb(255,96,96); border:1px solid rgba(255,96,96,0.2);">Гекс. ${hx.gate}</span>
+                    <span class="hex-gate-badge badge-design">Гекс. ${hx.gate}</span>
                 </td>
-                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.line}</span></td>
-                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.color}</span></td>
-                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.tone}</span></td>
-                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.base}</span></td>
-                <td><span class="hex-num" style="color:rgb(255,96,96);">${hx.theos}</span></td>
+                <td><span class="hex-num hex-num-design">${hx.line}</span></td>
+                <td><span class="hex-num hex-num-design">${hx.color}</span></td>
+                <td><span class="hex-num hex-num-design">${hx.tone}</span></td>
+                <td><span class="hex-num hex-num-design">${hx.base}</span></td>
+                <td><span class="hex-num hex-num-design">${hx.theos}</span></td>
             `;
             hexagramsTbody.appendChild(tr);
         });
@@ -1759,10 +1842,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const r3    = R * 0.60;          // houses inner / aspect outer
         const r4    = R * 0.20;          // centre circle
 
+        const isDarkTheme = document.body.classList.contains('theme-dark');
+
         ctx.clearRect(0, 0, size, size);
 
-        // Background (Pure White matching CSS --bg-card)
-        ctx.fillStyle = '#FFFFFF';
+        // Background
+        ctx.fillStyle = isDarkTheme ? '#0A0E17' : '#FFFFFF';
         ctx.beginPath();
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.fill();
@@ -1775,9 +1860,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, R, startAngle, endAngle);
             ctx.closePath();
-            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.04);
+            ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], isDarkTheme ? 0.14 : 0.04);
             ctx.fill();
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+            ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.25)' : 'rgba(197, 158, 63, 0.15)';
             ctx.lineWidth   = 1;
             ctx.stroke();
 
@@ -1786,15 +1871,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const gx = cx + (R * 0.91) * Math.cos(midAngle);
             const gy = cy + (R * 0.91) * Math.sin(midAngle);
             ctx.font      = `bold 12px serif`;
-            ctx.fillStyle = ZODIAC_COLORS[i];
+            ctx.fillStyle = isDarkTheme ? (ZODIAC_COLORS[i] === '#7E7A75' ? '#D1D5DB' : ZODIAC_COLORS[i]) : ZODIAC_COLORS[i];
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(ZODIAC_META[i].sym, gx, gy);
         }
 
         // Outer ring border
-        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.45)' : 'rgba(197, 158, 63, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.25)' : 'rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
 
         // -- House dividers --
         const asc = data.houses[0].longitude;  // Ascendant longitude
@@ -1810,7 +1895,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)';
+            ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.35)' : 'rgba(197, 158, 63, 0.25)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
@@ -1820,20 +1905,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const midAng = degToRad(lonToAngle(midLon, asc));
             const hx = cx + (r2 + r3) / 2 * Math.cos(midAng);
             const hy = cy + (r2 + r3) / 2 * Math.sin(midAng);
-            ctx.font      = '9px DM Sans, sans-serif';
-            ctx.fillStyle = '#777166';
+            ctx.font      = 'bold 9px DM Sans, sans-serif';
+            ctx.fillStyle = isDarkTheme ? '#FFEFA6' : '#777166';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(toRoman(i + 1), hx, hy);
         }
 
-        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle='#FFFFFF'; ctx.fill(); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.25)' : 'rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.22)' : 'rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle = isDarkTheme ? '#0A0E17' : '#FFFFFF'; ctx.fill(); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.22)' : 'rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
 
         // -- Aspects (between planets) --
         const planets = data.planets.filter(p => !activePlanets || activePlanets.has(p.name));
-        const ASPECTS = [
+        const ASPECTS = isDarkTheme ? [
+            { name:'conj', orb:10, color:'rgba(212, 175, 55, 0.85)',  deg:0 },    // gold
+            { name:'oppo', orb:10, color:'rgba(245, 158, 11, 0.85)',  deg:180 },  // amber/bronze
+            { name:'trig', orb:8,  color:'rgba(167, 139, 250, 0.85)', deg:120 },  // light violet/purple
+            { name:'squa', orb:8,  color:'rgba(248, 113, 113, 0.85)',  deg:90 },   // light coral
+            { name:'sext', orb:6,  color:'rgba(156, 163, 175, 0.75)',  deg:60 },   // platinum
+        ] : [
             { name:'conj', orb:10, color:'rgba(197, 158, 63, 0.6)',  deg:0 },    // gold
             { name:'oppo', orb:10, color:'rgba(165, 120, 69, 0.6)',  deg:180 },  // bronze
             { name:'trig', orb:8,  color:'rgba(94, 82, 176, 0.6)', deg:120 },  // purple
@@ -1892,24 +1983,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const dy   = cy + r2 * Math.sin(dotR);
             ctx.beginPath();
             ctx.arc(dx, dy, 3, 0, Math.PI*2);
-            ctx.fillStyle = '#C59E3F';
+            ctx.fillStyle = isDarkTheme ? '#D4AF37' : '#C59E3F';
             ctx.fill();
 
             // Line from dot to symbol
             ctx.beginPath();
             ctx.moveTo(dx, dy);
             ctx.lineTo(px, py);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)';
-            ctx.lineWidth = 0.7;
+            ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.35)' : 'rgba(197, 158, 63, 0.25)';
+            ctx.lineWidth = 0.8;
             ctx.stroke();
 
             // Symbol
-            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 13, PLANET_COLORS[p.name] || '#2E2A20');
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 13, isDarkTheme ? '#FFEFA6' : (PLANET_COLORS[p.name] || '#2E2A20'));
 
             // Retrograde indicator
             if (p.is_retrograde) {
                 ctx.font      = 'bold 9px DM Sans, sans-serif';
-                ctx.fillStyle = '#E06D53'; // terracotta/red highlight
+                ctx.fillStyle = isDarkTheme ? '#FF6B6B' : '#E06D53'; // red highlight
                 ctx.fillText('R', px + 9, py - 7);
             }
         });
@@ -1926,7 +2017,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lx = cx + (R + 4) * Math.cos(a);
             const ly = cy + (R + 4) * Math.sin(a);
             ctx.font      = 'bold 10px DM Sans, sans-serif';
-            ctx.fillStyle = '#C59E3F';
+            ctx.fillStyle = isDarkTheme ? '#FFEFA6' : '#C59E3F';
             ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
             ctx.textBaseline = ly < cy ? 'bottom' : 'top';
             ctx.fillText(label, lx, ly);
@@ -4020,28 +4111,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.clearRect(0, 0, size, size);
 
+        const isDarkTheme = document.body.classList.contains('theme-dark');
+
         // 1. Draw solid clean background
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(cx, cy, R, 0, Math.PI * 2);
-        ctx.fill();
+        if (isDarkTheme) {
+            ctx.fillStyle = '#0A0E17';
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, Math.PI * 2);
+            ctx.fill();
 
-        // Soft radial gradient for central bodygraph area
-        const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
-        centerGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-        centerGrad.addColorStop(0.70, 'rgba(253, 251, 248, 0.95)');
-        centerGrad.addColorStop(1, 'rgba(240, 236, 225, 0.35)');
-        ctx.fillStyle = centerGrad;
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-        ctx.fill();
-        // Subtle semi-transparent blue background for the outermost hexagram ring
-        ctx.beginPath();
-        ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
-        ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
-        ctx.fillStyle = 'rgba(41, 98, 160, 0.09)';
-        ctx.fill();
+            // Soft cosmic indigo radial gradient for central bodygraph area
+            const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
+            centerGrad.addColorStop(0, '#0D1424');
+            centerGrad.addColorStop(0.70, '#0A0E17');
+            centerGrad.addColorStop(1, 'rgba(10, 14, 23, 0.5)');
+            ctx.fillStyle = centerGrad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+            ctx.fill();
 
+            // Subtle gold background for the outermost hexagram ring
+            ctx.beginPath();
+            ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
+            ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
+            ctx.fillStyle = 'rgba(212, 175, 55, 0.05)';
+            ctx.fill();
+        } else {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Soft radial gradient for central bodygraph area
+            const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
+            centerGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+            centerGrad.addColorStop(0.70, 'rgba(253, 251, 248, 0.95)');
+            centerGrad.addColorStop(1, 'rgba(240, 236, 225, 0.35)');
+            ctx.fillStyle = centerGrad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Subtle semi-transparent blue background for the outermost hexagram ring
+            ctx.beginPath();
+            ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
+            ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
+            ctx.fillStyle = 'rgba(41, 98, 160, 0.09)';
+            ctx.fill();
+        }
 
         const GATE_ORDER = [
             25, 17, 21, 51, 42,  3, 27, 24,  2, 23,
@@ -4089,8 +4206,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 activationsByGate[p.hexagram.gate].push({
                     type: 'personality',
                     symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                    color: '#2E2A20',
-                    line: p.hexagram.line
+                    color: isDarkTheme ? '#2A6EBB' : '#2E2A20',
+                    line: p.hexagram.line,
+                    name: p.name
                 });
             }
         });
@@ -4099,8 +4217,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 activationsByGate[p.hexagram.gate].push({
                     type: 'design',
                     symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                    color: 'rgb(255,96,96)',
-                    line: p.hexagram.line
+                    color: isDarkTheme ? '#D4AF37' : 'rgb(255,96,96)',
+                    line: p.hexagram.line,
+                    name: p.name
                 });
             }
         });
@@ -4192,10 +4311,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.rotate(rotCross);
                 ctx.translate(-cx, -cy);
             }
-            // Design axis — RED (красное Солнце Дизайна → красная Земля Дизайна)
-            drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
-            // Personality axis — BLACK (чёрное Солнце → чёрная Земля)
-            drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
+            if (isDarkTheme) {
+                // Design axis — GOLD
+                drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(212, 175, 55, 0.45)', '#FFEFA6', 2.5);
+                // Personality axis — WHITE / BLUE
+                drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(42, 110, 187, 0.45)', '#3B82F6', 2.5);
+            } else {
+                // Design axis — RED (красное Солнце Дизайна → красная Земля Дизайна)
+                drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
+                // Personality axis — BLACK (чёрное Солнце → чёрная Земля)
+                drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(30, 25, 15, 0.30)', 'rgba(30, 25, 15, 0.95)', 2.5);
+            }
             ctx.restore();
         }
 
@@ -4295,31 +4421,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Highlight active gate cell background
             if (isCombinedActive) {
-                ctx.beginPath();
-                ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle, true);
-                ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
-                ctx.arc(cx, cy, rGatesInner, endAngle, startAngle, false);
-                ctx.closePath();
-
                 let opacityScale = 1.0;
                 if (isAnyHovered && !isHighlighted) opacityScale = 0.15;
 
                 const isCrossGate = (gateNum === pSunGate || gateNum === pEarthGate || gateNum === dSunGate || gateNum === dEarthGate);
                 if (isCrossGate) {
                     const isDesign = (gateNum === dSunGate || gateNum === dEarthGate);
-                    ctx.fillStyle = isDesign ? `rgba(255,96,96,${0.28 * opacityScale})` : `rgba(46,42,32,${0.18 * opacityScale})`;
-                } else {
-                    if (isPersActive && isDesActive) {
-                        ctx.fillStyle = `rgba(46,42,32,${0.12 * opacityScale})`;
-                    } else if (isDesActive) {
-                        ctx.fillStyle = `rgba(255,96,96,${0.12 * opacityScale})`;
-                    } else if (isPersActive) {
-                        ctx.fillStyle = `rgba(46,42,32,${0.10 * opacityScale})`;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle, true);
+                    ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
+                    ctx.arc(cx, cy, rGatesInner, endAngle, startAngle, false);
+                    ctx.closePath();
+                    if (isDarkTheme) {
+                        ctx.fillStyle = isDesign ? `rgba(212,175,55,${0.35 * opacityScale})` : `rgba(42,110,187,${0.28 * opacityScale})`;
                     } else {
-                        ctx.fillStyle = 'rgba(0,0,0,0)';
+                        ctx.fillStyle = isDesign ? `rgba(255,96,96,${0.28 * opacityScale})` : `rgba(46,42,32,${0.18 * opacityScale})`;
                     }
+                    ctx.fill();
+                } else if (isPersActive && isDesActive) {
+                    // Both: split gate background in half (50% Gold, 50% Blue)
+                    const midLon = (startLon + endLon) / 2;
+                    const midAngle = degToRad(180 - midLon);
+                    
+                    // 1st half: Gold (Design)
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, rGatesOuter, startAngle, midAngle, true);
+                    ctx.lineTo(cx + rGatesInner * Math.cos(midAngle), cy + rGatesInner * Math.sin(midAngle));
+                    ctx.arc(cx, cy, rGatesInner, midAngle, startAngle, false);
+                    ctx.closePath();
+                    ctx.fillStyle = isDarkTheme ? `rgba(212,175,55,${0.25 * opacityScale})` : `rgba(255,96,96,${0.14 * opacityScale})`;
+                    ctx.fill();
+
+                    // 2nd half: Blue (Personality)
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, rGatesOuter, midAngle, endAngle, true);
+                    ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
+                    ctx.arc(cx, cy, rGatesInner, endAngle, midAngle, false);
+                    ctx.closePath();
+                    ctx.fillStyle = isDarkTheme ? `rgba(42,110,187,${0.25 * opacityScale})` : `rgba(46,42,32,${0.12 * opacityScale})`;
+                    ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, rGatesOuter, startAngle, endAngle, true);
+                    ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
+                    ctx.arc(cx, cy, rGatesInner, endAngle, startAngle, false);
+                    ctx.closePath();
+
+                    let bgFill;
+                    if (isDarkTheme) {
+                        bgFill = isDesActive ? `rgba(212,175,55,${0.22 * opacityScale})` : `rgba(42,110,187,${0.22 * opacityScale})`;
+                    } else {
+                        bgFill = isDesActive ? `rgba(255,96,96,${0.12 * opacityScale})` : `rgba(46,42,32,${0.10 * opacityScale})`;
+                    }
+                    ctx.fillStyle = bgFill;
+                    ctx.fill();
                 }
-                ctx.fill();
             }
 
             // Draw colored activation blocks inside the 6 dial cells (Lines 1..6 CCW)
@@ -4327,13 +4483,33 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.entries(byLine).forEach(([lineStr, acts]) => {
                 const lineNum = parseInt(lineStr); // 1-6
                 const slotStartLon = startLon + (lineNum - 1) * slotSize;
-                const N = acts.length;
-                
-                acts.forEach((act, idx) => {
-                    const subStartLon = slotStartLon + idx * (slotSize / N);
-                    const subEndLon = slotStartLon + (idx + 1) * (slotSize / N);
-                    const aStart = degToRad(180 - subStartLon);
-                    const aEnd = degToRad(180 - subEndLon);
+                const slotEndLon = slotStartLon + slotSize;
+
+                const hasDesign = acts.some(a => a.type === 'design');
+                const hasPers   = acts.some(a => a.type === 'personality');
+
+                let segments = [];
+                if (hasDesign && hasPers) {
+                    // Both fall on the same cell -> split cell in half (50% Gold, 50% Blue)
+                    segments = [
+                        { type: 'design',      start: slotStartLon,                end: slotStartLon + slotSize / 2 },
+                        { type: 'personality', start: slotStartLon + slotSize / 2, end: slotEndLon }
+                    ];
+                } else if (hasDesign) {
+                    // Only Design -> 100% Gold
+                    segments = [
+                        { type: 'design',      start: slotStartLon, end: slotEndLon }
+                    ];
+                } else if (hasPers) {
+                    // Only Personality -> 100% Blue
+                    segments = [
+                        { type: 'personality', start: slotStartLon, end: slotEndLon }
+                    ];
+                }
+
+                segments.forEach(seg => {
+                    const aStart = degToRad(180 - seg.start);
+                    const aEnd   = degToRad(180 - seg.end);
 
                     ctx.beginPath();
                     ctx.arc(cx, cy, rGatesInner, aStart, aEnd, true);
@@ -4341,30 +4517,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.arc(cx, cy, rDialInner, aEnd, aStart, false);
                     ctx.closePath();
 
-                    let fillColor = act.color;
-                    if (isAnyHovered) {
-                        fillColor = isHighlighted ? act.color : 'rgba(150, 150, 150, 0.08)';
+                    let fillColor;
+                    if (isDarkTheme) {
+                        fillColor = seg.type === 'design' ? '#D4AF37' : '#2A6EBB';
+                        if (isAnyHovered && !isHighlighted) {
+                            fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(42, 110, 187, 0.12)';
+                        }
+                    } else {
+                        fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
+                        if (isAnyHovered && !isHighlighted) {
+                            fillColor = 'rgba(150, 150, 150, 0.08)';
+                        }
                     }
                     ctx.fillStyle = fillColor;
                     ctx.fill();
                 });
             });
-
-            // Radial divider lines for gates (extended through dial ring to rDialInner)
+            
+            // Radial divider line between gates
+            let strokeColor;
+            if (isDarkTheme) {
+                strokeColor = isHighlighted ? '#D4AF37' : (isCombinedActive ? 'rgba(212,175,55,0.45)' : 'rgba(212,175,55,0.18)');
+            } else {
+                if (isAnyHovered) {
+                    strokeColor = isHighlighted
+                        ? (isDesActive ? 'rgba(255,96,96,0.7)' : 'rgba(46,42,32,0.7)')
+                        : 'rgba(120,120,120,0.04)';
+                } else {
+                    strokeColor = isCombinedActive
+                        ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
+                        : 'rgba(180,175,165,0.18)';
+                }
+            }
             ctx.beginPath();
             ctx.moveTo(cx + rDialInner * Math.cos(startAngle), cy + rDialInner * Math.sin(startAngle));
             ctx.lineTo(cx + rGatesOuter * Math.cos(startAngle), cy + rGatesOuter * Math.sin(startAngle));
-            
-            let strokeColor;
-            if (isAnyHovered) {
-                strokeColor = isHighlighted
-                    ? (isDesActive ? 'rgba(255,96,96,0.7)' : 'rgba(46,42,32,0.7)')
-                    : 'rgba(120,120,120,0.04)';
-            } else {
-                strokeColor = isCombinedActive
-                    ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
-                    : 'rgba(180,175,165,0.18)';
-            }
             ctx.strokeStyle = strokeColor;
             ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 1.0 : 0.6);
             ctx.stroke();
@@ -4374,15 +4561,15 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let t = 1; t <= 5; t++) {
                 const tickLon = startLon + t * tickSpacing;
                 const tickAngle = degToRad(180 - tickLon);
-                let tickColor = 'rgba(180,175,165,0.22)';
+                let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(212,175,55,0.32)' : 'rgba(212,175,55,0.16)') : (isCombinedActive ? 'rgba(180,175,165,0.28)' : 'rgba(197,158,63,0.14)');
                 if (isAnyHovered) {
-                    tickColor = isHighlighted ? 'rgba(120,115,105,0.45)' : 'rgba(120,120,120,0.03)';
+                    tickColor = isHighlighted ? (isDarkTheme ? 'rgba(212,175,55,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(212,175,55,0.04)' : 'rgba(120,120,120,0.03)');
                 }
                 ctx.beginPath();
                 ctx.moveTo(cx + rGatesInner * Math.cos(tickAngle), cy + rGatesInner * Math.sin(tickAngle));
                 ctx.lineTo(cx + rDialInner * Math.cos(tickAngle), cy + rDialInner * Math.sin(tickAngle));
                 ctx.strokeStyle = tickColor;
-                ctx.lineWidth = 0.6;
+                ctx.lineWidth = 0.65;
                 ctx.stroke();
             }
 
@@ -4392,15 +4579,28 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let font = isCombinedActive ? 'bold 11px DM Sans, sans-serif' : '600 9.5px DM Sans, sans-serif';
             const gBoth = isPersActive && isDesActive;
-            let fillStyle = (gBoth || isPersActive) ? '#2E2A20'
-                          : isDesActive             ? 'rgb(220,60,60)'
-                          : 'rgba(165, 158, 145, 0.48)';
+            let fillStyle;
+            if (isDarkTheme) {
+                fillStyle = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#3B82F6' : 'rgba(212, 175, 55, 0.45)'));
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        font = 'bold 13px DM Sans, sans-serif';
+                        fillStyle = '#FFEFA6';
+                    } else {
+                        fillStyle = 'rgba(212, 175, 55, 0.12)';
+                    }
+                }
+            } else {
+                fillStyle = (gBoth || isPersActive) ? '#2E2A20'
+                              : isDesActive             ? 'rgb(220,60,60)'
+                              : 'rgba(165, 158, 145, 0.48)';
 
-            if (isAnyHovered) {
-                if (isHighlighted) {
-                    font = 'bold 13px DM Sans, sans-serif';
-                } else {
-                    fillStyle = 'rgba(180, 180, 180, 0.12)';
+                if (isAnyHovered) {
+                    if (isHighlighted) {
+                        font = 'bold 13px DM Sans, sans-serif';
+                    } else {
+                        fillStyle = 'rgba(180, 180, 180, 0.12)';
+                    }
                 }
             }
 
@@ -4433,12 +4633,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const halfLen = lineLen / 2;
                 const halfGap = gap / 2;
 
-                let hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
-                if (isAnyHovered) {
-                    if (isHighlighted) {
-                        hexColor = isPersActive ? '#000000' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(80, 80, 80, 0.9)');
-                    } else {
-                        hexColor = 'rgba(180, 180, 180, 0.12)';
+                let hexColor;
+                if (isDarkTheme) {
+                    hexColor = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#3B82F6' : 'rgba(212, 175, 55, 0.35)'));
+                    if (isAnyHovered) {
+                        hexColor = isHighlighted ? '#FFEFA6' : 'rgba(212, 175, 55, 0.12)';
+                    }
+                } else {
+                    hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
+                    if (isAnyHovered) {
+                        if (isHighlighted) {
+                            hexColor = isPersActive ? '#000000' : (isDesActive ? 'rgb(230, 60, 60)' : 'rgba(80, 80, 80, 0.9)');
+                        } else {
+                            hexColor = 'rgba(180, 180, 180, 0.12)';
+                        }
                     }
                 }
 
@@ -4508,7 +4716,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mirrorActivationsBySector[mIdx].push({
                         type: 'personality',
                         symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                        color: '#2E2A20',
+                        color: isDarkTheme ? '#2A6EBB' : '#2E2A20',
                         line: mLine,
                         gate: mGate,
                         name: p.name
@@ -4525,7 +4733,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mirrorActivationsBySector[mIdx].push({
                         type: 'design',
                         symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                        color: 'rgb(255,96,96)',
+                        color: isDarkTheme ? '#D4AF37' : 'rgb(255,96,96)',
                         line: mLine,
                         gate: mGate,
                         name: p.name
@@ -4564,38 +4772,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     byLine[ln].push(act);
                 });
 
-                // Highlight active gate cell background (numbers band: rMirrorGateInner to rMirrorOuter)
+                // Draw colored activation blocks inside the 6 dial cells (scale band: rMirrorInner to rMirrorGateInner, Lines 1..6 CCW)
                 if (isCombinedActive) {
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, rMirrorOuter, startAngle, endAngle, true);
-                    ctx.lineTo(cx + rMirrorGateInner * Math.cos(endAngle), cy + rMirrorGateInner * Math.sin(endAngle));
-                    ctx.arc(cx, cy, rMirrorGateInner, endAngle, startAngle, false);
-                    ctx.closePath();
-
-                    let opacityScale = 1.0;
-                    if (isAnyHovered && !isHighlighted) opacityScale = 0.15;
-
-                    let bgFill;
-                    if (isPersActive && isDesActive) bgFill = `rgba(46,42,32,${0.12 * opacityScale})`;
-                    else if (isDesActive)           bgFill = `rgba(255,96,96,${0.12 * opacityScale})`;
-                    else if (isPersActive)          bgFill = `rgba(46,42,32,${0.10 * opacityScale})`;
-                    else                            bgFill = 'rgba(0,0,0,0)';
-                    ctx.fillStyle = bgFill;
-                    ctx.fill();
-
-                    // Draw colored activation blocks inside the 6 dial cells (scale band: rMirrorInner to rMirrorGateInner, Lines 1..6 CCW)
                     const slotSize = MIRROR_INTERVAL / 6;
                     Object.entries(byLine).forEach(([lineStr, acts]) => {
                         const lineNum = parseInt(lineStr); // 1-6
                         const slotStartLon = startLon + (lineNum - 1) * slotSize;
-                        const N = acts.length;
+                        const slotEndLon   = slotStartLon + slotSize;
 
-                        acts.forEach((act, idx) => {
-                            const subStartLon = slotStartLon + idx * (slotSize / N);
-                            const subEndLon   = slotStartLon + (idx + 1) * (slotSize / N);
+                        const hasDesign = acts.some(a => a.type === 'design');
+                        const hasPers   = acts.some(a => a.type === 'personality');
 
-                            const aStart = degToRad(180 - subStartLon);
-                            const aEnd   = degToRad(180 - subEndLon);
+                        let segments = [];
+                        if (hasDesign && hasPers) {
+                            // Both fall on the same cell -> split cell in half (50% Gold, 50% Blue)
+                            segments = [
+                                { type: 'design',      start: slotStartLon,                end: slotStartLon + slotSize / 2 },
+                                { type: 'personality', start: slotStartLon + slotSize / 2, end: slotEndLon }
+                            ];
+                        } else if (hasDesign) {
+                            // Only Design -> 100% Gold
+                            segments = [
+                                { type: 'design',      start: slotStartLon, end: slotEndLon }
+                            ];
+                        } else if (hasPers) {
+                            // Only Personality -> 100% Blue
+                            segments = [
+                                { type: 'personality', start: slotStartLon, end: slotEndLon }
+                            ];
+                        }
+
+                        segments.forEach(seg => {
+                            const aStart = degToRad(180 - seg.start);
+                            const aEnd   = degToRad(180 - seg.end);
 
                             ctx.beginPath();
                             ctx.arc(cx, cy, rMirrorGateInner, aStart, aEnd, true);
@@ -4603,9 +4812,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             ctx.arc(cx, cy, rMirrorInner, aEnd, aStart, false);
                             ctx.closePath();
 
-                            let fillColor = act.color;
-                            if (isAnyHovered) {
-                                fillColor = isHighlighted ? act.color : 'rgba(150, 150, 150, 0.08)';
+                            let fillColor;
+                            if (isDarkTheme) {
+                                fillColor = seg.type === 'design' ? '#D4AF37' : '#2A6EBB';
+                                if (isAnyHovered && !isHighlighted) {
+                                    fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(42, 110, 187, 0.12)';
+                                }
+                            } else {
+                                fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
+                                if (isAnyHovered && !isHighlighted) {
+                                    fillColor = 'rgba(150, 150, 150, 0.08)';
+                                }
                             }
                             ctx.fillStyle = fillColor;
                             ctx.fill();
@@ -4615,17 +4832,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Radial divider lines at boundaries of gate
                 let strokeColor;
-                if (isAnyHovered) {
-                    strokeColor = isHighlighted
-                        ? (isDesActive ? 'rgba(255,96,96,0.7)' : (isPersActive ? 'rgba(46,42,32,0.7)' : 'rgba(120,115,105,0.4)'))
-                        : 'rgba(120,120,120,0.04)';
+                if (isDarkTheme) {
+                    strokeColor = isHighlighted ? '#D4AF37' : (isCombinedActive ? 'rgba(212,175,55,0.45)' : 'rgba(212,175,55,0.18)');
                 } else {
-                    strokeColor = isCombinedActive
-                        ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
-                        : 'rgba(197,158,63,0.14)';
+                    if (isAnyHovered) {
+                        strokeColor = isHighlighted
+                            ? (isDesActive ? 'rgba(255,96,96,0.7)' : (isPersActive ? 'rgba(46,42,32,0.7)' : 'rgba(120,115,105,0.4)'))
+                            : 'rgba(120,120,120,0.04)';
+                    } else {
+                        strokeColor = isCombinedActive
+                            ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
+                            : 'rgba(197,158,63,0.14)';
+                    }
                 }
                 ctx.strokeStyle = strokeColor;
-                ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 0.7 : 0.45);
+                ctx.lineWidth = isAnyHovered ? (isHighlighted ? 1.2 : 0.4) : (isCombinedActive ? 0.8 : 0.45);
 
                 ctx.beginPath();
                 ctx.moveTo(cx + rMirrorInner * Math.cos(startAngle), cy + rMirrorInner * Math.sin(startAngle));
@@ -4642,15 +4863,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let t = 1; t <= 5; t++) {
                     const tickLon = startLon + t * tickSpacing;
                     const tickAngle = degToRad(180 - tickLon);
-                    let tickColor = isCombinedActive ? 'rgba(180,175,165,0.22)' : 'rgba(197,158,63,0.10)';
+                    let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(212,175,55,0.32)' : 'rgba(212,175,55,0.14)') : (isCombinedActive ? 'rgba(180,175,165,0.25)' : 'rgba(197,158,63,0.12)');
                     if (isAnyHovered) {
-                        tickColor = isHighlighted ? 'rgba(120,115,105,0.45)' : 'rgba(120,120,120,0.03)';
+                        tickColor = isHighlighted ? (isDarkTheme ? 'rgba(212,175,55,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(212,175,55,0.04)' : 'rgba(120,120,120,0.03)');
                     }
                     ctx.beginPath();
                     ctx.moveTo(cx + rMirrorGateInner * Math.cos(tickAngle), cy + rMirrorGateInner * Math.sin(tickAngle));
                     ctx.lineTo(cx + rMirrorInner * Math.cos(tickAngle), cy + rMirrorInner * Math.sin(tickAngle));
                     ctx.strokeStyle = tickColor;
-                    ctx.lineWidth = 0.5;
+                    ctx.lineWidth = 0.65;
                     ctx.stroke();
                 }
 
@@ -4659,18 +4880,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lx = cx + rMirrorGateMid * Math.cos(midAngle);
                 const ly = cy + rMirrorGateMid * Math.sin(midAngle);
 
-                let font = isCombinedActive ? 'bold 11px "DM Sans", sans-serif' : '500 9.5px "DM Sans", sans-serif';
+                let font = isCombinedActive ? 'bold 11px "DM Sans", sans-serif' : '600 9.5px "DM Sans", sans-serif';
                 const mBoth = isPersActive && isDesActive;
-                let fillStyle = (mBoth || isPersActive) ? '#2E2A20'
-                              : isDesActive             ? 'rgb(220,60,60)'
-                              : 'rgba(120, 114, 102, 0.42)';
+                let fillStyle;
+                if (isDarkTheme) {
+                    fillStyle = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#3B82F6' : 'rgba(212, 175, 55, 0.45)'));
+                    if (isAnyHovered) {
+                        if (isHighlighted) {
+                            font = 'bold 13px "DM Sans", sans-serif';
+                            fillStyle = '#FFEFA6';
+                        } else {
+                            fillStyle = 'rgba(212, 175, 55, 0.12)';
+                        }
+                    }
+                } else {
+                    fillStyle = (mBoth || isPersActive) ? '#2E2A20'
+                                  : isDesActive             ? 'rgb(220,60,60)'
+                                  : 'rgba(165, 158, 145, 0.48)';
 
-                if (isAnyHovered) {
-                    if (isHighlighted) {
-                        font = 'bold 12.5px "DM Sans", sans-serif';
-                        fillStyle = (mBoth || isPersActive) ? '#000000' : isDesActive ? 'rgb(230,50,50)' : '#1E1A14';
-                    } else {
-                        fillStyle = 'rgba(180, 180, 180, 0.12)';
+                    if (isAnyHovered) {
+                        if (isHighlighted) {
+                            font = 'bold 13px "DM Sans", sans-serif';
+                        } else {
+                            fillStyle = 'rgba(180, 180, 180, 0.12)';
+                        }
                     }
                 }
 
@@ -4683,8 +4916,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         }
 
-        // Draw light white inner circle background (before zodiac/houses so they render on top)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+        // Draw light white/dark inner circle background (before zodiac/houses so they render on top)
+        ctx.fillStyle = isDarkTheme ? 'rgba(10, 14, 23, 0.78)' : 'rgba(255, 255, 255, 0.78)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
@@ -4830,7 +5063,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.lineTo(cx + rHousesInner * Math.cos(aEnd), cy + rHousesInner * Math.sin(aEnd));
                 ctx.arc(cx, cy, rHousesInner, aEnd, aStart, false);
                 ctx.closePath();
-                ctx.fillStyle = `rgba(225, 190, 110, ${fillOpacity})`;
+                ctx.fillStyle = isDarkTheme ? `rgba(212, 175, 55, ${fillOpacity * 0.55})` : `rgba(225, 190, 110, ${fillOpacity})`;
                 ctx.fill();
             }
 
@@ -4852,18 +5085,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 let cuspColor, cuspWidth;
                 if (isAnyHouseHovered) {
                     if (isCuspBorderingHovered) {
-                        cuspColor = 'rgba(150, 110, 25, 0.85)';
+                        cuspColor = isDarkTheme ? 'rgba(255, 239, 166, 0.95)' : 'rgba(150, 110, 25, 0.85)';
                         cuspWidth = 1.6;
                     } else {
-                        cuspColor = 'rgba(180, 145, 65, 0.08)';
+                        cuspColor = isDarkTheme ? 'rgba(212, 175, 55, 0.10)' : 'rgba(180, 145, 65, 0.08)';
                         cuspWidth = 0.6;
                     }
                 } else {
                     if (isAngularCusp) {
-                        cuspColor = 'rgba(165, 130, 45, 0.65)';
+                        cuspColor = isDarkTheme ? 'rgba(255, 239, 166, 0.80)' : 'rgba(165, 130, 45, 0.65)';
                         cuspWidth = 1.2;
                     } else {
-                        cuspColor = 'rgba(180, 145, 65, 0.48)';
+                        cuspColor = isDarkTheme ? 'rgba(212, 175, 55, 0.50)' : 'rgba(180, 145, 65, 0.48)';
                         cuspWidth = 1.0;
                     }
                 }
@@ -4895,8 +5128,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const angleHouseNum = degToRad(180.0 - ((startLon + 4.5) % 360.0));
                 const xHN = cx + rMid * Math.cos(angleHouseNum);
                 const yHN = cy + rMid * Math.sin(angleHouseNum);
-                ctx.font = isThisHouseHovered ? '700 12.5px "DM Sans", sans-serif' : '600 11.5px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba('#B88E28', textAlpha);
+                ctx.font = isThisHouseHovered ? '700 13px "DM Sans", sans-serif' : '700 12px "DM Sans", sans-serif';
+                ctx.fillStyle = hexToRgba(isDarkTheme ? '#D4A017' : '#B88E28', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(houseNum.toString(), xHN, yHN);
@@ -4925,12 +5158,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Draw Gate number
                 ctx.font = fontGate;
-                ctx.fillStyle = hexToRgba('#1E1A14', textAlpha);
+                ctx.fillStyle = hexToRgba(isDarkTheme ? '#FFEFA6' : '#1E1A14', textAlpha);
                 ctx.fillText(gateStr, startX, yGL);
 
                 // Draw dot & Line number
                 ctx.font = fontLine;
-                ctx.fillStyle = hexToRgba('#3A3428', textAlpha);
+                ctx.fillStyle = hexToRgba(isDarkTheme ? '#E6CA65' : '#3A3428', textAlpha);
                 ctx.fillText(`.${lineStr}`, startX + wGate, yGL + 0.5);
                 ctx.restore();
 
@@ -4944,8 +5177,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const xRP = cx + rMid * Math.cos(angleRulerPos);
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
 
-                    const upColor   = hexToRgba('#2E2A20', textAlpha * pRulers);
-                    const downColor = hexToRgba('#2E2A20', textAlpha * pRulers);
+                    const upColor   = hexToRgba(isDarkTheme ? '#FFEFA6' : '#2E2A20', textAlpha * pRulers);
+                    const downColor = hexToRgba(isDarkTheme ? '#D4AF37' : '#2E2A20', textAlpha * pRulers);
 
                     const tx = xRP - 8.0; // Column for triangles (strictly aligned vertically)
                     const px = xRP + 5.0; // Column for planet symbols
@@ -5109,8 +5342,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fill();
         }
 
-        // 7.5 Soft white overlay over rays before bodygraph and planet symbols render on top
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
+        // 7.5 Soft overlay over rays before bodygraph and planet symbols render on top
+        ctx.fillStyle = isDarkTheme ? 'rgba(10, 14, 23, 0.45)' : 'rgba(255, 255, 255, 0.40)';
         ctx.beginPath();
         ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
         ctx.fill();
@@ -5138,7 +5371,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ax = cx + rAct * cos;
                     const ay = cy + rAct * sin;
 
-                    let baseHex = act.type === 'design' ? '#DC2626' : '#1A1610';
+                    let baseHex;
+                    if (isDarkTheme) {
+                        baseHex = '#D4AF37'; // All planet symbols in the mandala are golden
+                    } else {
+                        baseHex = act.type === 'design' ? '#DC2626' : '#1A1610';
+                    }
                     let planetAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
                     let planetColor = hexToRgba(baseHex, planetAlpha);
 
@@ -5152,7 +5390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.textBaseline = 'middle';
                     
                     let lineAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
-                    ctx.fillStyle = hexToRgba(baseHex, lineAlpha);
+                    ctx.fillStyle = hexToRgba(isDarkTheme ? '#FFEFA6' : baseHex, lineAlpha);
                     ctx.fillText(act.line.toString(), sx, sy);
                 });
             }
@@ -5274,23 +5512,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activeGatesCombined = new Set([...activeGatesPersonality, ...activeGatesDesign]);
 
-        // Reset opacities and filters
-        svg.querySelectorAll('[class*="block__"]').forEach(el => {
-            el.style.opacity = '';
-            el.style.filter = '';
+        // Toggle defined centers class for night mode styling
+        const centerBlockMapAll = {
+            'Head': 1, 'Ajna': 2, 'Throat': 3, 'G-Center': 4,
+            'Heart': 5, 'Spleen': 6, 'Sacral': 7, 'SolarPlexus': 8, 'Root': 9
+        };
+        Object.entries(centerBlockMapAll).forEach(([cName, blockNum]) => {
+            const el = svg.querySelector('.block__' + blockNum);
+            if (el) {
+                el.classList.toggle('bg-center-defined', definedCenters && definedCenters.has(cName));
+            }
         });
-        svg.querySelectorAll('[class*="cls__"]').forEach(el => {
-            el.style.opacity = '';
-            el.style.filter = '';
+
+        // Reset opacities, filters, and all inline styles
+        svg.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('style');
         });
-        svg.querySelectorAll('[class*="cls_"]').forEach(el => {
-            el.style.opacity = '';
-            el.style.filter = '';
-        });
-        svg.querySelectorAll('[class^="a"]').forEach(el => {
-            el.style.fill = '';
-            el.style.filter = '';
-        });
+
+        // In night mode: gate numbers are Black on Gold in defined centers, Gold on Black in undefined centers
+        const isDarkTheme = document.body.classList.contains('theme-dark');
+        if (isDarkTheme) {
+            Object.entries(BG_CENTERS).forEach(([cName, centerObj]) => {
+                const isCenterDefined = definedCenters && definedCenters.has(cName);
+                
+                Object.keys(centerObj.gates).forEach(gNum => {
+                    const isGateDef = activeGatesCombined.has(Number(gNum));
+
+                    // Gate numbers
+                    svg.querySelectorAll('.a' + gNum).forEach(el => {
+                        el.style.setProperty('fill', isCenterDefined ? '#0A0E17' : (isGateDef ? '#FFEFA6' : '#D4AF37'), 'important');
+                        el.style.setProperty('display', 'block', 'important');
+                    });
+
+                    // Circle border around gate number
+                    const borderEls = svg.querySelectorAll('.red_border.cls__' + gNum + ', .cls______' + gNum);
+                    borderEls.forEach(bEl => {
+                        if (isGateDef) {
+                            bEl.style.setProperty('display', 'block', 'important');
+                            if (isCenterDefined) {
+                                bEl.style.setProperty('stroke', '#FFFFFF', 'important');
+                                bEl.style.setProperty('stroke-width', '1.6px', 'important');
+                                bEl.style.setProperty('fill', 'none', 'important');
+                            } else {
+                                bEl.style.setProperty('stroke', '#D4AF37', 'important');
+                                bEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                bEl.style.setProperty('fill', 'none', 'important');
+                            }
+                        } else {
+                            bEl.style.setProperty('display', 'none', 'important');
+                        }
+                    });
+
+                    // Transparent background disk
+                    const bgEls = svg.querySelectorAll('.red_bg.cls__' + gNum);
+                    bgEls.forEach(bgEl => {
+                        bgEl.style.setProperty('fill', 'transparent', 'important');
+                        bgEl.style.setProperty('display', 'block', 'important');
+                    });
+                });
+            });
+        }
 
         function getQuarterNameForIdx(idx) {
             if (idx >= 56 || idx <= 7) return "Инициация";
@@ -5740,14 +6021,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 bgLayoutEl.classList.toggle('mode-dial-2', currentBodygraphDial === '2');
             }
 
-            // Reset all gate elements to hidden
-            svgWrap.querySelectorAll('[class*="cls__"], [class*="cls_"]').forEach(el => {
+            // Reset all gate elements to hidden and completely remove all inline style attributes
+            svgWrap.querySelectorAll('*').forEach(el => {
                 el.classList.remove(
                     'bg-gate-active-personality',
                     'bg-gate-active-design',
-                    'bg-gate-active-both'
+                    'bg-gate-active-both',
+                    'bg-center-defined'
                 );
-                el.style.display = '';
+                el.removeAttribute('style');
             });
 
             // Collect current active gates
@@ -5911,13 +6193,99 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.entries(centerBlockMap).forEach(([center, info]) => {
                 const blockEl = svgWrap.querySelector('.block__' + info.blockNum);
                 if (blockEl) {
-                    if (definedCenters.has(center)) {
-                        blockEl.classList.add('block__' + info.blockNum + '-active');
-                    } else {
-                        blockEl.classList.remove('block__' + info.blockNum + '-active');
-                    }
+                    const isDef = definedCenters.has(center);
+                    blockEl.classList.toggle('block__' + info.blockNum + '-active', isDef);
+                    blockEl.classList.toggle('bg-center-defined', isDef);
                 }
             });
+
+            // Night theme gate numbers and white circular borders for defined centers
+            if (document.body.classList.contains('theme-dark')) {
+                const CENTER_GATES_LIST = {
+                    'head':    [64, 61, 63],
+                    'ajna':    [47, 24, 4, 11, 43, 17],
+                    'throat':  [62, 23, 56, 16, 20, 31, 8, 33, 35, 12, 45],
+                    'gcenter': [1, 7, 13, 10, 15, 2, 46, 25],
+                    'heart':   [21, 40, 26, 51],
+                    'spleen':  [48, 57, 44, 50, 32, 28, 18],
+                    'sacral':  [5, 14, 29, 34, 27, 42, 3, 9],
+                    'solar':   [36, 22, 37, 49, 55, 30, 6],
+                    'root':    [53, 60, 52, 19, 39, 41, 54, 38, 58]
+                };
+
+                Object.entries(CENTER_GATES_LIST).forEach(([cKey, gates]) => {
+                    const isCenterDef = definedCenters.has(cKey);
+
+                    gates.forEach(gNum => {
+                        const isGateDef = allActive.has(gNum);
+
+                        // Numbers inside the gate
+                        svgWrap.querySelectorAll('.a' + gNum).forEach(el => {
+                            if (isCenterDef) {
+                                // Dark readable number on Gold center
+                                el.style.setProperty('fill', '#0A0E17', 'important');
+                                el.style.setProperty('display', 'block', 'important');
+                            } else {
+                                // Light readable number on dark undefined center
+                                if (isGateDef) {
+                                    el.style.setProperty('fill', activeDesignGates[gNum] ? '#FFEFA6' : '#93C5FD', 'important');
+                                } else {
+                                    el.style.setProperty('fill', '#D4AF37', 'important');
+                                }
+                                el.style.setProperty('display', 'block', 'important');
+                            }
+                        });
+
+                        // Circle border around gate number
+                        // We use the background disk path (.cls-8) to draw the stroke, because .cls______ elements 
+                        // are actually channel endpoints in some gates (e.g. 18, 58) and not concentric with the text!
+                        const bgEls = svgWrap.querySelectorAll('.cls-8.cls__' + gNum + ', .red_bg.cls__' + gNum);
+                        bgEls.forEach(bgEl => {
+                            // Ensure background disk fill is transparent so center color shines through
+                            bgEl.style.setProperty('fill', 'transparent', 'important');
+                            
+                            if (isGateDef) {
+                                bgEl.style.setProperty('display', 'block', 'important');
+                                if (isCenterDef) {
+                                    // White circle outline around number in defined center!
+                                    bgEl.style.setProperty('stroke', '#FFFFFF', 'important');
+                                    bgEl.style.setProperty('stroke-width', '1.6px', 'important');
+                                } else {
+                                    // Colored border in undefined center
+                                    const isDes = !!activeDesignGates[gNum];
+                                    const isPers = !!activePersGates[gNum];
+                                    bgEl.style.setProperty('stroke', (isDes && isPers) ? '#D4AF37' : (isDes ? '#D4AF37' : '#2A6EBB'), 'important');
+                                    bgEl.style.setProperty('stroke-width', '1.2px', 'important');
+                                }
+                            } else {
+                                // Hide background disk entirely if gate is inactive
+                                bgEl.style.setProperty('display', 'none', 'important');
+                            }
+                        });
+
+                        // Make sure we DON'T accidentally add white stroke to channel endpoints (.cls______)
+                        const borderEls = svgWrap.querySelectorAll('.red_border.cls__' + gNum + ', .cls______' + gNum);
+                        borderEls.forEach(bEl => {
+                            if (isGateDef) {
+                                bEl.style.setProperty('display', 'block', 'important');
+                                bEl.style.removeProperty('stroke');
+                                bEl.style.removeProperty('stroke-width');
+                                bEl.style.removeProperty('fill');
+                            } else {
+                                bEl.style.setProperty('display', 'none', 'important');
+                            }
+                        });
+                    });
+                });
+            } else {
+                // Light mode: clear all inline overrides so canonical CSS works
+                svgWrap.querySelectorAll('[class*="a"], .cls-8, .red_bg, .red_border, [class*="cls______"]').forEach(el => {
+                    el.style.removeProperty('fill');
+                    el.style.removeProperty('stroke');
+                    el.style.removeProperty('stroke-width');
+                    el.style.removeProperty('display');
+                });
+            }
 
             // Keep mandala central bodygraph in sync
             if (typeof syncMandalaBodygraph === 'function') {
