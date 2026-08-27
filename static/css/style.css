@@ -4564,8 +4564,11 @@ body.theme-dark .bg-col-personality .bg-hex-icon .bg-hex-line {
 }
 
 /* Zodiac Symbols */
-body.theme-dark .bg-planet-row .bg-zodiac-sym {
-    color: #9CA3AF !important;
+body.theme-dark .bg-col-design .bg-zodiac-sym {
+    color: #D4AF37 !important;
+}
+body.theme-dark .bg-col-personality .bg-zodiac-sym {
+    color: #D8D8D8 !important;
 }
 
 /* Retrograde Badges */
