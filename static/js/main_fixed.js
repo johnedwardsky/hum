@@ -491,11 +491,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const geoCache   = new Map(); // local geocoding cache
 
     // ── Theme Switcher (Day / Night Mode Pill) ────────────────
-    function applyTheme(theme) {
+    function applyTheme(theme, save = true) {
         const isDark = (theme === 'dark');
         document.body.classList.toggle('theme-dark', isDark);
         document.body.classList.toggle('theme-light', !isDark);
-        localStorage.setItem('humantica_theme', isDark ? 'dark' : 'light');
+        if (save) {
+            localStorage.setItem('humantica_theme', isDark ? 'dark' : 'light');
+        }
 
         const btnLight = document.getElementById('theme-btn-light');
         const btnDark = document.getElementById('theme-btn-dark');
@@ -515,16 +517,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Default to 'light' (Day mode) on initial visit. Restore 'dark' only if previously saved.
     const savedTheme = localStorage.getItem('humantica_theme') || 'light';
-    applyTheme(savedTheme);
+    applyTheme(savedTheme, false);
 
     const btnThemeLight = document.getElementById('theme-btn-light');
     const btnThemeDark = document.getElementById('theme-btn-dark');
     if (btnThemeLight) {
-        btnThemeLight.addEventListener('click', () => applyTheme('light'));
+        btnThemeLight.addEventListener('click', () => applyTheme('light', true));
     }
     if (btnThemeDark) {
-        btnThemeDark.addEventListener('click', () => applyTheme('dark'));
+        btnThemeDark.addEventListener('click', () => applyTheme('dark', true));
     }
 
     // ── Bodygraph Dial Switcher ───────────────────────────────
