@@ -1541,11 +1541,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const isPersRetro   = p.is_retrograde;
             let retroHtml = '<span class="direct-dash">—</span>';
             if (isDesignRetro && isPersRetro) {
-                retroHtml = `<span class="retro-badge badge-design" title="Дизайн: Ретроградный">R</span> <span class="retro-badge badge-pers" title="Личность: Ретроградный">R</span>`;
+                retroHtml = `<span class="retro-badge badge-design" title="Самость: Ретроградный">R</span> <span class="retro-badge badge-pers" title="Эго: Ретроградный">R</span>`;
             } else if (isDesignRetro) {
-                retroHtml = `<span class="retro-badge badge-design" title="Дизайн: Ретроградный">R</span>`;
+                retroHtml = `<span class="retro-badge badge-design" title="Самость: Ретроградный">R</span>`;
             } else if (isPersRetro) {
-                retroHtml = `<span class="retro-badge badge-pers" title="Личность: Ретроградный">R</span>`;
+                retroHtml = `<span class="retro-badge badge-pers" title="Эго: Ретроградный">R</span>`;
             }
 
             const tr = document.createElement('tr');
@@ -1643,7 +1643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}">${getPlanetSym(p.name)}</div>
-                        <span class="planet-name">${p.name} <span class="hex-type-badge badge-pers">(Личность)</span></span>
+                        <span class="planet-name">${p.name} <span class="hex-type-badge badge-pers">(Эго)</span></span>
                     </div>
                 </td>
                 <td>
@@ -1670,7 +1670,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls} glyph-design">${getPlanetSym(p.name)}</div>
-                        <span class="planet-name planet-name-design">${p.name} <span class="hex-type-badge badge-design">(Дизайн)</span></span>
+                        <span class="planet-name planet-name-design">${p.name} <span class="hex-type-badge badge-design">(Самость)</span></span>
                     </div>
                 </td>
                 <td>
@@ -5776,7 +5776,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}">${getPlanetSym(p.name)}</div>
-                        <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Личность)</span></span>
+                        <span class="planet-name">${p.name} <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">(Эго)</span></span>
                     </div>
                 </td>
                 <td>
@@ -5808,7 +5808,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <div class="planet-cell">
                         <div class="planet-glyph ${meta.cls}" style="color:rgb(255,96,96);">${getPlanetSym(p.name)}</div>
-                        <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Дизайн)</span></span>
+                        <span class="planet-name" style="color:rgb(255,96,96);">${p.name} <span style="font-size:10px; color:rgba(255,96,96,0.7); font-weight:normal;">(Самость)</span></span>
                     </div>
                 </td>
                 <td>
@@ -6698,7 +6698,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sunArrow  = sunTone <= 3 ? 'left' : 'right';
                 const nodeArrow = nodeTone <= 3 ? 'left' : 'right';
 
-                const sideName = isDesign ? 'Дизайн' : 'Личность';
+                const sideName = isDesign ? 'Самость' : 'Эго';
 
                 return `
                     <div class="bg-var-arrow-wrap bg-var-arrow-top">
@@ -6831,7 +6831,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hasDes = act.design.length > 0;
                 const hasPer = act.personality.length > 0;
 
-                const typeLabel = hasDes && hasPer ? 'Дизайн + Личность'
+                const typeLabel = hasDes && hasPer ? 'Самость + Эго'
                                 : hasDes           ? 'Бессознательное'
                                 : hasPer           ? 'Сознательное'
                                 :                    'Не активировано';
@@ -7475,16 +7475,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const hasDes = activeDes.length > 0;
                     const hasPer = activePers.length > 0;
-                    const typeLabel = hasDes && hasPer ? 'Дизайн + Личность'
-                                    : hasDes           ? 'Бессознательное (Дизайн)'
-                                    : hasPer           ? 'Сознательное (Личность)'
+                    const typeLabel = hasDes && hasPer ? 'Самость + Эго'
+                                    : hasDes           ? 'Бессознательное (Самость)'
+                                    : hasPer           ? 'Сознательное (Эго)'
                                     :                    'Не активировано';
 
                     let rows = '';
                     const renderActivationRow = (p, isDesign) => {
                         const hx = p.hexagram;
                         const dotClass = isDesign ? 'tt-dot-design' : 'tt-dot-personality';
-                        const labelType = isDesign ? 'Дизайн' : 'Личность';
+                        const labelType = isDesign ? 'Самость' : 'Эго';
                         
                         const colorName = HD_COLORS[hx.color] || hx.color;
                         const toneName = HD_TONES[hx.tone] || hx.tone;
