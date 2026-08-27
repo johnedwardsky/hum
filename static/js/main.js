@@ -149,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openCustomDatePicker(inputEl) {
+        if (!isMobile()) return;
         activeDatePickerInput = inputEl;
         
         let curDate = new Date();
@@ -230,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputEl.setAttribute('readonly', 'true');
             if (!inputEl.dataset.pickerInitialized) {
                 inputEl.addEventListener('click', (e) => {
+                    if (!isMobile()) return;
                     e.preventDefault();
                     e.stopPropagation();
                     openCustomDatePicker(inputEl);
@@ -309,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openCustomTimePicker(inputEl) {
+        if (!isMobile()) return;
         activeTimePickerInput = inputEl;
         
         let curHour = 12;
@@ -369,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputEl.setAttribute('readonly', 'true');
             if (!inputEl.dataset.timePickerInitialized) {
                 inputEl.addEventListener('click', (e) => {
+                    if (!isMobile()) return;
                     e.preventDefault();
                     e.stopPropagation();
                     openCustomTimePicker(inputEl);
