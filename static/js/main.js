@@ -5627,6 +5627,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 });
+            });
         }
     }
 
