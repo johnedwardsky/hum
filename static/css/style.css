@@ -87,7 +87,7 @@ input  { font-family: inherit; }
     font-size: 18px; 
     font-weight: 700; 
     letter-spacing: -.02em;
-    background: linear-gradient(135deg, #2E2A20 30%, #B38F36 100%);
+    background: linear-gradient(135deg, #C59E3F 0%, #D4AF37 45%, #9E7A1C 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -4110,6 +4110,11 @@ body.theme-dark .theme-switch-glider {
 body.theme-dark .topnav {
     background: rgba(10, 14, 23, 0.92);
     border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+body.theme-dark .logo-text {
+    background: linear-gradient(135deg, #FFEFA6 0%, #E5C453 30%, #D4AF37 60%, #E5C453 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
 }
 body.theme-dark .sidebar {
     background: #0D1322;
