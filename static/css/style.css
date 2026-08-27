@@ -2851,6 +2851,10 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     position: relative;
 }
 
+#bodygraph-svg-wrap {
+    opacity: 0.8;
+}
+
 .bg-svg-wrap svg {
     width: 100%;
     height: auto;
