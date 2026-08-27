@@ -4209,7 +4209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 activationsByGate[p.hexagram.gate].push({
                     type: 'personality',
                     symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                    color: isDarkTheme ? '#2A6EBB' : '#2E2A20',
+                    color: isDarkTheme ? '#C8C8C8' : '#2E2A20',
                     line: p.hexagram.line,
                     name: p.name
                 });
@@ -4318,7 +4318,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Design axis — GOLD
                 drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(212, 175, 55, 0.45)', '#FFEFA6', 2.5);
                 // Personality axis — WHITE / BLUE
-                drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(42, 110, 187, 0.45)', '#3B82F6', 2.5);
+                drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(200, 200, 200, 0.45)', '#D8D8D8', 2.5);
             } else {
                 // Design axis — RED (красное Солнце Дизайна → красная Земля Дизайна)
                 drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(210, 55, 55, 0.30)', 'rgba(210, 55, 55, 0.95)', 2.5);
@@ -4436,7 +4436,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.arc(cx, cy, rGatesInner, endAngle, startAngle, false);
                     ctx.closePath();
                     if (isDarkTheme) {
-                        ctx.fillStyle = isDesign ? `rgba(212,175,55,${0.35 * opacityScale})` : `rgba(42,110,187,${0.28 * opacityScale})`;
+                        ctx.fillStyle = isDesign ? `rgba(212,175,55,${0.35 * opacityScale})` : `rgba(200,200,200,${0.28 * opacityScale})`;
                     } else {
                         ctx.fillStyle = isDesign ? `rgba(255,96,96,${0.28 * opacityScale})` : `rgba(46,42,32,${0.18 * opacityScale})`;
                     }
@@ -4461,7 +4461,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
                     ctx.arc(cx, cy, rGatesInner, endAngle, midAngle, false);
                     ctx.closePath();
-                    ctx.fillStyle = isDarkTheme ? `rgba(42,110,187,${0.25 * opacityScale})` : `rgba(46,42,32,${0.12 * opacityScale})`;
+                    ctx.fillStyle = isDarkTheme ? `rgba(200,200,200,${0.25 * opacityScale})` : `rgba(46,42,32,${0.12 * opacityScale})`;
                     ctx.fill();
                 } else {
                     ctx.beginPath();
@@ -4472,7 +4472,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let bgFill;
                     if (isDarkTheme) {
-                        bgFill = isDesActive ? `rgba(212,175,55,${0.22 * opacityScale})` : `rgba(42,110,187,${0.22 * opacityScale})`;
+                        bgFill = isDesActive ? `rgba(212,175,55,${0.22 * opacityScale})` : `rgba(200,200,200,${0.22 * opacityScale})`;
                     } else {
                         bgFill = isDesActive ? `rgba(255,96,96,${0.12 * opacityScale})` : `rgba(46,42,32,${0.10 * opacityScale})`;
                     }
@@ -4522,9 +4522,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let fillColor;
                     if (isDarkTheme) {
-                        fillColor = seg.type === 'design' ? '#D4AF37' : '#2A6EBB';
+                        fillColor = seg.type === 'design' ? '#D4AF37' : '#C8C8C8';
                         if (isAnyHovered && !isHighlighted) {
-                            fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(42, 110, 187, 0.12)';
+                            fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(200, 200, 200, 0.12)';
                         }
                     } else {
                         fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
@@ -4584,7 +4584,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const gBoth = isPersActive && isDesActive;
             let fillStyle;
             if (isDarkTheme) {
-                fillStyle = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#3B82F6' : 'rgba(212, 175, 55, 0.45)'));
+                fillStyle = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#D8D8D8' : 'rgba(212, 175, 55, 0.45)'));
                 if (isAnyHovered) {
                     if (isHighlighted) {
                         font = 'bold 13px DM Sans, sans-serif';
@@ -4638,7 +4638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let hexColor;
                 if (isDarkTheme) {
-                    hexColor = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#3B82F6' : 'rgba(212, 175, 55, 0.35)'));
+                    hexColor = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#D8D8D8' : 'rgba(212, 175, 55, 0.35)'));
                     if (isAnyHovered) {
                         hexColor = isHighlighted ? '#FFEFA6' : 'rgba(212, 175, 55, 0.12)';
                     }
@@ -4719,7 +4719,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mirrorActivationsBySector[mIdx].push({
                         type: 'personality',
                         symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                        color: isDarkTheme ? '#2A6EBB' : '#2E2A20',
+                        color: isDarkTheme ? '#C8C8C8' : '#2E2A20',
                         line: mLine,
                         gate: mGate,
                         name: p.name
@@ -4817,9 +4817,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             let fillColor;
                             if (isDarkTheme) {
-                                fillColor = seg.type === 'design' ? '#D4AF37' : '#2A6EBB';
+                                fillColor = seg.type === 'design' ? '#D4AF37' : '#C8C8C8';
                                 if (isAnyHovered && !isHighlighted) {
-                                    fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(42, 110, 187, 0.12)';
+                                    fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(200, 200, 200, 0.12)';
                                 }
                             } else {
                                 fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
@@ -4887,7 +4887,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mBoth = isPersActive && isDesActive;
                 let fillStyle;
                 if (isDarkTheme) {
-                    fillStyle = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#3B82F6' : 'rgba(212, 175, 55, 0.45)'));
+                    fillStyle = isCombinedActive ? '#FFEFA6' : (isDesActive ? '#D4AF37' : (isPersActive ? '#D8D8D8' : 'rgba(212, 175, 55, 0.45)'));
                     if (isAnyHovered) {
                         if (isHighlighted) {
                             font = 'bold 13px "DM Sans", sans-serif';
@@ -5555,7 +5555,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             bgEl.style.setProperty('display', 'block', 'important');
                             if (isPers || isBoth) {
                                 // Personality or Both: solid blue circle under number
-                                bgEl.style.setProperty('fill', '#2A6EBB', 'important');
+                                bgEl.style.setProperty('fill', '#C8C8C8', 'important');
                                 if (isBoth) {
                                     bgEl.style.setProperty('stroke', isCenterDefined ? '#8A6D15' : '#D4AF37', 'important');
                                     bgEl.style.setProperty('stroke-width', '1.2px', 'important');
@@ -5586,11 +5586,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    // 2. Numbers inside the gate (White on dark/blue circle backgrounds)
+                    // 2. Numbers inside the gate — color depends on disk background
                     svg.querySelectorAll('.a' + gNum).forEach(el => {
                         if (isGateDef) {
-                            // Active gates with dark/blue circle backgrounds have white numbers
-                            el.style.setProperty('fill', '#FFFFFF', 'important');
+                            if (isPers) {
+                                // Personality (or Both): silver disk — dark text for contrast
+                                el.style.setProperty('fill', '#1A1A1A', 'important');
+                            } else {
+                                // Design only: dark disk — white text for contrast
+                                el.style.setProperty('fill', '#FFFFFF', 'important');
+                            }
                         } else {
                             // Inactive gate: dark in defined gold center, gold in undefined dark center
                             if (isCenterDefined) {
@@ -6253,7 +6258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'gcenter': [1, 7, 13, 10, 15, 2, 46, 25],
                     'heart':   [21, 40, 26, 51],
                     'spleen':  [48, 57, 44, 50, 32, 28, 18],
-                    'sacral':  [5, 14, 29, 34, 27, 42, 3, 9],
+                    'sacral':  [5, 14, 29, 34, 27, 42, 3, 9, 59],
                     'solar':   [36, 22, 37, 49, 55, 30, 6],
                     'root':    [53, 60, 52, 19, 39, 41, 54, 38, 58]
                 };
@@ -6274,7 +6279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 bgEl.style.setProperty('display', 'block', 'important');
                                 if (isPers || isBoth) {
                                     // Personality or Both: solid blue circle under number
-                                    bgEl.style.setProperty('fill', '#2A6EBB', 'important');
+                                    bgEl.style.setProperty('fill', '#C8C8C8', 'important');
                                     if (isBoth) {
                                         bgEl.style.setProperty('stroke', isCenterDef ? '#8A6D15' : '#D4AF37', 'important');
                                         bgEl.style.setProperty('stroke-width', '1.2px', 'important');
@@ -6305,11 +6310,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         });
 
-                        // 2. Numbers inside the gate (White on dark/blue circle backgrounds)
+                        // 2. Numbers inside the gate — color depends on disk background
                         svgWrap.querySelectorAll('.a' + gNum).forEach(el => {
                             if (isGateDef) {
-                                // Active gates with dark/blue circle backgrounds have white numbers
-                                el.style.setProperty('fill', '#FFFFFF', 'important');
+                                if (isPers) {
+                                    // Personality (or Both): silver disk — dark text for contrast
+                                    el.style.setProperty('fill', '#1A1A1A', 'important');
+                                } else {
+                                    // Design only: dark disk — white text for contrast
+                                    el.style.setProperty('fill', '#FFFFFF', 'important');
+                                }
                             } else {
                                 // Inactive gate: dark in defined gold center, gold in undefined dark center
                                 if (isCenterDef) {

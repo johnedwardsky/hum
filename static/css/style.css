@@ -4307,8 +4307,8 @@ body.theme-dark #planets-table .th-dial-2 {
 }
 
 body.theme-dark #planets-table .col-pers-hdr {
-    color: #3B82F6 !important;
-    background: rgba(42, 110, 187, 0.1) !important;
+    color: #D8D8D8 !important;
+    background: rgba(200, 200, 200, 0.1) !important;
     border-right-color: rgba(212, 175, 55, 0.2) !important;
 }
 
@@ -4319,13 +4319,13 @@ body.theme-dark #planets-table .col-design-hdr {
 }
 
 body.theme-dark #planets-table .cell-pers {
-    color: #3B82F6 !important;
+    color: #D8D8D8 !important;
     font-weight: 500 !important;
     border-right-color: rgba(212, 175, 55, 0.12) !important;
 }
 
 body.theme-dark #planets-table .cell-pers .lon-dec {
-    color: rgba(147, 197, 253, 0.8) !important;
+    color: rgba(224, 224, 224, 0.8) !important;
 }
 
 body.theme-dark #planets-table .cell-design {
@@ -4339,9 +4339,9 @@ body.theme-dark #planets-table .cell-design .lon-dec {
 }
 
 body.theme-dark .retro-badge.badge-pers {
-    background: rgba(42, 110, 187, 0.2) !important;
-    color: #93C5FD !important;
-    border-color: rgba(59, 130, 246, 0.4) !important;
+    background: rgba(200, 200, 200, 0.2) !important;
+    color: #E0E0E0 !important;
+    border-color: rgba(216, 216, 216, 0.4) !important;
 }
 
 body.theme-dark .retro-badge.badge-design {
@@ -4366,28 +4366,28 @@ body.theme-dark .direct-dash {
    NIGHT THEME: PROGRAMS (HEXAGRAMS) TABLE & ACTIVATIONS
    ══════════════════════════════════════════════════════════════════════ */
 body.theme-dark .hex-row-pers .planet-name {
-    color: #3B82F6 !important;
+    color: #D8D8D8 !important;
 }
 body.theme-dark .hex-row-pers .planet-glyph {
-    color: #3B82F6 !important;
-    border-color: rgba(59, 130, 246, 0.4) !important;
-    background: rgba(42, 110, 187, 0.15) !important;
+    color: #D8D8D8 !important;
+    border-color: rgba(216, 216, 216, 0.4) !important;
+    background: rgba(200, 200, 200, 0.15) !important;
 }
 body.theme-dark .hex-row-pers .hex-type-badge.badge-pers {
-    color: #93C5FD !important;
+    color: #E0E0E0 !important;
 }
 body.theme-dark .hex-gate-badge.badge-pers {
-    background: linear-gradient(135deg, rgba(42, 110, 187, 0.25), rgba(42, 110, 187, 0.08)) !important;
-    border-color: rgba(59, 130, 246, 0.45) !important;
-    color: #93C5FD !important;
-    box-shadow: 0 0 8px rgba(42, 110, 187, 0.25) !important;
+    background: linear-gradient(135deg, rgba(200, 200, 200, 0.25), rgba(200, 200, 200, 0.08)) !important;
+    border-color: rgba(216, 216, 216, 0.45) !important;
+    color: #E0E0E0 !important;
+    box-shadow: 0 0 8px rgba(200, 200, 200, 0.25) !important;
 }
 body.theme-dark .hex-num.hex-num-pers {
-    background: rgba(42, 110, 187, 0.2) !important;
-    border-color: rgba(59, 130, 246, 0.45) !important;
-    color: #DBEAFE !important;
+    background: rgba(200, 200, 200, 0.2) !important;
+    border-color: rgba(216, 216, 216, 0.45) !important;
+    color: #EBEBEB !important;
     font-weight: 700 !important;
-    box-shadow: 0 0 8px rgba(42, 110, 187, 0.25) !important;
+    box-shadow: 0 0 8px rgba(200, 200, 200, 0.25) !important;
 }
 
 body.theme-dark .hex-row-design .planet-name-design {
@@ -4442,25 +4442,25 @@ body.theme-dark .bg-var-design .var-badge-svg text {
 }
 
 body.theme-dark .bg-var-personality {
-    color: #3B82F6 !important;
+    color: #D8D8D8 !important;
 }
 body.theme-dark .bg-var-personality .bg-var-labels span {
-    color: #93C5FD !important;
-    text-shadow: 0 0 8px rgba(42, 110, 187, 0.4);
+    color: #E0E0E0 !important;
+    text-shadow: 0 0 8px rgba(200, 200, 200, 0.4);
 }
 body.theme-dark .bg-var-personality .bg-var-arrow-svg path,
 body.theme-dark .bg-var-personality .var-arrow-svg path {
-    fill: #2A6EBB !important;
-    filter: drop-shadow(0 0 6px rgba(42, 110, 187, 0.6));
+    fill: #C8C8C8 !important;
+    filter: none !important;
 }
 body.theme-dark .bg-var-personality .var-badge-svg rect,
 body.theme-dark .bg-var-personality .var-badge-svg circle,
 body.theme-dark .bg-var-personality .var-badge-svg polygon {
-    fill: #2A6EBB !important;
-    filter: drop-shadow(0 0 6px rgba(42, 110, 187, 0.5));
+    fill: #C8C8C8 !important;
+    filter: none !important;
 }
 body.theme-dark .bg-var-personality .var-badge-svg text {
-    fill: #FFFFFF !important;
+    fill: #1A1A1A !important;
     font-weight: 800 !important;
 }
 
@@ -4476,11 +4476,11 @@ body.theme-dark .bg-col-title-design .bg-header-sub {
     color: #FFEFA6 !important;
 }
 body.theme-dark .bg-col-title-personality {
-    color: #3B82F6 !important;
-    text-shadow: 0 0 10px rgba(42, 110, 187, 0.4);
+    color: #D8D8D8 !important;
+    text-shadow: 0 0 10px rgba(200, 200, 200, 0.4);
 }
 body.theme-dark .bg-col-title-personality .bg-header-sub {
-    color: #93C5FD !important;
+    color: #E0E0E0 !important;
 }
 
 /* Column Container */
@@ -4495,7 +4495,7 @@ body.theme-dark .bg-col-design .bg-planet-list {
     border-right: 2px solid rgba(212, 175, 55, 0.5) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-list {
-    border-left: 2px solid rgba(42, 110, 187, 0.5) !important;
+    border-left: 2px solid rgba(200, 200, 200, 0.5) !important;
 }
 
 /* Rows */
@@ -4509,9 +4509,9 @@ body.theme-dark .bg-col-design .bg-planet-row:hover {
     box-shadow: 0 0 12px rgba(212, 175, 55, 0.3) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-row:hover {
-    background: rgba(42, 110, 187, 0.15) !important;
-    border-color: rgba(59, 130, 246, 0.4) !important;
-    box-shadow: 0 0 12px rgba(42, 110, 187, 0.25) !important;
+    background: rgba(200, 200, 200, 0.15) !important;
+    border-color: rgba(216, 216, 216, 0.4) !important;
+    box-shadow: 0 0 12px rgba(200, 200, 200, 0.25) !important;
 }
 
 /* Planet Wrap Box */
@@ -4520,8 +4520,8 @@ body.theme-dark .bg-col-design .bg-planet-wrap {
     border-color: rgba(212, 175, 55, 0.35) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-wrap {
-    background: rgba(42, 110, 187, 0.15) !important;
-    border-color: rgba(59, 130, 246, 0.35) !important;
+    background: rgba(200, 200, 200, 0.15) !important;
+    border-color: rgba(216, 216, 216, 0.35) !important;
 }
 
 /* Planet Glyphs */
@@ -4529,7 +4529,7 @@ body.theme-dark .bg-col-design .bg-planet-sym {
     color: #D4AF37 !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-sym {
-    color: #3B82F6 !important;
+    color: #D8D8D8 !important;
 }
 
 /* Gate Cells (Main numbers & line) */
@@ -4538,7 +4538,7 @@ body.theme-dark .bg-col-design .bg-gate-cell {
     font-weight: 700 !important;
 }
 body.theme-dark .bg-col-personality .bg-gate-cell {
-    color: #3B82F6 !important;
+    color: #D8D8D8 !important;
     font-weight: 700 !important;
 }
 
@@ -4547,7 +4547,7 @@ body.theme-dark .bg-col-design .bg-mirror-cell {
     color: rgba(255, 239, 166, 0.75) !important;
 }
 body.theme-dark .bg-col-personality .bg-mirror-cell {
-    color: rgba(147, 197, 253, 0.8) !important;
+    color: rgba(224, 224, 224, 0.8) !important;
 }
 
 /* Hexagram Icon Lines */
@@ -4555,7 +4555,7 @@ body.theme-dark .bg-col-design .bg-hex-icon .bg-hex-line {
     background: #D4AF37 !important;
 }
 body.theme-dark .bg-col-personality .bg-hex-icon .bg-hex-line {
-    background: #3B82F6 !important;
+    background: #D8D8D8 !important;
 }
 
 /* Zodiac Symbols */
@@ -4739,24 +4739,34 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-35 {
 }
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality {
-    fill: #2A6EBB !important;
+    fill: #C8C8C8 !important;
     display: block !important;
 }
 
+/* Channel connection lines (personality) — remain stroke-only */
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.red_border,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-15,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.red_border,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-15 {
+    stroke: #C8C8C8 !important;
+    fill: none !important;
+}
+/* Connection dot circles (personality) — solid silver, no ring */
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-31,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-35,
-body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.red_border,
-body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-15,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-31,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-35 {
-    stroke: #2A6EBB !important;
-    fill: none !important;
+    fill: #C8C8C8 !important;
+    stroke: none !important;
+}
+/* Both-gate disk fallback for gates not handled by JS CENTER_GATES_LIST */
+body.theme-dark .bg-svg-wrap .bg-gate-active-both.cls-8,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both.cls-8 {
+    fill: #C8C8C8 !important;
 }
 body.theme-dark .bg-svg-wrap .cls__.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap .cls__.bg-gate-active-both {
@@ -4808,7 +4818,7 @@ body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both {
 body.theme-dark .bg-svg-wrap g.bg-gate-active-both *,
 body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both * {
     display: block !important;
-    fill: #2A6EBB !important;
+    fill: #C8C8C8 !important;
 }
 
 /* Gate numbers in Night Mode */
