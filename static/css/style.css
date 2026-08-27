@@ -4318,7 +4318,7 @@ body.theme-dark #planets-table .col-pers-hdr {
 }
 
 body.theme-dark #planets-table .col-design-hdr {
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
     background: rgba(212, 175, 55, 0.1) !important;
     border-left-color: rgba(212, 175, 55, 0.2) !important;
 }
@@ -4334,13 +4334,13 @@ body.theme-dark #planets-table .cell-pers .lon-dec {
 }
 
 body.theme-dark #planets-table .cell-design {
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
     font-weight: 500 !important;
     border-left-color: rgba(212, 175, 55, 0.12) !important;
 }
 
 body.theme-dark #planets-table .cell-design .lon-dec {
-    color: rgba(255, 239, 166, 0.75) !important;
+    color: rgba(212, 175, 55, 0.75) !important;
 }
 
 body.theme-dark .retro-badge.badge-pers {
@@ -4351,7 +4351,7 @@ body.theme-dark .retro-badge.badge-pers {
 
 body.theme-dark .retro-badge.badge-design {
     background: rgba(212, 175, 55, 0.2) !important;
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
     border-color: rgba(212, 175, 55, 0.4) !important;
 }
 
@@ -4396,7 +4396,7 @@ body.theme-dark .hex-num.hex-num-pers {
 }
 
 body.theme-dark .hex-row-design .planet-name-design {
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
 }
 body.theme-dark .hex-row-design .glyph-design {
     color: #D4AF37 !important;
@@ -4409,13 +4409,13 @@ body.theme-dark .hex-row-design .hex-type-badge.badge-design {
 body.theme-dark .hex-gate-badge.badge-design {
     background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.1)) !important;
     border-color: rgba(212, 175, 55, 0.45) !important;
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.25) !important;
 }
 body.theme-dark .hex-num.hex-num-design {
     background: rgba(212, 175, 55, 0.2) !important;
     border-color: rgba(212, 175, 55, 0.45) !important;
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
     font-weight: 700 !important;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.25) !important;
 }
@@ -4539,7 +4539,7 @@ body.theme-dark .bg-col-personality .bg-planet-sym {
 
 /* Gate Cells (Main numbers & line) */
 body.theme-dark .bg-col-design .bg-gate-cell {
-    color: #FFEFA6 !important;
+    color: #D4AF37 !important;
     font-weight: 700 !important;
 }
 body.theme-dark .bg-col-personality .bg-gate-cell {
@@ -4549,7 +4549,7 @@ body.theme-dark .bg-col-personality .bg-gate-cell {
 
 /* 2nd Dial Mirror Cells */
 body.theme-dark .bg-col-design .bg-mirror-cell {
-    color: rgba(255, 239, 166, 0.75) !important;
+    color: rgba(212, 175, 55, 0.75) !important;
 }
 body.theme-dark .bg-col-personality .bg-mirror-cell {
     color: rgba(224, 224, 224, 0.8) !important;
