@@ -4455,21 +4455,21 @@ body.theme-dark .bg-var-design .var-badge-svg text {
 }
 
 body.theme-dark .bg-var-personality {
-    color: #F0F0F0 !important;
+    color: #FFFFFF !important;
 }
 body.theme-dark .bg-var-personality .bg-var-labels span {
-    color: #F0F0F0 !important;
-    text-shadow: 0 0 8px rgba(240, 240, 240, 0.4);
+    color: #FFFFFF !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 body.theme-dark .bg-var-personality .bg-var-arrow-svg path,
 body.theme-dark .bg-var-personality .var-arrow-svg path {
-    fill: #F0F0F0 !important;
+    fill: #FFFFFF !important;
     filter: none !important;
 }
 body.theme-dark .bg-var-personality .var-badge-svg rect,
 body.theme-dark .bg-var-personality .var-badge-svg circle,
 body.theme-dark .bg-var-personality .var-badge-svg polygon {
-    fill: #F0F0F0 !important;
+    fill: #FFFFFF !important;
     filter: none !important;
 }
 body.theme-dark .bg-var-personality .var-badge-svg text {
@@ -4489,11 +4489,11 @@ body.theme-dark .bg-col-title-design .bg-header-sub {
     color: #FFEFA6 !important;
 }
 body.theme-dark .bg-col-title-personality {
-    color: #D8D8D8 !important;
-    text-shadow: 0 0 10px rgba(200, 200, 200, 0.4);
+    color: #FFFFFF !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 body.theme-dark .bg-col-title-personality .bg-header-sub {
-    color: #E0E0E0 !important;
+    color: #FFFFFF !important;
 }
 
 /* Column Container */
@@ -4508,7 +4508,7 @@ body.theme-dark .bg-col-design .bg-planet-list {
     border-right: 2px solid rgba(212, 175, 55, 0.5) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-list {
-    border-left: 2px solid rgba(200, 200, 200, 0.5) !important;
+    border-left: 2px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Rows */
@@ -4522,9 +4522,9 @@ body.theme-dark .bg-col-design .bg-planet-row:hover {
     box-shadow: 0 0 12px rgba(212, 175, 55, 0.3) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-row:hover {
-    background: rgba(200, 200, 200, 0.15) !important;
-    border-color: rgba(216, 216, 216, 0.4) !important;
-    box-shadow: 0 0 12px rgba(200, 200, 200, 0.25) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.25) !important;
 }
 
 /* Planet Wrap Box */
@@ -4533,8 +4533,8 @@ body.theme-dark .bg-col-design .bg-planet-wrap {
     border-color: rgba(212, 175, 55, 0.35) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-wrap {
-    background: rgba(200, 200, 200, 0.15) !important;
-    border-color: rgba(216, 216, 216, 0.35) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
 /* Planet Glyphs */
@@ -4542,7 +4542,7 @@ body.theme-dark .bg-col-design .bg-planet-sym {
     color: #D4AF37 !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-sym {
-    color: #D8D8D8 !important;
+    color: #FFFFFF !important;
 }
 
 /* Gate Cells (Main numbers & line) */
@@ -4551,7 +4551,7 @@ body.theme-dark .bg-col-design .bg-gate-cell {
     font-weight: 700 !important;
 }
 body.theme-dark .bg-col-personality .bg-gate-cell {
-    color: #D8D8D8 !important;
+    color: #FFFFFF !important;
     font-weight: 700 !important;
 }
 
@@ -4560,7 +4560,7 @@ body.theme-dark .bg-col-design .bg-mirror-cell {
     color: rgba(212, 175, 55, 0.75) !important;
 }
 body.theme-dark .bg-col-personality .bg-mirror-cell {
-    color: rgba(224, 224, 224, 0.8) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Hexagram Icon Lines */
@@ -4568,7 +4568,7 @@ body.theme-dark .bg-col-design .bg-hex-icon .bg-hex-line {
     background: #D4AF37 !important;
 }
 body.theme-dark .bg-col-personality .bg-hex-icon .bg-hex-line {
-    background: #D8D8D8 !important;
+    background: #FFFFFF !important;
 }
 
 /* Zodiac Symbols */
@@ -4755,7 +4755,7 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-35 {
 }
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality {
-    fill: #F0F0F0 !important;
+    fill: #FFFFFF !important;
     display: block !important;
 }
 
@@ -4764,10 +4764,10 @@ body.theme-dark .bg-svg-wrap .bg-gate-active-personality.red_border,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-15,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.red_border,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-15 {
-    stroke: #F0F0F0 !important;
+    stroke: #FFFFFF !important;
     fill: none !important;
 }
-/* Connection dot circles (personality) — solid luminous white, no ring */
+/* Connection dot circles (personality) — solid pure white, no ring */
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-31,
@@ -4776,13 +4776,13 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-31,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-35 {
-    fill: #F0F0F0 !important;
+    fill: #FFFFFF !important;
     stroke: none !important;
 }
 /* Both-gate disk fallback for gates not handled by JS CENTER_GATES_LIST */
 body.theme-dark .bg-svg-wrap .bg-gate-active-both.cls-8,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both.cls-8 {
-    fill: #F0F0F0 !important;
+    fill: #FFFFFF !important;
 }
 body.theme-dark .bg-svg-wrap .cls__.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap .cls__.bg-gate-active-both {
@@ -4834,7 +4834,7 @@ body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both {
 body.theme-dark .bg-svg-wrap g.bg-gate-active-both *,
 body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both * {
     display: block !important;
-    fill: #F0F0F0 !important;
+    fill: #FFFFFF !important;
 }
 
 /* Gate numbers in Night Mode */
