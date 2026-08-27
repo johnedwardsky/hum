@@ -4455,21 +4455,21 @@ body.theme-dark .bg-var-design .var-badge-svg text {
 }
 
 body.theme-dark .bg-var-personality {
-    color: #DFDFDF !important;
+    color: #F0F0F0 !important;
 }
 body.theme-dark .bg-var-personality .bg-var-labels span {
-    color: #DFDFDF !important;
-    text-shadow: 0 0 8px rgba(223, 223, 223, 0.4);
+    color: #F0F0F0 !important;
+    text-shadow: 0 0 8px rgba(240, 240, 240, 0.4);
 }
 body.theme-dark .bg-var-personality .bg-var-arrow-svg path,
 body.theme-dark .bg-var-personality .var-arrow-svg path {
-    fill: #DFDFDF !important;
+    fill: #F0F0F0 !important;
     filter: none !important;
 }
 body.theme-dark .bg-var-personality .var-badge-svg rect,
 body.theme-dark .bg-var-personality .var-badge-svg circle,
 body.theme-dark .bg-var-personality .var-badge-svg polygon {
-    fill: #DFDFDF !important;
+    fill: #F0F0F0 !important;
     filter: none !important;
 }
 body.theme-dark .bg-var-personality .var-badge-svg text {
@@ -4755,7 +4755,7 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-35 {
 }
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality {
-    fill: #DFDFDF !important;
+    fill: #F0F0F0 !important;
     display: block !important;
 }
 
@@ -4764,10 +4764,10 @@ body.theme-dark .bg-svg-wrap .bg-gate-active-personality.red_border,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-15,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.red_border,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-15 {
-    stroke: #DFDFDF !important;
+    stroke: #F0F0F0 !important;
     fill: none !important;
 }
-/* Connection dot circles (personality) — solid platinum-white, no ring */
+/* Connection dot circles (personality) — solid luminous white, no ring */
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-31,
@@ -4776,13 +4776,13 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-31,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-35 {
-    fill: #DFDFDF !important;
+    fill: #F0F0F0 !important;
     stroke: none !important;
 }
 /* Both-gate disk fallback for gates not handled by JS CENTER_GATES_LIST */
 body.theme-dark .bg-svg-wrap .bg-gate-active-both.cls-8,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both.cls-8 {
-    fill: #DFDFDF !important;
+    fill: #F0F0F0 !important;
 }
 body.theme-dark .bg-svg-wrap .cls__.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap .cls__.bg-gate-active-both {
@@ -4834,7 +4834,7 @@ body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both {
 body.theme-dark .bg-svg-wrap g.bg-gate-active-both *,
 body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both * {
     display: block !important;
-    fill: #DFDFDF !important;
+    fill: #F0F0F0 !important;
 }
 
 /* Gate numbers in Night Mode */
