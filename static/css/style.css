@@ -4754,7 +4754,15 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-35 {
     fill: none !important;
 }
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality,
-body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality {
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-17,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-19,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-17,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-19,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-17,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-19,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-17,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-19 {
     fill: #FFFFFF !important;
     display: block !important;
 }
@@ -4762,8 +4770,12 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality {
 /* Channel connection lines (personality) — remain stroke-only */
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.red_border,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-15,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .red_border,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-15,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.red_border,
-body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-15 {
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-15,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .red_border,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-15 {
     stroke: #FFFFFF !important;
     fill: none !important;
 }
@@ -4772,10 +4784,18 @@ body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-31,
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-35,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-21,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-30,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-31,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality .cls-35,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-21,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-30,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-31,
-body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-35 {
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-35,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-21,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-30,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-31,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-35 {
     fill: #FFFFFF !important;
     stroke: none !important;
 }

@@ -4462,7 +4462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.fillStyle = isDarkTheme ? `rgba(212,175,55,${0.25 * opacityScale})` : `rgba(255,96,96,${0.14 * opacityScale})`;
                     ctx.fill();
 
-                    // 2nd half: Blue (Personality)
+                    // 2nd half: White (Personality)
                     ctx.beginPath();
                     ctx.arc(cx, cy, rGatesOuter, midAngle, endAngle, true);
                     ctx.lineTo(cx + rGatesInner * Math.cos(endAngle), cy + rGatesInner * Math.sin(endAngle));
