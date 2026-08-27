@@ -4529,9 +4529,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let fillColor;
                     if (isDarkTheme) {
-                        fillColor = seg.type === 'design' ? '#D4AF37' : '#C8C8C8';
+                        fillColor = seg.type === 'design' ? '#D4AF37' : '#DF8F2E';
                         if (isAnyHovered && !isHighlighted) {
-                            fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(200, 200, 200, 0.12)';
+                            fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(223, 143, 46, 0.12)';
                         }
                     } else {
                         fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
@@ -4726,7 +4726,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mirrorActivationsBySector[mIdx].push({
                         type: 'personality',
                         symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                        color: isDarkTheme ? '#C8C8C8' : '#2E2A20',
+                        color: isDarkTheme ? '#DF8F2E' : '#2E2A20',
                         line: mLine,
                         gate: mGate,
                         name: p.name
@@ -4824,9 +4824,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             let fillColor;
                             if (isDarkTheme) {
-                                fillColor = seg.type === 'design' ? '#D4AF37' : '#C8C8C8';
+                                fillColor = seg.type === 'design' ? '#D4AF37' : '#DF8F2E';
                                 if (isAnyHovered && !isHighlighted) {
-                                    fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(200, 200, 200, 0.12)';
+                                    fillColor = seg.type === 'design' ? 'rgba(212, 175, 55, 0.12)' : 'rgba(223, 143, 46, 0.12)';
                                 }
                             } else {
                                 fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
@@ -5561,8 +5561,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (isGateDef) {
                             bgEl.style.setProperty('display', 'block', 'important');
                             if (isPers || isBoth) {
-                                // Personality or Both: solid blue circle under number
-                                bgEl.style.setProperty('fill', '#C8C8C8', 'important');
+                                // Personality or Both: solid amber circle under number
+                                bgEl.style.setProperty('fill', '#DF8F2E', 'important');
                                 if (isBoth) {
                                     bgEl.style.setProperty('stroke', isCenterDefined ? '#8A6D15' : '#D4AF37', 'important');
                                     bgEl.style.setProperty('stroke-width', '1.2px', 'important');
@@ -6153,8 +6153,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (isGateDef) {
                                 bgEl.style.setProperty('display', 'block', 'important');
                                 if (isPers || isBoth) {
-                                    // Personality or Both: solid blue circle under number
-                                    bgEl.style.setProperty('fill', '#C8C8C8', 'important');
+                                    // Personality or Both: solid amber circle under number
+                                    bgEl.style.setProperty('fill', '#DF8F2E', 'important');
                                     if (isBoth) {
                                         bgEl.style.setProperty('stroke', isCenterDef ? '#8A6D15' : '#D4AF37', 'important');
                                         bgEl.style.setProperty('stroke-width', '1.2px', 'important');
