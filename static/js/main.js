@@ -488,6 +488,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'Лилит (интерп.)',
         'Приап (интерп.)'
     ];
+    const CANONICAL_HD_PLANET_NAMES = new Set([
+        'Солнце', 'Земля', 'Истинный Северный Узел', 'Истинный Южный Узел',
+        'Средний Северный Узел', 'Средний Южный Узел', 'Северный Узел', 'Южный Узел',
+        'Луна', 'Меркурий', 'Венера', 'Марс', 'Юпитер', 'Сатурн',
+        'Уран', 'Нептун', 'Плутон',
+        'Sun', 'Earth', 'True Node', 'True South Node',
+        'Mean Node', 'Mean South Node', 'North Node', 'South Node',
+        'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn',
+        'Uranus', 'Neptune', 'Pluto'
+    ]);
     const geoCache   = new Map(); // local geocoding cache
 
     // ── Theme Switcher (Day / Night Mode Pill) ────────────────
@@ -3155,7 +3165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { gateA: 9, gateB: 52, centerA: 'Sacral', centerB: 'Root', type: 'straight' },
         { gateA: 10, gateB: 34, centerA: 'G-Center', centerB: 'Sacral', type: 'straight' },
         { gateA: 10, gateB: 20, centerA: 'G-Center', centerB: 'Throat', type: 'straight' },
-        { gateA: 20, gateB: 34, centerA: 'Throat', centerB: 'Sacral', type: 'bent_34_20' }
+        { gateA: 20, gateB: 34, centerA: 'Throat', centerB: 'Sacral', type: 'bent_34_20' },
+        { gateA: 34, gateB: 57, centerA: 'Sacral', centerB: 'Spleen', type: 'straight' }
     ];
 
     /* ── shared drawing core (used by standalone bodygraph + mandala overlay) ── */
@@ -3506,7 +3517,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const oy = 131.25;
         drawBodygraphOnCtx(ctx, data, sc, ox, oy, activeGatesPersonality, activeGatesDesign, definedCenters);
 
-        // 2. Draw Side Columns
+        // 2. Draw Side Columns (Canonical 13 HD objects)
         const planetNames = [
             "Солнце",
             "Земля",
@@ -3520,12 +3531,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Сатурн",
             "Уран",
             "Нептун",
-            "Плутон",
-            "Хирон",
-            "Лилит (истинная)",
-            "Лилит (средняя)",
-            "Лилит (интерп.)",
-            "Приап (интерп.)"
+            "Плутон"
         ];
 
         const lineFixations = {
@@ -3803,24 +3809,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lineIdx = (houseData.hexagram.line || 1) - 1;
                 return (WHEEL_START_LOCAL + gateIdx * GATE_INTERVAL_LOCAL + lineIdx * (GATE_INTERVAL_LOCAL / 6)) % 360;
             };
+            const isPlanetActive = (pName, isDesign = false) => {
+                if (isDesign && activeBgDesign) return activeBgDesign.has(pName);
+                if (!isDesign && activeBgPers) return activeBgPers.has(pName);
+                if (activePlanets) return activePlanets.has(pName);
+                return !DEFAULT_INACTIVE_PLANETS.includes(pName);
+            };
+
             const AS = getProgramBoundary(data.houses[0]);
             (data.planets || []).forEach(p => {
-                if (p.longitude != null) {
+                if (p.longitude != null && isPlanetActive(p.name, false)) {
                     const relLon = (p.longitude - AS + 360) % 360;
                     const mIdx = Math.floor(relLon / 5.625) % 64;
                     activeGates.add(MIRROR_GATE_ORDER[mIdx]);
                 }
             });
             (data.design_planets || []).forEach(p => {
-                if (p.longitude != null) {
+                if (p.longitude != null && isPlanetActive(p.name, true)) {
                     const relLon = (p.longitude - AS + 360) % 360;
                     const mIdx = Math.floor(relLon / 5.625) % 64;
                     activeGates.add(MIRROR_GATE_ORDER[mIdx]);
                 }
             });
         } else {
-            (data.planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
-            (data.design_planets || []).forEach(p => { if (p.hexagram) activeGates.add(p.hexagram.gate); });
+            const isPlanetActive = (pName, isDesign = false) => {
+                if (isDesign && activeBgDesign) return activeBgDesign.has(pName);
+                if (!isDesign && activeBgPers) return activeBgPers.has(pName);
+                if (activePlanets) return activePlanets.has(pName);
+                return !DEFAULT_INACTIVE_PLANETS.includes(pName);
+            };
+            (data.planets || []).forEach(p => {
+                if (p.hexagram && isPlanetActive(p.name, false)) activeGates.add(p.hexagram.gate);
+            });
+            (data.design_planets || []).forEach(p => {
+                if (p.hexagram && isPlanetActive(p.name, true)) activeGates.add(p.hexagram.gate);
+            });
         }
 
         // Defined centers via channels (both gates must be active)
@@ -4390,6 +4413,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return false;
             }
+            if (hoverType === 'mirrorGate') {
+                return false;
+            }
             return true;
         }
 
@@ -4763,7 +4789,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const gateNum = MIRROR_GATE_ORDER[i];
-                const isHighlighted = isGateHighlighted(gateNum, i);
+                // 2nd dial programs ONLY highlight if hovered directly on 2nd dial (hoverType === 'mirrorGate' and mirrorIdx === i)
+                // When hovering on 1st dial (hoverType === 'gate'), 2nd dial sectors do NOT highlight, and hidden programs NEVER appear.
+                const isHighlighted = (hoverType === 'mirrorGate' && hoverState && hoverState.mirrorIdx === i);
                 const isAnyHovered  = (hoverType !== null);
 
                 // Sector boundaries (CCW from AS)
@@ -5836,7 +5864,7 @@ document.addEventListener('DOMContentLoaded', () => {
             61: ['Xun',  'Dui'], 62: ['Zhen', 'Gen'], 63: ['Kan',  'Li'], 64: ['Li',   'Kan']
         };
 
-        // Helper to extract and format standard planets plus Chiron, Lilith, Priapus
+        // Helper to extract and format standard canonical 13 HD planets (Sun to Pluto)
         function getBodygraphPlanets(planetList) {
             const map = {};
             planetList.forEach(p => {
@@ -6233,6 +6261,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Keep mandala central bodygraph in sync
             if (typeof syncMandalaBodygraph === 'function') {
                 syncMandalaBodygraph();
+            }
+
+            // Dynamically refresh the HD Type / Profile / Authority card below bodygraph
+            if (typeof updateHdTypeProfile === 'function' && data) {
+                updateHdTypeProfile(data);
             }
         }
 
@@ -7116,7 +7149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let angle = Math.atan2(dy, dx);
                     let deg = (180.0 - angle * (180.0 / Math.PI) + 720.0) % 360.0;
 
-                    // Check if hovering the Houses Ring (rHousesInner <= dist <= rHousesOuter)
+                    // 1. Houses Ring (rHousesInner <= dist <= rHousesOuter)
                     if (pH2 > 0.5 && dist >= rHousesInner && dist <= rHousesOuter && lastChart && lastChart.houses && lastChart.houses.length === 12) {
                         const getProgramBoundary = (houseData) => {
                             if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
@@ -7133,63 +7166,72 @@ document.addEventListener('DOMContentLoaded', () => {
                             target = houseIdx + 1;
                         }
                     }
+                    // 2. Zodiac Ring (rZodiacInner <= dist <= rDialInner)
+                    else if (pZ > 0.5 && dist >= rZodiacInner && dist <= rDialInner) {
+                        const signIdx = Math.floor(deg / 30) % 12;
+                        type = 'zodiac';
+                        target = signIdx;
+                    }
+                    // 3. 2nd Dial / Mirror Ring (rMirrorInner <= dist <= rMirrorOuter)
+                    else if (pM > 0.5 && dist >= rMirrorInner && dist <= rMirrorOuter && lastChart && lastChart.houses && lastChart.houses.length >= 1) {
+                        const getProgramBoundary = (houseData) => {
+                            if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                            const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                            if (gIdx === -1) return houseData.longitude;
+                            const lineIdx = (houseData.hexagram.line || 1) - 1;
+                            return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                        };
+                        const AS = getProgramBoundary(lastChart.houses[0]);
+                        const relLon = (deg - AS + 720.0) % 360.0;
+                        const mIdx = Math.floor(relLon / GATE_INTERVAL) % 64;
 
-                        // Check if hovering 2nd dial (Mirror Ring) - only active programs can be hovered
-                        if (pM > 0.5 && dist >= rMirrorInner && dist <= rMirrorOuter && lastChart && lastChart.houses && lastChart.houses.length >= 1) {
-                            const getProgramBoundary = (houseData) => {
-                                if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
-                                const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
-                                if (gIdx === -1) return houseData.longitude;
-                                const lineIdx = (houseData.hexagram.line || 1) - 1;
-                                return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
-                            };
-                            const AS = getProgramBoundary(lastChart.houses[0]);
-                            const relLon = (deg - AS + 720.0) % 360.0;
-                            const mIdx = Math.floor(relLon / GATE_INTERVAL) % 64;
-
-                            let isMirrorActive = false;
-                            (lastChart.planets || []).forEach(p => {
-                                if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                                    const pRel = (p.longitude - AS + 720.0) % 360.0;
-                                    if (Math.floor(pRel / GATE_INTERVAL) % 64 === mIdx) isMirrorActive = true;
-                                }
-                            });
-                            (lastChart.design_planets || []).forEach(p => {
-                                if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
-                                    const pRel = (p.longitude - AS + 720.0) % 360.0;
-                                    if (Math.floor(pRel / GATE_INTERVAL) % 64 === mIdx) isMirrorActive = true;
-                                }
-                            });
-
-                            if (isMirrorActive) {
-                                const mGate = MIRROR_GATE_ORDER[mIdx];
-                                type = 'gate';
-                                target = mGate;
-                                gateIdx = GATE_ORDER.indexOf(mGate);
+                        let isMirrorActive = false;
+                        (lastChart.planets || []).forEach(p => {
+                            if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
+                                const pRel = (p.longitude - AS + 720.0) % 360.0;
+                                if (Math.floor(pRel / GATE_INTERVAL) % 64 === mIdx) isMirrorActive = true;
                             }
-                        } else {
-                            // On the 1st dial / Gates Ring
-                            let offset = (deg - WHEEL_START + 720.0) % 360.0;
-                            gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
-                            const gateNum = GATE_ORDER[gateIdx];
+                        });
+                        (lastChart.design_planets || []).forEach(p => {
+                            if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
+                                const pRel = (p.longitude - AS + 720.0) % 360.0;
+                                if (Math.floor(pRel / GATE_INTERVAL) % 64 === mIdx) isMirrorActive = true;
+                            }
+                        });
 
-                            type = 'gate';
-                            target = gateNum;
+                        // If dial2 toggle is ON, or if this sector is active: allow hover on 2nd dial
+                        if (isMirrorActive || mandalaSettings.dial2) {
+                            const mGate = MIRROR_GATE_ORDER[mIdx];
+                            type = 'mirrorGate';
+                            target = mGate;
+                            mirrorIdx = mIdx;
+                            gateIdx = GATE_ORDER.indexOf(mGate);
                         }
+                        // Inactive/hidden programs on 2nd dial do NOT appear or hover when dial2 is false
+                    }
+                    // 4. 1st Dial (Gates Ring) & Hexagrams Ring (rDialInner <= dist <= rGatesOuter OR dist > rMirrorOuter)
+                    else {
+                        let offset = (deg - WHEEL_START + 720.0) % 360.0;
+                        gateIdx = Math.floor(offset / GATE_INTERVAL) % 64;
+                        const gateNum = GATE_ORDER[gateIdx];
+
+                        type = 'gate';
+                        target = gateNum;
+                    }
                 }
 
-                const changed = (type !== mandalaHoverState.type || target !== mandalaHoverState.target);
+                const changed = (type !== mandalaHoverState.type || target !== mandalaHoverState.target || mirrorIdx !== (mandalaHoverState.mirrorIdx ?? -1));
                 
-                mandalaHoverState = { type, target, mx, my, cx: e.clientX, cy: e.clientY, gateIdx };
+                mandalaHoverState = { type, target, mx, my, cx: e.clientX, cy: e.clientY, gateIdx, mirrorIdx };
 
                 if (changed) {
                     drawMandala(lastChart, canvasEl, mandalaHoverState);
                     updateTooltip();
                 } else if (type) {
                     // Just update tooltip position
-                    if (type === 'center') {
+                    if (type === 'center' || type === 'house' || type === 'zodiac' || type === 'quarter' || type === 'godhead') {
                         if (centerTooltip) positionEl(centerTooltip, e.clientX, e.clientY);
-                    } else if (type === 'gate') {
+                    } else if (type === 'gate' || type === 'mirrorGate') {
                         if (gateTooltip) positionEl(gateTooltip, e.clientX, e.clientY);
                     }
                 }
@@ -7198,7 +7240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             canvasEl.addEventListener('mouseleave', () => {
                 if (!lastChart) return;
                 if (mandalaHoverState.type) {
-                    mandalaHoverState = { type: null, target: null, mx: 0, my: 0, cx: 0, cy: 0, gateIdx: -1 };
+                    mandalaHoverState = { type: null, target: null, mx: 0, my: 0, cx: 0, cy: 0, gateIdx: -1, mirrorIdx: -1 };
                     drawMandala(lastChart, canvasEl, mandalaHoverState);
                     if (gateTooltip) gateTooltip.classList.remove('visible');
                     if (centerTooltip) centerTooltip.classList.remove('visible');
@@ -7260,7 +7302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             function updateTooltip() {
                 if (!gateTooltip || !centerTooltip) return;
                 
-                const { type, target, cx, cy, gateIdx } = mandalaHoverState;
+                const { type, target, cx, cy, gateIdx, mirrorIdx } = mandalaHoverState;
                 
                 // Hide all first
                 gateTooltip.classList.remove('visible');
@@ -7399,6 +7441,108 @@ document.addEventListener('DOMContentLoaded', () => {
                     gateTooltip.style.top  = '-9999px';
                     gateTooltip.classList.add('visible');
                     requestAnimationFrame(() => positionEl(gateTooltip, cx, cy));
+                } else if (type === 'mirrorGate') {
+                    const gateNum = target;
+                    const mIdx = mirrorIdx;
+                    const name = GATE_NAMES[gateNum] || '';
+
+                    const getProgramBoundary = (houseData) => {
+                        if (!houseData || !houseData.hexagram) return houseData ? houseData.longitude : 0;
+                        const gIdx = GATE_ORDER.indexOf(houseData.hexagram.gate);
+                        if (gIdx === -1) return houseData.longitude;
+                        const lineIdx = (houseData.hexagram.line || 1) - 1;
+                        return (WHEEL_START + gIdx * GATE_INTERVAL + lineIdx * (GATE_INTERVAL / 6)) % 360;
+                    };
+                    const AS = (lastChart.houses && lastChart.houses.length >= 1) ? getProgramBoundary(lastChart.houses[0]) : 0;
+
+                    // Collect planets activated in this 2nd dial sector (mIdx)
+                    const activePers = [];
+                    const activeDes = [];
+                    (lastChart.planets || []).forEach(p => {
+                        if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
+                            const relLon = (p.longitude - AS + 720.0) % 360.0;
+                            if (Math.floor(relLon / GATE_INTERVAL) % 64 === mIdx) {
+                                const mLine = Math.min(6, Math.max(1, Math.floor((relLon % GATE_INTERVAL) / (GATE_INTERVAL / 6)) + 1));
+                                activePers.push({ planet: p, line: mLine });
+                            }
+                        }
+                    });
+                    (lastChart.design_planets || []).forEach(p => {
+                        if (p.longitude != null && (!activePlanets || activePlanets.has(p.name))) {
+                            const relLon = (p.longitude - AS + 720.0) % 360.0;
+                            if (Math.floor(relLon / GATE_INTERVAL) % 64 === mIdx) {
+                                const mLine = Math.min(6, Math.max(1, Math.floor((relLon % GATE_INTERVAL) / (GATE_INTERVAL / 6)) + 1));
+                                activeDes.push({ planet: p, line: mLine });
+                            }
+                        }
+                    });
+
+                    const hasDes = activeDes.length > 0;
+                    const hasPer = activePers.length > 0;
+                    const typeLabel = hasDes && hasPer ? 'Самость + Эго'
+                                    : hasDes           ? 'Бессознательное (Самость)'
+                                    : hasPer           ? 'Сознательное (Эго)'
+                                    :                    'Не активировано';
+
+                    let rows = '';
+                    const renderActivationRow = (item, isDesign) => {
+                        const p = item.planet;
+                        const line = item.line;
+                        const dotClass = isDesign ? 'tt-dot-design' : 'tt-dot-personality';
+                        const labelType = isDesign ? 'Самость' : 'Эго';
+                        const dispName = p.displayName || p.name;
+                        
+                        return `
+                            <div class="tt-planet-row-detail">
+                                <div class="tt-planet-header">
+                                    <div class="${dotClass}"></div>
+                                    <span class="tt-planet-name-spec">${dispName} (${labelType})</span>
+                                    <span class="tt-planet-line-badge">Линия ${line}</span>
+                                </div>
+                            </div>
+                        `;
+                    };
+
+                    const allRows = [];
+                    activePers.forEach(item => allRows.push(renderActivationRow(item, false)));
+                    activeDes.forEach(item => allRows.push(renderActivationRow(item, true)));
+                    rows = allRows.join('');
+
+                    gateTooltip.innerHTML = `
+                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(212,175,55,0.85);margin-bottom:2px;font-weight:600;">2-й циферблат (Зеркало Жизни)</div>
+                        <span class="tt-gate-num">Ворота ${gateNum}</span>
+                        ${name ? `<span class="tt-gate-name">${name}</span>` : ''}
+                        <div style="font-size:10px;color:rgba(200,180,130,0.65);margin-bottom:${rows?'5px':'0'}">${typeLabel}</div>
+                        ${rows ? `<div class="tt-planets">${rows}</div>` : ''}
+                    `;
+                    gateTooltip.style.left = '-9999px';
+                    gateTooltip.style.top  = '-9999px';
+                    gateTooltip.classList.add('visible');
+                    requestAnimationFrame(() => positionEl(gateTooltip, cx, cy));
+                } else if (type === 'zodiac') {
+                    const sign = ZODIAC_META[target];
+                    if (sign) {
+                        centerTooltip.innerHTML = `
+                            <span class="tt-center-name">${sign.sym} ${sign.name}</span>
+                            <span class="tt-center-subtitle" style="margin-bottom:0;">Знак зодиака (30° сектор).</span>
+                        `;
+                        centerTooltip.style.left = '-9999px';
+                        centerTooltip.style.top  = '-9999px';
+                        centerTooltip.classList.add('visible');
+                        requestAnimationFrame(() => positionEl(centerTooltip, cx, cy));
+                    }
+                } else if (type === 'house') {
+                    const houseNum = target;
+                    const h = lastChart && lastChart.houses ? lastChart.houses[houseNum - 1] : null;
+                    const gateStr = h && h.hexagram ? `Ворота ${h.hexagram.gate}.${h.hexagram.line}` : '';
+                    centerTooltip.innerHTML = `
+                        <span class="tt-center-name">Дом ${houseNum}</span>
+                        ${gateStr ? `<span class="tt-center-subtitle" style="margin-bottom:0;">Куспид: ${gateStr}</span>` : ''}
+                    `;
+                    centerTooltip.style.left = '-9999px';
+                    centerTooltip.style.top  = '-9999px';
+                    centerTooltip.classList.add('visible');
+                    requestAnimationFrame(() => positionEl(centerTooltip, cx, cy));
                 } else if (type === 'quarter') {
                     centerTooltip.innerHTML = `
                         <span class="tt-center-name">Четверть: ${target}</span>

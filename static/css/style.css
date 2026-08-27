@@ -4140,7 +4140,6 @@ body.theme-dark .form-input,
 body.theme-dark .form-select {
     background-color: #FFFFFF !important;
     color: #1C1917 !important;
-    -webkit-text-fill-color: #1C1917 !important;
     border-color: rgba(212, 175, 55, 0.35) !important;
     color-scheme: light !important;
 }
@@ -4152,15 +4151,42 @@ body.theme-dark .form-input:focus,
 body.theme-dark .form-select:focus {
     background-color: #FFFFFF !important;
     color: #1C1917 !important;
-    -webkit-text-fill-color: #1C1917 !important;
     border-color: #D4AF37 !important;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.35) !important;
+}
+
+/* Date & Time Segment Selection / Focus in Night Mode (White digits on Blue) */
+body.theme-dark .field-input::-webkit-datetime-edit-day-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-month-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-year-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-hour-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-minute-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-second-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-ampm-field:focus,
+body.theme-dark .field-input::-webkit-datetime-edit-fields-wrapper:focus,
+body.theme-dark input::-webkit-datetime-edit-day-field:focus,
+body.theme-dark input::-webkit-datetime-edit-month-field:focus,
+body.theme-dark input::-webkit-datetime-edit-year-field:focus,
+body.theme-dark input::-webkit-datetime-edit-hour-field:focus,
+body.theme-dark input::-webkit-datetime-edit-minute-field:focus,
+body.theme-dark input::-webkit-datetime-edit-second-field:focus,
+body.theme-dark input::-webkit-datetime-edit-ampm-field:focus {
+    background-color: #007aff !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+body.theme-dark .field-input::selection,
+body.theme-dark input::selection,
+body.theme-dark select::selection {
+    background-color: #007aff !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
 }
 
 body.theme-dark .field-input::placeholder,
 body.theme-dark .city-input::placeholder {
     color: #9CA3AF !important;
-    -webkit-text-fill-color: #9CA3AF !important;
 }
 
 body.theme-dark .field-icon,
@@ -4801,18 +4827,23 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-35 {
 }
 /* Both-gate disk fallback for gates not handled by JS CENTER_GATES_LIST */
 body.theme-dark .bg-svg-wrap .bg-gate-active-both.cls-8,
-body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both.cls-8 {
+body.theme-dark .bg-svg-wrap path.bg-gate-active-both.cls-8,
+body.theme-dark .bg-svg-wrap path.bg-gate-active-both.red_bg,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both.cls-8,
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.cls-8,
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.red_bg {
     fill: #FFFFFF !important;
+    display: block !important;
 }
 body.theme-dark .bg-svg-wrap .cls__.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap .cls__.bg-gate-active-both {
     display: block !important;
 }
 body.theme-dark .bg-svg-wrap path.bg-gate-active-both:not(.cls-8):not(.red_bg),
-body.theme-dark .bg-svg-wrap rect.bg-gate-active-both,
+body.theme-dark .bg-svg-wrap rect.bg-gate-active-both:not(.cls-19),
 body.theme-dark .bg-svg-wrap polygon.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both:not(.cls-8):not(.red_bg),
-body.theme-dark #mandala-bodygraph-wrap rect.bg-gate-active-both,
+body.theme-dark #mandala-bodygraph-wrap rect.bg-gate-active-both:not(.cls-19),
 body.theme-dark #mandala-bodygraph-wrap polygon.bg-gate-active-both {
     fill: #D4AF37 !important;
     stroke: none !important;
@@ -4831,7 +4862,7 @@ body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.cls-30,
 body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.cls-31,
 body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.cls-35 {
     fill: none !important;
-    stroke: #D4AF37 !important;
+    stroke: url(#half_gold_white) !important;
 }
 body.theme-dark .bg-svg-wrap .bg-gate-active-both .red_border,
 body.theme-dark .bg-svg-wrap .bg-gate-active-both .cls-15,
@@ -4845,16 +4876,32 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both .cls-21,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both .cls-30,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both .cls-31,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both .cls-35 {
-    stroke: #D4AF37 !important;
+    stroke: url(#half_gold_white) !important;
 }
 body.theme-dark .bg-svg-wrap g.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both {
     display: block !important;
 }
 body.theme-dark .bg-svg-wrap g.bg-gate-active-both *,
-body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both * {
+body.theme-dark .bg-svg-wrap g.bg-gate-active-both rect,
+body.theme-dark .bg-svg-wrap g.bg-gate-active-both path,
+body.theme-dark .bg-svg-wrap g.bg-gate-active-both polygon,
+body.theme-dark .bg-svg-wrap [class*="cls_"].bg-gate-active-both *,
+body.theme-dark .bg-svg-wrap [class*="cls_"].bg-gate-active-both rect,
+body.theme-dark .bg-svg-wrap rect.cls-19.bg-gate-active-both,
+body.theme-dark .bg-svg-wrap g.cls-19.bg-gate-active-both rect,
+body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both *,
+body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both rect,
+body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both path,
+body.theme-dark #mandala-bodygraph-wrap g.bg-gate-active-both polygon,
+body.theme-dark #mandala-bodygraph-wrap [class*="cls_"].bg-gate-active-both *,
+body.theme-dark #mandala-bodygraph-wrap [class*="cls_"].bg-gate-active-both rect,
+body.theme-dark #mandala-bodygraph-wrap rect.cls-19.bg-gate-active-both,
+body.theme-dark #mandala-bodygraph-wrap g.cls-19.bg-gate-active-both rect {
     display: block !important;
     fill: #FFFFFF !important;
+    stroke: none !important;
+    opacity: 1 !important;
 }
 
 /* Gate numbers in Night Mode */
