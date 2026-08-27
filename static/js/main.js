@@ -5493,7 +5493,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrap = document.getElementById('mandala-bodygraph-wrap');
         if (!wrap) return;
 
-        wrap.style.opacity = mandalaSettings.bodygraph ? '0.7' : '0';
+        wrap.style.opacity = mandalaSettings.bodygraph ? '0.8' : '0';
         wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
         wrap.style.pointerEvents = 'none';
 
@@ -7082,7 +7082,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const wrap = document.getElementById('mandala-bodygraph-wrap');
                     if (wrap) {
-                        wrap.style.opacity = mandalaSettings.bodygraph ? '0.7' : '0';
+                        wrap.style.opacity = mandalaSettings.bodygraph ? '0.8' : '0';
                         wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
                     }
 
@@ -7110,7 +7110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Update bodygraph CSS overlay transition immediately
                         const wrap = document.getElementById('mandala-bodygraph-wrap');
                         if (wrap) {
-                            wrap.style.opacity = mandalaSettings.bodygraph ? '0.7' : '0';
+                            wrap.style.opacity = mandalaSettings.bodygraph ? '0.8' : '0';
                             wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
                         }
 
