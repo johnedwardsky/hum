@@ -3375,34 +3375,53 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 /* Soft Hover Effects per column (only for active rows) */
 .bg-col-design .bg-planet-row:not(.bg-row-inactive):hover {
-    background: rgba(254, 0, 0, 0.045);
+    background: rgba(254, 0, 0, 0.06);
     box-shadow: 0 2px 10px rgba(254, 0, 0, 0.08);
     transform: translateX(3px);
 }
 
 .bg-col-personality .bg-planet-row:not(.bg-row-inactive):hover {
-    background: rgba(197, 158, 63, 0.06);
+    background: rgba(197, 158, 63, 0.08);
     box-shadow: 0 2px 10px rgba(197, 158, 63, 0.10);
     transform: translateX(-3px);
 }
 
-/* Inactive = clicked/dimmed */
+/* Inactive Row: Dimmed & Grayscale by default */
 .bg-planet-row.bg-row-inactive {
-    background: rgba(120, 120, 120, 0.04) !important;
-    border: 1px dashed rgba(120, 120, 120, 0.15) !important;
+    background: rgba(0, 0, 0, 0.02) !important;
+    border: 1px dashed rgba(0, 0, 0, 0.12) !important;
     opacity: 0.35 !important;
     filter: grayscale(100%) !important;
     box-shadow: none !important;
     transform: none !important;
 }
+
+.bg-planet-row.bg-row-inactive .bg-planet-sym,
+.bg-planet-row.bg-row-inactive .bg-gate-cell,
+.bg-planet-row.bg-row-inactive .bg-zodiac-sym {
+    color: #888888 !important;
+    transition: color 0.2s ease;
+}
+
+/* Inactive Row on Hover: Illuminates temporarily while cursor is over it */
 .bg-planet-row.bg-row-inactive:hover {
-    background: rgba(120, 120, 120, 0.08) !important;
-    border-color: rgba(120, 120, 120, 0.3) !important;
-    opacity: 0.55 !important;
-    filter: grayscale(80%) !important;
-    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(197, 158, 63, 0.45) !important;
+    opacity: 0.85 !important;
+    filter: grayscale(0%) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
     transform: none !important;
     cursor: pointer;
+}
+
+.bg-col-design .bg-planet-row.bg-row-inactive:hover .bg-planet-sym,
+.bg-col-design .bg-planet-row.bg-row-inactive:hover .bg-gate-cell {
+    color: #fe0000 !important;
+}
+
+.bg-col-personality .bg-planet-row.bg-row-inactive:hover .bg-planet-sym,
+.bg-col-personality .bg-planet-row.bg-row-inactive:hover .bg-gate-cell {
+    color: #2E2A20 !important;
 }
 
 /* Cross-highlight: when a planet row is hovered, the gate glows */
@@ -3429,18 +3448,6 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-planet-row.bg-row-extra {
     border: 1px dashed rgba(0, 0, 0, 0.08);
     background: rgba(255, 255, 255, 0.5);
-}
-
-.bg-planet-row.bg-row-extra.bg-row-inactive {
-    background: rgba(120, 120, 120, 0.04);
-    border: 1px dashed rgba(120, 120, 120, 0.15);
-    opacity: 0.4;
-}
-
-.bg-planet-row.bg-row-extra.bg-row-inactive:hover {
-    background: rgba(120, 120, 120, 0.09);
-    border-color: rgba(120, 120, 120, 0.3);
-    opacity: 0.7;
 }
 
 
@@ -4604,20 +4611,41 @@ body.theme-dark .bg-planet-row.bg-row-extra {
 }
 
 body.theme-dark .bg-planet-row.bg-row-inactive {
-    background: rgba(10, 14, 23, 0.35) !important;
-    border: 1px dashed rgba(255, 255, 255, 0.08) !important;
-    opacity: 0.35 !important;
+    background: rgba(10, 14, 23, 0.4) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.12) !important;
+    opacity: 0.3 !important;
+    filter: grayscale(100%) !important;
     box-shadow: none !important;
     transform: none !important;
 }
 
+body.theme-dark .bg-planet-row.bg-row-inactive .bg-planet-sym,
+body.theme-dark .bg-planet-row.bg-row-inactive .bg-gate-cell,
+body.theme-dark .bg-planet-row.bg-row-inactive .bg-zodiac-sym {
+    color: rgba(255, 255, 255, 0.35) !important;
+    text-shadow: none !important;
+    transition: color 0.2s ease !important;
+}
+
+/* Inactive Row on Hover: Illuminates temporarily while cursor is over it, dims again on mouseleave */
 body.theme-dark .bg-planet-row.bg-row-inactive:hover {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    opacity: 0.55 !important;
-    box-shadow: none !important;
+    background: rgba(13, 19, 34, 0.9) !important;
+    border-color: rgba(212, 175, 55, 0.5) !important;
+    opacity: 0.9 !important;
+    filter: grayscale(0%) !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.25) !important;
     transform: none !important;
     cursor: pointer;
+}
+
+body.theme-dark .bg-col-design .bg-planet-row.bg-row-inactive:hover .bg-planet-sym,
+body.theme-dark .bg-col-design .bg-planet-row.bg-row-inactive:hover .bg-gate-cell {
+    color: #D4AF37 !important;
+}
+
+body.theme-dark .bg-col-personality .bg-planet-row.bg-row-inactive:hover .bg-planet-sym,
+body.theme-dark .bg-col-personality .bg-planet-row.bg-row-inactive:hover .bg-gate-cell {
+    color: #FFFFFF !important;
 }
 
 /* Planet Wrap Box */
