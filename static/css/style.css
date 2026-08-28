@@ -252,6 +252,50 @@ input  { font-family: inherit; }
 .sug-name { font-size: 13px; font-weight: 500; color: var(--text-dark); }
 .sug-sub  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
+/* Coordinates refinement box */
+.coords-box {
+    margin-top: 10px;
+    background: rgba(197, 158, 63, 0.05);
+    border: 1px solid rgba(197, 158, 63, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    animation: fadeIn 0.2s ease-out;
+}
+.coords-box-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+.coords-header-icon {
+    flex-shrink: 0;
+    color: var(--primary);
+}
+.coords-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.coords-field {
+    display: flex;
+    flex-direction: column;
+}
+.coords-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-sub);
+    margin-bottom: 4px;
+}
+.coords-input {
+    height: 36px;
+    padding: 0 10px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
 /* Radio */
 .radio-row {
     display: flex;
@@ -2726,8 +2770,57 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
     margin: 8px 0 16px 0;
     width: 100%;
+}
+
+.bg-extra-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    border-radius: 24px;
+    border: 1px solid rgba(197, 158, 63, 0.28);
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--text-muted);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(46, 42, 32, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.bg-extra-toggle-btn .chip-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(160, 150, 135, 0.4);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bg-extra-toggle-btn:not(.active):hover {
+    border-color: var(--primary);
+    color: var(--text-dark);
+    background: rgba(197, 158, 63, 0.06);
+}
+
+.bg-extra-toggle-btn.active {
+    background: linear-gradient(135deg, rgba(197, 158, 63, 0.16) 0%, rgba(217, 180, 85, 0.26) 100%);
+    border-color: var(--primary);
+    color: var(--text-dark);
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(197, 158, 63, 0.20);
+}
+
+.bg-extra-toggle-btn.active .chip-dot {
+    background: var(--primary);
+    transform: scale(1.25);
 }
 
 .bg-dial-segmented {
@@ -4266,6 +4359,20 @@ body.theme-dark .sug-sub {
     color: #6B7280 !important;
 }
 
+body.theme-dark .coords-box {
+    background: rgba(212, 175, 55, 0.08) !important;
+    border-color: rgba(212, 175, 55, 0.25) !important;
+}
+body.theme-dark .coords-box-header {
+    color: #D4AF37 !important;
+}
+body.theme-dark .coords-header-icon {
+    color: #D4AF37 !important;
+}
+body.theme-dark .coords-label {
+    color: #D1D5DB !important;
+}
+
 body.theme-dark .tz-note {
     background: rgba(212, 175, 55, 0.08) !important;
     border-color: rgba(212, 175, 55, 0.2) !important;
@@ -4731,6 +4838,31 @@ body.theme-dark .bg-dial-btn.active {
 body.theme-dark .bg-dial-btn.active .bg-dial-badge {
     background: #D4AF37 !important;
     color: #0A0E17 !important;
+}
+
+body.theme-dark .bg-extra-toggle-btn {
+    background: rgba(13, 19, 34, 0.85) !important;
+    border: 1px solid rgba(212, 175, 55, 0.25) !important;
+    color: var(--text-muted) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.theme-dark .bg-extra-toggle-btn:not(.active):hover {
+    border-color: rgba(212, 175, 55, 0.45) !important;
+    color: #FFF !important;
+    background: rgba(212, 175, 55, 0.08) !important;
+}
+
+body.theme-dark .bg-extra-toggle-btn.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(230, 202, 101, 0.35) 100%) !important;
+    border-color: #D4AF37 !important;
+    color: #FFF !important;
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.30) !important;
+}
+
+body.theme-dark .bg-extra-toggle-btn.active .chip-dot {
+    background: #D4AF37 !important;
+    transform: scale(1.25) !important;
 }
 
 body.theme-dark #hd-type-info-card {

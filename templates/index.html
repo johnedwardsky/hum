@@ -167,11 +167,30 @@
                                 </svg>
                             </button>
                             <div class="search-spinner hidden" id="search-spinner"></div>
-                            <input type="hidden" id="lat">
-                            <input type="hidden" id="lon">
                         </div>
                         <!-- Autocomplete dropdown -->
                         <ul class="suggestions" id="suggestions"></ul>
+
+                        <!-- Coordinates refinement box (appears when city is selected) -->
+                        <div class="coords-box hidden" id="coords-box">
+                            <div class="coords-box-header">
+                                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" class="coords-header-icon">
+                                    <path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="currentColor" stroke-width="1.3"/>
+                                    <circle cx="8" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/>
+                                </svg>
+                                <span>Координаты (можно скорректировать)</span>
+                            </div>
+                            <div class="coords-grid">
+                                <div class="coords-field">
+                                    <label class="coords-label" for="lat">Широта (°)</label>
+                                    <input type="number" step="any" id="lat" class="field-input coords-input" placeholder="Широта, напр. 56.0153" autocomplete="off">
+                                </div>
+                                <div class="coords-field">
+                                    <label class="coords-label" for="lon">Долгота (°)</label>
+                                    <input type="number" step="any" id="lon" class="field-input coords-input" placeholder="Долгота, напр. 92.8932" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Time type -->
@@ -541,6 +560,10 @@
                                 <span class="bg-dial-desc">Зеркало Жизни</span>
                             </button>
                         </div>
+                        <button type="button" class="bg-extra-toggle-btn" id="bg-extra-toggle-btn" title="Включить / скрыть дополнительные точки (Хирон, Лилит, Приап)">
+                            <span class="chip-dot"></span>
+                            <span class="bg-extra-toggle-text">Доп. активации</span>
+                        </button>
                     </div>
 
                     <div class="bg-layout">
@@ -1761,10 +1784,29 @@
                                                 <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="#7A7585" stroke-width="1.5" stroke-linecap="round"/></svg>
                                             </button>
                                             <div class="search-spinner hidden" id="p1-search-spinner"></div>
-                                            <input type="hidden" id="p1_lat">
-                                            <input type="hidden" id="p1_lon">
                                         </div>
                                         <ul class="suggestions" id="p1_suggestions"></ul>
+
+                                        <!-- Partner 1 Coordinates Box -->
+                                        <div class="coords-box hidden" id="p1-coords-box">
+                                            <div class="coords-box-header">
+                                                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" class="coords-header-icon">
+                                                    <path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="currentColor" stroke-width="1.3"/>
+                                                    <circle cx="8" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/>
+                                                </svg>
+                                                <span>Координаты (можно скорректировать)</span>
+                                            </div>
+                                            <div class="coords-grid">
+                                                <div class="coords-field">
+                                                    <label class="coords-label" for="p1_lat">Широта (°)</label>
+                                                    <input type="number" step="any" id="p1_lat" class="field-input coords-input" placeholder="Широта, напр. 56.0153" autocomplete="off">
+                                                </div>
+                                                <div class="coords-field">
+                                                    <label class="coords-label" for="p1_lon">Долгота (°)</label>
+                                                    <input type="number" step="any" id="p1_lon" class="field-input coords-input" placeholder="Долгота, напр. 92.8932" autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="field-group">
@@ -1810,10 +1852,29 @@
                                                 <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="#7A7585" stroke-width="1.5" stroke-linecap="round"/></svg>
                                             </button>
                                             <div class="search-spinner hidden" id="p2-search-spinner"></div>
-                                            <input type="hidden" id="p2_lat">
-                                            <input type="hidden" id="p2_lon">
                                         </div>
                                         <ul class="suggestions" id="p2_suggestions"></ul>
+
+                                        <!-- Partner 2 Coordinates Box -->
+                                        <div class="coords-box hidden" id="p2-coords-box">
+                                            <div class="coords-box-header">
+                                                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" class="coords-header-icon">
+                                                    <path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="currentColor" stroke-width="1.3"/>
+                                                    <circle cx="8" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/>
+                                                </svg>
+                                                <span>Координаты (можно скорректировать)</span>
+                                            </div>
+                                            <div class="coords-grid">
+                                                <div class="coords-field">
+                                                    <label class="coords-label" for="p2_lat">Широта (°)</label>
+                                                    <input type="number" step="any" id="p2_lat" class="field-input coords-input" placeholder="Широта, напр. 55.7558" autocomplete="off">
+                                                </div>
+                                                <div class="coords-field">
+                                                    <label class="coords-label" for="p2_lon">Долгота (°)</label>
+                                                    <input type="number" step="any" id="p2_lon" class="field-input coords-input" placeholder="Долгота, напр. 37.6173" autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="field-group">

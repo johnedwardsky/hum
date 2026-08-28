@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestions   = document.getElementById('suggestions');
     const searchSpinner = document.getElementById('search-spinner');
     const cityClear     = document.getElementById('city-clear');
+    const coordsBox     = document.getElementById('coords-box');
     const latHidden     = document.getElementById('lat');
     const lonHidden     = document.getElementById('lon');
     const isGmtHidden   = document.getElementById('is_gmt');
@@ -481,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeBgDesign = null; // Set of active planet names for Bodygraph Design (red) column
     let activeBgPers = null;   // Set of active planet names for Bodygraph Personality (black) column
     let currentBodygraphDial = '1'; // '1' = 1-й циферблат (Основной), '2' = 2-й циферблат (Зеркало)
+    let showBodygraphExtraPlanets = false; // Toggle to show/hide extra points section (Chiron, Lilith, Priapus)
     const DEFAULT_INACTIVE_PLANETS = [
         'Хирон',
         'Лилит (средняя)',
@@ -556,6 +558,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ── Bodygraph Extra Planets Section Toggle ─────────────────
+    const bgExtraToggleBtn = document.getElementById('bg-extra-toggle-btn');
+    if (bgExtraToggleBtn) {
+        bgExtraToggleBtn.classList.toggle('active', showBodygraphExtraPlanets);
+        bgExtraToggleBtn.addEventListener('click', () => {
+            showBodygraphExtraPlanets = !showBodygraphExtraPlanets;
+            bgExtraToggleBtn.classList.toggle('active', showBodygraphExtraPlanets);
+
+            document.querySelectorAll('.bg-extra-section').forEach(sec => {
+                sec.style.display = showBodygraphExtraPlanets ? 'flex' : 'none';
+            });
+
+            // When turning OFF: deactivate any active extra points and recalculate HD Type/Profile/Authority
+            if (!showBodygraphExtraPlanets) {
+                DEFAULT_INACTIVE_PLANETS.forEach(pName => {
+                    if (activeBgDesign) activeBgDesign.delete(pName);
+                    if (activeBgPers) activeBgPers.delete(pName);
+                });
+                document.querySelectorAll('.bg-planet-row.bg-row-extra').forEach(row => {
+                    row.classList.add('bg-row-inactive');
+                    row.classList.remove('bg-row-highlighted');
+                });
+                if (lastChart) {
+                    renderSvgBodygraph(lastChart);
+                    updateHdTypeProfile(lastChart);
+                }
+            }
+        });
+    }
+
     // ── Radio time mode ───────────────────────────────────────
     document.getElementById('radio-local').addEventListener('click', () => setGmt(false));
     document.getElementById('radio-gmt').addEventListener('click',   () => setGmt(true));
@@ -595,6 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lonHidden.value = '';
         selectedCity    = null;
         cityClear.classList.add('hidden');
+        if (coordsBox) coordsBox.classList.add('hidden');
         closeSuggestions();
         cityInput.focus();
     });
@@ -604,7 +637,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = cityInput.value.trim();
         cityClear.classList.toggle('hidden', !q);
         clearTimeout(debounce);
-        if (q.length < 1) { closeSuggestions(); return; }
+        if (q.length < 1) {
+            latHidden.value = '';
+            lonHidden.value = '';
+            selectedCity = null;
+            if (coordsBox) coordsBox.classList.add('hidden');
+            closeSuggestions();
+            return;
+        }
 
         // If query is already in cache, show it instantly
         const cacheKey = q.toLowerCase();
@@ -615,6 +655,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         debounce = setTimeout(() => fetchCities(q), 120);
     });
+
+    if (latHidden) {
+        latHidden.addEventListener('input', () => {
+            const val = parseFloat(latHidden.value);
+            if (!isNaN(val)) {
+                if (!selectedCity) selectedCity = { display: cityInput.value || 'Точка расчёта', lat: val, lon: parseFloat(lonHidden.value) || 0 };
+                else selectedCity.lat = val;
+            }
+        });
+    }
+    if (lonHidden) {
+        lonHidden.addEventListener('input', () => {
+            const val = parseFloat(lonHidden.value);
+            if (!isNaN(val)) {
+                if (!selectedCity) selectedCity = { display: cityInput.value || 'Точка расчёта', lat: parseFloat(latHidden.value) || 0, lon: val };
+                else selectedCity.lon = val;
+            }
+        });
+    }
 
     cityInput.addEventListener('keydown', (e) => {
         const items = suggestions.querySelectorAll('li');
@@ -720,6 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
         latHidden.value = li.dataset.lat;
         lonHidden.value = li.dataset.lon;
         cityClear.classList.remove('hidden');
+        if (coordsBox) coordsBox.classList.remove('hidden');
         closeSuggestions();
     }
 
@@ -902,9 +962,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const birth_time = birthTimeEl.value;
 
+        const latVal = latHidden ? parseFloat(latHidden.value) : NaN;
+        const lonVal = lonHidden ? parseFloat(lonHidden.value) : NaN;
+
         if (!birth_date || !birth_time) { alert('Укажите дату и время рождения'); return; }
-        if (!isGmt && (!latHidden.value || !lonHidden.value)) {
-            alert('Выберите город из выпадающего списка'); return;
+        if (!isGmt && (isNaN(latVal) || isNaN(lonVal))) {
+            alert('Укажите корректные координаты (широту и долготу) или выберите город'); return;
+        }
+        if (!isGmt) {
+            if (!selectedCity) {
+                selectedCity = { display: cityInput.value || 'Точка расчёта', lat: latVal, lon: lonVal };
+            } else {
+                selectedCity.lat = latVal;
+                selectedCity.lon = lonVal;
+            }
         }
 
         // Show loading
@@ -920,8 +991,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     birth_date,
                     birth_time,
                     is_gmt: isGmt,
-                    lat: isGmt ? null : parseFloat(latHidden.value),
-                    lon: isGmt ? null : parseFloat(lonHidden.value),
+                    lat: isGmt ? null : latVal,
+                    lon: isGmt ? null : lonVal,
                     house_system: houseSystemSelect.value,
                     cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
                     use_polar_equal: usePolarEqualCheckbox ? usePolarEqualCheckbox.checked : false,
@@ -1451,14 +1522,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fmt1 = `${d}° ${String(m).padStart(2, '0')}' ${String(s).padStart(2, '0')}"`;
 
-        // Format 2: Decimal representation, truncated to 6 decimal places
+        // Format 2: Decimal representation, truncated to 6 decimal places (no rounding, 7th digit discarded visually)
         const parts = normalized.toFixed(12).split('.');
         let integerPart = parts[0];
         if (integerPart === '360') {
             integerPart = '0';
         }
-        const fractionalPart = parts[1].substring(0, 6);
-        const fmt2 = `${integerPart},${fractionalPart}`;
+        const fractionalPart = (parts[1] || '').padEnd(6, '0').substring(0, 6);
+        const fmt2 = `${String(integerPart).padStart(2, '0')},${fractionalPart}`;
 
         return `${fmt1}<br><span class="lon-dec" style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;">${fmt2}</span>`;
     }
@@ -2265,13 +2336,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
 
     // Reusable city autocomplete helper
-    function initCityAutocomplete(inputId, latId, lonId, clearId, spinnerId, suggestionsId) {
+    function initCityAutocomplete(inputId, latId, lonId, clearId, spinnerId, suggestionsId, coordsBoxId) {
         const cityInput = document.getElementById(inputId);
         const latHidden = document.getElementById(latId);
         const lonHidden = document.getElementById(lonId);
         const cityClear = document.getElementById(clearId);
         const searchSpinner = document.getElementById(spinnerId);
         const suggestions = document.getElementById(suggestionsId);
+        const coordsBox = coordsBoxId ? document.getElementById(coordsBoxId) : null;
 
         let debounce;
         let activeIdx = -1;
@@ -2279,10 +2351,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cityClear.addEventListener('click', () => {
             cityInput.value = '';
-            latHidden.value = '';
-            lonHidden.value = '';
+            if (latHidden) latHidden.value = '';
+            if (lonHidden) lonHidden.value = '';
             selectedCity = null;
             cityClear.classList.add('hidden');
+            if (coordsBox) coordsBox.classList.add('hidden');
             closeSuggestions();
             cityInput.focus();
         });
@@ -2291,7 +2364,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const q = cityInput.value.trim();
             cityClear.classList.toggle('hidden', !q);
             clearTimeout(debounce);
-            if (q.length < 1) { closeSuggestions(); return; }
+            if (q.length < 1) {
+                if (latHidden) latHidden.value = '';
+                if (lonHidden) lonHidden.value = '';
+                selectedCity = null;
+                if (coordsBox) coordsBox.classList.add('hidden');
+                closeSuggestions();
+                return;
+            }
 
             const cacheKey = q.toLowerCase();
             if (geoCache.has(cacheKey)) {
@@ -2301,6 +2381,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             debounce = setTimeout(() => fetchCities(q), 120);
         });
+
+        if (latHidden) {
+            latHidden.addEventListener('input', () => {
+                const val = parseFloat(latHidden.value);
+                if (!isNaN(val) && selectedCity) selectedCity.lat = val;
+            });
+        }
+        if (lonHidden) {
+            lonHidden.addEventListener('input', () => {
+                const val = parseFloat(lonHidden.value);
+                if (!isNaN(val) && selectedCity) selectedCity.lon = val;
+            });
+        }
 
         cityInput.addEventListener('keydown', (e) => {
             const items = suggestions.querySelectorAll('li');
@@ -2385,9 +2478,10 @@ document.addEventListener('DOMContentLoaded', () => {
         function pickSuggestion(li) {
             selectedCity = { display: li.dataset.name, lat: parseFloat(li.dataset.lat), lon: parseFloat(li.dataset.lon) };
             cityInput.value = li.dataset.name;
-            latHidden.value = li.dataset.lat;
-            lonHidden.value = li.dataset.lon;
+            if (latHidden) latHidden.value = li.dataset.lat;
+            if (lonHidden) lonHidden.value = li.dataset.lon;
             cityClear.classList.remove('hidden');
+            if (coordsBox) coordsBox.classList.remove('hidden');
             closeSuggestions();
         }
 
@@ -2418,8 +2512,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCompatType = 'zodiac';
 
     // Initialize Autocompletes
-    initCityAutocomplete('p1_city', 'p1_lat', 'p1_lon', 'p1-city-clear', 'p1-search-spinner', 'p1_suggestions');
-    initCityAutocomplete('p2_city', 'p2_lat', 'p2_lon', 'p2-city-clear', 'p2-search-spinner', 'p2_suggestions');
+    initCityAutocomplete('p1_city', 'p1_lat', 'p1_lon', 'p1-city-clear', 'p1-search-spinner', 'p1_suggestions', 'p1-coords-box');
+    initCityAutocomplete('p2_city', 'p2_lat', 'p2_lon', 'p2-city-clear', 'p2-search-spinner', 'p2_suggestions', 'p2-coords-box');
 
     // GMT toggles for partners
     let p1IsGmt = false;
@@ -2549,8 +2643,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         const p1_birth_time = document.getElementById('p1_birth_time').value;
-        const p1_lat = document.getElementById('p1_lat').value;
-        const p1_lon = document.getElementById('p1_lon').value;
+        const p1_lat_el = document.getElementById('p1_lat');
+        const p1_lon_el = document.getElementById('p1_lon');
+        const p1_lat = p1_lat_el ? parseFloat(p1_lat_el.value) : NaN;
+        const p1_lon = p1_lon_el ? parseFloat(p1_lon_el.value) : NaN;
         const p1_city = document.getElementById('p1_city').value;
         
         let p2_birth_date = document.getElementById('p2_birth_date').value;
@@ -2561,16 +2657,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         const p2_birth_time = document.getElementById('p2_birth_time').value;
-        const p2_lat = document.getElementById('p2_lat').value;
-        const p2_lon = document.getElementById('p2_lon').value;
+        const p2_lat_el = document.getElementById('p2_lat');
+        const p2_lon_el = document.getElementById('p2_lon');
+        const p2_lat = p2_lat_el ? parseFloat(p2_lat_el.value) : NaN;
+        const p2_lon = p2_lon_el ? parseFloat(p2_lon_el.value) : NaN;
         const p2_city = document.getElementById('p2_city').value;
         
-        if (!p1_birth_date || !p1_birth_time || !p1_lat || !p1_lon) {
-            showToast("Укажите полные данные Партнёра 1 (включая город)");
+        if (!p1_birth_date || !p1_birth_time || (!p1IsGmt && (isNaN(p1_lat) || isNaN(p1_lon)))) {
+            showToast("Укажите полные данные Партнёра 1 (включая город и координаты)");
             return;
         }
-        if (!p2_birth_date || !p2_birth_time || !p2_lat || !p2_lon) {
-            showToast("Укажите полные данные Партнёра 2 (включая город)");
+        if (!p2_birth_date || !p2_birth_time || (!p2IsGmt && (isNaN(p2_lat) || isNaN(p2_lon)))) {
+            showToast("Укажите полные данные Партнёра 2 (включая город и координаты)");
             return;
         }
         
@@ -2581,8 +2679,8 @@ document.addEventListener('DOMContentLoaded', () => {
             p1: {
                 birth_date: p1_birth_date,
                 birth_time: p1_birth_time,
-                lat: p1_lat,
-                lon: p1_lon,
+                lat: p1IsGmt ? null : p1_lat,
+                lon: p1IsGmt ? null : p1_lon,
                 is_gmt: p1IsGmt,
                 house_system: houseSystemSelect.value,
                 cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
@@ -2592,8 +2690,8 @@ document.addEventListener('DOMContentLoaded', () => {
             p2: {
                 birth_date: p2_birth_date,
                 birth_time: p2_birth_time,
-                lat: p2_lat,
-                lon: p2_lon,
+                lat: p2IsGmt ? null : p2_lat,
+                lon: p2IsGmt ? null : p2_lon,
                 is_gmt: p2IsGmt,
                 house_system: houseSystemSelect.value,
                 cusp_offset: parseFloat(document.getElementById('cusp_offset').value) || 0.0,
@@ -6495,6 +6593,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (extraList.length > 0) {
                 const extraSec = document.createElement('div');
                 extraSec.className = 'bg-extra-section';
+                extraSec.style.display = showBodygraphExtraPlanets ? 'flex' : 'none';
                 
                 extraList.forEach(p => {
                     extraSec.appendChild(buildPlanetRow(p, isDesign, true));
