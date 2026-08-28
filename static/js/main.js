@@ -4348,7 +4348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 activationsByGate[p.hexagram.gate].push({
                     type: 'design',
                     symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                    color: isDarkTheme ? '#FF9E1B' : 'rgb(255,96,96)',
+                    color: isDarkTheme ? '#FFB71B' : 'rgb(255,96,96)',
                     line: p.hexagram.line,
                     name: p.name
                 });
@@ -4443,8 +4443,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.translate(-cx, -cy);
             }
             if (isDarkTheme) {
-                // Design axis — BRIGHT AMBER
-                drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(255, 158, 27, 0.45)', '#FFE4A0', 2.5);
+                // Design axis — GOLDEN AMBER
+                drawCrossAxis(dSunGate, dSunLine, dEarthGate, dEarthLine, 'rgba(255, 183, 27, 0.45)', '#FFE9B3', 2.5);
                 // Personality axis — PURE WHITE
                 drawCrossAxis(pSunGate, pSunLine, pEarthGate, pEarthLine, 'rgba(255, 255, 255, 0.45)', '#FFFFFF', 2.5);
             } else {
@@ -4653,9 +4653,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let fillColor;
                     if (isDarkTheme) {
-                        fillColor = seg.type === 'design' ? '#FF9E1B' : '#FFFFFF';
+                        fillColor = seg.type === 'design' ? '#FFB71B' : '#FFFFFF';
                         if (isAnyHovered && !isHighlighted) {
-                            fillColor = seg.type === 'design' ? 'rgba(255, 158, 27, 0.12)' : 'rgba(255, 255, 255, 0.15)';
+                            fillColor = seg.type === 'design' ? 'rgba(255, 183, 27, 0.12)' : 'rgba(255, 255, 255, 0.15)';
                         }
                     } else {
                         fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
@@ -4671,7 +4671,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Radial divider line between gates
             let strokeColor;
             if (isDarkTheme) {
-                strokeColor = isHighlighted ? '#FF9E1B' : (isCombinedActive ? 'rgba(255,158,27,0.45)' : 'rgba(255,158,27,0.18)');
+                strokeColor = isHighlighted ? '#FFB71B' : (isCombinedActive ? 'rgba(255,183,27,0.45)' : 'rgba(255,183,27,0.18)');
             } else {
                 if (isAnyHovered) {
                     strokeColor = isHighlighted
@@ -4695,9 +4695,9 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let t = 1; t <= 5; t++) {
                 const tickLon = startLon + t * tickSpacing;
                 const tickAngle = degToRad(180 - tickLon);
-                let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(255,158,27,0.32)' : 'rgba(255,158,27,0.16)') : (isCombinedActive ? 'rgba(180,175,165,0.28)' : 'rgba(197,158,63,0.14)');
+                let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(255,183,27,0.32)' : 'rgba(255,183,27,0.16)') : (isCombinedActive ? 'rgba(180,175,165,0.28)' : 'rgba(197,158,63,0.14)');
                 if (isAnyHovered) {
-                    tickColor = isHighlighted ? (isDarkTheme ? 'rgba(255,158,27,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(255,158,27,0.04)' : 'rgba(120,120,120,0.03)');
+                    tickColor = isHighlighted ? (isDarkTheme ? 'rgba(255,183,27,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(255,183,27,0.04)' : 'rgba(120,120,120,0.03)');
                 }
                 ctx.beginPath();
                 ctx.moveTo(cx + rGatesInner * Math.cos(tickAngle), cy + rGatesInner * Math.sin(tickAngle));
@@ -4715,13 +4715,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const gBoth = isPersActive && isDesActive;
             let fillStyle;
             if (isDarkTheme) {
-                fillStyle = isCombinedActive ? '#FFE4A0' : (isDesActive ? '#FF9E1B' : (isPersActive ? '#D8D8D8' : 'rgba(255, 158, 27, 0.45)'));
+                fillStyle = isCombinedActive ? '#FFE9B3' : (isDesActive ? '#FFB71B' : (isPersActive ? '#D8D8D8' : 'rgba(255, 183, 27, 0.45)'));
                 if (isAnyHovered) {
                     if (isHighlighted) {
                         font = 'bold 13px DM Sans, sans-serif';
-                        fillStyle = '#FFE4A0';
+                        fillStyle = '#FFE9B3';
                     } else {
-                        fillStyle = 'rgba(255, 158, 27, 0.12)';
+                        fillStyle = 'rgba(255, 183, 27, 0.12)';
                     }
                 }
             } else {
@@ -4769,9 +4769,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let hexColor;
                 if (isDarkTheme) {
-                    hexColor = isCombinedActive ? '#FFE4A0' : (isDesActive ? '#FF9E1B' : (isPersActive ? '#FFFFFF' : 'rgba(255, 158, 27, 0.35)'));
+                    hexColor = isCombinedActive ? '#FFE9B3' : (isDesActive ? '#FFB71B' : (isPersActive ? '#FFFFFF' : 'rgba(255, 183, 27, 0.35)'));
                     if (isAnyHovered) {
-                        hexColor = isHighlighted ? '#FFE4A0' : 'rgba(255, 158, 27, 0.12)';
+                        hexColor = isHighlighted ? '#FFE9B3' : 'rgba(255, 183, 27, 0.12)';
                     }
                 } else {
                     hexColor = isPersActive ? '#2E2A20' : (isDesActive ? 'rgb(220, 60, 60)' : 'rgba(195, 188, 178, 0.32)');
@@ -4867,7 +4867,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mirrorActivationsBySector[mIdx].push({
                         type: 'design',
                         symbol: PLANET_META[p.name]?.sym || p.symbol || '?',
-                        color: isDarkTheme ? '#FF9E1B' : 'rgb(255,96,96)',
+                        color: isDarkTheme ? '#FFB71B' : 'rgb(255,96,96)',
                         line: mLine,
                         gate: mGate,
                         name: p.name
@@ -4950,9 +4950,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             let fillColor;
                             if (isDarkTheme) {
-                                fillColor = seg.type === 'design' ? '#FF9E1B' : '#FFFFFF';
+                                fillColor = seg.type === 'design' ? '#FFB71B' : '#FFFFFF';
                                 if (isAnyHovered && !isHighlighted) {
-                                    fillColor = seg.type === 'design' ? 'rgba(255, 158, 27, 0.12)' : 'rgba(255, 255, 255, 0.15)';
+                                    fillColor = seg.type === 'design' ? 'rgba(255, 183, 27, 0.12)' : 'rgba(255, 255, 255, 0.15)';
                                 }
                             } else {
                                 fillColor = seg.type === 'design' ? 'rgb(255,96,96)' : '#2E2A20';
@@ -4969,7 +4969,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Radial divider lines at boundaries of gate
                 let strokeColor;
                 if (isDarkTheme) {
-                    strokeColor = isHighlighted ? '#FF9E1B' : (isCombinedActive ? 'rgba(255,158,27,0.45)' : 'rgba(255,158,27,0.18)');
+                    strokeColor = isHighlighted ? '#FFB71B' : (isCombinedActive ? 'rgba(255,183,27,0.45)' : 'rgba(255,183,27,0.18)');
                 } else {
                     if (isAnyHovered) {
                         strokeColor = isHighlighted
@@ -4999,9 +4999,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let t = 1; t <= 5; t++) {
                     const tickLon = startLon + t * tickSpacing;
                     const tickAngle = degToRad(180 - tickLon);
-                    let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(255,158,27,0.32)' : 'rgba(255,158,27,0.14)') : (isCombinedActive ? 'rgba(180,175,165,0.25)' : 'rgba(197,158,63,0.12)');
+                    let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(255,183,27,0.32)' : 'rgba(255,183,27,0.14)') : (isCombinedActive ? 'rgba(180,175,165,0.25)' : 'rgba(197,158,63,0.12)');
                     if (isAnyHovered) {
-                        tickColor = isHighlighted ? (isDarkTheme ? 'rgba(255,158,27,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(255,158,27,0.04)' : 'rgba(120,120,120,0.03)');
+                        tickColor = isHighlighted ? (isDarkTheme ? 'rgba(255,183,27,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(255,183,27,0.04)' : 'rgba(120,120,120,0.03)');
                     }
                     ctx.beginPath();
                     ctx.moveTo(cx + rMirrorGateInner * Math.cos(tickAngle), cy + rMirrorGateInner * Math.sin(tickAngle));
@@ -5020,13 +5020,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mBoth = isPersActive && isDesActive;
                 let fillStyle;
                 if (isDarkTheme) {
-                    fillStyle = isCombinedActive ? '#FFE4A0' : (isDesActive ? '#FF9E1B' : (isPersActive ? '#D8D8D8' : 'rgba(255, 158, 27, 0.45)'));
+                    fillStyle = isCombinedActive ? '#FFE9B3' : (isDesActive ? '#FFB71B' : (isPersActive ? '#D8D8D8' : 'rgba(255, 183, 27, 0.45)'));
                     if (isAnyHovered) {
                         if (isHighlighted) {
                             font = 'bold 13px "DM Sans", sans-serif';
-                            fillStyle = '#FFE4A0';
+                            fillStyle = '#FFE9B3';
                         } else {
-                            fillStyle = 'rgba(255, 158, 27, 0.12)';
+                            fillStyle = 'rgba(255, 183, 27, 0.12)';
                         }
                     }
                 } else {
@@ -5691,7 +5691,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // Personality or Both: solid pure white circle under number
                                 bgEl.style.setProperty('fill', '#FFFFFF', 'important');
                                 if (isBoth) {
-                                    bgEl.style.setProperty('stroke', isCenterDefined ? '#B36500' : '#FF9E1B', 'important');
+                                    bgEl.style.setProperty('stroke', isCenterDefined ? '#B87300' : '#FFB71B', 'important');
                                     bgEl.style.setProperty('stroke-width', '1.2px', 'important');
                                 } else {
                                     bgEl.style.removeProperty('stroke');
@@ -5700,14 +5700,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else if (isDes) {
                                 // Design only
                                 if (isCenterDefined) {
-                                    // Defined center: rich dark amber circle under number
-                                    bgEl.style.setProperty('fill', '#4A2800', 'important');
+                                    // Defined center: rich dark golden amber circle under number
+                                    bgEl.style.setProperty('fill', '#4A3100', 'important');
                                     bgEl.style.removeProperty('stroke');
                                     bgEl.style.removeProperty('stroke-width');
                                 } else {
                                     // Undefined center: circle outline with its line
                                     bgEl.style.setProperty('fill', 'transparent', 'important');
-                                    bgEl.style.setProperty('stroke', '#FF9E1B', 'important');
+                                    bgEl.style.setProperty('stroke', '#FFB71B', 'important');
                                     bgEl.style.setProperty('stroke-width', '1.2px', 'important');
                                 }
                             }
@@ -5731,11 +5731,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 el.style.setProperty('fill', '#FFFFFF', 'important');
                             }
                         } else {
-                            // Inactive gate: dark in defined amber center, bright amber in undefined dark center
+                            // Inactive gate: dark in defined golden amber center, bright golden amber in undefined dark center
                             if (isCenterDefined) {
                                 el.style.setProperty('fill', '#0A0E17', 'important');
                             } else {
-                                el.style.setProperty('fill', '#FF9E1B', 'important');
+                                el.style.setProperty('fill', '#FFB71B', 'important');
                             }
                         }
                         el.style.setProperty('display', 'block', 'important');
@@ -6283,7 +6283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     // Personality or Both: solid pure white circle under number
                                     bgEl.style.setProperty('fill', '#FFFFFF', 'important');
                                     if (isBoth) {
-                                        bgEl.style.setProperty('stroke', isCenterDef ? '#B36500' : '#FF9E1B', 'important');
+                                        bgEl.style.setProperty('stroke', isCenterDef ? '#B87300' : '#FFB71B', 'important');
                                         bgEl.style.setProperty('stroke-width', '1.2px', 'important');
                                     } else {
                                         bgEl.style.removeProperty('stroke');
@@ -6292,14 +6292,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 } else if (isDes) {
                                     // Design only
                                     if (isCenterDef) {
-                                        // Defined center: rich dark amber circle under number
-                                        bgEl.style.setProperty('fill', '#4A2800', 'important');
+                                        // Defined center: rich dark golden amber circle under number
+                                        bgEl.style.setProperty('fill', '#4A3100', 'important');
                                         bgEl.style.removeProperty('stroke');
                                         bgEl.style.removeProperty('stroke-width');
                                     } else {
-                                        // Undefined center: circle outline with its line (stroke bright amber, transparent fill)
+                                        // Undefined center: circle outline with its line (stroke golden amber, transparent fill)
                                         bgEl.style.setProperty('fill', 'transparent', 'important');
-                                        bgEl.style.setProperty('stroke', '#FF9E1B', 'important');
+                                        bgEl.style.setProperty('stroke', '#FFB71B', 'important');
                                         bgEl.style.setProperty('stroke-width', '1.2px', 'important');
                                     }
                                 }
@@ -6323,11 +6323,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                     el.style.setProperty('fill', '#FFFFFF', 'important');
                                 }
                             } else {
-                                // Inactive gate: dark in defined amber center, bright amber in undefined dark center
+                                // Inactive gate: dark in defined golden amber center, bright golden amber in undefined dark center
                                 if (isCenterDef) {
                                     el.style.setProperty('fill', '#0A0E17', 'important');
                                 } else {
-                                    el.style.setProperty('fill', '#FF9E1B', 'important');
+                                    el.style.setProperty('fill', '#FFB71B', 'important');
                                 }
                             }
                             el.style.setProperty('display', 'block', 'important');
