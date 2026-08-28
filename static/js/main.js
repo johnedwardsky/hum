@@ -5411,7 +5411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let baseHex;
                     if (isDarkTheme) {
-                        baseHex = '#D4AF37'; // All planet symbols in the mandala are golden
+                        baseHex = act.type === 'design' ? '#D4AF37' : '#FFFFFF';
                     } else {
                         baseHex = act.type === 'design' ? '#DC2626' : '#1A1610';
                     }
@@ -5428,7 +5428,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.textBaseline = 'middle';
                     
                     let lineAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
-                    ctx.fillStyle = hexToRgba(isDarkTheme ? '#FFEFA6' : baseHex, lineAlpha);
+                    let lineHex = isDarkTheme ? (act.type === 'design' ? '#FFEFA6' : '#FFFFFF') : baseHex;
+                    ctx.fillStyle = hexToRgba(lineHex, lineAlpha);
                     ctx.fillText(act.line.toString(), sx, sy);
                 });
             }
