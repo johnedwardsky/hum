@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.setAttribute('width', '14'); icon.setAttribute('height', '14');
             icon.setAttribute('viewBox', '0 0 16 16'); icon.setAttribute('fill', 'none');
             icon.classList.add('sug-icon');
-            icon.innerHTML = `<path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="#D4AF37" stroke-width="1.3"/><circle cx="8" cy="6" r="1.8" stroke="#D4AF37" stroke-width="1.3"/>`;
+            icon.innerHTML = `<path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="#CC942D" stroke-width="1.3"/><circle cx="8" cy="6" r="1.8" stroke="#CC942D" stroke-width="1.3"/>`;
 
             // Text
             const body    = document.createElement('div');
@@ -843,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
         // Draw gold card border
-        tempCtx.strokeStyle = 'rgba(197, 158, 63, 0.4)';
+        tempCtx.strokeStyle = 'rgba(204, 148, 45, 0.4)';
         tempCtx.lineWidth = Math.max(2, tempCanvas.width * 0.008);
         tempCtx.strokeRect(0, 0, tempCanvas.width, tempCanvas.height);
 
@@ -1875,14 +1875,14 @@ document.addEventListener('DOMContentLoaded', () => {
     //  NATAL CHART CANVAS DRAWING
     // ============================================================
     const ZODIAC_COLORS = [
-        '#C59E3F','#C5A059','#777166',  // Aries (Fire), Taurus (Earth), Gemini (Air)
-        '#5E52B0','#C59E3F','#C5A059',  // Cancer (Water), Leo (Fire), Virgo (Earth)
-        '#777166','#5E52B0','#C59E3F',  // Libra (Air), Scorpio (Water), Sagittarius (Fire)
+        '#CC942D','#C5A059','#777166',  // Aries (Fire), Taurus (Earth), Gemini (Air)
+        '#5E52B0','#CC942D','#C5A059',  // Cancer (Water), Leo (Fire), Virgo (Earth)
+        '#777166','#5E52B0','#CC942D',  // Libra (Air), Scorpio (Water), Sagittarius (Fire)
         '#C5A059','#777166','#5E52B0',  // Capricorn (Earth), Aquarius (Air), Pisces (Water)
     ];
 
     const PLANET_COLORS = {
-        'Солнце':       '#C59E3F',
+        'Солнце':       '#CC942D',
         'Луна':         '#4E493F',
         'Меркурий':     '#5F707A',
         'Венера':       '#B44682',
@@ -1953,7 +1953,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.closePath();
             ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], isDarkTheme ? 0.14 : 0.04);
             ctx.fill();
-            ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.25)' : 'rgba(197, 158, 63, 0.15)';
+            ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.25)' : 'rgba(204, 148, 45, 0.15)';
             ctx.lineWidth   = 1;
             ctx.stroke();
 
@@ -1969,8 +1969,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Outer ring border
-        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.45)' : 'rgba(197, 158, 63, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.25)' : 'rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.45)' : 'rgba(204, 148, 45, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.25)' : 'rgba(204, 148, 45, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
 
         // -- House dividers --
         const asc = data.houses[0].longitude;  // Ascendant longitude
@@ -1986,7 +1986,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
-            ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.35)' : 'rgba(197, 158, 63, 0.25)';
+            ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.35)' : 'rgba(204, 148, 45, 0.25)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
@@ -2003,20 +2003,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillText(toRoman(i + 1), hx, hy);
         }
 
-        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.25)' : 'rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.22)' : 'rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle = isDarkTheme ? '#0A0E17' : '#FFFFFF'; ctx.fill(); ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.22)' : 'rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.25)' : 'rgba(204, 148, 45, 0.15)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.22)' : 'rgba(204, 148, 45, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle = isDarkTheme ? '#0A0E17' : '#FFFFFF'; ctx.fill(); ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.22)' : 'rgba(204, 148, 45, 0.12)'; ctx.lineWidth=1; ctx.stroke();
 
         // -- Aspects (between planets) --
         const planets = data.planets.filter(p => !activePlanets || activePlanets.has(p.name));
         const ASPECTS = isDarkTheme ? [
-            { name:'conj', orb:10, color:'rgba(212, 175, 55, 0.85)',  deg:0 },    // gold
+            { name:'conj', orb:10, color:'rgba(204, 148, 45, 0.85)',  deg:0 },    // gold
             { name:'oppo', orb:10, color:'rgba(245, 158, 11, 0.85)',  deg:180 },  // amber/bronze
             { name:'trig', orb:8,  color:'rgba(167, 139, 250, 0.85)', deg:120 },  // light violet/purple
             { name:'squa', orb:8,  color:'rgba(248, 113, 113, 0.85)',  deg:90 },   // light coral
             { name:'sext', orb:6,  color:'rgba(156, 163, 175, 0.75)',  deg:60 },   // platinum
         ] : [
-            { name:'conj', orb:10, color:'rgba(197, 158, 63, 0.6)',  deg:0 },    // gold
+            { name:'conj', orb:10, color:'rgba(204, 148, 45, 0.6)',  deg:0 },    // gold
             { name:'oppo', orb:10, color:'rgba(165, 120, 69, 0.6)',  deg:180 },  // bronze
             { name:'trig', orb:8,  color:'rgba(94, 82, 176, 0.6)', deg:120 },  // purple
             { name:'squa', orb:8,  color:'rgba(204, 89, 63, 0.6)',  deg:90 },   // coral
@@ -2074,14 +2074,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const dy   = cy + r2 * Math.sin(dotR);
             ctx.beginPath();
             ctx.arc(dx, dy, 3, 0, Math.PI*2);
-            ctx.fillStyle = isDarkTheme ? '#D4AF37' : '#C59E3F';
+            ctx.fillStyle = isDarkTheme ? '#CC942D' : '#CC942D';
             ctx.fill();
 
             // Line from dot to symbol
             ctx.beginPath();
             ctx.moveTo(dx, dy);
             ctx.lineTo(px, py);
-            ctx.strokeStyle = isDarkTheme ? 'rgba(212, 175, 55, 0.35)' : 'rgba(197, 158, 63, 0.25)';
+            ctx.strokeStyle = isDarkTheme ? 'rgba(204, 148, 45, 0.35)' : 'rgba(204, 148, 45, 0.25)';
             ctx.lineWidth = 0.8;
             ctx.stroke();
 
@@ -2108,7 +2108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lx = cx + (R + 4) * Math.cos(a);
             const ly = cy + (R + 4) * Math.sin(a);
             ctx.font      = 'bold 10px DM Sans, sans-serif';
-            ctx.fillStyle = isDarkTheme ? '#FFEFA6' : '#C59E3F';
+            ctx.fillStyle = isDarkTheme ? '#FFEFA6' : '#CC942D';
             ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
             ctx.textBaseline = ly < cy ? 'bottom' : 'top';
             ctx.fillText(label, lx, ly);
@@ -2175,7 +2175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const eA = degToRad((i + 1) * 30 - 90);
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, sA, eA); ctx.closePath();
             ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.04); ctx.fill();
-            ctx.strokeStyle = 'rgba(197,158,63,0.15)'; ctx.lineWidth = 0.8; ctx.stroke();
+            ctx.strokeStyle = 'rgba(204, 148, 45,0.15)'; ctx.lineWidth = 0.8; ctx.stroke();
             const mA = degToRad(i * 30 + 15 - 90);
             const gx = cx + (R * 0.91) * Math.cos(mA);
             const gy = cy + (R * 0.91) * Math.sin(mA);
@@ -2183,8 +2183,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText(ZODIAC_META[i].sym, gx, gy);
         }
-        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.35)'; ctx.lineWidth=1.2; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45,0.35)'; ctx.lineWidth=1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
 
         const asc = data.houses[0].longitude;
 
@@ -2196,18 +2196,18 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
             ctx.strokeStyle = 'rgba(94,82,176,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + r2 * Math.cos(angle), cy + r2 * Math.sin(angle));
-            ctx.strokeStyle = 'rgba(197,158,63,0.08)'; ctx.lineWidth = 0.5; ctx.stroke();
+            ctx.strokeStyle = 'rgba(204, 148, 45,0.08)'; ctx.lineWidth = 0.5; ctx.stroke();
         }
-        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.2)'; ctx.lineWidth=0.8; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(197,158,63,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45,0.2)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
         ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2);
         ctx.fillStyle='rgba(250,248,245,0.95)'; ctx.fill();
-        ctx.strokeStyle='rgba(197,158,63,0.25)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.strokeStyle='rgba(204, 148, 45,0.25)'; ctx.lineWidth=0.8; ctx.stroke();
 
         // Aspects
         const planets = data.planets.filter(p => !activePlanets || activePlanets.has(p.name));
         const ASPECTS = [
-            { deg: 0,   orb: 8, color: 'rgba(197,158,63,0.5)',  dash: [] },
+            { deg: 0,   orb: 8, color: 'rgba(204, 148, 45,0.5)',  dash: [] },
             { deg: 120, orb: 6, color: 'rgba(94,82,176,0.45)',  dash: [] },
             { deg: 90,  orb: 6, color: 'rgba(204,89,63,0.45)',  dash: [3,2] },
             { deg: 180, orb: 6, color: 'rgba(165,120,69,0.45)', dash: [] },
@@ -2249,7 +2249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             placed.push({ x: px, y: py });
             ctx.beginPath(); ctx.moveTo(dx, dy); ctx.lineTo(px, py);
-            ctx.strokeStyle = 'rgba(197,158,63,0.2)'; ctx.lineWidth = 0.5; ctx.stroke();
+            ctx.strokeStyle = 'rgba(204, 148, 45,0.2)'; ctx.lineWidth = 0.5; ctx.stroke();
             drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 12.5, PLANET_COLORS[p.name] || '#2E2A20');
             if (p.is_retrograde) {
                 ctx.font = 'bold 7px DM Sans,sans-serif'; ctx.fillStyle = '#E06D53';
@@ -2267,7 +2267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const a = degToRad(lonToAngle(lon % 360, asc));
             const lx = cx + (R + 3) * Math.cos(a);
             const ly = cy + (R + 3) * Math.sin(a);
-            ctx.font = 'bold 8px DM Sans,sans-serif'; ctx.fillStyle = '#C59E3F';
+            ctx.font = 'bold 8px DM Sans,sans-serif'; ctx.fillStyle = '#CC942D';
             ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
             ctx.textBaseline = ly < cy ? 'bottom' : 'top';
             ctx.fillText(label, lx, ly);
@@ -2437,7 +2437,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.setAttribute('width', '14'); icon.setAttribute('height', '14');
                 icon.setAttribute('viewBox', '0 0 16 16'); icon.setAttribute('fill', 'none');
                 icon.classList.add('sug-icon');
-                icon.innerHTML = `<path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="#D4AF37" stroke-width="1.3"/><circle cx="8" cy="6" r="1.8" stroke="#D4AF37" stroke-width="1.3"/>`;
+                icon.innerHTML = `<path d="M8 1a5 5 0 0 1 5 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 0 1 5-5z" stroke="#CC942D" stroke-width="1.3"/><circle cx="8" cy="6" r="1.8" stroke="#CC942D" stroke-width="1.3"/>`;
 
                 const body = document.createElement('div');
                 body.className = 'sug-body';
@@ -2968,13 +2968,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         ctx.beginPath();
         ctx.arc(cx, cy, size/2 - 20, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)';
+        ctx.strokeStyle = 'rgba(204, 148, 45, 0.25)';
         ctx.lineWidth = 1;
         ctx.stroke();
         
         ctx.beginPath();
         ctx.arc(cx, cy, size/2 - 25, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+        ctx.strokeStyle = 'rgba(204, 148, 45, 0.15)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
         ctx.stroke();
@@ -3002,7 +3002,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText(sym2, cx + 60, cy);
         
         ctx.font = '28px sans-serif';
-        ctx.fillStyle = '#C59E3F';
+        ctx.fillStyle = '#CC942D';
         ctx.fillText('❤️', cx, cy - 5);
         
         ctx.font = '500 13px DM Sans, sans-serif';
@@ -3048,7 +3048,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.closePath();
             ctx.fillStyle = hexToRgba(ZODIAC_COLORS[i], 0.04);
             ctx.fill();
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.15)';
+            ctx.strokeStyle = 'rgba(204, 148, 45, 0.15)';
             ctx.lineWidth   = 1;
             ctx.stroke();
 
@@ -3062,8 +3062,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillText(ZODIAC_META[i].sym, gx, gy);
         }
         
-        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, R,  0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45, 0.35)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45, 0.15)'; ctx.lineWidth=1;   ctx.stroke();
         
         // Align to Partner 1 Ascendant
         const asc = data.p1.houses[0].longitude;
@@ -3080,7 +3080,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.25)';
+            ctx.strokeStyle = 'rgba(204, 148, 45, 0.25)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
@@ -3090,19 +3090,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const hx = cx + (r2 + r3) / 2 * Math.cos(midAng);
             const hy = cy + (r2 + r3) / 2 * Math.sin(midAng);
             ctx.font      = '8px DM Sans, sans-serif';
-            ctx.fillStyle = '#C59E3F';
+            ctx.fillStyle = '#CC942D';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(toRoman(i + 1), hx, hy);
         }
         
-        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.15)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle='#FFFFFF'; ctx.fill(); ctx.strokeStyle='rgba(197, 158, 63, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r2, 0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45, 0.15)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI*2); ctx.strokeStyle='rgba(204, 148, 45, 0.12)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, r4, 0, Math.PI*2); ctx.fillStyle='#FFFFFF'; ctx.fill(); ctx.strokeStyle='rgba(204, 148, 45, 0.12)'; ctx.lineWidth=1; ctx.stroke();
         
         // Aspect lines between planets of P1 and P2
         const ASPECTS_STYLES = {
-            'Соединение': 'rgba(197, 158, 63, 0.6)',
+            'Соединение': 'rgba(204, 148, 45, 0.6)',
             'Оппозиция': 'rgba(165, 120, 69, 0.6)',
             'Тригон': 'rgba(94, 82, 176, 0.6)',
             'Квадрат': 'rgba(204, 89, 63, 0.6)',
@@ -3156,17 +3156,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const dy = cy + r2 * Math.sin(dotR);
             ctx.beginPath();
             ctx.arc(dx, dy, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = '#C59E3F';
+            ctx.fillStyle = '#CC942D';
             ctx.fill();
             
             ctx.beginPath();
             ctx.moveTo(dx, dy);
             ctx.lineTo(px, py);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.2)';
+            ctx.strokeStyle = 'rgba(204, 148, 45, 0.2)';
             ctx.lineWidth = 0.5;
             ctx.stroke();
             
-            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 12, '#C59E3F');
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 12, '#CC942D');
         });
         
         // Draw P2 Planets (Dark Slate)
@@ -3390,7 +3390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // ── Channels ──
-        const inactiveColor = 'rgba(197,158,63,0.13)';
+        const inactiveColor = 'rgba(204, 148, 45,0.13)';
         const personalityColor = '#4D4D4D'; // Black/Grey
         const designColor = '#E06D53'; // Red/Coral
         const bgWidth = Math.max(8 * sc, 2);
@@ -3483,7 +3483,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.entries(BG_CENTERS).forEach(([name, c]) => {
             const isDef = definedCenters.has(name);
-            const cc = CENTER_COLORS[name] || { def: '#C59E3F', stroke: '#A8832E', hover: '#DFB135' };
+            const cc = CENTER_COLORS[name] || { def: '#CC942D', stroke: '#A8832E', hover: '#DFB135' };
             let fill   = isDef ? cc.def    : uFill;
             let stroke = isDef ? cc.stroke : uStroke;
 
@@ -3493,8 +3493,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.globalAlpha = op;
 
             if (hoverType === 'center' && name === hoverTarget) {
-                fill   = isDef ? cc.hover : 'rgba(197,158,63,0.22)';
-                stroke = isDef ? cc.def   : '#C59E3F';
+                fill   = isDef ? cc.hover : 'rgba(204, 148, 45,0.22)';
+                stroke = isDef ? cc.def   : '#CC942D';
             }
 
             if (c.poly) {
@@ -4078,7 +4078,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Type colors
         const typeStyles = {
             'Генератор':                  { bg: '#E8780A', color: '#fff' },
-            'Манифестирующий Генератор':  { bg: '#C59E3F', color: '#fff' },
+            'Манифестирующий Генератор':  { bg: '#CC942D', color: '#fff' },
             'Манифестор':                 { bg: '#C0392B', color: '#fff' },
             'Проектор':                   { bg: '#2471A3', color: '#fff' },
             'Рефлектор':                  { bg: '#566573', color: '#fff' },
@@ -4086,7 +4086,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fill old mandala badge if it exists
         if (typeBadge || profileBadge || authorityBadge) {
-            const mSt = typeStyles[mandalaInfo.type] || { bg: '#C59E3F', color: '#fff' };
+            const mSt = typeStyles[mandalaInfo.type] || { bg: '#CC942D', color: '#fff' };
             if (typeBadge) {
                 typeBadge.textContent = mandalaInfo.type;
                 typeBadge.style.background = mSt.bg;
@@ -4107,7 +4107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── New bodygraph page type card (updates for selected dial 1 or 2) ──
         const currentDial = typeof currentBodygraphDial !== 'undefined' ? currentBodygraphDial : '1';
         const info = computeHdInfo(data, currentDial);
-        const st = typeStyles[info.type] || { bg: '#C59E3F', color: '#fff' };
+        const st = typeStyles[info.type] || { bg: '#CC942D', color: '#fff' };
 
         const card     = document.getElementById('hd-type-info-card');
         const pillEl   = document.getElementById('hd-type-badge-bg');
@@ -4265,7 +4265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath();
             ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
             ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
-            ctx.fillStyle = 'rgba(212, 175, 55, 0.05)';
+            ctx.fillStyle = 'rgba(204, 148, 45, 0.05)';
             ctx.fill();
         } else {
             ctx.fillStyle = '#FFFFFF';
@@ -4567,7 +4567,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.arc(cx, cy, rGatesInner, endAngle, startAngle, false);
                     ctx.closePath();
                     if (isDarkTheme) {
-                        ctx.fillStyle = isDesign ? `rgba(212,175,55,${0.35 * opacityScale})` : `rgba(200,200,200,${0.28 * opacityScale})`;
+                        ctx.fillStyle = isDesign ? `rgba(204, 148, 45,${0.35 * opacityScale})` : `rgba(200,200,200,${0.28 * opacityScale})`;
                     } else {
                         ctx.fillStyle = isDesign ? `rgba(255,96,96,${0.28 * opacityScale})` : `rgba(46,42,32,${0.18 * opacityScale})`;
                     }
@@ -4583,7 +4583,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.lineTo(cx + rGatesInner * Math.cos(midAngle), cy + rGatesInner * Math.sin(midAngle));
                     ctx.arc(cx, cy, rGatesInner, midAngle, startAngle, false);
                     ctx.closePath();
-                    ctx.fillStyle = isDarkTheme ? `rgba(212,175,55,${0.25 * opacityScale})` : `rgba(255,96,96,${0.14 * opacityScale})`;
+                    ctx.fillStyle = isDarkTheme ? `rgba(204, 148, 45,${0.25 * opacityScale})` : `rgba(255,96,96,${0.14 * opacityScale})`;
                     ctx.fill();
 
                     // 2nd half: White (Personality)
@@ -4603,7 +4603,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let bgFill;
                     if (isDarkTheme) {
-                        bgFill = isDesActive ? `rgba(212,175,55,${0.22 * opacityScale})` : `rgba(200,200,200,${0.22 * opacityScale})`;
+                        bgFill = isDesActive ? `rgba(204, 148, 45,${0.22 * opacityScale})` : `rgba(200,200,200,${0.22 * opacityScale})`;
                     } else {
                         bgFill = isDesActive ? `rgba(255,96,96,${0.12 * opacityScale})` : `rgba(46,42,32,${0.10 * opacityScale})`;
                     }
@@ -4695,7 +4695,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let t = 1; t <= 5; t++) {
                 const tickLon = startLon + t * tickSpacing;
                 const tickAngle = degToRad(180 - tickLon);
-                let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(204,148,45,0.32)' : 'rgba(204,148,45,0.16)') : (isCombinedActive ? 'rgba(180,175,165,0.28)' : 'rgba(197,158,63,0.14)');
+                let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(204,148,45,0.32)' : 'rgba(204,148,45,0.16)') : (isCombinedActive ? 'rgba(180,175,165,0.28)' : 'rgba(204, 148, 45,0.14)');
                 if (isAnyHovered) {
                     tickColor = isHighlighted ? (isDarkTheme ? 'rgba(204,148,45,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(204,148,45,0.04)' : 'rgba(120,120,120,0.03)');
                 }
@@ -4978,7 +4978,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         strokeColor = isCombinedActive
                             ? (isDesActive && isPersActive ? 'rgba(46,42,32,0.35)' : isDesActive ? 'rgba(255,96,96,0.35)' : 'rgba(46,42,32,0.35)')
-                            : 'rgba(197,158,63,0.14)';
+                            : 'rgba(204, 148, 45,0.14)';
                     }
                 }
                 ctx.strokeStyle = strokeColor;
@@ -4999,7 +4999,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let t = 1; t <= 5; t++) {
                     const tickLon = startLon + t * tickSpacing;
                     const tickAngle = degToRad(180 - tickLon);
-                    let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(204,148,45,0.32)' : 'rgba(204,148,45,0.14)') : (isCombinedActive ? 'rgba(180,175,165,0.25)' : 'rgba(197,158,63,0.12)');
+                    let tickColor = isDarkTheme ? (isCombinedActive ? 'rgba(204,148,45,0.32)' : 'rgba(204,148,45,0.14)') : (isCombinedActive ? 'rgba(180,175,165,0.25)' : 'rgba(204, 148, 45,0.12)');
                     if (isAnyHovered) {
                         tickColor = isHighlighted ? (isDarkTheme ? 'rgba(204,148,45,0.55)' : 'rgba(120,115,105,0.45)') : (isDarkTheme ? 'rgba(204,148,45,0.04)' : 'rgba(120,120,120,0.03)');
                     }
@@ -5199,7 +5199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.lineTo(cx + rHousesInner * Math.cos(aEnd), cy + rHousesInner * Math.sin(aEnd));
                 ctx.arc(cx, cy, rHousesInner, aEnd, aStart, false);
                 ctx.closePath();
-                ctx.fillStyle = isDarkTheme ? `rgba(212, 175, 55, ${fillOpacity * 0.55})` : `rgba(225, 190, 110, ${fillOpacity})`;
+                ctx.fillStyle = isDarkTheme ? `rgba(204, 148, 45, ${fillOpacity * 0.55})` : `rgba(225, 175, 75, ${fillOpacity})`;
                 ctx.fill();
             }
 
@@ -5221,18 +5221,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 let cuspColor, cuspWidth;
                 if (isAnyHouseHovered) {
                     if (isCuspBorderingHovered) {
-                        cuspColor = isDarkTheme ? 'rgba(255, 239, 166, 0.95)' : 'rgba(150, 110, 25, 0.85)';
+                        cuspColor = isDarkTheme ? 'rgba(255, 239, 166, 0.95)' : 'rgba(204, 148, 45, 0.85)';
                         cuspWidth = 1.6;
                     } else {
-                        cuspColor = isDarkTheme ? 'rgba(212, 175, 55, 0.10)' : 'rgba(180, 145, 65, 0.08)';
+                        cuspColor = isDarkTheme ? 'rgba(204, 148, 45, 0.10)' : 'rgba(204, 148, 45, 0.08)';
                         cuspWidth = 0.6;
                     }
                 } else {
                     if (isAngularCusp) {
-                        cuspColor = isDarkTheme ? 'rgba(255, 239, 166, 0.80)' : 'rgba(165, 130, 45, 0.65)';
+                        cuspColor = isDarkTheme ? 'rgba(255, 239, 166, 0.80)' : 'rgba(204, 148, 45, 0.65)';
                         cuspWidth = 1.2;
                     } else {
-                        cuspColor = isDarkTheme ? 'rgba(212, 175, 55, 0.50)' : 'rgba(180, 145, 65, 0.48)';
+                        cuspColor = isDarkTheme ? 'rgba(204, 148, 45, 0.50)' : 'rgba(204, 148, 45, 0.48)';
                         cuspWidth = 1.0;
                     }
                 }
@@ -5265,7 +5265,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const xHN = cx + rMid * Math.cos(angleHouseNum);
                 const yHN = cy + rMid * Math.sin(angleHouseNum);
                 ctx.font = isThisHouseHovered ? '700 13px "DM Sans", sans-serif' : '700 12px "DM Sans", sans-serif';
-                ctx.fillStyle = hexToRgba(isDarkTheme ? '#D4A017' : '#B88E28', textAlpha);
+                ctx.fillStyle = hexToRgba(isDarkTheme ? '#CC942D' : '#CC942D', textAlpha);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(houseNum.toString(), xHN, yHN);
@@ -5314,7 +5314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
 
                     const upColor   = hexToRgba(isDarkTheme ? '#FFEFA6' : '#2E2A20', textAlpha * pRulers);
-                    const downColor = hexToRgba(isDarkTheme ? '#D4AF37' : '#2E2A20', textAlpha * pRulers);
+                    const downColor = hexToRgba(isDarkTheme ? '#CC942D' : '#2E2A20', textAlpha * pRulers);
 
                     const tx = xRP - 8.0; // Column for triangles (strictly aligned vertically)
                     const px = xRP + 5.0; // Column for planet symbols
@@ -5379,11 +5379,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 5. Draw concentric circle dividing lines
         // Structural borders
         const concentricBorders = [
-            { r: rInnerBorder, alpha: 1.0, stroke: 'rgba(180,145,65,0.42)', width: 1.1 },
-            { r: rDialInner, alpha: mandalaAnimState.zodiac.progress, stroke: 'rgba(197,158,63,0.22)', width: 0.8 },
-            { r: rGatesInner, alpha: 1.0, stroke: 'rgba(197,158,63,0.18)', width: 0.8 },
-            { r: rZodiacInner, alpha: Math.max(mandalaAnimState.zodiac.progress, mandalaAnimState.houses.progress), stroke: 'rgba(180,145,65,0.32)', width: 0.9 },
-            { r: rMirrorGateInner, alpha: mandalaAnimState.mirror.progress, stroke: 'rgba(197,158,63,0.18)', width: 0.8 }
+            { r: rInnerBorder, alpha: 1.0, stroke: 'rgba(204, 148, 45,0.42)', width: 1.1 },
+            { r: rDialInner, alpha: mandalaAnimState.zodiac.progress, stroke: 'rgba(204, 148, 45,0.22)', width: 0.8 },
+            { r: rGatesInner, alpha: 1.0, stroke: 'rgba(204, 148, 45,0.18)', width: 0.8 },
+            { r: rZodiacInner, alpha: Math.max(mandalaAnimState.zodiac.progress, mandalaAnimState.houses.progress), stroke: 'rgba(204, 148, 45,0.32)', width: 0.9 },
+            { r: rMirrorGateInner, alpha: mandalaAnimState.mirror.progress, stroke: 'rgba(204, 148, 45,0.18)', width: 0.8 }
         ];
         concentricBorders.forEach(({ r, alpha, stroke, width }) => {
             if (alpha < 0.001) return;
@@ -5410,7 +5410,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.globalAlpha = alpha;
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(197, 158, 63, 0.50)'; // 50% opacity gold
+            ctx.strokeStyle = 'rgba(204, 148, 45, 0.50)'; // 50% opacity gold
             ctx.lineWidth = 1.0;
             ctx.stroke();
             ctx.restore();
@@ -5509,7 +5509,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let baseHex;
                     if (isDarkTheme) {
-                        baseHex = act.type === 'design' ? '#D4AF37' : '#FFFFFF';
+                        baseHex = act.type === 'design' ? '#CC942D' : '#FFFFFF';
                     } else {
                         baseHex = act.type === 'design' ? '#DC2626' : '#1A1610';
                     }
@@ -5854,7 +5854,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gateActivators[gNum] = [];
                 }
                 const meta = PLANET_META[p.name] || { sym: p.symbol, cls: '' };
-                gateActivators[gNum].push(`<span class="planet-badge ${meta.cls}" style="display:inline-flex; align-items:center; gap:2px; font-size:10px; background:rgba(197,158,63,0.06); border:1px solid rgba(197,158,63,0.15); padding:1px 6px; border-radius:10px; margin-right:4px;">${meta.sym} ${p.name}</span>`);
+                gateActivators[gNum].push(`<span class="planet-badge ${meta.cls}" style="display:inline-flex; align-items:center; gap:2px; font-size:10px; background:rgba(204, 148, 45,0.06); border:1px solid rgba(204, 148, 45,0.15); padding:1px 6px; border-radius:10px; margin-right:4px;">${meta.sym} ${p.name}</span>`);
             }
         });
 
@@ -5881,7 +5881,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const tr = document.createElement('tr');
             if (isActive) {
-                tr.style.background = 'rgba(197, 158, 63, 0.03)';
+                tr.style.background = 'rgba(204, 148, 45, 0.03)';
             }
 
             tr.innerHTML = `
@@ -7626,7 +7626,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     rows = allRows.join('');
 
                     gateTooltip.innerHTML = `
-                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(212,175,55,0.85);margin-bottom:2px;font-weight:600;">2-й циферблат (Зеркало Жизни)</div>
+                        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(204, 148, 45,0.85);margin-bottom:2px;font-weight:600;">2-й циферблат (Зеркало Жизни)</div>
                         <span class="tt-gate-num">Ворота ${gateNum}</span>
                         ${name ? `<span class="tt-gate-name">${name}</span>` : ''}
                         <div style="font-size:10px;color:rgba(200,180,130,0.65);margin-bottom:${rows?'5px':'0'}">${typeLabel}</div>
