@@ -4409,14 +4409,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 hoverTarget === pSunGate || hoverTarget === pEarthGate ||
                 hoverTarget === dSunGate || hoverTarget === dEarthGate
             );
-            const color = isHov ? colHover : color;
+            const color = isHov ? colHover : col;
             const rLine = R + 18;
 
             // Full line from gate A through center to gate B
             ctx.beginPath();
             ctx.moveTo(cx + rLine * Math.cos(aA), cy + rLine * Math.sin(aA));
             ctx.lineTo(cx + rLine * Math.cos(aB), cy + rLine * Math.sin(aB));
-            ctx.strokeStyle = isHov ? colHover : col;
+            ctx.strokeStyle = color;
             ctx.lineWidth   = lineW;
             ctx.lineCap     = 'round';
             ctx.setLineDash([]);
@@ -4427,7 +4427,7 @@ document.addEventListener('DOMContentLoaded', () => {
             [aA, aB].forEach(a => {
                 ctx.beginPath();
                 ctx.arc(cx + rLine * Math.cos(a), cy + rLine * Math.sin(a), dotR, 0, Math.PI * 2);
-                ctx.fillStyle = isHov ? colHover : col;
+                ctx.fillStyle = color;
                 ctx.fill();
             });
         }
