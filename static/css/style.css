@@ -3408,6 +3408,37 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     box-shadow: 0 0 0 2px rgba(197,158,63,0.15);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Extra Activations Section in Side Columns (Day Mode)
+   ───────────────────────────────────────────────────────────── */
+.bg-extra-section {
+    margin-top: 6px;
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.025);
+    border: 1px dashed rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bg-planet-row.bg-row-extra {
+    border: 1px dashed rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.bg-planet-row.bg-row-extra.bg-row-inactive {
+    background: rgba(120, 120, 120, 0.04);
+    border: 1px dashed rgba(120, 120, 120, 0.15);
+    opacity: 0.4;
+}
+
+.bg-planet-row.bg-row-extra.bg-row-inactive:hover {
+    background: rgba(120, 120, 120, 0.09);
+    border-color: rgba(120, 120, 120, 0.3);
+    opacity: 0.7;
+}
+
 
 .bg-planet-wrap {
     position: relative;
@@ -4551,6 +4582,29 @@ body.theme-dark .bg-col-personality .bg-planet-row:hover {
     background: rgba(255, 255, 255, 0.15) !important;
     border-color: rgba(255, 255, 255, 0.4) !important;
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Extra Activations Section in Side Columns (Night Mode) */
+body.theme-dark .bg-extra-section {
+    background: rgba(212, 175, 55, 0.03) !important;
+    border: 1px dashed rgba(212, 175, 55, 0.22) !important;
+}
+
+body.theme-dark .bg-planet-row.bg-row-extra {
+    background: rgba(10, 14, 23, 0.5) !important;
+    border: 1px dashed rgba(212, 175, 55, 0.18) !important;
+}
+
+body.theme-dark .bg-planet-row.bg-row-extra.bg-row-inactive {
+    background: rgba(10, 14, 23, 0.3) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.08) !important;
+    opacity: 0.35 !important;
+}
+
+body.theme-dark .bg-planet-row.bg-row-extra.bg-row-inactive:hover {
+    background: rgba(212, 175, 55, 0.08) !important;
+    border-color: rgba(212, 175, 55, 0.35) !important;
+    opacity: 0.75 !important;
 }
 
 /* Planet Wrap Box */

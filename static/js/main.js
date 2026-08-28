@@ -6357,7 +6357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // ── Build a planet row ─────────────────────────────────────────
-        function buildPlanetRow(p, isDesign) {
+        function buildPlanetRow(p, isDesign, isExtra = false) {
             const colorCss  = isDesign ? '#fe0000' : '#2E2A20';
             const sym       = getPlanetSym(p.name);
             const gate      = p.hexagram ? p.hexagram.gate : '—';
@@ -6373,11 +6373,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const row = document.createElement('div');
-            row.className = 'bg-planet-row' + (isActive ? '' : ' bg-row-inactive');
+            row.className = 'bg-planet-row' + (isExtra ? ' bg-row-extra' : '') + (isActive ? '' : ' bg-row-inactive');
             row.dataset.planetName = p.name;
             row.dataset.gate       = gate;
             row.dataset.isDesign   = isDesign ? '1' : '0';
-            row.title              = `${p.displayName || p.name}: ворота ${gate}.${line}`;
+            row.title              = `${p.displayName || p.name}: ворота ${gate}.${line}` + (isExtra ? ' (дополнительная точка)' : '');
 
             const key = p.name === 'Северный Узел' ? 'Истинный Северный Узел' : (p.name === 'Южный Узел' ? 'Истинный Южный Узел' : p.name);
             const pMeta = PLANET_META[key] || PLANET_META[p.name] || {};
@@ -6478,19 +6478,36 @@ document.addEventListener('DOMContentLoaded', () => {
             return row;
         }
 
+        // ── Helper to populate column with canonical and extra sections ─
+        function populatePlanetColumn(targetContainer, planetsList, isDesign) {
+            targetContainer.innerHTML = '';
+            
+            const canonicalList = planetsList.filter(p => p.hexagram && !DEFAULT_INACTIVE_PLANETS.includes(p.name));
+            const extraList = planetsList.filter(p => p.hexagram && DEFAULT_INACTIVE_PLANETS.includes(p.name));
+            
+            // 1. Canonical 13 HD Planets
+            canonicalList.forEach(p => {
+                targetContainer.appendChild(buildPlanetRow(p, isDesign, false));
+            });
+            
+            // 2. Additional Activations Section (Chiron, Lilith, Priapus)
+            if (extraList.length > 0) {
+                const extraSec = document.createElement('div');
+                extraSec.className = 'bg-extra-section';
+                
+                extraList.forEach(p => {
+                    extraSec.appendChild(buildPlanetRow(p, isDesign, true));
+                });
+                
+                targetContainer.appendChild(extraSec);
+            }
+        }
+
         // ── Populate left column (Design / red) ────────────────────────
-        designList.innerHTML = '';
-        designPlanets.forEach(p => {
-            if (!p.hexagram) return;
-            designList.appendChild(buildPlanetRow(p, true));
-        });
+        populatePlanetColumn(designList, designPlanets, true);
 
         // ── Populate right column (Personality / black) ────────────────
-        persList.innerHTML = '';
-        personalityPlanets.forEach(p => {
-            if (!p.hexagram) return;
-            persList.appendChild(buildPlanetRow(p, false));
-        });
+        populatePlanetColumn(persList, personalityPlanets, false);
 
         // ── Apply initial gate state ───────────────────────────────────
         applyGatesToSvg();
