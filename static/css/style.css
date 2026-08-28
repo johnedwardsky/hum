@@ -4611,22 +4611,22 @@ body.theme-dark .hex-num.hex-num-design {
    NIGHT THEME: VARIABLES & ARROWS (СТРЕЛОЧКИ И ПЕРЕМЕННЫЕ)
    ══════════════════════════════════════════════════════════════════════ */
 body.theme-dark .bg-var-design {
-    color: #F59E0B !important;
+    color: #CC942D !important;
 }
 body.theme-dark .bg-var-design .bg-var-labels span {
-    color: #FDE68A !important;
-    text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+    color: #F3D389 !important;
+    text-shadow: 0 0 8px rgba(204, 148, 45, 0.4);
 }
 body.theme-dark .bg-var-design .bg-var-arrow-svg path,
 body.theme-dark .bg-var-design .var-arrow-svg path {
-    fill: url(#grad-amber-gold) !important;
-    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+    fill: #CC942D !important;
+    filter: drop-shadow(0 0 6px rgba(204, 148, 45, 0.5));
 }
 body.theme-dark .bg-var-design .var-badge-svg rect,
 body.theme-dark .bg-var-design .var-badge-svg circle,
 body.theme-dark .bg-var-design .var-badge-svg polygon {
-    fill: url(#grad-amber-gold) !important;
-    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+    fill: #CC942D !important;
+    filter: drop-shadow(0 0 6px rgba(204, 148, 45, 0.4));
 }
 body.theme-dark .bg-var-design .var-badge-svg text {
     fill: #0A0E17 !important;
@@ -4661,14 +4661,11 @@ body.theme-dark .bg-var-personality .var-badge-svg text {
    ══════════════════════════════════════════════════════════════════════ */
 /* Titles */
 body.theme-dark .bg-col-title-design {
-    background: linear-gradient(135deg, #FEF08A 0%, #F59E0B 50%, #D97706 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    text-shadow: 0 0 14px rgba(245, 158, 11, 0.45) !important;
+    color: #CC942D !important;
+    text-shadow: 0 0 10px rgba(204, 148, 45, 0.4);
 }
 body.theme-dark .bg-col-title-design .bg-header-sub {
-    color: #FDE68A !important;
-    -webkit-text-fill-color: #FDE68A !important;
+    color: #F3D389 !important;
 }
 body.theme-dark .bg-col-title-personality {
     color: #FFFFFF !important;
@@ -4681,13 +4678,13 @@ body.theme-dark .bg-col-title-personality .bg-header-sub {
 /* Column Container */
 body.theme-dark .bg-planet-list {
     background: rgba(13, 19, 34, 0.75) !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(245, 158, 11, 0.1) !important;
+    border: 1px solid rgba(204, 148, 45, 0.25) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(204, 148, 45, 0.08) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
 }
 body.theme-dark .bg-col-design .bg-planet-list {
-    border-right: 2px solid rgba(245, 158, 11, 0.55) !important;
+    border-right: 2px solid rgba(204, 148, 45, 0.5) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-list {
     border-left: 2px solid rgba(255, 255, 255, 0.5) !important;
@@ -4699,9 +4696,9 @@ body.theme-dark .bg-planet-row {
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 body.theme-dark .bg-col-design .bg-planet-row:not(.bg-row-inactive):hover {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.08) 100%) !important;
-    border-color: rgba(251, 191, 36, 0.5) !important;
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+    background: rgba(204, 148, 45, 0.12) !important;
+    border-color: rgba(204, 148, 45, 0.45) !important;
+    box-shadow: 0 0 12px rgba(204, 148, 45, 0.3) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-row:not(.bg-row-inactive):hover {
     background: rgba(255, 255, 255, 0.15) !important;
@@ -4711,13 +4708,13 @@ body.theme-dark .bg-col-personality .bg-planet-row:not(.bg-row-inactive):hover {
 
 /* Extra Activations Section in Side Columns (Night Mode) */
 body.theme-dark .bg-extra-section {
-    background: rgba(245, 158, 11, 0.03) !important;
-    border: 1px dashed rgba(245, 158, 11, 0.22) !important;
+    background: rgba(204, 148, 45, 0.03) !important;
+    border: 1px dashed rgba(204, 148, 45, 0.22) !important;
 }
 
 body.theme-dark .bg-planet-row.bg-row-extra {
     background: rgba(10, 14, 23, 0.5) !important;
-    border: 1px dashed rgba(245, 158, 11, 0.18) !important;
+    border: 1px dashed rgba(204, 148, 45, 0.18) !important;
 }
 
 body.theme-dark .bg-planet-row.bg-row-inactive {
@@ -4740,17 +4737,17 @@ body.theme-dark .bg-planet-row.bg-row-inactive .bg-zodiac-sym {
 /* Inactive Row on Hover: Illuminates temporarily while cursor is over it, dims again on mouseleave */
 body.theme-dark .bg-planet-row.bg-row-inactive:hover {
     background: rgba(13, 19, 34, 0.9) !important;
-    border-color: rgba(245, 158, 11, 0.5) !important;
+    border-color: rgba(204, 148, 45, 0.5) !important;
     opacity: 0.9 !important;
     filter: grayscale(0%) !important;
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.25) !important;
+    box-shadow: 0 0 10px rgba(204, 148, 45, 0.25) !important;
     transform: none !important;
     cursor: pointer;
 }
 
 body.theme-dark .bg-col-design .bg-planet-row.bg-row-inactive:hover .bg-planet-sym,
 body.theme-dark .bg-col-design .bg-planet-row.bg-row-inactive:hover .bg-gate-cell {
-    color: #FBBF24 !important;
+    color: #CC942D !important;
 }
 
 body.theme-dark .bg-col-personality .bg-planet-row.bg-row-inactive:hover .bg-planet-sym,
@@ -4760,8 +4757,8 @@ body.theme-dark .bg-col-personality .bg-planet-row.bg-row-inactive:hover .bg-gat
 
 /* Planet Wrap Box */
 body.theme-dark .bg-col-design .bg-planet-wrap {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.08) 100%) !important;
-    border-color: rgba(251, 191, 36, 0.4) !important;
+    background: rgba(204, 148, 45, 0.12) !important;
+    border-color: rgba(204, 148, 45, 0.35) !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-wrap {
     background: rgba(255, 255, 255, 0.15) !important;
@@ -4770,8 +4767,7 @@ body.theme-dark .bg-col-personality .bg-planet-wrap {
 
 /* Planet Glyphs */
 body.theme-dark .bg-col-design .bg-planet-sym {
-    color: #FBBF24 !important;
-    text-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+    color: #CC942D !important;
 }
 body.theme-dark .bg-col-personality .bg-planet-sym {
     color: #FFFFFF !important;
@@ -4779,7 +4775,7 @@ body.theme-dark .bg-col-personality .bg-planet-sym {
 
 /* Gate Cells (Main numbers & line) */
 body.theme-dark .bg-col-design .bg-gate-cell {
-    color: #F59E0B !important;
+    color: #CC942D !important;
     font-weight: 700 !important;
 }
 body.theme-dark .bg-col-personality .bg-gate-cell {
@@ -4789,7 +4785,7 @@ body.theme-dark .bg-col-personality .bg-gate-cell {
 
 /* 2nd Dial Mirror Cells */
 body.theme-dark .bg-col-design .bg-mirror-cell {
-    color: rgba(245, 158, 11, 0.8) !important;
+    color: rgba(204, 148, 45, 0.75) !important;
 }
 body.theme-dark .bg-col-personality .bg-mirror-cell {
     color: rgba(255, 255, 255, 0.8) !important;
@@ -4797,7 +4793,7 @@ body.theme-dark .bg-col-personality .bg-mirror-cell {
 
 /* Hexagram Icon Lines */
 body.theme-dark .bg-col-design .bg-hex-icon .bg-hex-line {
-    background: linear-gradient(90deg, #FDE68A 0%, #F59E0B 100%) !important;
+    background: #CC942D !important;
 }
 body.theme-dark .bg-col-personality .bg-hex-icon .bg-hex-line {
     background: #FFFFFF !important;
@@ -4805,7 +4801,7 @@ body.theme-dark .bg-col-personality .bg-hex-icon .bg-hex-line {
 
 /* Zodiac Symbols */
 body.theme-dark .bg-col-design .bg-zodiac-sym {
-    color: #FBBF24 !important;
+    color: #CC942D !important;
 }
 body.theme-dark .bg-col-personality .bg-zodiac-sym {
     color: #D8D8D8 !important;
@@ -4813,7 +4809,7 @@ body.theme-dark .bg-col-personality .bg-zodiac-sym {
 
 /* Retrograde Badges */
 body.theme-dark .bg-planet-wrap .bg-retro-badge {
-    background: linear-gradient(135deg, #FDE047 0%, #F59E0B 100%) !important;
+    background: #CC942D !important;
     color: #0A0E17 !important;
     font-weight: 800 !important;
 }
@@ -4823,45 +4819,45 @@ body.theme-dark .bg-planet-wrap .bg-retro-badge {
    ══════════════════════════════════════════════════════════════════════ */
 body.theme-dark .bg-dial-segmented {
     background: rgba(13, 19, 34, 0.85) !important;
-    border-color: rgba(245, 158, 11, 0.3) !important;
+    border-color: rgba(204, 148, 45, 0.3) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 body.theme-dark .bg-dial-btn {
     color: #9CA3AF !important;
 }
 body.theme-dark .bg-dial-btn:hover {
-    color: #FDE68A !important;
-    background: rgba(245, 158, 11, 0.12) !important;
+    color: #F3D389 !important;
+    background: rgba(204, 148, 45, 0.12) !important;
 }
 body.theme-dark .bg-dial-btn.active {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.35) 0%, rgba(217, 119, 6, 0.45) 100%) !important;
-    border-color: #F59E0B !important;
+    background: linear-gradient(135deg, rgba(204, 148, 45, 0.35) 0%, rgba(225, 175, 75, 0.45) 100%) !important;
+    border-color: #CC942D !important;
     color: #FFFFFF !important;
-    box-shadow: 0 0 18px rgba(245, 158, 11, 0.4) !important;
+    box-shadow: 0 0 16px rgba(204, 148, 45, 0.35) !important;
 }
 body.theme-dark .bg-dial-btn.active .bg-dial-badge {
-    background: linear-gradient(135deg, #FDE047 0%, #F59E0B 100%) !important;
+    background: #CC942D !important;
     color: #0A0E17 !important;
 }
 
 body.theme-dark .bg-extra-toggle-btn {
     background: rgba(13, 19, 34, 0.85) !important;
-    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+    border: 1px solid rgba(204, 148, 45, 0.25) !important;
     color: var(--text-muted) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 body.theme-dark .bg-extra-toggle-btn:not(.active):hover {
-    border-color: rgba(245, 158, 11, 0.45) !important;
+    border-color: rgba(204, 148, 45, 0.45) !important;
     color: #FFF !important;
-    background: rgba(245, 158, 11, 0.08) !important;
+    background: rgba(204, 148, 45, 0.08) !important;
 }
 
 body.theme-dark .bg-extra-toggle-btn.active {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(217, 119, 6, 0.35) 100%) !important;
-    border-color: #F59E0B !important;
+    background: linear-gradient(135deg, rgba(204, 148, 45, 0.25) 0%, rgba(225, 175, 75, 0.35) 100%) !important;
+    border-color: #CC942D !important;
     color: #FFF !important;
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+    box-shadow: 0 0 14px rgba(204, 148, 45, 0.30) !important;
 }
 
 body.theme-dark .bg-extra-toggle-btn.active .chip-dot {
@@ -4985,14 +4981,14 @@ body.theme-dark #mandala-bodygraph-wrap .cls-32,
 body.theme-dark #mandala-bodygraph-wrap .cls-35:not([class*="bg-gate-active"]) {
     display: block !important;
     fill: none !important;
-    stroke: rgba(245, 158, 11, 0.18) !important;
+    stroke: rgba(204, 148, 45, 0.18) !important;
     stroke-width: 0.9px !important;
 }
 
-/* 3. Gate activations in Night Mode: Design = Amber-Gold gradient, Personality = White, Both = Amber-Gold + White stripes */
+/* 3. Gate activations in Night Mode: Design = Warm Amber/Gold, Personality = White, Both = Warm Gold + White stripes */
 body.theme-dark .bg-svg-wrap .bg-gate-active-design,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design {
-    fill: url(#grad-amber-gold) !important;
+    fill: #CC942D !important;
     display: block !important;
 }
 
@@ -5008,7 +5004,7 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-21,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-30,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-31,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-35 {
-    stroke: url(#grad-amber-gold-line) !important;
+    stroke: #CC942D !important;
     fill: none !important;
 }
 body.theme-dark .bg-svg-wrap .bg-gate-active-personality,
@@ -5077,7 +5073,7 @@ body.theme-dark .bg-svg-wrap polygon.bg-gate-active-both,
 body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both:not(.cls-8):not(.red_bg),
 body.theme-dark #mandala-bodygraph-wrap rect.bg-gate-active-both:not(.cls-19),
 body.theme-dark #mandala-bodygraph-wrap polygon.bg-gate-active-both {
-    fill: url(#grad-amber-gold) !important;
+    fill: #CC942D !important;
     stroke: none !important;
     display: block !important;
 }
@@ -5148,7 +5144,7 @@ body.theme-dark #mandala-bodygraph-wrap [class^="a"],
 body.theme-dark #mandala-bodygraph-wrap [class*=" a"],
 body.theme-dark #mandala-bodygraph-wrap text {
     display: block !important;
-    fill: #FBBF24 !important;
+    fill: #CC942D !important;
 }
 
 /* Circle background disks under gate numbers in night mode (default transparent) */
@@ -5161,23 +5157,22 @@ body.theme-dark #mandala-bodygraph-wrap .cls-8[class*="cls__"] {
     fill: transparent;
 }
 
-/* 4. Defined Centers: Radiant Luminous Amber-Gold Radial Gradient */
+/* 4. Defined Centers: Radiant Warm Gold */
 body.theme-dark .bg-svg-wrap .bg-center-defined,
 body.theme-dark .bg-svg-wrap [class*="block__"][class*="-active"],
 body.theme-dark #mandala-bodygraph-wrap .bg-center-defined,
 body.theme-dark #mandala-bodygraph-wrap [class*="block__"][class*="-active"] {
-    fill: url(#grad-amber-gold-radial) !important;
-    stroke: #FDE68A !important;
+    fill: #CC942D !important;
+    stroke: #F3D389 !important;
     stroke-width: 1.5px !important;
-    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.45)) !important;
     display: block !important;
 }
 
-/* 5. Undefined Centers: Dark cosmic indigo with amber-gold outline */
+/* 5. Undefined Centers: Dark cosmic indigo with warm gold outline */
 body.theme-dark .bg-svg-wrap [class*="block__"]:not(.bg-center-defined):not([class*="-active"]),
 body.theme-dark #mandala-bodygraph-wrap [class*="block__"]:not(.bg-center-defined):not([class*="-active"]) {
     fill: #0A0E17 !important;
-    stroke: rgba(245, 158, 11, 0.45) !important;
+    stroke: rgba(204, 148, 45, 0.45) !important;
     stroke-width: 1.2px !important;
     display: block !important;
 }
@@ -5187,8 +5182,8 @@ body.theme-dark #mandala-bodygraph-wrap [class*="block__"]:not(.bg-center-define
    ══════════════════════════════════════════════════════════════════════ */
 body.theme-dark .custom-picker-content {
     background: #111722 !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(204, 148, 45, 0.4) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(204, 148, 45, 0.15) !important;
 }
 body.theme-dark .custom-picker-header {
     color: #F3F4F6 !important;
@@ -5207,8 +5202,8 @@ body.theme-dark .custom-picker-item.active {
     color: #FFFFFF !important;
 }
 body.theme-dark .custom-picker-highlight {
-    border-color: #F59E0B !important;
-    background: rgba(245, 158, 11, 0.08) !important;
+    border-color: #CC942D !important;
+    background: rgba(204, 148, 45, 0.08) !important;
 }
 body.theme-dark .custom-picker-btn.cancel {
     background: rgba(255, 255, 255, 0.08) !important;
@@ -5218,10 +5213,10 @@ body.theme-dark .custom-picker-btn.cancel:active {
     background: rgba(255, 255, 255, 0.14) !important;
 }
 body.theme-dark .custom-picker-btn.confirm {
-    background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%) !important;
+    background: linear-gradient(135deg, #CC942D 0%, #996B1A 100%) !important;
     color: #0A0E17 !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+    box-shadow: 0 4px 14px rgba(204, 148, 45, 0.3) !important;
 }
 
 
