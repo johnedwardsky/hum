@@ -1997,7 +1997,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const hx = cx + (r2 + r3) / 2 * Math.cos(midAng);
             const hy = cy + (r2 + r3) / 2 * Math.sin(midAng);
             ctx.font      = 'bold 9px DM Sans, sans-serif';
-            ctx.fillStyle = isDarkTheme ? '#FFEFA6' : '#777166';
+            ctx.fillStyle = isDarkTheme ? '#F3D389' : '#777166';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(toRoman(i + 1), hx, hy);
@@ -2086,7 +2086,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
 
             // Symbol
-            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 13, isDarkTheme ? '#FFEFA6' : (PLANET_COLORS[p.name] || '#2E2A20'));
+            drawPlanetOnCanvas(ctx, p.name, meta.sym, px, py, 13, isDarkTheme ? '#F3D389' : (PLANET_COLORS[p.name] || '#2E2A20'));
 
             // Retrograde indicator
             if (p.is_retrograde) {
@@ -2108,7 +2108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lx = cx + (R + 4) * Math.cos(a);
             const ly = cy + (R + 4) * Math.sin(a);
             ctx.font      = 'bold 10px DM Sans, sans-serif';
-            ctx.fillStyle = isDarkTheme ? '#FFEFA6' : '#CC942D';
+            ctx.fillStyle = isDarkTheme ? '#F3D389' : '#CC942D';
             ctx.textAlign = lx < cx ? 'right' : lx > cx ? 'left' : 'center';
             ctx.textBaseline = ly < cy ? 'bottom' : 'top';
             ctx.fillText(label, lx, ly);
@@ -5294,7 +5294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Draw Gate number
                 ctx.font = fontGate;
-                ctx.fillStyle = hexToRgba(isDarkTheme ? '#FFEFA6' : '#1E1A14', textAlpha);
+                ctx.fillStyle = hexToRgba(isDarkTheme ? '#F3D389' : '#1E1A14', textAlpha);
                 ctx.fillText(gateStr, startX, yGL);
 
                 // Draw dot & Line number
@@ -5313,7 +5313,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const xRP = cx + rMid * Math.cos(angleRulerPos);
                     const yRP = cy + rMid * Math.sin(angleRulerPos);
 
-                    const upColor   = hexToRgba(isDarkTheme ? '#FFEFA6' : '#2E2A20', textAlpha * pRulers);
+                    const upColor   = hexToRgba(isDarkTheme ? '#F3D389' : '#2E2A20', textAlpha * pRulers);
                     const downColor = hexToRgba(isDarkTheme ? '#CC942D' : '#2E2A20', textAlpha * pRulers);
 
                     const tx = xRP - 8.0; // Column for triangles (strictly aligned vertically)
@@ -5526,7 +5526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.textBaseline = 'middle';
                     
                     let lineAlpha = (isAnyHovered && !isHighlighted ? 0.15 : 1.0) * pRaysPlanets;
-                    let lineHex = isDarkTheme ? (act.type === 'design' ? '#FFEFA6' : '#FFFFFF') : baseHex;
+                    let lineHex = isDarkTheme ? (act.type === 'design' ? '#F3D389' : '#FFFFFF') : baseHex;
                     ctx.fillStyle = hexToRgba(lineHex, lineAlpha);
                     ctx.fillText(act.line.toString(), sx, sy);
                 });

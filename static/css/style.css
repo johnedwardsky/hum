@@ -6,7 +6,7 @@
     --primary:       #CC942D; /* Elegant Contrast Gold */
     --primary-light: rgba(204, 148, 45, 0.06);
     --primary-mid:   #D9B455;
-    --accent:        #FFEFA6;
+    --accent:        #F3D389;
 
     --bg:            #FAF8F5; /* Warm Champagne Cream */
     --bg-card:       rgba(255, 255, 255, 0.8); /* White glass card */
@@ -357,7 +357,7 @@ input  { font-family: inherit; }
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #FFEFA6 0%, #CC942D 40%, #AA7C11 100%);
+    background: linear-gradient(135deg, #F3D389 0%, #CC942D 40%, #AA7C11 100%);
     color: #2E2A20; /* dark contrast text for luxury feel */
     border: none;
     border-radius: var(--radius-md);
@@ -4122,7 +4122,7 @@ body.theme-dark {
     --primary:       #CC942D; /* Radiant Warm Gold */
     --primary-light: rgba(204, 148, 45, 0.12);
     --primary-mid:   #E6CA65;
-    --accent:        #FFEFA6;
+    --accent:        #F3D389;
 
     --bg:            #0A0E17; /* Cosmic Dark Indigo */
     --bg-card:       rgba(14, 20, 32, 0.85); /* Frosted Dark Navy Glass */
@@ -4225,7 +4225,7 @@ body.theme-dark .theme-switch-btn {
 }
 
 body.theme-dark .theme-switch-btn:hover {
-    color: #FFEFA6;
+    color: #F3D389;
 }
 
 body.theme-dark .theme-switch-btn.active {
@@ -4238,8 +4238,8 @@ body.theme-dark #theme-btn-dark.active .theme-btn-icon {
 }
 
 body.theme-dark .theme-switch-glider {
-    background: linear-gradient(135deg, #FFEFA6 0%, #CC942D 100%);
-    box-shadow: 0 0 12px rgba(204, 148, 45, 0.5), 0 2px 5px rgba(0, 0, 0, 0.3);
+    background: #CC942D !important;
+    box-shadow: 0 0 14px rgba(204, 148, 45, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35) !important;
     transform: translateX(100%);
 }
 
@@ -4400,7 +4400,7 @@ body.theme-dark .btn-export,
 body.theme-dark .btn-ghost {
     background: rgba(14, 20, 32, 0.75) !important;
     border-color: rgba(204, 148, 45, 0.3) !important;
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -4423,7 +4423,7 @@ body.theme-dark .btn-ghost:hover {
 body.theme-dark .btn-export:hover svg,
 body.theme-dark .btn-export[aria-expanded="true"] svg,
 body.theme-dark .btn-ghost:hover svg {
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
 }
 
 body.theme-dark .export-dropdown {
@@ -4444,11 +4444,11 @@ body.theme-dark .export-item svg {
 
 body.theme-dark .export-item:hover {
     background: rgba(204, 148, 45, 0.15) !important;
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
 }
 
 body.theme-dark .export-item:hover svg {
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
 }
 
 /* Natal Chart Card and Legend in Night Mode */
@@ -4475,7 +4475,7 @@ body.theme-dark .table-section {
 }
 
 body.theme-dark .data-table th {
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
     border-color: rgba(204, 148, 45, 0.2) !important;
 }
 
@@ -4487,7 +4487,7 @@ body.theme-dark .data-table td {
 body.theme-dark #planets-table .th-dial-group {
     background: rgba(204, 148, 45, 0.12) !important;
     border-color: rgba(204, 148, 45, 0.25) !important;
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
 }
 
 body.theme-dark #planets-table .th-dial-1 {
@@ -4875,7 +4875,7 @@ body.theme-dark .hd-info-pill {
     box-shadow: 0 0 25px rgba(204, 148, 45, 0.35) !important;
 }
 body.theme-dark .hd-dial-mode-tag {
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
     background: rgba(204, 148, 45, 0.15) !important;
     border-color: rgba(204, 148, 45, 0.35) !important;
 }
@@ -4888,7 +4888,7 @@ body.theme-dark .hd-info-meta-label {
     opacity: 0.9 !important;
 }
 body.theme-dark .hd-info-meta-value {
-    color: #FFEFA6 !important;
+    color: #F3D389 !important;
     font-weight: 700 !important;
 }
 body.theme-dark .hd-info-meta-sep {
