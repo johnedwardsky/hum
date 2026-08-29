@@ -193,51 +193,64 @@
                         </div>
                     </div>
 
-                    <!-- Time type -->
-                    <div class="field-group">
-                        <label class="field-label">Время</label>
-                        <label class="radio-row" id="radio-local">
-                            <div class="radio-dot active" id="radio-local-dot"></div>
-                            <span>Местное время (по часовому поясу)</span>
-                        </label>
-                        <label class="radio-row" id="radio-gmt">
-                            <div class="radio-dot" id="radio-gmt-dot"></div>
-                            <span>Время по Гринвичу (GMT / UTC)</span>
-                        </label>
-                        <input type="hidden" id="is_gmt" value="0">
+                    <!-- Advanced Settings Toggle -->
+                    <div class="advanced-toggle-wrap">
+                        <button type="button" class="btn-advanced-toggle" id="btn-advanced-toggle" aria-expanded="false">
+                            <svg class="advanced-toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M6 3.5l4.5 4.5L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Дополнительные настройки</span>
+                        </button>
                     </div>
 
-                    <!-- House System Selection -->
-                    <div class="field-group">
-                        <label class="field-label" for="house_system">Система домов</label>
-                        <div class="field-wrap">
-                            <select id="house_system" class="field-input select-input">
-                                <option value="P" selected>Плацидус (Placidus)</option>
-                                <option value="D">Равнодомная от МС (Equal MC)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- House Cusp Offset (shown only when Equal MC is selected) -->
-                    <div class="field-group hidden" id="cusp-offset-group">
-                        <label class="field-label" for="cusp_offset">Сдвиг куспидов (в градусах)</label>
-                        <div class="field-wrap">
-                            <input type="number" id="cusp_offset" class="field-input" value="0" step="1" placeholder="Например: -5 или 5">
-                        </div>
-                    </div>
-
-                    <!-- Polar equal house system options (shown only when Placidus is selected) -->
-                    <div id="placidus-polar-options">
+                    <!-- Advanced Settings Collapsible Container -->
+                    <div class="advanced-settings-wrapper collapsed" id="advanced-settings-wrapper">
+                        <!-- Time type -->
                         <div class="field-group">
-                            <label class="checkbox-row" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 10px;">
-                                <input type="checkbox" id="use_polar_equal" style="accent-color: var(--primary); cursor: pointer; transform: scale(1.15);">
-                                <span style="font-size: 13px; color: var(--text-dark);">Равнодомная для заполярных широт</span>
+                            <label class="field-label">Время</label>
+                            <label class="radio-row" id="radio-local">
+                                <div class="radio-dot active" id="radio-local-dot"></div>
+                                <span>Местное время (по часовому поясу)</span>
                             </label>
+                            <label class="radio-row" id="radio-gmt">
+                                <div class="radio-dot" id="radio-gmt-dot"></div>
+                                <span>Время по Гринвичу (GMT / UTC)</span>
+                            </label>
+                            <input type="hidden" id="is_gmt" value="0">
                         </div>
-                        <div class="field-group hidden" id="polar-boundary-group">
-                            <label class="field-label" for="polar_boundary">Граница заполярья (широта, °)</label>
+
+                        <!-- House System Selection -->
+                        <div class="field-group">
+                            <label class="field-label" for="house_system">Система домов</label>
                             <div class="field-wrap">
-                                <input type="number" id="polar_boundary" class="field-input" value="62" min="0" max="90" step="1">
+                                <select id="house_system" class="field-input select-input">
+                                    <option value="P" selected>Плацидус (Placidus)</option>
+                                    <option value="D">Равнодомная от МС (Equal MC)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- House Cusp Offset (shown only when Equal MC is selected) -->
+                        <div class="field-group hidden" id="cusp-offset-group">
+                            <label class="field-label" for="cusp_offset">Сдвиг куспидов (в градусах)</label>
+                            <div class="field-wrap">
+                                <input type="number" id="cusp_offset" class="field-input" value="0" step="1" placeholder="Например: -5 или 5">
+                            </div>
+                        </div>
+
+                        <!-- Polar equal house system options (shown only when Placidus is selected) -->
+                        <div id="placidus-polar-options">
+                            <div class="field-group">
+                                <label class="checkbox-row" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 10px;">
+                                    <input type="checkbox" id="use_polar_equal" style="accent-color: var(--primary); cursor: pointer; transform: scale(1.15);">
+                                    <span style="font-size: 13px; color: var(--text-dark);">Равнодомная для заполярных широт</span>
+                                </label>
+                            </div>
+                            <div class="field-group hidden" id="polar-boundary-group">
+                                <label class="field-label" for="polar_boundary">Граница заполярья (широта, °)</label>
+                                <div class="field-wrap">
+                                    <input type="number" id="polar_boundary" class="field-input" value="62" min="0" max="90" step="1">
+                                </div>
                             </div>
                         </div>
                     </div>

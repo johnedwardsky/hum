@@ -332,6 +332,55 @@ input  { font-family: inherit; }
 }
 .radio-dot.active::after { opacity: 1; transform: scale(1); }
 
+/* Advanced settings toggle & collapsible container */
+.advanced-toggle-wrap {
+    margin: 10px 0 6px 0;
+}
+.btn-advanced-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--primary);
+    cursor: pointer;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    user-select: none;
+    text-align: left;
+}
+.btn-advanced-toggle:hover {
+    color: var(--primary-mid, #D9A443);
+    opacity: 0.95;
+}
+.advanced-toggle-icon {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--primary);
+    flex-shrink: 0;
+}
+.btn-advanced-toggle[aria-expanded="true"] .advanced-toggle-icon {
+    transform: rotate(90deg);
+}
+
+.advanced-settings-wrapper {
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.35s ease;
+    max-height: 600px;
+    opacity: 1;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+.advanced-settings-wrapper.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
 /* TZ note */
 .tz-note {
     display: flex;
@@ -4372,6 +4421,16 @@ body.theme-dark .coords-header-icon {
 }
 body.theme-dark .coords-label {
     color: #D1D5DB !important;
+}
+
+body.theme-dark .btn-advanced-toggle {
+    color: #CC942D !important;
+}
+body.theme-dark .btn-advanced-toggle:hover {
+    color: #F3D389 !important;
+}
+body.theme-dark .advanced-toggle-icon {
+    color: #CC942D !important;
 }
 
 body.theme-dark .tz-note {

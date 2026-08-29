@@ -599,6 +599,17 @@ document.addEventListener('DOMContentLoaded', () => {
         radioGmtDot.classList.toggle('active',  val);
     }
 
+    // ── Advanced settings toggle ─────────────────────────────
+    const btnAdvancedToggle = document.getElementById('btn-advanced-toggle');
+    const advancedSettingsWrapper = document.getElementById('advanced-settings-wrapper');
+    if (btnAdvancedToggle && advancedSettingsWrapper) {
+        btnAdvancedToggle.addEventListener('click', () => {
+            const isCollapsed = advancedSettingsWrapper.classList.contains('collapsed');
+            advancedSettingsWrapper.classList.toggle('collapsed', !isCollapsed);
+            btnAdvancedToggle.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
+        });
+    }
+
     // ── House system picker toggle ────────────────────────────
     const houseSystemSelect = document.getElementById('house_system');
     const cuspOffsetGroup   = document.getElementById('cusp-offset-group');
