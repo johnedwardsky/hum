@@ -1348,9 +1348,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'меркурий': (ctx) => {
             ctx.beginPath(); ctx.arc(71.5, 68, 17.5, 0, 2*Math.PI); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(71.5, 85.5); ctx.lineTo(71.5, 104.5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(66.5, 97.5); ctx.lineTo(76.5, 97.5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(59.5, 55.5); ctx.lineTo(52.5, 48.5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(83.5, 55.5); ctx.lineTo(90.5, 48.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(64.5, 97.5); ctx.lineTo(78.5, 97.5); ctx.stroke();
+            const p = new Path2D("M54.1265396,33.5930455 C54.1265396,37.5324264 55.4628663,41.0650517 58.1355196,44.1909213 C60.8705263,47.3897179 68.233617,52.2085667 75.3684182,49.8545669 C78.5065298,48.8192032 81.4831864,48.0137312 85.3892083,43.4829937 C87.4696807,41.0697777 89.0290863,36.9629183 89.0290863,33.5930455");
+            ctx.stroke(p);
         },
         'венера': (ctx) => {
             ctx.beginPath(); ctx.arc(71.5, 63.5, 21, 0, 2*Math.PI); ctx.stroke();

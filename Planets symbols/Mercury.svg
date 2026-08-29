@@ -4,8 +4,7 @@
     <g id="Artboard-Copy-9" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <circle id="Oval" stroke="#000000" cx="71.5" cy="68" r="17.5"></circle>
         <line x1="71.5" y1="85.5" x2="71.5" y2="104.5" id="Line-3" stroke="#000000" stroke-linecap="square"></line>
-        <line x1="66.5" y1="97.5" x2="76.5" y2="97.5" id="Line" stroke="#000000" stroke-linecap="square"></line>
-        <line x1="59.5" y1="55.5" x2="52.5" y2="48.5" id="Path-3" stroke="#000000"></line>
-        <line x1="88.0984668" y1="54.5" x2="82.0984668" y2="48.5" id="Path-3-Copy" stroke="#000000" transform="translate(85.299233, 51.500000) scale(-1, 1) translate(-85.299233, -51.500000) "></line>
+        <line x1="64.5" y1="97.5" x2="78.5" y2="97.5" id="Line" stroke="#000000" stroke-linecap="square"></line>
+        <path d="M54.1265396,33.5930455 C54.1265396,37.5324264 55.4628663,41.0650517 58.1355196,44.1909213 C60.8705263,47.3897179 68.233617,52.2085667 75.3684182,49.8545669 C78.5065298,48.8192032 81.4831864,48.0137312 85.3892083,43.4829937 C87.4696807,41.0697777 89.0290863,36.9629183 89.0290863,33.5930455" id="Path-3" stroke="#000000"></path>
     </g>
 </svg>
