@@ -2952,22 +2952,20 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 .bg-layout.mode-dial-2 .bg-col-design .bg-mirror-cell {
     opacity: 1;
     color: #fe0000;
-    font-weight: 700;
 }
 .bg-layout.mode-dial-2 .bg-col-personality .bg-mirror-cell {
     opacity: 1;
     color: #2E2A20;
-    font-weight: 700;
 }
 .bg-layout.mode-dial-2 .bg-gate-cell:not(.bg-mirror-cell) {
-    opacity: 0.38;
+    opacity: 0.65;
 }
 
 .bg-layout.mode-dial-1 .bg-gate-cell:not(.bg-mirror-cell) {
     opacity: 1;
 }
 .bg-layout.mode-dial-1 .bg-mirror-cell {
-    opacity: 0.45;
+    opacity: 0.88;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -3723,7 +3721,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 
 /* Mirror Cell (Second Dial Program) Styling */
 .bg-mirror-cell {
-    opacity: 0.68;
+    opacity: 0.88;
     padding: 0 2px;
     border: none;
     margin: 0;
@@ -3738,9 +3736,10 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 .bg-mirror-cell .bg-line-sub {
     font-size: 8.5px;
+    font-weight: 500;
 }
-.bg-col-design .bg-mirror-cell { color: rgba(254, 0, 0, 0.68); }
-.bg-col-personality .bg-mirror-cell { color: rgba(46, 42, 32, 0.68); }
+.bg-col-design .bg-mirror-cell { color: #fe0000; }
+.bg-col-personality .bg-mirror-cell { color: #2E2A20; }
 
 /* Hexagram icon */
 .bg-hex-icon {
@@ -4845,10 +4844,18 @@ body.theme-dark .bg-col-personality .bg-gate-cell {
 
 /* 2nd Dial Mirror Cells */
 body.theme-dark .bg-col-design .bg-mirror-cell {
-    color: rgba(204, 148, 45, 0.75) !important;
+    color: #CC942D !important;
+    opacity: 0.9 !important;
 }
 body.theme-dark .bg-col-personality .bg-mirror-cell {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: #E5E7EB !important;
+    opacity: 0.9 !important;
+}
+body.theme-dark .bg-layout.mode-dial-1 .bg-mirror-cell {
+    opacity: 0.9 !important;
+}
+body.theme-dark .bg-layout.mode-dial-2 .bg-mirror-cell {
+    opacity: 1 !important;
 }
 
 /* Hexagram Icon Lines */
