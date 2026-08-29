@@ -5120,14 +5120,27 @@ body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality .cls-35 {
     fill: #FFFFFF !important;
     stroke: none !important;
 }
-/* Both-gate disk fallback for gates not handled by JS CENTER_GATES_LIST */
+/* Active gate disk fallback in night mode: dark circle without stroke */
 body.theme-dark .bg-svg-wrap .bg-gate-active-both.cls-8,
 body.theme-dark .bg-svg-wrap path.bg-gate-active-both.cls-8,
 body.theme-dark .bg-svg-wrap path.bg-gate-active-both.red_bg,
+body.theme-dark .bg-svg-wrap .bg-gate-active-personality.cls-8,
+body.theme-dark .bg-svg-wrap path.bg-gate-active-personality.cls-8,
+body.theme-dark .bg-svg-wrap path.bg-gate-active-personality.red_bg,
+body.theme-dark .bg-svg-wrap .bg-gate-active-design.cls-8,
+body.theme-dark .bg-svg-wrap path.bg-gate-active-design.cls-8,
+body.theme-dark .bg-svg-wrap path.bg-gate-active-design.red_bg,
 body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-both.cls-8,
 body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.cls-8,
-body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.red_bg {
-    fill: #FFFFFF !important;
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-both.red_bg,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-personality.cls-8,
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-personality.cls-8,
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-personality.red_bg,
+body.theme-dark #mandala-bodygraph-wrap .bg-gate-active-design.cls-8,
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-design.cls-8,
+body.theme-dark #mandala-bodygraph-wrap path.bg-gate-active-design.red_bg {
+    fill: #0A0E17 !important;
+    stroke: none !important;
     display: block !important;
 }
 body.theme-dark .bg-svg-wrap .cls__.bg-gate-active-both,
@@ -5214,6 +5227,14 @@ body.theme-dark #mandala-bodygraph-wrap text {
     fill: #CC942D !important;
 }
 
+/* Active gate numbers on dark disks */
+body.theme-dark .bg-svg-wrap [class*="bg-gate-active"] [class^="a"],
+body.theme-dark .bg-svg-wrap [class*="bg-gate-active"] [class*=" a"],
+body.theme-dark #mandala-bodygraph-wrap [class*="bg-gate-active"] [class^="a"],
+body.theme-dark #mandala-bodygraph-wrap [class*="bg-gate-active"] [class*=" a"] {
+    fill: #FFFFFF !important;
+}
+
 /* Circle background disks under gate numbers in night mode (default transparent) */
 body.theme-dark .bg-svg-wrap .red_bg,
 body.theme-dark .bg-svg-wrap path.red_bg,
@@ -5222,6 +5243,16 @@ body.theme-dark #mandala-bodygraph-wrap .red_bg,
 body.theme-dark #mandala-bodygraph-wrap path.red_bg,
 body.theme-dark #mandala-bodygraph-wrap .cls-8[class*="cls__"] {
     fill: transparent;
+    stroke: none !important;
+}
+
+/* Remove all borders / rims around gate numbers */
+body.theme-dark .bg-svg-wrap .red_border[class*="cls__"],
+body.theme-dark .bg-svg-wrap [class*="cls______"],
+body.theme-dark #mandala-bodygraph-wrap .red_border[class*="cls__"],
+body.theme-dark #mandala-bodygraph-wrap [class*="cls______"] {
+    display: none !important;
+    stroke: none !important;
 }
 
 /* 4. Defined Centers: Radiant Warm Gold */
