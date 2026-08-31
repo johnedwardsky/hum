@@ -3839,9 +3839,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const fix = getFixation(pName, hx.gate, hx.line, data);
                 if (fix === "exalted") {
-                    drawUpTriangle(ctx, xCenter - 31, y - 18, 6, persBaseColor);
+                    drawUpTriangle(ctx, xText + 10.5, y - 21, 5.5, persBaseColor);
                 } else if (fix === "detriment") {
-                    drawDownTriangle(ctx, xCenter - 31, y - 18, 6, persBaseColor);
+                    drawDownTriangle(ctx, xText + 10.5, y - 21, 5.5, persBaseColor);
                 }
 
                 if (pName !== "Солнце" && pName !== "Земля" && pName !== "Луна") {
@@ -3884,9 +3884,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const fix = getFixation(pName, hx.gate, hx.line, data);
                 if (fix === "exalted") {
-                    drawUpTriangle(ctx, xCenter + 40, y - 18, 6, desBaseColor);
+                    drawUpTriangle(ctx, xText + 10.5, y - 21, 5.5, desBaseColor);
                 } else if (fix === "detriment") {
-                    drawDownTriangle(ctx, xCenter + 40, y - 18, 6, desBaseColor);
+                    drawDownTriangle(ctx, xText + 10.5, y - 21, 5.5, desBaseColor);
                 }
 
                 if (pName !== "Солнце" && pName !== "Земля" && pName !== "Луна") {
