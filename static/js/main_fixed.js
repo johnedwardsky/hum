@@ -3654,14 +3654,88 @@ document.addEventListener('DOMContentLoaded', () => {
             "Юпитер-63-2": "exalted"
         };
 
-        function getFixation(planetName, gate, line) {
-            const key = `${planetName}-${gate}-${line}`;
-            if (lineFixations[key]) {
-                return lineFixations[key];
+        function isPlanetInGate(planetName, targetGate, chartData) {
+            let checkName = planetName;
+            if (planetName.includes("Северный Узел")) checkName = "Северный узел";
+            else if (planetName.includes("Южный Узел")) checkName = "Южный узел";
+            
+            for (let p of chartData.planets) {
+                let pName = p.name;
+                if (pName.includes("Северный Узел")) pName = "Северный узел";
+                else if (pName.includes("Южный Узел")) pName = "Южный узел";
+                if (pName === checkName && p.hexagram && p.hexagram.gate === targetGate) return true;
             }
-            const hash = (planetName.charCodeAt(0) + gate * 13 + line * 37) % 7;
-            if (hash === 1) return "exalted";
-            if (hash === 2) return "detriment";
+            if (chartData.design_planets) {
+                for (let p of chartData.design_planets) {
+                    let pName = p.name;
+                    if (pName.includes("Северный Узел")) pName = "Северный узел";
+                    else if (pName.includes("Южный Узел")) pName = "Южный узел";
+                    if (pName === checkName && p.hexagram && p.hexagram.gate === targetGate) return true;
+                }
+            }
+            return false;
+        }
+
+        function getOppositeGates(gate) {
+            let ops = [];
+            if (typeof CHANNELS_DATA !== 'undefined') {
+                CHANNELS_DATA.forEach(ch => {
+                    if (ch.gateA === gate) ops.push(ch.gateB);
+                    if (ch.gateB === gate) ops.push(ch.gateA);
+                });
+            }
+            return ops;
+        }
+
+        function getFixation(planetName, gate, line, chartData) {
+            const key = `${planetName}-${gate}-${line}`;
+            if (lineFixations[key]) return lineFixations[key];
+
+            let activeName = planetName;
+            if (activeName.includes("Северный Узел")) activeName = "Северный узел";
+            else if (activeName.includes("Южный Узел")) activeName = "Южный узел";
+
+            if (typeof RULERS_NIDANA !== 'undefined') {
+                const entry = RULERS_NIDANA[`${gate}.${line}`];
+                if (entry) {
+                    // Check exalted
+                    if (entry.up) {
+                        for (let upPlanet of entry.up) {
+                            let matchName = upPlanet;
+                            if (matchName === 'Северный узел') matchName = 'Северный узел';
+                            if (matchName === 'Южный узел') matchName = 'Южный узел';
+                            
+                            // Direct activation
+                            if (activeName === matchName) return "exalted";
+                            
+                            // Opposite channel activation
+                            if (chartData) {
+                                const opposites = getOppositeGates(gate);
+                                for (let oppGate of opposites) {
+                                    if (isPlanetInGate(matchName, oppGate, chartData)) return "exalted";
+                                }
+                            }
+                        }
+                    }
+                    // Check detriment
+                    if (entry.down) {
+                        for (let downPlanet of entry.down) {
+                            let matchName = downPlanet;
+                            if (matchName === 'Северный узел') matchName = 'Северный узел';
+                            if (matchName === 'Южный узел') matchName = 'Южный узел';
+                            
+                            if (activeName === matchName) return "detriment";
+                            
+                            if (chartData) {
+                                const opposites = getOppositeGates(gate);
+                                for (let oppGate of opposites) {
+                                    if (isPlanetInGate(matchName, oppGate, chartData)) return "detriment";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return "none";
         }
 
@@ -3763,7 +3837,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = signColor;
                 ctx.fillText(signSym, xCenter - 71, y);
 
-                const fix = getFixation(pName, hx.gate, hx.line);
+                const fix = getFixation(pName, hx.gate, hx.line, data);
                 if (fix === "exalted") {
                     drawUpTriangle(ctx, xCenter - 31, y - 18, 6, persBaseColor);
                 } else if (fix === "detriment") {
@@ -3808,7 +3882,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = signColor;
                 ctx.fillText(signSym, xCenter + 58, y);
 
-                const fix = getFixation(pName, hx.gate, hx.line);
+                const fix = getFixation(pName, hx.gate, hx.line, data);
                 if (fix === "exalted") {
                     drawUpTriangle(ctx, xCenter + 40, y - 18, 6, desBaseColor);
                 } else if (fix === "detriment") {
