@@ -3663,14 +3663,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 let pName = p.name;
                 if (pName.includes("Северный Узел")) pName = "Северный узел";
                 else if (pName.includes("Южный Узел")) pName = "Южный узел";
-                if (pName === checkName && p.hexagram && p.hexagram.gate === targetGate) return true;
+                if (pName === checkName && p.hexagram && p.hexagram.gate == targetGate) return true;
             }
             if (chartData.design_planets) {
                 for (let p of chartData.design_planets) {
                     let pName = p.name;
                     if (pName.includes("Северный Узел")) pName = "Северный узел";
                     else if (pName.includes("Южный Узел")) pName = "Южный узел";
-                    if (pName === checkName && p.hexagram && p.hexagram.gate === targetGate) return true;
+                    if (pName === checkName && p.hexagram && p.hexagram.gate == targetGate) return true;
                 }
             }
             return false;
@@ -3680,8 +3680,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let ops = [];
             if (typeof CHANNELS_DATA !== 'undefined') {
                 CHANNELS_DATA.forEach(ch => {
-                    if (ch.gateA === gate) ops.push(ch.gateB);
-                    if (ch.gateB === gate) ops.push(ch.gateA);
+                    if (ch.gateA == gate) ops.push(ch.gateB);
+                    if (ch.gateB == gate) ops.push(ch.gateA);
                 });
             }
             return ops;
