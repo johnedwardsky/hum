@@ -5323,3 +5323,31 @@ body.theme-dark .custom-picker-btn.confirm {
 
 
 
+
+/* Transparent export overrides */
+body.exporting-transparent .bg-svg-wrap [class*="block__"]:not(.bg-center-defined):not([class*="-active"]),
+body.exporting-transparent #mandala-bodygraph-wrap [class*="block__"]:not(.bg-center-defined):not([class*="-active"]) {
+    fill: transparent !important;
+}
+
+body.exporting-transparent #mandala-bodygraph-wrap .cls-3,
+body.exporting-transparent #mandala-bodygraph-wrap .cls-4,
+body.exporting-transparent #mandala-bodygraph-wrap .cls-5,
+body.exporting-transparent #mandala-bodygraph-wrap .cls-6,
+body.exporting-transparent #mandala-bodygraph-wrap .cls-7,
+body.exporting-transparent .bg-svg-wrap .cls-5,
+body.exporting-transparent .bg-svg-wrap .cls-7 {
+    fill: none !important;
+}
+
+/* Force static state and no animations during html2canvas export */
+body.exporting-transparent * {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* html2canvas struggles with backdrop-filter, disable it on all elements during export */
+body.exporting-transparent * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}

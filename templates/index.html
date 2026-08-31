@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=1.4.2">
+    <link rel="stylesheet" href="/static/css/style.css?v=1.4.5">
     <script>
         (function() {
             var theme = localStorage.getItem('humantica_theme') || 'light';
@@ -576,6 +576,10 @@
                         <button type="button" class="bg-extra-toggle-btn" id="bg-extra-toggle-btn" title="Включить / скрыть дополнительные точки (Хирон, Лилит, Приап)">
                             <span class="chip-dot"></span>
                             <span class="bg-extra-toggle-text">Доп. активации</span>
+                        </button>
+                        <button type="button" class="bg-extra-toggle-btn" id="btn-download-bodygraph" title="Скачать Бодиграф (PNG без фона)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span class="bg-extra-toggle-text">Скачать PNG</span>
                         </button>
                     </div>
 
@@ -1618,9 +1622,12 @@
                                 <button class="mandala-chip active" data-ring="cross">
                                     <span class="chip-dot"></span>
                                     <span class="chip-label">Крест Инкарнации</span>
-                                </button>
                                 <button class="mandala-chip-all" id="mandala-toggle-all">
                                     ↺ Сбросить
+                                </button>
+                                <button type="button" class="mandala-chip" id="btn-download-mandala" title="Скачать Мандалу (PNG без фона)" style="margin-left: auto;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    <span class="chip-label">Скачать PNG</span>
                                 </button>
                             </div>
                         </div>
@@ -2434,7 +2441,8 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="/static/js/rulers_data.js?v=1.0.4"></script>
-    <script src="/static/js/main.js?v=1.4.2"></script>
+    <script src="/static/js/main.js?v=1.4.5"></script>
 </body>
 </html>

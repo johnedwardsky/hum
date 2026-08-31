@@ -588,6 +588,118 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ── Download PNG logic for Bodygraph and Mandala ────────────
+    const btnDownloadBodygraph = document.getElementById('btn-download-bodygraph');
+    if (btnDownloadBodygraph) {
+        btnDownloadBodygraph.addEventListener('click', () => {
+            const container = document.querySelector('#content-bodygraph .bg-layout');
+            if (!container) return;
+            
+            // Set exporting flag
+            window.__transparentExport = true;
+            document.body.classList.add('exporting-transparent');
+            
+            // Store original styles
+            const origBg = container.style.background;
+            container.style.background = 'transparent';
+            
+            btnDownloadBodygraph.style.opacity = '0.5';
+            btnDownloadBodygraph.innerText = 'Загрузка...';
+
+            html2canvas(container, {
+                backgroundColor: null,
+                scale: 3,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'humantica-bodygraph.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Restore styles
+                container.style.background = origBg;
+                window.__transparentExport = false;
+                document.body.classList.remove('exporting-transparent');
+                btnDownloadBodygraph.style.opacity = '1';
+                btnDownloadBodygraph.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span class="bg-extra-toggle-text">Скачать PNG</span>';
+            }).catch(err => {
+                console.error("Ошибка при сохранении бодиграфа:", err);
+                container.style.background = origBg;
+                window.__transparentExport = false;
+                document.body.classList.remove('exporting-transparent');
+                btnDownloadBodygraph.style.opacity = '1';
+                btnDownloadBodygraph.innerHTML = 'Ошибка';
+            });
+        });
+    }
+
+    const btnDownloadMandala = document.getElementById('btn-download-mandala');
+    if (btnDownloadMandala) {
+        btnDownloadMandala.addEventListener('click', () => {
+            const container = document.getElementById('mandala-container');
+            if (!container) return;
+            
+            window.__transparentExport = true;
+            document.body.classList.add('exporting-transparent');
+            if (lastChart) {
+                drawMandala(lastChart, document.getElementById('mandala-canvas'));
+            }
+            
+            const origBg = container.style.background;
+            const origBoxShadow = container.style.boxShadow;
+            const origBorder = container.style.border;
+            const origBackdrop = container.style.backdropFilter;
+            
+            container.style.background = 'transparent';
+            container.style.boxShadow = 'none';
+            container.style.border = 'none';
+            container.style.backdropFilter = 'none';
+            
+            btnDownloadMandala.style.opacity = '0.5';
+            btnDownloadMandala.innerText = 'Загрузка...';
+
+            html2canvas(container, {
+                backgroundColor: null,
+                scale: 3,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'humantica-mandala.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                container.style.background = origBg;
+                container.style.boxShadow = origBoxShadow;
+                container.style.border = origBorder;
+                container.style.backdropFilter = origBackdrop;
+                window.__transparentExport = false;
+                document.body.classList.remove('exporting-transparent');
+                
+                if (lastChart) {
+                    drawMandala(lastChart, document.getElementById('mandala-canvas'));
+                }
+                
+                btnDownloadMandala.style.opacity = '1';
+                btnDownloadMandala.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span class="chip-label">Скачать PNG</span>';
+            }).catch(err => {
+                console.error("Ошибка при сохранении мандалы:", err);
+                container.style.background = origBg;
+                container.style.boxShadow = origBoxShadow;
+                container.style.border = origBorder;
+                container.style.backdropFilter = origBackdrop;
+                window.__transparentExport = false;
+                document.body.classList.remove('exporting-transparent');
+                if (lastChart) {
+                    drawMandala(lastChart, document.getElementById('mandala-canvas'));
+                }
+                btnDownloadMandala.style.opacity = '1';
+                btnDownloadMandala.innerHTML = 'Ошибка';
+            });
+        });
+    }
+
     // ── Radio time mode ───────────────────────────────────────
     document.getElementById('radio-local').addEventListener('click', () => setGmt(false));
     document.getElementById('radio-gmt').addEventListener('click',   () => setGmt(true));
@@ -4330,50 +4442,52 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDarkTheme = document.body.classList.contains('theme-dark');
 
         // 1. Draw solid clean background
-        if (isDarkTheme) {
-            ctx.fillStyle = '#0A0E17';
-            ctx.beginPath();
-            ctx.arc(cx, cy, R, 0, Math.PI * 2);
-            ctx.fill();
+        if (!window.__transparentExport) {
+            if (isDarkTheme) {
+                ctx.fillStyle = '#0A0E17';
+                ctx.beginPath();
+                ctx.arc(cx, cy, R, 0, Math.PI * 2);
+                ctx.fill();
 
-            // Soft cosmic indigo radial gradient for central bodygraph area
-            const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
-            centerGrad.addColorStop(0, '#0D1424');
-            centerGrad.addColorStop(0.70, '#0A0E17');
-            centerGrad.addColorStop(1, 'rgba(10, 14, 23, 0.5)');
-            ctx.fillStyle = centerGrad;
-            ctx.beginPath();
-            ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-            ctx.fill();
+                // Soft cosmic indigo radial gradient for central bodygraph area
+                const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
+                centerGrad.addColorStop(0, '#0D1424');
+                centerGrad.addColorStop(0.70, '#0A0E17');
+                centerGrad.addColorStop(1, 'rgba(10, 14, 23, 0.5)');
+                ctx.fillStyle = centerGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+                ctx.fill();
 
-            // Subtle gold background for the outermost hexagram ring
-            ctx.beginPath();
-            ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
-            ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
-            ctx.fillStyle = 'rgba(204, 148, 45, 0.05)';
-            ctx.fill();
-        } else {
-            ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath();
-            ctx.arc(cx, cy, R, 0, Math.PI * 2);
-            ctx.fill();
+                // Subtle gold background for the outermost hexagram ring
+                ctx.beginPath();
+                ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
+                ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
+                ctx.fillStyle = 'rgba(204, 148, 45, 0.05)';
+                ctx.fill();
+            } else {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(cx, cy, R, 0, Math.PI * 2);
+                ctx.fill();
 
-            // Soft radial gradient for central bodygraph area
-            const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
-            centerGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-            centerGrad.addColorStop(0.70, 'rgba(253, 251, 248, 0.95)');
-            centerGrad.addColorStop(1, 'rgba(240, 236, 225, 0.35)');
-            ctx.fillStyle = centerGrad;
-            ctx.beginPath();
-            ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-            ctx.fill();
+                // Soft radial gradient for central bodygraph area
+                const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rInnerBorder);
+                centerGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+                centerGrad.addColorStop(0.70, 'rgba(253, 251, 248, 0.95)');
+                centerGrad.addColorStop(1, 'rgba(240, 236, 225, 0.35)');
+                ctx.fillStyle = centerGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+                ctx.fill();
 
-            // Subtle semi-transparent blue background for the outermost hexagram ring
-            ctx.beginPath();
-            ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
-            ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
-            ctx.fillStyle = 'rgba(41, 98, 160, 0.09)';
-            ctx.fill();
+                // Subtle semi-transparent blue background for the outermost hexagram ring
+                ctx.beginPath();
+                ctx.arc(cx, cy, rHexagramsOuter, 0, Math.PI * 2);
+                ctx.arc(cx, cy, rHexagramsInner, 0, Math.PI * 2, true);
+                ctx.fillStyle = 'rgba(41, 98, 160, 0.09)';
+                ctx.fill();
+            }
         }
 
         const GATE_ORDER = [
@@ -5138,10 +5252,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Draw light white/dark inner circle background (before zodiac/houses so they render on top)
-        ctx.fillStyle = isDarkTheme ? 'rgba(10, 14, 23, 0.78)' : 'rgba(255, 255, 255, 0.78)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-        ctx.fill();
+        if (!window.__transparentExport) {
+            ctx.fillStyle = isDarkTheme ? 'rgba(10, 14, 23, 0.78)' : 'rgba(255, 255, 255, 0.78)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // 4. Zodiac Ring and Ticks (CCW from Aries 0°)
         const pZod = mandalaAnimState.zodiac.progress;
@@ -5564,10 +5680,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 7.5 Soft overlay over rays before bodygraph and planet symbols render on top
-        ctx.fillStyle = isDarkTheme ? 'rgba(10, 14, 23, 0.45)' : 'rgba(255, 255, 255, 0.40)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
-        ctx.fill();
+        if (!window.__transparentExport) {
+            ctx.fillStyle = isDarkTheme ? 'rgba(10, 14, 23, 0.45)' : 'rgba(255, 255, 255, 0.40)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, rInnerBorder, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // 7.8 Planet activation lines and symbols inside the wheel (CCW, rendered crisp on top of background)
         const pRaysPlanets = (mandalaAnimState.raysPlanets ? mandalaAnimState.raysPlanets.progress : 1);
