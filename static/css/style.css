@@ -3720,6 +3720,26 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     opacity: 0.92;
 }
 
+.bg-fix-pair {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    line-height: 1;
+}
+
+.bg-fix-pair .bg-arrow-badge {
+    position: absolute;
+    left: calc(100% + 2px);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 700;
+    opacity: 0.92;
+    white-space: nowrap;
+}
+
 .bg-line-sub {
     font-size: 11.5px;
     font-weight: 700;
@@ -3765,6 +3785,10 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     font-size: 7.5px;
     line-height: 1;
     margin-bottom: 0;
+}
+.bg-mirror-cell .bg-fix-pair .bg-arrow-badge {
+    font-size: 7.5px;
+    left: calc(100% + 1.5px);
 }
 .bg-mirror-cell .bg-line-sub {
     font-size: 10.5px;

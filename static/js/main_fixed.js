@@ -6629,24 +6629,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 isDown = (entry.down || []).some(r => normalizeName(r) === normTarget);
             }
 
-            let sym = '';
-            let title = '';
+            // 1. Triangle fixation symbol (▲, ▽, ☆)
+            let fixSym = '';
+            let fixTitle = '';
             if (isUp && isDown) {
-                sym = '☆'; title = 'Юкста-позиция';
+                fixSym = '☆'; fixTitle = 'Юкста-позиция';
             } else if (isUp) {
-                sym = '▲'; title = 'Экзальтация';
+                fixSym = '▲'; fixTitle = 'Экзальтация';
             } else if (isDown) {
-                sym = '▽'; title = 'Падение';
-            } else {
-                const outerPlanets = ['сатурн', 'уран', 'нептун', 'плутон', 'юпитер'];
-                const pLower = (planetName || '').toLowerCase().trim();
-                if (outerPlanets.some(op => pLower.includes(op)) || isRetro) {
-                    sym = '→'; title = 'Направление';
-                }
+                fixSym = '▽'; fixTitle = 'Падение';
             }
 
-            if (!sym) return '';
-            return `<span class="bg-fix-badge" title="${title}">${sym}</span>`;
+            // 2. Direction / Retrograde arrow symbol (→)
+            let arrowSym = '';
+            let arrowTitle = '';
+            const outerPlanets = ['сатурн', 'уран', 'нептун', 'плутон', 'юпитер'];
+            const pLower = (planetName || '').toLowerCase().trim();
+            if (outerPlanets.some(op => pLower.includes(op)) || isRetro) {
+                arrowSym = '→';
+                arrowTitle = isRetro ? 'Ретроградное движение' : 'Направление';
+            }
+
+            if (!fixSym && !arrowSym) return '';
+
+            // If only triangle is present
+            if (fixSym && !arrowSym) {
+                return `<span class="bg-fix-badge" title="${fixTitle}">${fixSym}</span>`;
+            }
+
+            // If only arrow is present
+            if (!fixSym && arrowSym) {
+                return `<span class="bg-fix-badge bg-arrow-only" title="${arrowTitle}">${arrowSym}</span>`;
+            }
+
+            // If BOTH are present: triangle stays on its place, arrow is placed to the right
+            return `<div class="bg-fix-pair">` +
+                   `<span class="bg-fix-badge" title="${fixTitle}">${fixSym}</span>` +
+                   `<span class="bg-arrow-badge" title="${arrowTitle}">${arrowSym}</span>` +
+                   `</div>`;
         }
 
         // ── Build a planet row ─────────────────────────────────────────
