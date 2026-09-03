@@ -919,6 +919,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('content-' + btn.dataset.tab).classList.add('active');
+            if (btn.dataset.tab === 'mandala' && lastChart) {
+                const mandalaCv = document.getElementById('mandala-canvas');
+                if (mandalaCv) drawMandala(lastChart, mandalaCv);
+            }
         });
     });
 
@@ -3755,16 +3759,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Плутон"
         ];
 
-        const lineFixations = {
-            "Солнце-62-5": "exalted",
-            "Луна-34-5": "detriment",
-            "Юпитер-36-1": "detriment",
-            "Нептун-10-6": "detriment",
-            "Луна-62-5": "exalted",
-            "Меркурий-25-2": "exalted",
-            "Марс-38-1": "detriment",
-            "Юпитер-63-2": "exalted"
-        };
+        const lineFixations = {};
 
         function isPlanetInGate(planetName, targetGate, chartData) {
             let checkName = planetName;
@@ -4057,22 +4052,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mandalaSettings = {
         bodygraph: true,
-        hexagrams: true,
+        hexagrams: false,
         mirror: true,
         dial2: false,
-        zodiac: true,
+        zodiac: false,
         houses: true,
-        rulers: true,
+        rulers: false,
         raysPlanets: true,
         cross: true
     };
 
     const mandalaAnimState = {
-        hexagrams:   { progress: 1, startAngle:  0.20 },
+        hexagrams:   { progress: 0, startAngle:  0.20 },
         mirror:      { progress: 1, startAngle:  0.20 },
-        zodiac:      { progress: 1, startAngle:  0.18 },
+        zodiac:      { progress: 0, startAngle:  0.18 },
         houses:      { progress: 1, startAngle:  0.18 },
-        rulers:      { progress: 1, startAngle:  0.18 },
+        rulers:      { progress: 0, startAngle:  0.18 },
         raysPlanets: { progress: 1, startAngle:  0.18 },
         cross:       { progress: 1, startAngle:  0.20 }
     };
@@ -6551,28 +6546,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Helper to compute fixation symbol (▲, ▽, ☆, →) for a planet in a gate/line
-        function getPlanetFixationBadgeHtml(planetName, gate, line, isRetro) {
-            if (!gate || !line) return '';
+        function getPlanetFixationBadgeHtml(planetName, gate, line, isRetro, isFirstDial = true) {
+            if (!gate || !line || gate === '—') return '';
             const rulerKey = `${gate}.${line}`;
             const entry = (typeof RULERS_NIDANA !== 'undefined') ? RULERS_NIDANA[rulerKey] : null;
             
             const pLower = (planetName || '').toLowerCase().trim();
 
+            const normalizeName = (name) => {
+                let s = (name || '').toLowerCase().trim();
+                if (s.includes('узел')) {
+                    if (s.includes('северн')) return 'северный узел';
+                    if (s.includes('южн')) return 'южный узел';
+                    return 'узел';
+                }
+                if (s.includes('солнце')) return 'солнце';
+                if (s.includes('земля')) return 'земля';
+                if (s.includes('луна')) return 'луна';
+                if (s.includes('меркурий')) return 'меркурий';
+                if (s.includes('венера')) return 'венера';
+                if (s.includes('марс')) return 'марс';
+                if (s.includes('юпитер')) return 'юпитер';
+                if (s.includes('сатурн')) return 'сатурн';
+                if (s.includes('уран')) return 'уран';
+                if (s.includes('нептун')) return 'нептун';
+                if (s.includes('плутон')) return 'плутон';
+                if (s.includes('хирон')) return 'хирон';
+                if (s.includes('лилит')) return 'лилит';
+                if (s.includes('приап')) return 'приап';
+                return s;
+            };
+
+            const normTarget = normalizeName(planetName);
+
             let isUp = false;
             let isDown = false;
 
             if (entry) {
-                const matchName = (list) => (list || []).some(n => {
-                    const l = (n || '').toLowerCase().trim();
-                    if (l === pLower) return true;
-                    if (pLower.includes('узел') && l.includes('узел')) return true;
-                    if (pLower.includes('солнце') && l.includes('солнце')) return true;
-                    if (pLower.includes('земля') && l.includes('земля')) return true;
-                    return false;
-                });
+                // 1. Direct activation check
+                const matchDirect = (rulerList) => (rulerList || []).some(r => normalizeName(r) === normTarget);
 
-                isUp = matchName(entry.up);
-                isDown = matchName(entry.down);
+                isUp = matchDirect(entry.up);
+                isDown = matchDirect(entry.down);
+
+                // 2. Channel opposite gate check (ONLY for 1st dial!)
+                if (isFirstDial) {
+                    const gNum = Number(gate);
+                    const oppositeGates = [];
+                    if (typeof CHANNELS_DATA !== 'undefined') {
+                        CHANNELS_DATA.forEach(ch => {
+                            if (Number(ch.gateA) === gNum) oppositeGates.push(Number(ch.gateB));
+                            if (Number(ch.gateB) === gNum) oppositeGates.push(Number(ch.gateA));
+                        });
+                    }
+
+                    if (oppositeGates.length > 0) {
+                        const matchOpposite = (rulerList) => {
+                            if (!rulerList || rulerList.length === 0) return false;
+                            const checkPlanet = (p, activeSet) => {
+                                if (!p || !p.hexagram || !p.hexagram.gate) return false;
+                                if (activeSet && !activeSet.has(p.name)) return false;
+                                if (!oppositeGates.includes(Number(p.hexagram.gate))) return false;
+                                const pNorm = normalizeName(p.name);
+                                return rulerList.some(r => normalizeName(r) === pNorm);
+                            };
+
+                            const inPers = (personalityPlanets || []).some(p => checkPlanet(p, activeBgPers));
+                            if (inPers) return true;
+                            const inDes = (designPlanets || []).some(p => checkPlanet(p, activeBgDesign));
+                            return inDes;
+                        };
+
+                        if (!isUp) isUp = matchOpposite(entry.up);
+                        if (!isDown) isDown = matchOpposite(entry.down);
+                    }
+                }
             }
 
             let sym = '';
@@ -6621,7 +6669,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pMeta = PLANET_META[key] || PLANET_META[p.name] || {};
             const glyphCls = pMeta.cls || '';
 
-            const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro);
+            const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro, true);
 
             const gateCellHtml = `
                 <div class="bg-gate-cell" style="color:${colorCss}" title="1-й цифербат (Основной Рейв): ворота ${gate}.${line}">
@@ -6650,7 +6698,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mGate = MIRROR_GATE_ORDER[mIdx];
                 const mLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
 
-                const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro);
+                const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro, false);
 
                 mirrorGateCellHtml = `
                     <div class="bg-gate-cell bg-mirror-cell" title="2-й цифербат (Зеркало Жизни): ворота ${mGate}.${mLine}">
@@ -7152,137 +7200,156 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         initBodygraphInteractivity();
+    }
 
-        // ── Mandala Canvas Interactivity (Hover effects & tooltips) ──
-        function initMandalaInteractivity() {
-            const canvasEl = document.getElementById('mandala-canvas');
-            if (!canvasEl) return;
+    // ── Mandala Canvas Interactivity (Hover effects & tooltips) ──
+    let mandalaInteractivityInited = false;
+    function initMandalaInteractivity() {
+        if (mandalaInteractivityInited) return;
+        mandalaInteractivityInited = true;
 
-            // Ensure 'rulers' chip is present in DOM even if cached template was served
-            const chipsContainer = document.querySelector('.mandala-toggle-chips');
-            if (chipsContainer) {
-                if (!document.querySelector('.mandala-chip[data-ring="dial2"]')) {
-                    const dial2Btn = document.createElement('button');
-                    dial2Btn.className = 'mandala-chip' + (mandalaSettings.dial2 ? ' active' : '');
-                    dial2Btn.setAttribute('data-ring', 'dial2');
-                    dial2Btn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">2 циферблат</span>';
-                    
-                    const zodiacBtn = document.querySelector('.mandala-chip[data-ring="zodiac"]');
-                    if (zodiacBtn) {
-                        chipsContainer.insertBefore(dial2Btn, zodiacBtn);
+        const canvasEl = document.getElementById('mandala-canvas');
+        if (!canvasEl) return;
+
+        // Ensure dynamic chips are present in DOM even if cached template was served
+        const chipsContainer = document.querySelector('.mandala-toggle-chips');
+        if (chipsContainer) {
+            if (!document.querySelector('.mandala-chip[data-ring="dial2"]')) {
+                const dial2Btn = document.createElement('button');
+                dial2Btn.type = 'button';
+                dial2Btn.className = 'mandala-chip' + (mandalaSettings.dial2 ? ' active' : '');
+                dial2Btn.setAttribute('data-ring', 'dial2');
+                dial2Btn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">2 циферблат</span>';
+                
+                const zodiacBtn = document.querySelector('.mandala-chip[data-ring="zodiac"]');
+                if (zodiacBtn) {
+                    chipsContainer.insertBefore(dial2Btn, zodiacBtn);
+                } else {
+                    const mirrorBtn = document.querySelector('.mandala-chip[data-ring="mirror"]');
+                    if (mirrorBtn && mirrorBtn.nextSibling) {
+                        chipsContainer.insertBefore(dial2Btn, mirrorBtn.nextSibling);
                     } else {
-                        const mirrorBtn = document.querySelector('.mandala-chip[data-ring="mirror"]');
-                        if (mirrorBtn && mirrorBtn.nextSibling) {
-                            chipsContainer.insertBefore(dial2Btn, mirrorBtn.nextSibling);
-                        } else {
-                            chipsContainer.appendChild(dial2Btn);
-                        }
-                    }
-                }
-
-                if (!document.querySelector('.mandala-chip[data-ring="rulers"]')) {
-                    const rulersBtn = document.createElement('button');
-                    rulersBtn.className = 'mandala-chip' + (mandalaSettings.rulers ? ' active' : '');
-                    rulersBtn.setAttribute('data-ring', 'rulers');
-                    rulersBtn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">Управители</span>';
-                    
-                    const crossBtn = document.querySelector('.mandala-chip[data-ring="cross"]');
-                    if (crossBtn) {
-                        chipsContainer.insertBefore(rulersBtn, crossBtn);
-                    } else {
-                        chipsContainer.appendChild(rulersBtn);
-                    }
-                }
-
-                if (!document.querySelector('.mandala-chip[data-ring="raysPlanets"]')) {
-                    const raysBtn = document.createElement('button');
-                    raysBtn.className = 'mandala-chip' + (mandalaSettings.raysPlanets ? ' active' : '');
-                    raysBtn.setAttribute('data-ring', 'raysPlanets');
-                    raysBtn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">Планеты программ</span>';
-                    
-                    const crossBtn = document.querySelector('.mandala-chip[data-ring="cross"]');
-                    if (crossBtn) {
-                        chipsContainer.insertBefore(raysBtn, crossBtn);
-                    } else {
-                        const resetBtn = document.getElementById('mandala-toggle-all');
-                        if (resetBtn) {
-                            chipsContainer.insertBefore(raysBtn, resetBtn);
-                        } else {
-                            chipsContainer.appendChild(raysBtn);
-                        }
+                        chipsContainer.appendChild(dial2Btn);
                     }
                 }
             }
 
-            const RING_KEYS = ['bodygraph', 'hexagrams', 'mirror', 'zodiac', 'houses', 'rulers', 'raysPlanets', 'cross'];
-            const btnToggleAll = document.getElementById('mandala-toggle-all');
+            if (!document.querySelector('.mandala-chip[data-ring="rulers"]')) {
+                const rulersBtn = document.createElement('button');
+                rulersBtn.type = 'button';
+                rulersBtn.className = 'mandala-chip' + (mandalaSettings.rulers ? ' active' : '');
+                rulersBtn.setAttribute('data-ring', 'rulers');
+                rulersBtn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">Управители</span>';
+                
+                const crossBtn = document.querySelector('.mandala-chip[data-ring="cross"]');
+                if (crossBtn) {
+                    chipsContainer.insertBefore(rulersBtn, crossBtn);
+                } else {
+                    chipsContainer.appendChild(rulersBtn);
+                }
+            }
 
-            function updateToggleAllBtnState() {
-                if (!btnToggleAll) return;
+            if (!document.querySelector('.mandala-chip[data-ring="raysPlanets"]')) {
+                const raysBtn = document.createElement('button');
+                raysBtn.type = 'button';
+                raysBtn.className = 'mandala-chip' + (mandalaSettings.raysPlanets ? ' active' : '');
+                raysBtn.setAttribute('data-ring', 'raysPlanets');
+                raysBtn.innerHTML = '<span class="chip-dot"></span><span class="chip-label">Планеты программ</span>';
+                
+                const crossBtn = document.querySelector('.mandala-chip[data-ring="cross"]');
+                if (crossBtn) {
+                    chipsContainer.insertBefore(raysBtn, crossBtn);
+                } else {
+                    const resetBtn = document.getElementById('mandala-toggle-all');
+                    if (resetBtn) {
+                        chipsContainer.insertBefore(raysBtn, resetBtn);
+                    } else {
+                        chipsContainer.appendChild(raysBtn);
+                    }
+                }
+            }
+        }
+
+        const RING_KEYS = ['bodygraph', 'hexagrams', 'mirror', 'zodiac', 'houses', 'rulers', 'raysPlanets', 'cross'];
+        const btnToggleAll = document.getElementById('mandala-toggle-all');
+
+        function updateToggleAllBtnState() {
+            if (!btnToggleAll) return;
+            const areAllOn = RING_KEYS.every(k => mandalaSettings[k]);
+            btnToggleAll.innerHTML = areAllOn ? '↺ Сбросить' : 'Всё';
+        }
+
+        if (btnToggleAll) {
+            btnToggleAll.addEventListener('click', (e) => {
+                e.preventDefault();
                 const areAllOn = RING_KEYS.every(k => mandalaSettings[k]);
-                btnToggleAll.innerHTML = areAllOn ? '↺ Сбросить' : 'Всё';
-            }
 
-            if (btnToggleAll) {
-                btnToggleAll.addEventListener('click', () => {
-                    const areAllOn = RING_KEYS.every(k => mandalaSettings[k]);
+                const newState = !areAllOn;
+                RING_KEYS.forEach(k => {
+                    mandalaSettings[k] = newState;
+                });
+                if (!newState) {
+                    mandalaSettings.dial2 = false;
+                }
 
-                    const newState = !areAllOn;
-                    RING_KEYS.forEach(k => {
-                        mandalaSettings[k] = newState;
-                    });
-                    if (!newState) {
-                        mandalaSettings.dial2 = false;
+                document.querySelectorAll('.mandala-chip[data-ring]').forEach(chip => {
+                    const ring = chip.getAttribute('data-ring');
+                    if (ring in mandalaSettings) {
+                        chip.classList.toggle('active', mandalaSettings[ring]);
                     }
+                });
 
-                    document.querySelectorAll('.mandala-chip').forEach(chip => {
-                        const ring = chip.getAttribute('data-ring');
-                        if (ring in mandalaSettings) {
-                            chip.classList.toggle('active', mandalaSettings[ring]);
-                        }
-                    });
+                updateToggleAllBtnState();
+
+                const wrap = document.getElementById('mandala-bodygraph-wrap');
+                if (wrap) {
+                    wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
+                    wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
+                }
+
+                animateMandala();
+            });
+        }
+
+        // Bind click listeners to Mandala ring toggle chips
+        document.querySelectorAll('.mandala-chip[data-ring]').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                e.preventDefault();
+                const ring = chip.getAttribute('data-ring');
+                if (ring in mandalaSettings) {
+                    mandalaSettings[ring] = !mandalaSettings[ring];
+                    chip.classList.toggle('active', mandalaSettings[ring]);
+                    
+                    // If user enabled dial2, ensure mirror ring itself is active
+                    if (ring === 'dial2' && mandalaSettings.dial2 && !mandalaSettings.mirror) {
+                        mandalaSettings.mirror = true;
+                        const mirrorChip = document.querySelector('.mandala-chip[data-ring="mirror"]');
+                        if (mirrorChip) mirrorChip.classList.add('active');
+                    }
 
                     updateToggleAllBtnState();
 
+                    // Update bodygraph CSS overlay transition immediately
                     const wrap = document.getElementById('mandala-bodygraph-wrap');
                     if (wrap) {
                         wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
                         wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
                     }
 
+                    // Trigger smooth rotation & fade animation loop for rings on canvas
                     animateMandala();
-                });
-            }
-
-            // Bind click listeners to Mandala ring toggle chips
-            document.querySelectorAll('.mandala-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    const ring = chip.getAttribute('data-ring');
-                    if (ring in mandalaSettings) {
-                        mandalaSettings[ring] = !mandalaSettings[ring];
-                        chip.classList.toggle('active', mandalaSettings[ring]);
-                        
-                        // If user enabled dial2, ensure mirror ring itself is active
-                        if (ring === 'dial2' && mandalaSettings.dial2 && !mandalaSettings.mirror) {
-                            mandalaSettings.mirror = true;
-                            const mirrorChip = document.querySelector('.mandala-chip[data-ring="mirror"]');
-                            if (mirrorChip) mirrorChip.classList.add('active');
-                        }
-
-                        updateToggleAllBtnState();
-
-                        // Update bodygraph CSS overlay transition immediately
-                        const wrap = document.getElementById('mandala-bodygraph-wrap');
-                        if (wrap) {
-                            wrap.style.opacity = mandalaSettings.bodygraph ? '1' : '0';
-                            wrap.style.transform = mandalaSettings.bodygraph ? 'scale(1)' : 'scale(0.93)';
-                        }
-
-                        // Trigger smooth rotation & fade animation loop for rings on canvas
-                        animateMandala();
-                    }
-                });
+                }
             });
+        });
+
+        // Initial sync of chips state and 'Всё' button
+        document.querySelectorAll('.mandala-chip[data-ring]').forEach(chip => {
+            const ring = chip.getAttribute('data-ring');
+            if (ring in mandalaSettings) {
+                chip.classList.toggle('active', !!mandalaSettings[ring]);
+            }
+        });
+        updateToggleAllBtnState();
             
             let mandalaHoverState = { type: null, target: null, mx: 0, my: 0, cx: 0, cy: 0, gateIdx: -1 };
             
@@ -7819,10 +7886,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     requestAnimationFrame(() => positionEl(centerTooltip, cx, cy));
                 }
             }
-        }
-
-        initMandalaInteractivity();
     }
 
+    // Initialize mandala toolbar interactivity once on page load
+    initMandalaInteractivity();
 });
 
