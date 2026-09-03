@@ -3674,15 +3674,24 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     justify-content: space-between;
 }
 
-/* Gate Cell: Gate Number + Subscript Line + Fixation Arrow */
+/* Gate Cell: Gate Number + Subscript Line + Fixation Arrow + Optional Deep Values */
 .bg-gate-cell {
     display: inline-flex;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     position: relative;
     font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1;
     min-width: 28px;
+}
+
+.bg-gate-top {
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+    line-height: 1;
 }
 
 .bg-gate-main {
@@ -3700,7 +3709,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     margin-left: 2px;
     position: relative;
     bottom: -1px;
-    gap: 3.5px;
+    gap: 3px;
 }
 
 .bg-fix-badge {
@@ -3712,9 +3721,25 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
 }
 
 .bg-line-sub {
-    font-size: 9.5px;
+    font-size: 11.5px;
     font-weight: 700;
     line-height: 1;
+}
+
+.bg-deep-values {
+    display: none;
+    font-size: 8.5px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-top: 2.5px;
+    letter-spacing: -0.01em;
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0.85;
+}
+
+.bg-layout.show-deep-values .bg-deep-values {
+    display: block;
 }
 
 .bg-col-design .bg-gate-cell { color: #fe0000; }
@@ -3733,7 +3758,7 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     font-weight: 500;
 }
 .bg-mirror-cell .bg-line-stack {
-    gap: 3px;
+    gap: 2.5px;
     margin-left: 1.5px;
 }
 .bg-mirror-cell .bg-fix-badge {
@@ -3742,8 +3767,13 @@ canvas { max-width: 100%; border-radius: 50%; filter: drop-shadow(0 4px 16px rgb
     margin-bottom: 0;
 }
 .bg-mirror-cell .bg-line-sub {
-    font-size: 8.5px;
+    font-size: 10.5px;
+    font-weight: 600;
+}
+.bg-mirror-cell .bg-deep-values {
+    font-size: 8px;
     font-weight: 500;
+    opacity: 0.8;
 }
 .bg-col-design .bg-mirror-cell { color: #fe0000; }
 .bg-col-personality .bg-mirror-cell { color: #2E2A20; }
@@ -4863,6 +4893,24 @@ body.theme-dark .bg-layout.mode-dial-1 .bg-mirror-cell {
 }
 body.theme-dark .bg-layout.mode-dial-2 .bg-mirror-cell {
     opacity: 1 !important;
+}
+
+/* Deep Values in Dark Mode */
+body.theme-dark .bg-col-design .bg-deep-values {
+    color: #CC942D !important;
+    opacity: 0.85 !important;
+}
+body.theme-dark .bg-col-personality .bg-deep-values {
+    color: #FFFFFF !important;
+    opacity: 0.85 !important;
+}
+body.theme-dark .bg-col-design .bg-mirror-cell .bg-deep-values {
+    color: #CC942D !important;
+    opacity: 0.8 !important;
+}
+body.theme-dark .bg-col-personality .bg-mirror-cell .bg-deep-values {
+    color: #E5E7EB !important;
+    opacity: 0.8 !important;
 }
 
 /* Hexagram Icon Lines */

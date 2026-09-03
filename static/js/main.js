@@ -483,6 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeBgPers = null;   // Set of active planet names for Bodygraph Personality (black) column
     let currentBodygraphDial = '1'; // '1' = 1-й циферблат (Основной), '2' = 2-й циферблат (Зеркало)
     let showBodygraphExtraPlanets = false; // Toggle to show/hide extra points section (Chiron, Lilith, Priapus)
+    let showBodygraphDeepValues   = false; // Toggle to show/hide deep values (color, tone, base, theos) - Доп 2
     const DEFAULT_INACTIVE_PLANETS = [
         'Хирон',
         'Лилит (средняя)',
@@ -584,6 +585,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderSvgBodygraph(lastChart);
                     updateHdTypeProfile(lastChart);
                 }
+            }
+        });
+    }
+
+    // ── Bodygraph Deep Values Toggle ("Доп 2") ──────────────────
+    const bgDeepToggleBtn = document.getElementById('bg-deep-toggle-btn');
+    if (bgDeepToggleBtn) {
+        bgDeepToggleBtn.classList.toggle('active', showBodygraphDeepValues);
+        bgDeepToggleBtn.addEventListener('click', () => {
+            showBodygraphDeepValues = !showBodygraphDeepValues;
+            bgDeepToggleBtn.classList.toggle('active', showBodygraphDeepValues);
+            const bgLayoutEl = document.querySelector('.bg-layout');
+            if (bgLayoutEl) {
+                bgLayoutEl.classList.toggle('show-deep-values', showBodygraphDeepValues);
             }
         });
     }
@@ -6237,6 +6252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bgLayoutEl) {
                 bgLayoutEl.classList.toggle('mode-dial-1', currentBodygraphDial === '1');
                 bgLayoutEl.classList.toggle('mode-dial-2', currentBodygraphDial === '2');
+                bgLayoutEl.classList.toggle('show-deep-values', !!showBodygraphDeepValues);
             }
 
             // Reset all gate elements to hidden and completely remove all inline style attributes
@@ -6671,12 +6687,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const fixBadge = getPlanetFixationBadgeHtml(p.name, gate, line, isRetro, true);
 
+            const hx = p.hexagram || {};
+            const color = hx.color || 1;
+            const tone = hx.tone || 1;
+            const base = hx.base || 1;
+            const theos = hx.theos || 1;
+            const deepValStr = (gate && gate !== '—') ? `${color}.${tone}.${base}.${theos}` : '';
+            const deepValTitle = (gate && gate !== '—') ? `Цвет: ${color} • Тон: ${tone} • База: ${base} • Теос: ${theos}` : '';
+
             const gateCellHtml = `
-                <div class="bg-gate-cell" style="color:${colorCss}" title="1-й цифербат (Основной Рейв): ворота ${gate}.${line}">
-                    <span class="bg-gate-main">${gate}</span>
-                    <div class="bg-line-stack">
-                        ${fixBadge}
-                        <span class="bg-line-sub">${line || ''}</span>
+                <div class="bg-gate-cell" style="color:${colorCss}" title="1-й циферблат (Основной Рейв): ворота ${gate}.${line}">
+                    <div class="bg-gate-top">
+                        <span class="bg-gate-main">${gate}</span>
+                        <div class="bg-line-stack">
+                            ${fixBadge}
+                            <span class="bg-line-sub">${line || ''}</span>
+                        </div>
+                    </div>
+                    <div class="bg-deep-values" title="${deepValTitle}">
+                        ${deepValStr}
                     </div>
                 </div>
             `;
@@ -6696,16 +6725,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 const relLon = (p.longitude - AS + 360) % 360;
                 const mIdx = Math.floor(relLon / 5.625) % 64;
                 const mGate = MIRROR_GATE_ORDER[mIdx];
-                const mLine = Math.min(6, Math.max(1, Math.floor((relLon % 5.625) / (5.625 / 6)) + 1));
+                const gateOffset = relLon % 5.625;
+
+                // Subdivisions within mirror gate: line, color, tone, base, theos
+                const LINE_INT  = 5.625 / 6;
+                const COLOR_INT = LINE_INT / 6;
+                const TONE_INT  = COLOR_INT / 6;
+                const BASE_INT  = TONE_INT / 5;
+                const THEOS_INT = BASE_INT / 3;
+
+                const lineIdx   = Math.min(5, Math.max(0, Math.floor(gateOffset / LINE_INT)));
+                const remLine   = gateOffset - lineIdx * LINE_INT;
+
+                const colorIdx  = Math.min(5, Math.max(0, Math.floor(remLine / COLOR_INT)));
+                const remColor  = remLine - colorIdx * COLOR_INT;
+
+                const toneIdx   = Math.min(5, Math.max(0, Math.floor(remColor / TONE_INT)));
+                const remTone   = remColor - toneIdx * TONE_INT;
+
+                const baseIdx   = Math.min(4, Math.max(0, Math.floor(remTone / BASE_INT)));
+                const remBase   = remTone - baseIdx * BASE_INT;
+
+                const theosIdx  = Math.min(2, Math.max(0, Math.floor(remBase / THEOS_INT)));
+
+                const mLine     = lineIdx + 1;
+                const mColor    = colorIdx + 1;
+                const mTone     = toneIdx + 1;
+                const mBase     = baseIdx + 1;
+                const mTheos    = theosIdx + 1;
+
+                const mDeepValStr = `${mColor}.${mTone}.${mBase}.${mTheos}`;
+                const mDeepValTitle = `Цвет: ${mColor} • Тон: ${mTone} • База: ${mBase} • Теос: ${mTheos}`;
 
                 const mirrorFixBadge = getPlanetFixationBadgeHtml(p.name, mGate, mLine, isRetro, false);
 
                 mirrorGateCellHtml = `
-                    <div class="bg-gate-cell bg-mirror-cell" title="2-й цифербат (Зеркало Жизни): ворота ${mGate}.${mLine}">
-                        <span class="bg-gate-main">${mGate}</span>
-                        <div class="bg-line-stack">
-                            ${mirrorFixBadge}
-                            <span class="bg-line-sub">${mLine}</span>
+                    <div class="bg-gate-cell bg-mirror-cell" title="2-й циферблат (Зеркало Жизни): ворота ${mGate}.${mLine}">
+                        <div class="bg-gate-top">
+                            <span class="bg-gate-main">${mGate}</span>
+                            <div class="bg-line-stack">
+                                ${mirrorFixBadge}
+                                <span class="bg-line-sub">${mLine}</span>
+                            </div>
+                        </div>
+                        <div class="bg-deep-values" title="${mDeepValTitle}">
+                            ${mDeepValStr}
                         </div>
                     </div>
                 `;
