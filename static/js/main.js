@@ -3799,11 +3799,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function getOppositeGates(gate) {
+            const gNum = Number(gate);
+            const INTEGRATION_GATES = [10, 20, 34, 57];
+            if (INTEGRATION_GATES.includes(gNum)) {
+                return INTEGRATION_GATES.filter(g => g !== gNum);
+            }
             let ops = [];
             if (typeof CHANNELS_DATA !== 'undefined') {
                 CHANNELS_DATA.forEach(ch => {
-                    if (ch.gateA == gate) ops.push(ch.gateB);
-                    if (ch.gateB == gate) ops.push(ch.gateA);
+                    if (Number(ch.gateA) === gNum) ops.push(Number(ch.gateB));
+                    if (Number(ch.gateB) === gNum) ops.push(Number(ch.gateA));
                 });
             }
             return ops;
@@ -6592,12 +6597,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 2 - какая планета активирует такую же программу в другой линии (двойная активация ворот).
                 // 3 - какие планеты активируют все встречные программы в канале в любых линиях.
                 const gNum = Number(gate);
-                const connectedGates = [gNum];
+                const connectedGates = new Set([gNum]);
 
-                if (typeof CHANNELS_DATA !== 'undefined') {
+                // Для канала Интеграции (10, 20, 34, 57) встречными являются ВСЕ три остальные программы!
+                const INTEGRATION_GATES = [10, 20, 34, 57];
+                if (INTEGRATION_GATES.includes(gNum)) {
+                    INTEGRATION_GATES.forEach(ig => connectedGates.add(ig));
+                } else if (typeof CHANNELS_DATA !== 'undefined') {
                     CHANNELS_DATA.forEach(ch => {
-                        if (Number(ch.gateA) === gNum) connectedGates.push(Number(ch.gateB));
-                        if (Number(ch.gateB) === gNum) connectedGates.push(Number(ch.gateA));
+                        if (Number(ch.gateA) === gNum) connectedGates.add(Number(ch.gateB));
+                        if (Number(ch.gateB) === gNum) connectedGates.add(Number(ch.gateA));
                     });
                 }
 
@@ -6610,7 +6619,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (DEFAULT_INACTIVE_PLANETS.includes(p.name)) {
                         if (!activeSet || !activeSet.has(p.name)) return;
                     }
-                    if (connectedGates.includes(Number(p.hexagram.gate))) {
+                    if (connectedGates.has(Number(p.hexagram.gate))) {
                         activatingPlanetNorms.add(normalizeName(p.name));
                         if (p.displayName) activatingPlanetNorms.add(normalizeName(p.displayName));
                     }
