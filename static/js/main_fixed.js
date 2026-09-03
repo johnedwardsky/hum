@@ -3820,42 +3820,34 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof RULERS_NIDANA !== 'undefined') {
                 const entry = RULERS_NIDANA[`${gate}.${line}`];
                 if (entry) {
-                    // Check exalted
-                    if (entry.up) {
-                        for (let upPlanet of entry.up) {
-                            let matchName = upPlanet;
-                            if (matchName === 'Северный узел') matchName = 'Северный узел';
-                            if (matchName === 'Южный узел') matchName = 'Южный узел';
-                            
-                            // Direct activation
-                            if (activeName === matchName) return "exalted";
-                            
-                            // Opposite channel activation
-                            if (chartData) {
-                                const opposites = getOppositeGates(gate);
-                                for (let oppGate of opposites) {
-                                    if (isPlanetInGate(matchName, oppGate, chartData)) return "exalted";
-                                }
+                    const gNum = Number(gate);
+                    const connectedGates = [gNum];
+                    const opposites = getOppositeGates(gNum);
+                    opposites.forEach(og => connectedGates.push(Number(og)));
+
+                    const isRulerActive = (rulerPlanetName) => {
+                        let matchName = rulerPlanetName;
+                        if (matchName.includes("Северный узел")) matchName = "Северный узел";
+                        if (matchName.includes("Южный узел")) matchName = "Южный узел";
+
+                        // 1. Direct activation of this row
+                        if (activeName === matchName) return true;
+
+                        // 2 & 3. Gate itself (double activation in another line) or opposite gate(s)
+                        if (chartData) {
+                            for (let cGate of connectedGates) {
+                                if (isPlanetInGate(matchName, cGate, chartData)) return true;
                             }
                         }
-                    }
-                    // Check detriment
-                    if (entry.down) {
-                        for (let downPlanet of entry.down) {
-                            let matchName = downPlanet;
-                            if (matchName === 'Северный узел') matchName = 'Северный узел';
-                            if (matchName === 'Южный узел') matchName = 'Южный узел';
-                            
-                            if (activeName === matchName) return "detriment";
-                            
-                            if (chartData) {
-                                const opposites = getOppositeGates(gate);
-                                for (let oppGate of opposites) {
-                                    if (isPlanetInGate(matchName, oppGate, chartData)) return "detriment";
-                                }
-                            }
-                        }
-                    }
+                        return false;
+                    };
+
+                    const isUp = entry.up && entry.up.some(p => isRulerActive(p));
+                    const isDown = entry.down && entry.down.some(p => isRulerActive(p));
+
+                    if (isUp && isDown) return "juxtaposition";
+                    if (isUp) return "exalted";
+                    if (isDown) return "detriment";
                 }
             }
             return "none";
@@ -6566,16 +6558,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!gate || !line || gate === '—') return '';
             const rulerKey = `${gate}.${line}`;
             const entry = (typeof RULERS_NIDANA !== 'undefined') ? RULERS_NIDANA[rulerKey] : null;
-            
-            const pLower = (planetName || '').toLowerCase().trim();
+            if (!entry) return '';
 
             const normalizeName = (name) => {
                 let s = (name || '').toLowerCase().trim();
-                if (s.includes('узел')) {
-                    if (s.includes('северн')) return 'северный узел';
-                    if (s.includes('южн')) return 'южный узел';
-                    return 'узел';
-                }
+                if (s.includes('северн') && s.includes('узел')) return 'северный узел';
+                if (s.includes('южн') && s.includes('узел')) return 'южный узел';
+                if (s.includes('узел')) return 'узел';
                 if (s.includes('солнце')) return 'солнце';
                 if (s.includes('земля')) return 'земля';
                 if (s.includes('луна')) return 'луна';
@@ -6593,50 +6582,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 return s;
             };
 
-            const normTarget = normalizeName(planetName);
-
             let isUp = false;
             let isDown = false;
 
-            if (entry) {
-                // 1. Direct activation check
-                const matchDirect = (rulerList) => (rulerList || []).some(r => normalizeName(r) === normTarget);
+            if (isFirstDial) {
+                // ── 1-й циферблат (Основной Рейв) ──
+                // Проверяем:
+                // 1 - какая планета активирует саму программу и линию gate.line.
+                // 2 - какая планета активирует такую же программу в другой линии (двойная активация ворот).
+                // 3 - какие планеты активируют все встречные программы в канале в любых линиях.
+                const gNum = Number(gate);
+                const connectedGates = [gNum];
 
-                isUp = matchDirect(entry.up);
-                isDown = matchDirect(entry.down);
-
-                // 2. Channel opposite gate check (ONLY for 1st dial!)
-                if (isFirstDial) {
-                    const gNum = Number(gate);
-                    const oppositeGates = [];
-                    if (typeof CHANNELS_DATA !== 'undefined') {
-                        CHANNELS_DATA.forEach(ch => {
-                            if (Number(ch.gateA) === gNum) oppositeGates.push(Number(ch.gateB));
-                            if (Number(ch.gateB) === gNum) oppositeGates.push(Number(ch.gateA));
-                        });
-                    }
-
-                    if (oppositeGates.length > 0) {
-                        const matchOpposite = (rulerList) => {
-                            if (!rulerList || rulerList.length === 0) return false;
-                            const checkPlanet = (p, activeSet) => {
-                                if (!p || !p.hexagram || !p.hexagram.gate) return false;
-                                if (activeSet && !activeSet.has(p.name)) return false;
-                                if (!oppositeGates.includes(Number(p.hexagram.gate))) return false;
-                                const pNorm = normalizeName(p.name);
-                                return rulerList.some(r => normalizeName(r) === pNorm);
-                            };
-
-                            const inPers = (personalityPlanets || []).some(p => checkPlanet(p, activeBgPers));
-                            if (inPers) return true;
-                            const inDes = (designPlanets || []).some(p => checkPlanet(p, activeBgDesign));
-                            return inDes;
-                        };
-
-                        if (!isUp) isUp = matchOpposite(entry.up);
-                        if (!isDown) isDown = matchOpposite(entry.down);
-                    }
+                if (typeof CHANNELS_DATA !== 'undefined') {
+                    CHANNELS_DATA.forEach(ch => {
+                        if (Number(ch.gateA) === gNum) connectedGates.push(Number(ch.gateB));
+                        if (Number(ch.gateB) === gNum) connectedGates.push(Number(ch.gateA));
+                    });
                 }
+
+                // Собираем нормализованные имена всех планет, активирующих эти ворота (свои или встречные в канале)
+                const activatingPlanetNorms = new Set();
+
+                const checkAndAdd = (p, activeSet) => {
+                    if (!p || !p.hexagram || p.hexagram.gate == null) return;
+                    // Канонические 13 планет всегда активны; дополнительные точки активны, если включены пользователем
+                    if (DEFAULT_INACTIVE_PLANETS.includes(p.name)) {
+                        if (!activeSet || !activeSet.has(p.name)) return;
+                    }
+                    if (connectedGates.includes(Number(p.hexagram.gate))) {
+                        activatingPlanetNorms.add(normalizeName(p.name));
+                        if (p.displayName) activatingPlanetNorms.add(normalizeName(p.displayName));
+                    }
+                };
+
+                (personalityPlanets || []).forEach(p => checkAndAdd(p, activeBgPers));
+                (designPlanets || []).forEach(p => checkAndAdd(p, activeBgDesign));
+
+                isUp = (entry.up || []).some(r => activatingPlanetNorms.has(normalizeName(r)));
+                isDown = (entry.down || []).some(r => activatingPlanetNorms.has(normalizeName(r)));
+            } else {
+                // ── 2-й циферблат (Зеркало Жизни) ──
+                // Треугольник ставится ТОЛЬКО по планете самой программы
+                const normTarget = normalizeName(planetName);
+                isUp = (entry.up || []).some(r => normalizeName(r) === normTarget);
+                isDown = (entry.down || []).some(r => normalizeName(r) === normTarget);
             }
 
             let sym = '';
@@ -6649,6 +6639,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sym = '▽'; title = 'Падение';
             } else {
                 const outerPlanets = ['сатурн', 'уран', 'нептун', 'плутон', 'юпитер'];
+                const pLower = (planetName || '').toLowerCase().trim();
                 if (outerPlanets.some(op => pLower.includes(op)) || isRetro) {
                     sym = '→'; title = 'Направление';
                 }
